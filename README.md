@@ -2,11 +2,22 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.2.0-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.2.2-lightgrey)
 
 ---
 
 ## Releases
+
+### v0.2.2 — GPU utilization, menu bar sparkline, Settings fix
+- **GPU utilization %** — live usage read from `IOAccelerator`; GPU card switches between chart, gauge, and info (GPU name + displays) views from the card menu
+- **Menu bar sparkline** — mini live chart in the menu bar showing the last 30 seconds of the selected metric; toggle between sparkline and plain text in Settings → Menu bar style
+- **Settings window** now opens in front correctly on menu bar-only apps
+
+### v0.2.1 — Disk card redesign, UI polish
+- **Disk card** replaced the unlabelled single sparkline with a labelled butterfly chart: read speed (indigo) grows upward, write speed (purple) grows downward, on a shared scale
+- **Disk gauge mode** — new ring view showing disk used %, with free / total GB alongside
+- **Chart styles simplified** — line and bar removed everywhere; only Area and Gauge remain
+- **Centered values** across all overview cards (CPU, Memory, Thermal, Battery, GPU, Disk)
 
 ### v0.2.0 — SMC temperatures, fan readings, network connection indicators
 - **Thermal card** on the main overview now shows CPU, GPU, and Battery temperatures simultaneously, each colour-coded
@@ -51,7 +62,8 @@ A lightweight macOS menu bar app that gives you real-time system metrics at a gl
 - Historical I/O chart
 
 ### GPU & Displays
-- GPU usage percentage
+- Live GPU utilization % via IOAccelerator (same source as Activity Monitor)
+- Switchable card view: chart sparkline, ring gauge, or display info
 - Connected display names with native pixel resolutions and Retina badge
 - Quick link to Display Arrangement settings
 
@@ -105,6 +117,11 @@ The build script compiles a release binary, assembles the `.app` bundle, embeds 
 No data is collected or transmitted. Everything runs locally.
 
 ---
+
+### Menu Bar
+- Configurable metric: CPU, Memory, Network, or Disk
+- Two display styles: **Sparkline** (mini live chart + current value) or **Text only**
+- Sparkline shows the last 30 seconds of history, updated every second
 
 ### Thermal & Fans
 - CPU, GPU, and Battery temperatures read from the SMC via IOKit
