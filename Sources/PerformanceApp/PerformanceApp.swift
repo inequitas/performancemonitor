@@ -17,7 +17,7 @@ struct PerformanceApp: App {
                 DetailWindow(kind: kind, engine: engine)
             }
         }
-        .defaultSize(width: 420, height: 540)
+        .defaultSize(width: detailWindowWidth, height: detailWindowHeight)
         .windowResizability(.contentSize)
 
         Settings {

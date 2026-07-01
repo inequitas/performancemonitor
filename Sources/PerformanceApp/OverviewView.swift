@@ -54,7 +54,7 @@ struct OverviewView: View {
                     percentValue: engine.diskTotalGB > 0 ? ((engine.diskTotalGB - engine.diskFreeGB) / engine.diskTotalGB) * 100 : 0,
                     style: $diskStyle,
                     allowGauge: true,
-                    valueFormatter: formatSpeed
+                    valueFormatter: formatSpeedCompact
                 ) { openDetail(.disk) }
 
                 ThermalCard(state: engine.thermalState) { openDetail(.cpu) }
@@ -107,11 +107,10 @@ struct OverviewView: View {
         NSApp.activate(ignoringOtherApps: true)
         openWindow(id: "detail", value: kind)
     }
+}
 
-    private func formatSpeed(_ kbps: Double) -> String {
-        if kbps > 1024 { return String(format: "%.1fMB/s", kbps / 1024) }
-        return String(format: "%.0fKB/s", kbps)
-    }
+private func formatSpeedCompact(_ kbps: Double) -> String {
+    kbps > 1024 ? String(format: "%.1fMB/s", kbps / 1024) : String(format: "%.0fKB/s", kbps)
 }
 
 // MARK: - Card chart style
@@ -119,14 +118,7 @@ struct OverviewView: View {
 enum CardChartStyle: String, CaseIterable, Identifiable {
     case line, area, bar, gauge
     var id: String { rawValue }
-    var label: String {
-        switch self {
-        case .line: return "Line"
-        case .area: return "Area"
-        case .bar: return "Bar"
-        case .gauge: return "Gauge"
-        }
-    }
+    var label: String { rawValue.capitalized }
     var systemImage: String {
         switch self {
         case .line: return "chart.xyaxis.line"
@@ -339,10 +331,6 @@ private struct NetworkOverviewCard: View {
     @ObservedObject var engine: MetricsEngine
     let action: () -> Void
 
-    private func formatSpeed(_ kbps: Double) -> String {
-        kbps > 1024 ? String(format: "%.1fMB/s", kbps / 1024) : String(format: "%.0fKB/s", kbps)
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Button(action: action) {
@@ -351,10 +339,10 @@ private struct NetworkOverviewCard: View {
                     Text("Network").font(.caption).foregroundStyle(.secondary)
                     Spacer()
                     HStack(spacing: 10) {
-                        Label(formatSpeed(engine.downloadSpeedKBps), systemImage: "arrow.down")
+                        Label(formatSpeedCompact(engine.downloadSpeedKBps), systemImage: "arrow.down")
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(MetricTheme.networkDown)
-                        Label(formatSpeed(engine.uploadSpeedKBps), systemImage: "arrow.up")
+                        Label(formatSpeedCompact(engine.uploadSpeedKBps), systemImage: "arrow.up")
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(MetricTheme.networkUp)
                     }
@@ -424,16 +412,15 @@ struct BluetoothOverviewCard: View {
                         Image(systemName: device.icon).font(.system(size: 12)).foregroundStyle(.blue).frame(width: 16)
                         Text(device.name).font(.caption).lineLimit(1)
                         Spacer()
-                        // Show L/R/Case for earbuds; single % for other devices
                         if device.batteryLeft != nil || device.batteryRight != nil {
                             HStack(spacing: 5) {
-                                if let l = device.batteryLeft  { earbudPill("L", l) }
-                                if let r = device.batteryRight { earbudPill("R", r) }
-                                if let c = device.batteryCase  { earbudPill("⬡", c) }
+                                if let l = device.batteryLeft  { EarbudBatteryPill("L", l) }
+                                if let r = device.batteryRight { EarbudBatteryPill("R", r) }
+                                if let c = device.batteryCase  { EarbudBatteryPill("⬡", c) }
                             }
                         } else if let pct = device.batteryPercent {
                             HStack(spacing: 3) {
-                                Image(systemName: batteryIcon(pct)).font(.caption2).foregroundStyle(pct < 20 ? .red : pct < 40 ? .orange : .green)
+                                Image(systemName: batterySystemImage(pct)).font(.caption2).foregroundStyle(pct < 20 ? .red : pct < 40 ? .orange : .green)
                                 Text("\(pct)%").font(.caption.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
                             }
                         }
@@ -447,22 +434,6 @@ struct BluetoothOverviewCard: View {
         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.blue.opacity(0.15), lineWidth: 1))
     }
 
-    private func batteryIcon(_ pct: Int) -> String {
-        switch pct {
-        case 0..<20: return "battery.0percent"
-        case 20..<40: return "battery.25percent"
-        case 40..<65: return "battery.50percent"
-        case 65..<90: return "battery.75percent"
-        default: return "battery.100percent"
-        }
-    }
-
-    private func earbudPill(_ label: String, _ pct: Int) -> some View {
-        HStack(spacing: 2) {
-            Text(label).font(.caption2).foregroundStyle(.tertiary)
-            Text("\(pct)%").font(.caption2.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
-        }
-    }
 }
 
 // MARK: - Shared icon helper

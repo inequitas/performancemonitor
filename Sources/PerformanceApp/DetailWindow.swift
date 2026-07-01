@@ -35,12 +35,49 @@ struct DetailWindow: View {
                 }
             }
             .padding()
-            .frame(width: 420, alignment: .leading)
+            .frame(width: detailWindowWidth, alignment: .leading)
         }
-        .frame(width: 420, height: 540)
+        .frame(width: detailWindowWidth, height: detailWindowHeight)
         .navigationTitle(kind.title)
         .background(.regularMaterial)
         .background(WindowFloatAccessor())
+    }
+}
+
+let detailWindowWidth: CGFloat = 420
+let detailWindowHeight: CGFloat = 540
+
+func formatSpeed(_ kbps: Double) -> String {
+    kbps > 1024 ? String(format: "%.2f MB/s", kbps / 1024) : String(format: "%.1f KB/s", kbps)
+}
+
+func batterySystemImage(_ pct: Int) -> String {
+    switch pct {
+    case 76...: return "battery.100percent"
+    case 51...: return "battery.75percent"
+    case 26...: return "battery.50percent"
+    case 11...: return "battery.25percent"
+    default:    return "battery.0percent"
+    }
+}
+
+func detailRow(_ label: String, _ value: String) -> some View {
+    HStack {
+        Text(label).font(.caption).foregroundStyle(.secondary)
+        Spacer()
+        Text(value).font(.caption.monospacedDigit())
+    }
+}
+
+struct EarbudBatteryPill: View {
+    let label: String
+    let pct: Int
+    init(_ label: String, _ pct: Int) { self.label = label; self.pct = pct }
+    var body: some View {
+        HStack(spacing: 2) {
+            Text(label).font(.caption2).foregroundStyle(.tertiary)
+            Text("\(pct)%").font(.caption2.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
+        }
     }
 }
 
@@ -160,17 +197,15 @@ private struct ProcessListView: View {
                 }
             }
         }
-        .alert("Quit \(pendingKill?.name ?? "")?", isPresented: Binding(
-            get: { pendingKill != nil },
-            set: { if !$0 { pendingKill = nil } }
-        )) {
-            Button("Cancel", role: .cancel) { pendingKill = nil }
-            Button("Quit", role: .destructive) {
-                if let proc = pendingKill { engine.terminateProcess(pid: proc.pid) }
-                pendingKill = nil
-            }
-        } message: {
-            Text("This sends a quit signal to the process (PID \(pendingKill?.pid ?? 0)). Unsaved work may be lost.")
+        .alert(
+            "Quit \(pendingKill?.name ?? "process")?",
+            isPresented: Binding(get: { pendingKill != nil }, set: { _ in pendingKill = nil }),
+            presenting: pendingKill
+        ) { proc in
+            Button("Cancel", role: .cancel) { }
+            Button("Quit", role: .destructive) { engine.terminateProcess(pid: proc.pid) }
+        } message: { proc in
+            Text("This sends a quit signal to the process (PID \(proc.pid)). Unsaved work may be lost.")
         }
     }
 }
@@ -423,10 +458,6 @@ struct NetworkDetailView: View {
             Spacer()
         }
     }
-
-    private func formatSpeed(_ kbps: Double) -> String {
-        kbps > 1024 ? String(format: "%.2f MB/s", kbps / 1024) : String(format: "%.1f KB/s", kbps)
-    }
 }
 
 // MARK: - Disk
@@ -477,10 +508,6 @@ struct DiskDetailView: View {
             Spacer()
         }
     }
-
-    private func formatSpeed(_ kbps: Double) -> String {
-        kbps > 1024 ? String(format: "%.2f MB/s", kbps / 1024) : String(format: "%.1f KB/s", kbps)
-    }
 }
 
 // MARK: - GPU & Displays
@@ -503,9 +530,9 @@ struct GPUDetailView: View {
                     Text(engine.gpuName)
                         .font(.system(size: 18, weight: .bold, design: .rounded))
                         .foregroundStyle(.cyan)
-                    row("Location", engine.gpuLocation)
-                    row("Max working set", String(format: "%.1f GB", engine.gpuRecommendedMemoryGB))
-                    row("Power mode", engine.gpuIsLowPower ? "Low power" : "High performance")
+                    detailRow("Location", engine.gpuLocation)
+                    detailRow("Max working set", String(format: "%.1f GB", engine.gpuRecommendedMemoryGB))
+                    detailRow("Power mode", engine.gpuIsLowPower ? "Low power" : "High performance")
                 }
             }
 
@@ -552,13 +579,6 @@ struct GPUDetailView: View {
         }
     }
 
-    private func row(_ label: String, _ value: String) -> some View {
-        HStack {
-            Text(label).font(.caption).foregroundStyle(.secondary)
-            Spacer()
-            Text(value).font(.caption.monospacedDigit())
-        }
-    }
 }
 
 // MARK: - Battery
@@ -596,27 +616,11 @@ struct BatteryDetailView: View {
                         InfoButton(text: "Capacity %: NominalChargeCapacity ÷ DesignCapacity × 100. This shows how much of the original battery capacity remains.\n\nCycle count: Each full charge/discharge cycle counts as one. Apple considers batteries at peak performance for 1000 cycles (MacBook Pro/Air M-series). After that, capacity may be below 80%.\n\nCondition 'Normal' means the battery is performing within expected parameters. 'Service Recommended' means capacity has dropped significantly and Apple recommends a replacement.")
                     }
                     if let health = engine.batteryHealthPercent {
-                        HStack {
-                            Text("Capacity vs. design").font(.caption).foregroundStyle(.secondary)
-                            Spacer()
-                            Text(String(format: "%.0f%%", health)).font(.caption.monospacedDigit())
-                        }
+                        detailRow("Capacity vs. design", String(format: "%.0f%%", health))
                     }
-                    HStack {
-                        Text("Condition").font(.caption).foregroundStyle(.secondary)
-                        Spacer()
-                        Text(engine.batteryCondition).font(.caption.monospacedDigit())
-                    }
+                    detailRow("Condition", engine.batteryCondition)
                     if let cycles = engine.batteryCycleCount {
-                        HStack {
-                            Text("Cycle count").font(.caption).foregroundStyle(.secondary)
-                            Spacer()
-                            if let design = engine.batteryDesignCycleCount {
-                                Text("\(cycles) / \(design)").font(.caption.monospacedDigit())
-                            } else {
-                                Text("\(cycles)").font(.caption.monospacedDigit())
-                            }
-                        }
+                        detailRow("Cycle count", engine.batteryDesignCycleCount.map { "\(cycles) / \($0)" } ?? "\(cycles)")
                     }
                 }
             }
@@ -629,25 +633,13 @@ struct BatteryDetailView: View {
                         InfoButton(text: "Temperature: Read from AppleSmartBattery IORegistry — no special privileges needed. This is the battery cell temperature, not the CPU temperature.\n\nVoltage: Current battery terminal voltage in volts.\n\nCurrent: Positive = charging (current flowing in). Negative = discharging (current flowing out). Values are in milliamps (mA).\n\nAll values come from the AppleSmartBattery driver which is always accessible without entitlements.")
                     }
                     if let temp = engine.batteryTemperatureC {
-                        HStack {
-                            Text("Temperature").font(.caption).foregroundStyle(.secondary)
-                            Spacer()
-                            Text(String(format: "%.1f°C", temp)).font(.caption.monospacedDigit())
-                        }
+                        detailRow("Temperature", String(format: "%.1f°C", temp))
                     }
                     if let voltage = engine.batteryVoltage {
-                        HStack {
-                            Text("Voltage").font(.caption).foregroundStyle(.secondary)
-                            Spacer()
-                            Text(String(format: "%.2f V", voltage)).font(.caption.monospacedDigit())
-                        }
+                        detailRow("Voltage", String(format: "%.2f V", voltage))
                     }
                     if let amperage = engine.batteryAmperage {
-                        HStack {
-                            Text("Current").font(.caption).foregroundStyle(.secondary)
-                            Spacer()
-                            Text("\(amperage) mA").font(.caption.monospacedDigit())
-                        }
+                        detailRow("Current", "\(amperage) mA")
                     }
                 }
             }
@@ -673,17 +665,18 @@ struct BluetoothDetailView: View {
 
             if engine.bluetoothAuthState != .allowedAlways {
                 SectionCard {
+                    let isDenied = engine.bluetoothAuthState == .denied || engine.bluetoothAuthState == .restricted
                     VStack(spacing: 12) {
                         Image(systemName: "hand.raised.fill")
                             .font(.largeTitle).foregroundStyle(.blue)
                         Text("Bluetooth Access Required")
                             .font(.subheadline.weight(.semibold))
-                        Text(engine.bluetoothAuthState == .denied || engine.bluetoothAuthState == .restricted
+                        Text(isDenied
                              ? "Access was denied. Go to System Settings → Privacy & Security → Bluetooth to enable it."
                              : "Allow Performance Monitor to read your paired Bluetooth devices.")
                             .font(.caption).foregroundStyle(.secondary)
                             .multilineTextAlignment(.center)
-                        if engine.bluetoothAuthState == .denied || engine.bluetoothAuthState == .restricted {
+                        if isDenied {
                             Button("Open Privacy Settings") {
                                 NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Bluetooth")!)
                             }
@@ -739,12 +732,11 @@ struct BluetoothDeviceRow: View {
                 .frame(width: 18)
             VStack(alignment: .leading, spacing: 2) {
                 Text(device.name).font(.caption).lineLimit(1)
-                // Show L/R/Case breakdown for earbuds
                 if device.batteryLeft != nil || device.batteryRight != nil || device.batteryCase != nil {
                     HStack(spacing: 6) {
-                        if let l = device.batteryLeft  { batteryLabel("L", l) }
-                        if let r = device.batteryRight { batteryLabel("R", r) }
-                        if let c = device.batteryCase  { batteryLabel("Case", c) }
+                        if let l = device.batteryLeft  { EarbudBatteryPill("L", l) }
+                        if let r = device.batteryRight { EarbudBatteryPill("R", r) }
+                        if let c = device.batteryCase  { EarbudBatteryPill("Case", c) }
                     }
                 }
             }
@@ -762,22 +754,6 @@ struct BluetoothDeviceRow: View {
         }
     }
 
-    private func batteryLabel(_ label: String, _ pct: Int) -> some View {
-        HStack(spacing: 2) {
-            Text(label).font(.caption2).foregroundStyle(.tertiary)
-            Text("\(pct)%").font(.caption2.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
-        }
-    }
-
-    private func batterySystemImage(_ pct: Int) -> String {
-        switch pct {
-        case 76...: return "battery.100percent"
-        case 51...: return "battery.75percent"
-        case 26...: return "battery.50percent"
-        case 11...: return "battery.25percent"
-        default:    return "battery.0percent"
-        }
-    }
 }
 
 // MARK: - Shared helpers
@@ -869,7 +845,7 @@ private struct WindowFloatAccessor: NSViewRepresentable {
             // Force every detail window to exactly the same content size.
             // SwiftUI's frame/defaultSize hints are unreliable when windows have
             // been resized or when content height differs between tabs.
-            window.setContentSize(NSSize(width: 420, height: 540))
+            window.setContentSize(NSSize(width: detailWindowWidth, height: detailWindowHeight))
             window.styleMask.remove(.resizable)
         }
         return view

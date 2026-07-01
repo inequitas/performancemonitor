@@ -22,7 +22,7 @@ struct SettingsView: View {
                     SettingsRow(label: "Menu bar shows") {
                         Picker("", selection: $engine.menuBarMetric) {
                             ForEach(MetricsEngine.MenuBarMetric.allCases) { m in
-                                Text(m.label).tag(m)
+                                Text(m.rawValue).tag(m)
                             }
                         }
                         .labelsHidden()
@@ -46,27 +46,9 @@ struct SettingsView: View {
 
                 SettingsSection(icon: "list.number", title: "Processes", color: .blue) {
                     SettingsRow(label: "Top processes shown") {
-                        HStack(spacing: 12) {
-                            Button {
-                                if engine.topProcessCount > 3 { engine.topProcessCount -= 1 }
-                            } label: {
-                                Image(systemName: "minus.circle.fill")
-                                    .font(.title3)
-                                    .foregroundStyle(engine.topProcessCount > 3 ? Color.secondary : Color.secondary.opacity(0.3))
-                            }
-                            .buttonStyle(.plain)
+                        Stepper(value: $engine.topProcessCount, in: 3...15) {
                             Text("\(engine.topProcessCount)")
                                 .font(.system(.body, design: .rounded).weight(.semibold))
-                                .frame(width: 24)
-                                .multilineTextAlignment(.center)
-                            Button {
-                                if engine.topProcessCount < 15 { engine.topProcessCount += 1 }
-                            } label: {
-                                Image(systemName: "plus.circle.fill")
-                                    .font(.title3)
-                                    .foregroundStyle(engine.topProcessCount < 15 ? Color.blue : Color.secondary.opacity(0.3))
-                            }
-                            .buttonStyle(.plain)
                         }
                     }
                 }

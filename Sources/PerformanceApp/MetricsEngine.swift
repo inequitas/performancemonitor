@@ -94,6 +94,9 @@ final class MetricsEngine: ObservableObject {
     private var btBatteryCacheDate: Date = .distantPast
     private var bleBatteryByName: [String: Int] = [:]
     private var bleBatteryReader: BLEBatteryReader?
+    private var wifiCacheDate: Date = .distantPast
+    private var batteryHealthCacheDate: Date = .distantPast
+    private var btDevicesCacheDate: Date = .distantPast
     @Published var performanceCoreCount: Int = 0
     @Published var efficiencyCoreCount: Int = 0
 
@@ -123,16 +126,11 @@ final class MetricsEngine: ObservableObject {
     private var historyFileHandle: FileHandle?
 
     enum MenuBarMetric: String, CaseIterable, Identifiable {
-        case cpu, memory, network, disk
+        case cpu = "CPU"
+        case memory = "Memory"
+        case network = "Network"
+        case disk = "Disk"
         var id: String { rawValue }
-        var label: String {
-            switch self {
-            case .cpu: return "CPU"
-            case .memory: return "Memory"
-            case .network: return "Network"
-            case .disk: return "Disk"
-            }
-        }
     }
 
     @Published var menuBarMetric: MenuBarMetric = .cpu
@@ -142,6 +140,10 @@ final class MetricsEngine: ObservableObject {
     }
 
     private let historyLimit = 300 // ~5 min at 1s interval
+    private func appendCapped(_ value: Double, to array: inout [Double]) {
+        array.append(value)
+        if array.count > historyLimit { array.removeFirst() }
+    }
     private var timer: Timer?
     private var previousCPUTicks: [(user: UInt32, system: UInt32, idle: UInt32, nice: UInt32)] = []
     private var previousNetBytes: (received: UInt64, sent: UInt64)?
@@ -173,8 +175,22 @@ final class MetricsEngine: ObservableObject {
                 self?.thermalState = ProcessInfo.processInfo.thermalState
             }
         }
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.didChangeScreenParametersNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in Task { @MainActor in self?.updateDisplays() } }
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didMountNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in Task { @MainActor in self?.updateVolumes() } }
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didUnmountNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in Task { @MainActor in self?.updateVolumes() } }
         updateGPUInfo()
         readCoreClusterCounts()
+        updateDisplays()
+        updateVolumes()
         startPathMonitor()
         startPingTimer()
         if publicIPEnabled { fetchPublicIP() }
@@ -220,17 +236,10 @@ final class MetricsEngine: ObservableObject {
             Task { @MainActor in
                 guard let self else { return }
                 self.isConnected = path.status == .satisfied
-                if path.usesInterfaceType(.wifi) {
-                    self.connectionType = "Wi-Fi"
-                } else if path.usesInterfaceType(.wiredEthernet) {
-                    self.connectionType = "Ethernet"
-                } else if path.usesInterfaceType(.cellular) {
-                    self.connectionType = "Cellular"
-                } else if path.status == .satisfied {
-                    self.connectionType = "Other"
-                } else {
-                    self.connectionType = "Offline"
-                }
+                self.connectionType = path.usesInterfaceType(.wifi) ? "Wi-Fi"
+                    : path.usesInterfaceType(.wiredEthernet) ? "Ethernet"
+                    : path.usesInterfaceType(.cellular) ? "Cellular"
+                    : path.status == .satisfied ? "Other" : "Offline"
             }
         }
         monitor.start(queue: DispatchQueue(label: "NetworkPathMonitor"))
@@ -261,30 +270,14 @@ final class MetricsEngine: ObservableObject {
         updateProcesses()
         updateNetworkProcesses()
         updateBattery()
-        updateDisplays()
         updateWiFiSignal()
         updateBluetooth()
         checkAlerts()
         appendPersistedHistoryRow()
 
-        if publicIPEnabled {
-            if lastPublicIPFetch == nil || Date().timeIntervalSince(lastPublicIPFetch!) > 300 {
-                fetchPublicIP()
-            }
+        if publicIPEnabled, lastPublicIPFetch.map({ Date().timeIntervalSince($0) > 300 }) ?? true {
+            fetchPublicIP()
         }
-
-        cpuHistory.append(cpuUsagePercent)
-        if cpuHistory.count > historyLimit { cpuHistory.removeFirst() }
-        memoryHistory.append(memoryUsedGB)
-        if memoryHistory.count > historyLimit { memoryHistory.removeFirst() }
-        downloadHistory.append(downloadSpeedKBps)
-        if downloadHistory.count > historyLimit { downloadHistory.removeFirst() }
-        uploadHistory.append(uploadSpeedKBps)
-        if uploadHistory.count > historyLimit { uploadHistory.removeFirst() }
-        diskReadHistory.append(diskReadKBps)
-        if diskReadHistory.count > historyLimit { diskReadHistory.removeFirst() }
-        diskWriteHistory.append(diskWriteKBps)
-        if diskWriteHistory.count > historyLimit { diskWriteHistory.removeFirst() }
     }
 
     // MARK: - CPU
@@ -352,6 +345,7 @@ final class MetricsEngine: ObservableObject {
         if getloadavg(&loadavg, 3) == 3 {
             loadAverages = (loadavg[0], loadavg[1], loadavg[2])
         }
+        appendCapped(cpuUsagePercent, to: &cpuHistory)
     }
 
     // MARK: - Memory
@@ -381,6 +375,7 @@ final class MetricsEngine: ObservableObject {
         if sysctlbyname("vm.swapusage", &swapUsage, &size, nil, 0) == 0 {
             swapUsedGB = Double(swapUsage.xsu_used) / 1_073_741_824
         }
+        appendCapped(memoryUsedGB, to: &memoryHistory)
     }
 
     // MARK: - Network
@@ -436,6 +431,8 @@ final class MetricsEngine: ObservableObject {
 
         previousNetBytes = (totalReceived, totalSent)
         previousNetTimestamp = now
+        appendCapped(downloadSpeedKBps, to: &downloadHistory)
+        appendCapped(uploadSpeedKBps, to: &uploadHistory)
     }
 
     // MARK: - Disk
@@ -447,8 +444,6 @@ final class MetricsEngine: ObservableObject {
             diskTotalGB = Double(fsStat.f_blocks) * blockSize / 1_073_741_824
             diskFreeGB = Double(fsStat.f_bavail) * blockSize / 1_073_741_824
         }
-
-        updateVolumes()
 
         var (totalRead, totalWrite): (UInt64, UInt64) = (0, 0)
         var iterator: io_iterator_t = 0
@@ -487,6 +482,8 @@ final class MetricsEngine: ObservableObject {
         }
         previousDiskBytes = (totalRead, totalWrite)
         previousDiskTimestamp = now
+        appendCapped(diskReadKBps, to: &diskReadHistory)
+        appendCapped(diskWriteKBps, to: &diskWriteHistory)
     }
 
     private func updateVolumes() {
@@ -541,7 +538,7 @@ final class MetricsEngine: ObservableObject {
                       let rawCPU = Double(parts[parts.count - 2]),
                       let mem = Double(parts[parts.count - 1]) else { continue }
                 let name = parts[1..<(parts.count - 2)].joined(separator: " ")
-                let cpu = (rawCPU / logicalCPUs).rounded(toPlaces: 1)
+                let cpu = (rawCPU / logicalCPUs * 10).rounded() / 10
                 cpuList.append(ProcessUsage(pid: pid, name: name, value: cpu))
                 memList.append(ProcessUsage(pid: pid, name: name, value: mem))
             }
@@ -727,7 +724,10 @@ final class MetricsEngine: ObservableObject {
             batteryTimeRemainingMinutes = nil
         }
 
-        updateBatteryHealth()
+        if Date().timeIntervalSince(batteryHealthCacheDate) > 60 {
+            batteryHealthCacheDate = Date()
+            updateBatteryHealth()
+        }
     }
 
     // MARK: - Public IP (opt-in, calls a third-party service)
@@ -815,6 +815,8 @@ final class MetricsEngine: ObservableObject {
 
     private func readBluetoothDevices() {
         refreshBTBatteryCache()
+        guard Date().timeIntervalSince(btDevicesCacheDate) > 5 else { return }
+        btDevicesCacheDate = Date()
         guard let paired = IOBluetoothDevice.pairedDevices() as? [IOBluetoothDevice] else { return }
         bluetoothDevices = paired.map { device in
             let cod = device.classOfDevice
@@ -830,16 +832,7 @@ final class MetricsEngine: ObservableObject {
             let addr = (device.addressString ?? "").lowercased().replacingOccurrences(of: "-", with: ":")
             let name = device.nameOrAddress ?? "Unknown"
             let info = btBatteryCache[addr]
-            // For earbuds, primary battery = min(L, R) so it reflects the one that'll die first
-            let earbud: Int? = info.flatMap { i in
-                switch (i.left, i.right) {
-                case let (l?, r?): return min(l, r)
-                case let (l?, nil): return l
-                case let (nil, r?): return r
-                default: return nil
-                }
-            }
-            // Fallback to BLE GATT reading for devices not in system_profiler cache
+            let earbud: Int? = info.flatMap { i in [i.left, i.right].compactMap { $0 }.min() }
             let primary: Int? = info?.main ?? earbud ?? bleBatteryByName[name]
             return BluetoothDevice(
                 id: device.addressString ?? UUID().uuidString,
@@ -848,7 +841,7 @@ final class MetricsEngine: ObservableObject {
                 batteryPercent: primary,
                 batteryLeft: info?.left,
                 batteryRight: info?.right,
-                batteryCase: info?.case_,
+                batteryCase: info?.caseLevel,
                 icon: icon
             )
         }
@@ -858,7 +851,7 @@ final class MetricsEngine: ObservableObject {
         var main: Int?
         var left: Int?
         var right: Int?
-        var case_: Int?
+        var caseLevel: Int?
     }
 
     private func refreshBTBatteryCache() {
@@ -899,10 +892,10 @@ final class MetricsEngine: ObservableObject {
                                   let addr = info["device_address"] as? String else { continue }
                             let norm = addr.lowercased().replacingOccurrences(of: "-", with: ":")
                             cache[norm] = BtBatteryInfo(
-                                main:  parsePct(info, "device_batteryLevel"),
-                                left:  parsePct(info, "device_batteryLevelLeft"),
-                                right: parsePct(info, "device_batteryLevelRight"),
-                                case_: parsePct(info, "device_batteryLevelCase")
+                                main:      parsePct(info, "device_batteryLevel"),
+                                left:      parsePct(info, "device_batteryLevelLeft"),
+                                right:     parsePct(info, "device_batteryLevelRight"),
+                                caseLevel: parsePct(info, "device_batteryLevelCase")
                             )
                         }
                     }
@@ -931,8 +924,11 @@ final class MetricsEngine: ObservableObject {
         guard connectionType == "Wi-Fi" else {
             wifiSSID = nil
             wifiRSSI = nil
+            wifiCacheDate = .distantPast
             return
         }
+        guard Date().timeIntervalSince(wifiCacheDate) > 3 else { return }
+        wifiCacheDate = Date()
         let iface = CWWiFiClient.shared().interface()
         wifiSSID = iface?.ssid()
         if let rssi = iface?.rssiValue(), rssi != 0 {
@@ -989,10 +985,6 @@ struct LocalInterface: Identifiable {
 }
 
 private extension Double {
-    func rounded(toPlaces places: Int) -> Double {
-        let factor = pow(10.0, Double(places))
-        return (self * factor).rounded() / factor
-    }
     func clamped(to range: ClosedRange<Double>) -> Double {
         Swift.min(Swift.max(self, range.lowerBound), range.upperBound)
     }

@@ -4,13 +4,7 @@ import Charts
 enum ChartDisplayStyle: String, CaseIterable, Identifiable {
     case line, area, bar
     var id: String { rawValue }
-    var label: String {
-        switch self {
-        case .line: return "Line"
-        case .area: return "Area"
-        case .bar: return "Bar"
-        }
-    }
+    var label: String { rawValue.capitalized }
     var systemImage: String {
         switch self {
         case .line: return "chart.xyaxis.line"
