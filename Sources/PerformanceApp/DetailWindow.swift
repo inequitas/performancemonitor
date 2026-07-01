@@ -668,7 +668,7 @@ struct BluetoothDetailView: View {
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(.blue)
                 Spacer()
-                InfoButton(text: "Paired devices are read from the IOBluetooth framework — all devices you have ever paired, whether connected or not.\n\nBattery percentage is read from the IOHIDDevice registry for devices that expose it (Apple peripherals: AirPods, Magic Mouse, Magic Keyboard, etc.). Third-party peripherals may not expose battery data.\n\nDisconnect (✕) sends a close-connection request to the device over Bluetooth. The device remains paired and can reconnect.")
+                InfoButton(text: "Paired devices are read from the IOBluetooth framework — all devices you have ever paired, whether connected or not.\n\nBattery percentage is read from the IOHIDDevice registry for devices that expose it (Apple peripherals: AirPods, Magic Mouse, Magic Keyboard, etc.). Third-party peripherals may not expose battery data.")
             }
 
             if engine.bluetoothAuthState != .allowedAlways {
@@ -709,14 +709,14 @@ struct BluetoothDetailView: View {
                             if !connected.isEmpty {
                                 Text("Connected").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                                 ForEach(connected) { device in
-                                    BluetoothDeviceRow(device: device) { engine.disconnectBluetooth(id: device.id) }
+                                    BluetoothDeviceRow(device: device)
                                 }
                             }
                             if !disconnected.isEmpty {
                                 if !connected.isEmpty { Divider() }
                                 Text("Not connected").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                                 ForEach(disconnected) { device in
-                                    BluetoothDeviceRow(device: device, onDisconnect: nil)
+                                    BluetoothDeviceRow(device: device)
                                 }
                             }
                         }
@@ -730,7 +730,6 @@ struct BluetoothDetailView: View {
 
 struct BluetoothDeviceRow: View {
     let device: BluetoothDevice
-    let onDisconnect: (() -> Void)?
 
     var body: some View {
         HStack(spacing: 8) {
@@ -747,14 +746,7 @@ struct BluetoothDeviceRow: View {
                 }
                 .foregroundStyle(pct < 20 ? .red : .secondary)
             }
-            if device.isConnected, let onDisconnect {
-                Button(action: onDisconnect) {
-                    Image(systemName: "xmark.circle")
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
-                .help("Disconnect \(device.name)")
-            } else {
+            if !device.isConnected {
                 Circle().fill(Color.secondary.opacity(0.3)).frame(width: 7, height: 7)
             }
         }

@@ -526,14 +526,18 @@ final class MetricsEngine: ObservableObject {
 
             var cpuList: [ProcessUsage] = []
             var memList: [ProcessUsage] = []
+            // ps %cpu is per-core: a process using 2 cores fully shows 200%.
+            // Divide by logical CPU count to express as % of total system capacity.
+            let logicalCPUs = Double(ProcessInfo.processInfo.processorCount).clamped(to: 1...256)
 
             for line in lines {
                 let parts = line.split(separator: " ", omittingEmptySubsequences: true)
                 guard parts.count >= 4,
                       let pid = Int32(parts[0]),
-                      let cpu = Double(parts[parts.count - 2]),
+                      let rawCPU = Double(parts[parts.count - 2]),
                       let mem = Double(parts[parts.count - 1]) else { continue }
                 let name = parts[1..<(parts.count - 2)].joined(separator: " ")
+                let cpu = (rawCPU / logicalCPUs).rounded(toPlaces: 1)
                 cpuList.append(ProcessUsage(pid: pid, name: name, value: cpu))
                 memList.append(ProcessUsage(pid: pid, name: name, value: mem))
             }
@@ -621,45 +625,7 @@ final class MetricsEngine: ObservableObject {
         kill(pid, SIGTERM)
     }
 
-    func disconnectBluetooth(id: String) {
-        let targetName = bluetoothDevices.first(where: { $0.id == id })?.name
 
-        // Path 1: Classic Bluetooth via IOBluetooth
-        IOBluetoothDevice(addressString: id)?.closeConnection()
-
-        // Path 2: BLE via CoreBluetooth — CBPeripheral has no MAC address on macOS
-        // so we match the connected peripheral by display name.
-        if let central = btAuthManager, let name = targetName {
-            // Service UUIDs covering common Apple peripherals + generic profiles
-            let serviceUUIDs = [
-                CBUUID(string: "1800"),   // Generic Access
-                CBUUID(string: "180A"),   // Device Information
-                CBUUID(string: "180F"),   // Battery
-                CBUUID(string: "FE03"),   // AirPods audio
-                CBUUID(string: "FD44"),   // Beats/AirPods
-            ]
-            for uuid in serviceUUIDs {
-                for peripheral in central.retrieveConnectedPeripherals(withServices: [uuid]) {
-                    if peripheral.name == name {
-                        central.cancelPeripheralConnection(peripheral)
-                    }
-                }
-            }
-        }
-
-        // Optimistic UI update so the row disappears immediately
-        bluetoothDevices = bluetoothDevices.map { d in
-            guard d.id == id else { return d }
-            return BluetoothDevice(id: d.id, name: d.name, isConnected: false,
-                                   batteryPercent: d.batteryPercent, icon: d.icon)
-        }
-
-        // Verify actual state after the OS has processed the disconnect
-        Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .milliseconds(1500))
-            self?.readBluetoothDevices()
-        }
-    }
 
     // MARK: - Alerts
 
@@ -831,6 +797,10 @@ final class MetricsEngine: ObservableObject {
         bluetoothAuthState = auth
         switch auth {
         case .allowedAlways:
+            // Ensure CBCentralManager exists — needed for BLE disconnect.
+            // If already authorised at launch, requestBluetoothAccess() is never
+            // called by the notDetermined path, leaving btAuthManager nil.
+            if btAuthManager == nil { requestBluetoothAccess() }
             readBluetoothDevices()
         case .notDetermined:
             requestBluetoothAccess()
@@ -959,6 +929,16 @@ struct LocalInterface: Identifiable {
     let name: String
     let address: String
     var id: String { name }
+}
+
+private extension Double {
+    func rounded(toPlaces places: Int) -> Double {
+        let factor = pow(10.0, Double(places))
+        return (self * factor).rounded() / factor
+    }
+    func clamped(to range: ClosedRange<Double>) -> Double {
+        Swift.min(Swift.max(self, range.lowerBound), range.upperBound)
+    }
 }
 
 struct ProcessUsage: Identifiable {

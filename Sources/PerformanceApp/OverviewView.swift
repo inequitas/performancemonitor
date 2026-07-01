@@ -79,8 +79,7 @@ struct OverviewView: View {
             // Bluetooth — full-width with connected device rows
             BluetoothOverviewCard(
                 devices: engine.bluetoothDevices,
-                action: { openDetail(.bluetooth) },
-                onDisconnect: { engine.disconnectBluetooth(id: $0) }
+                action: { openDetail(.bluetooth) }
             )
             .padding(.horizontal, 14)
 
@@ -145,6 +144,9 @@ enum CardChartStyle: String, CaseIterable, Identifiable {
         }
     }
 }
+
+// Fixed height shared by every grid card so all rows look uniform.
+private let cardHeight: CGFloat = 120
 
 // MARK: - Generic overview card
 
@@ -211,7 +213,7 @@ private struct OverviewCard: View {
             .buttonStyle(.plain)
         }
         .padding(10)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(color.opacity(0.15), lineWidth: 1))
     }
@@ -237,7 +239,7 @@ private struct ThermalCard: View {
                 .frame(height: 46, alignment: .center)
             }
             .padding(10)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
             .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(state.color.opacity(0.15), lineWidth: 1))
         }
@@ -278,7 +280,7 @@ private struct BatteryCard: View {
                 Text(timeText).font(.caption2).foregroundStyle(.secondary).frame(height: 46 - 16, alignment: .top)
             }
             .padding(10)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
             .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(color.opacity(0.15), lineWidth: 1))
         }
@@ -323,7 +325,7 @@ private struct GPUCard: View {
                 }
             }
             .padding(10)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
             .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.cyan.opacity(0.15), lineWidth: 1))
         }
@@ -398,7 +400,6 @@ private struct NetworkOverviewCard: View {
 struct BluetoothOverviewCard: View {
     let devices: [BluetoothDevice]
     let action: () -> Void
-    let onDisconnect: (String) -> Void
 
     private var connected: [BluetoothDevice] { devices.filter { $0.isConnected } }
 
@@ -415,10 +416,7 @@ struct BluetoothOverviewCard: View {
             }
             .buttonStyle(.plain)
 
-            if devices.isEmpty && connected.isEmpty {
-                // Show either auth prompt or genuinely-empty state
-                Text("No devices connected").font(.caption).foregroundStyle(.secondary)
-            } else if connected.isEmpty {
+            if connected.isEmpty {
                 Text("No devices connected").font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(connected) { device in
@@ -432,11 +430,6 @@ struct BluetoothOverviewCard: View {
                                 Text("\(pct)%").font(.caption.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
                             }
                         }
-                        Button { onDisconnect(device.id) } label: {
-                            Image(systemName: "xmark.circle").font(.caption).foregroundStyle(.secondary)
-                        }
-                        .buttonStyle(.plain)
-                        .help("Disconnect \(device.name)")
                     }
                 }
             }
