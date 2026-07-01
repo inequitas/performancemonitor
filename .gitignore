@@ -1,0 +1,15 @@
+# Swift build artifacts
+.build/
+*.o
+*.d
+
+# Packaged app (built output — not source)
+dist/
+
+# Xcode / macOS noise
+.DS_Store
+*.xcuserstate
+xcuserdata/
+
+# Claude Code session data
+.claude/
