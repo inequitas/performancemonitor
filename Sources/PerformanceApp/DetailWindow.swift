@@ -737,11 +737,21 @@ struct BluetoothDeviceRow: View {
                 .font(.system(size: 13))
                 .foregroundStyle(device.isConnected ? .blue : .secondary)
                 .frame(width: 18)
-            Text(device.name).font(.caption).lineLimit(1)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(device.name).font(.caption).lineLimit(1)
+                // Show L/R/Case breakdown for earbuds
+                if device.batteryLeft != nil || device.batteryRight != nil || device.batteryCase != nil {
+                    HStack(spacing: 6) {
+                        if let l = device.batteryLeft  { batteryLabel("L", l) }
+                        if let r = device.batteryRight { batteryLabel("R", r) }
+                        if let c = device.batteryCase  { batteryLabel("Case", c) }
+                    }
+                }
+            }
             Spacer()
-            if let pct = device.batteryPercent {
+            if let pct = device.batteryPercent, device.batteryLeft == nil && device.batteryRight == nil {
                 HStack(spacing: 3) {
-                    Image(systemName: "battery.75percent").font(.caption2)
+                    Image(systemName: batterySystemImage(pct)).font(.caption2)
                     Text("\(pct)%").font(.caption.monospacedDigit())
                 }
                 .foregroundStyle(pct < 20 ? .red : .secondary)
@@ -749,6 +759,23 @@ struct BluetoothDeviceRow: View {
             if !device.isConnected {
                 Circle().fill(Color.secondary.opacity(0.3)).frame(width: 7, height: 7)
             }
+        }
+    }
+
+    private func batteryLabel(_ label: String, _ pct: Int) -> some View {
+        HStack(spacing: 2) {
+            Text(label).font(.caption2).foregroundStyle(.tertiary)
+            Text("\(pct)%").font(.caption2.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
+        }
+    }
+
+    private func batterySystemImage(_ pct: Int) -> String {
+        switch pct {
+        case 76...: return "battery.100percent"
+        case 51...: return "battery.75percent"
+        case 26...: return "battery.50percent"
+        case 11...: return "battery.25percent"
+        default:    return "battery.0percent"
         }
     }
 }

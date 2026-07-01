@@ -424,7 +424,14 @@ struct BluetoothOverviewCard: View {
                         Image(systemName: device.icon).font(.system(size: 12)).foregroundStyle(.blue).frame(width: 16)
                         Text(device.name).font(.caption).lineLimit(1)
                         Spacer()
-                        if let pct = device.batteryPercent {
+                        // Show L/R/Case for earbuds; single % for other devices
+                        if device.batteryLeft != nil || device.batteryRight != nil {
+                            HStack(spacing: 5) {
+                                if let l = device.batteryLeft  { earbudPill("L", l) }
+                                if let r = device.batteryRight { earbudPill("R", r) }
+                                if let c = device.batteryCase  { earbudPill("⬡", c) }
+                            }
+                        } else if let pct = device.batteryPercent {
                             HStack(spacing: 3) {
                                 Image(systemName: batteryIcon(pct)).font(.caption2).foregroundStyle(pct < 20 ? .red : pct < 40 ? .orange : .green)
                                 Text("\(pct)%").font(.caption.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
@@ -447,6 +454,13 @@ struct BluetoothOverviewCard: View {
         case 40..<65: return "battery.50percent"
         case 65..<90: return "battery.75percent"
         default: return "battery.100percent"
+        }
+    }
+
+    private func earbudPill(_ label: String, _ pct: Int) -> some View {
+        HStack(spacing: 2) {
+            Text(label).font(.caption2).foregroundStyle(.tertiary)
+            Text("\(pct)%").font(.caption2.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
         }
     }
 }

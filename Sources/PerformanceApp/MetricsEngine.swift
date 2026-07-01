@@ -90,6 +90,10 @@ final class MetricsEngine: ObservableObject {
     // Held strongly so the permission dialog can fire and the delegate callback arrives.
     private var btAuthManager: CBCentralManager?
     private var btDelegate: BluetoothAuthDelegate?
+    private var btBatteryCache: [String: BtBatteryInfo] = [:]
+    private var btBatteryCacheDate: Date = .distantPast
+    private var bleBatteryByName: [String: Int] = [:]
+    private var bleBatteryReader: BLEBatteryReader?
     @Published var performanceCoreCount: Int = 0
     @Published var efficiencyCoreCount: Int = 0
 
@@ -810,6 +814,7 @@ final class MetricsEngine: ObservableObject {
     }
 
     private func readBluetoothDevices() {
+        refreshBTBatteryCache()
         guard let paired = IOBluetoothDevice.pairedDevices() as? [IOBluetoothDevice] else { return }
         bluetoothDevices = paired.map { device in
             let cod = device.classOfDevice
@@ -822,37 +827,89 @@ final class MetricsEngine: ObservableObject {
             case 5: icon = "keyboard"
             default: icon = "dot.radiowaves.left.and.right"
             }
-            let battery = bluetoothBattery(for: device)
+            let addr = (device.addressString ?? "").lowercased().replacingOccurrences(of: "-", with: ":")
+            let name = device.nameOrAddress ?? "Unknown"
+            let info = btBatteryCache[addr]
+            // For earbuds, primary battery = min(L, R) so it reflects the one that'll die first
+            let earbud: Int? = info.flatMap { i in
+                switch (i.left, i.right) {
+                case let (l?, r?): return min(l, r)
+                case let (l?, nil): return l
+                case let (nil, r?): return r
+                default: return nil
+                }
+            }
+            // Fallback to BLE GATT reading for devices not in system_profiler cache
+            let primary: Int? = info?.main ?? earbud ?? bleBatteryByName[name]
             return BluetoothDevice(
                 id: device.addressString ?? UUID().uuidString,
-                name: device.nameOrAddress ?? "Unknown",
+                name: name,
                 isConnected: device.isConnected(),
-                batteryPercent: battery,
+                batteryPercent: primary,
+                batteryLeft: info?.left,
+                batteryRight: info?.right,
+                batteryCase: info?.case_,
                 icon: icon
             )
         }
     }
 
-    private func bluetoothBattery(for device: IOBluetoothDevice) -> Int? {
-        guard device.isConnected(), let addr = device.addressString else { return nil }
-        let matching = IOServiceMatching("IOHIDDevice")
-        var iterator: io_iterator_t = 0
-        guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else { return nil }
-        defer { IOObjectRelease(iterator) }
-        var service = IOIteratorNext(iterator)
-        while service != 0 {
-            defer { IOObjectRelease(service); service = IOIteratorNext(iterator) }
-            var propsRef: Unmanaged<CFMutableDictionary>?
-            guard IORegistryEntryCreateCFProperties(service, &propsRef, kCFAllocatorDefault, 0) == KERN_SUCCESS,
-                  let props = propsRef?.takeRetainedValue() as? [String: Any] else { continue }
-            // Match by BT address in the device address property
-            if let deviceAddr = props["DeviceAddress"] as? String,
-               deviceAddr.lowercased().replacingOccurrences(of: "-", with: ":") == addr.lowercased(),
-               let pct = props["BatteryPercent"] as? Int {
-                return pct
-            }
+    private struct BtBatteryInfo {
+        var main: Int?
+        var left: Int?
+        var right: Int?
+        var case_: Int?
+    }
+
+    private func refreshBTBatteryCache() {
+        guard Date().timeIntervalSince(btBatteryCacheDate) > 25 else { return }
+        // BLE GATT battery read (runs alongside system_profiler parse)
+        let reader = BLEBatteryReader()
+        bleBatteryReader = reader
+        reader.onResult = { [weak self] name, pct in
+            self?.bleBatteryByName[name] = pct
         }
-        return nil
+        reader.read()
+        btBatteryCacheDate = Date()
+        Task.detached(priority: .utility) { [weak self] in
+            let proc = Process()
+            proc.executableURL = URL(fileURLWithPath: "/usr/sbin/system_profiler")
+            proc.arguments = ["SPBluetoothDataType", "-json"]
+            let pipe = Pipe()
+            proc.standardOutput = pipe
+            proc.standardError = Pipe()
+            guard (try? proc.run()) != nil else { return }
+            proc.waitUntilExit()
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let btArray = json["SPBluetoothDataType"] as? [[String: Any]] else { return }
+
+            func parsePct(_ info: [String: Any], _ key: String) -> Int? {
+                guard let s = info[key] as? String else { return nil }
+                return Int(s.replacingOccurrences(of: "%", with: "").trimmingCharacters(in: .whitespaces))
+            }
+
+            var cache: [String: BtBatteryInfo] = [:]
+            for entry in btArray {
+                for listKey in ["device_connected", "device_not_connected"] {
+                    guard let deviceList = entry[listKey] as? [[String: Any]] else { continue }
+                    for deviceDict in deviceList {
+                        for (_, infoAny) in deviceDict {
+                            guard let info = infoAny as? [String: Any],
+                                  let addr = info["device_address"] as? String else { continue }
+                            let norm = addr.lowercased().replacingOccurrences(of: "-", with: ":")
+                            cache[norm] = BtBatteryInfo(
+                                main:  parsePct(info, "device_batteryLevel"),
+                                left:  parsePct(info, "device_batteryLevelLeft"),
+                                right: parsePct(info, "device_batteryLevelRight"),
+                                case_: parsePct(info, "device_batteryLevelCase")
+                            )
+                        }
+                    }
+                }
+            }
+            await MainActor.run { self?.btBatteryCache = cache }
+        }
     }
 
     // MARK: - CPU Core Clusters
@@ -952,7 +1009,10 @@ struct BluetoothDevice: Identifiable {
     let id: String
     let name: String
     let isConnected: Bool
-    let batteryPercent: Int?
+    let batteryPercent: Int?    // primary / overall; for earbuds = min(L, R)
+    let batteryLeft: Int?       // AirPods left earbud
+    let batteryRight: Int?      // AirPods right earbud
+    let batteryCase: Int?       // AirPods case
     let icon: String
 }
 
@@ -966,5 +1026,63 @@ final class BluetoothAuthDelegate: NSObject, CBCentralManagerDelegate {
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         onUpdate(CBCentralManager.authorization)
+    }
+}
+
+// Reads GATT Battery Service (0x180F) from BLE peripherals already connected to the system.
+final class BLEBatteryReader: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
+    private static let batterySvc  = CBUUID(string: "180F")
+    private static let batteryChar = CBUUID(string: "2A19")
+
+    private var central: CBCentralManager?
+    private var inFlight: Set<CBPeripheral> = []
+    var onResult: ((String, Int) -> Void)?   // peripheral.name → percent
+
+    func read() {
+        // Re-create central each time so state machine resets cleanly
+        central = CBCentralManager(delegate: self, queue: .main,
+                                   options: [CBCentralManagerOptionShowPowerAlertKey: false])
+    }
+
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        guard central.state == .poweredOn else { return }
+        let peripherals = central.retrieveConnectedPeripherals(withServices: [Self.batterySvc])
+        for p in peripherals {
+            p.delegate = self
+            inFlight.insert(p)
+            central.connect(p, options: nil)
+        }
+    }
+
+    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        peripheral.discoverServices([Self.batterySvc])
+    }
+
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        inFlight.remove(peripheral)
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        guard let services = peripheral.services else { inFlight.remove(peripheral); return }
+        for svc in services where svc.uuid == Self.batterySvc {
+            peripheral.discoverCharacteristics([Self.batteryChar], for: svc)
+        }
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        guard let chars = service.characteristics else { inFlight.remove(peripheral); return }
+        for c in chars where c.uuid == Self.batteryChar {
+            peripheral.readValue(for: c)
+        }
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        defer { inFlight.remove(peripheral); central?.cancelPeripheralConnection(peripheral) }
+        guard characteristic.uuid == Self.batteryChar,
+              let data = characteristic.value, let raw = data.first,
+              let name = peripheral.name else { return }
+        let pct = Int(raw)
+        guard pct >= 0, pct <= 100 else { return }
+        onResult?(name, pct)
     }
 }
