@@ -5,6 +5,7 @@ import Charts
 struct OverviewView: View {
     @ObservedObject var engine: MetricsEngine
     @Environment(\.openWindow) private var openWindow
+    @Environment(\.openSettings) private var openSettings
 
     @State private var cpuStyle: CardChartStyle = .area
     @State private var memoryStyle: CardChartStyle = .area
@@ -53,7 +54,7 @@ struct OverviewView: View {
                     batteryTemp: engine.batteryTemperatureC
                 ) { openDetail(.thermal) }
 
-                GPUCard(name: engine.gpuName, displays: engine.displays) { openDetail(.gpu) }
+                GPUCard(name: engine.gpuName, usagePercent: engine.gpuUsagePercent, history: engine.gpuHistory, displays: engine.displays) { openDetail(.gpu) }
 
                 if let percent = engine.batteryPercent {
                     let watts: Double? = engine.batteryVoltage.flatMap { v in
@@ -84,7 +85,11 @@ struct OverviewView: View {
             Divider().padding(.horizontal, 14)
 
             HStack {
-                SettingsLink {
+                Button {
+                    NSApp.setActivationPolicy(.regular)
+                    NSApp.activate(ignoringOtherApps: true)
+                    openSettings()
+                } label: {
                     Label("Settings", systemImage: "gearshape")
                 }
                 .buttonStyle(.plain)
@@ -428,49 +433,99 @@ private struct BatteryCard: View {
 
 // MARK: - GPU card
 
+private enum GPUCardStyle: String, CaseIterable, Identifiable {
+    case area, gauge, info
+    var id: String { rawValue }
+    var label: String {
+        switch self {
+        case .area:  return "Chart"
+        case .gauge: return "Gauge"
+        case .info:  return "Info"
+        }
+    }
+    var systemImage: String {
+        switch self {
+        case .area:  return "chart.bar.fill"
+        case .gauge: return "gauge.with.dots.needle.50percent"
+        case .info:  return "info.circle"
+        }
+    }
+}
+
 private struct GPUCard: View {
     let name: String
+    let usagePercent: Double
+    let history: [Double]
     let displays: [DisplayInfo]
     let action: () -> Void
 
+    @State private var style: GPUCardStyle = .area
+
     var body: some View {
-        Button(action: action) {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(spacing: 6) {
-                    cardIcon("cube.transparent", color: .cyan)
-                    Text("GPU & Displays").font(.caption).foregroundStyle(.secondary)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                cardIcon("cube.transparent", color: .cyan)
+                Text("GPU & Displays").font(.caption).foregroundStyle(.secondary)
+                Spacer()
+                Menu {
+                    ForEach(GPUCardStyle.allCases) { s in
+                        Button { style = s } label: { Label(s.label, systemImage: s.systemImage) }
+                    }
+                } label: {
+                    Image(systemName: style.systemImage).font(.system(size: 10)).foregroundStyle(.secondary)
                 }
-                Text(name)
-                    .font(.system(.callout, design: .rounded)).fontWeight(.semibold)
-                    .lineLimit(1).minimumScaleFactor(0.7)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                if displays.isEmpty {
-                    Text("No display info")
-                        .font(.caption2).foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                } else {
-                    ForEach(displays) { d in
-                        HStack(spacing: 4) {
-                            Image(systemName: d.isMain ? "display" : "display.2")
-                                .font(.caption2).foregroundStyle(.cyan)
-                            Text(d.name)
-                                .font(.caption2).lineLimit(1).foregroundStyle(.secondary)
-                            if d.isMain {
-                                Text("main")
-                                    .font(.caption2)
-                                    .foregroundStyle(.cyan.opacity(0.7))
+                .menuStyle(.borderlessButton)
+                .frame(width: 16)
+            }
+            Button(action: action) {
+                VStack(spacing: 4) {
+                    switch style {
+                    case .area:
+                        Text(String(format: "%.0f%%", usagePercent))
+                            .font(.system(.body, design: .rounded)).fontWeight(.semibold)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        MetricChart(values: history, unit: "%", fixedMax: 100,
+                                    showAxes: false, color: .cyan, style: .area)
+                            .frame(height: 46)
+                    case .gauge:
+                        HStack {
+                            Spacer()
+                            RingGaugeView(value: usagePercent, color: .cyan)
+                            Spacer()
+                        }
+                        .frame(height: 66)
+                    case .info:
+                        Text(name)
+                            .font(.system(.callout, design: .rounded)).fontWeight(.semibold)
+                            .lineLimit(1).minimumScaleFactor(0.7)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        if displays.isEmpty {
+                            Text("No display info")
+                                .font(.caption2).foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        } else {
+                            ForEach(displays) { d in
+                                HStack(spacing: 4) {
+                                    Image(systemName: d.isMain ? "display" : "display.2")
+                                        .font(.caption2).foregroundStyle(.cyan)
+                                    Text(d.name)
+                                        .font(.caption2).lineLimit(1).foregroundStyle(.secondary)
+                                    if d.isMain {
+                                        Text("main").font(.caption2).foregroundStyle(.cyan.opacity(0.7))
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .center)
                             }
                         }
-                        .frame(maxWidth: .infinity, alignment: .center)
                     }
                 }
             }
-            .padding(10)
-            .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
-            .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.cyan.opacity(0.15), lineWidth: 1))
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
+        .padding(10)
+        .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.cyan.opacity(0.15), lineWidth: 1))
     }
 }
 

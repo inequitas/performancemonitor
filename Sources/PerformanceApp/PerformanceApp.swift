@@ -8,7 +8,11 @@ struct PerformanceApp: App {
         MenuBarExtra {
             OverviewView(engine: engine)
         } label: {
-            Text(engine.menuBarLabel)
+            if engine.menuBarStyle == .sparkline {
+                Image(nsImage: engine.menuBarImage)
+            } else {
+                Text(engine.menuBarLabel)
+            }
         }
         .menuBarExtraStyle(.window)
 

@@ -30,6 +30,18 @@ struct SettingsView: View {
                         .frame(maxWidth: 140)
                     }
                     Divider().padding(.vertical, 4)
+                    SettingsRow(label: "Menu bar style") {
+                        Picker("", selection: $engine.menuBarStyle) {
+                            ForEach(MetricsEngine.MenuBarStyle.allCases) { s in
+                                Text(s.rawValue).tag(s)
+                            }
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .frame(maxWidth: 140)
+                        .onChange(of: engine.menuBarStyle) { _, _ in engine.renderMenuBarImage() }
+                    }
+                    Divider().padding(.vertical, 4)
                     SettingsRow(label: "Launch at login") {
                         Toggle("", isOn: $launchAtLogin)
                             .labelsHidden()

@@ -116,6 +116,8 @@ final class MetricsEngine: ObservableObject {
     @Published var gpuIsLowPower: Bool = false
     @Published var gpuIsRemovable: Bool = false
     @Published var gpuLocation: String = "Built-in"
+    @Published var gpuUsagePercent: Double = 0
+    @Published var gpuHistory: [Double] = []
 
     @Published var alertsEnabled: Bool = false {
         didSet { if alertsEnabled { requestNotificationAuthorization() } }
@@ -144,7 +146,14 @@ final class MetricsEngine: ObservableObject {
         var id: String { rawValue }
     }
 
+    enum MenuBarStyle: String, CaseIterable, Identifiable {
+        case sparkline = "Sparkline"
+        case text      = "Text only"
+        var id: String { rawValue }
+    }
+
     @Published var menuBarMetric: MenuBarMetric = .cpu
+    @Published var menuBarStyle: MenuBarStyle = .sparkline
 
     @Published var refreshInterval: Double = 1.0 {
         didSet { restartTimer() }
@@ -173,6 +182,94 @@ final class MetricsEngine: ObservableObject {
         case .memory: return String(format: "MEM %.1fGB", memoryUsedGB)
         case .network: return String(format: "↓%.0f KB/s", downloadSpeedKBps)
         case .disk: return String(format: "DISK %.0fGB", diskFreeGB)
+        }
+    }
+
+    @Published var menuBarImage: NSImage = NSImage()
+
+    private var menuBarSparklineHistory: [Double] {
+        let raw: [Double]
+        switch menuBarMetric {
+        case .cpu:     raw = cpuHistory
+        case .memory:  raw = memoryHistory
+        case .network: raw = downloadHistory
+        case .disk:    raw = diskReadHistory
+        }
+        return Array(raw.suffix(30))
+    }
+
+    private var menuBarValueText: String {
+        switch menuBarMetric {
+        case .cpu:     return String(format: "%.0f%%", cpuUsagePercent)
+        case .memory:  return String(format: "%.1fG", memoryUsedGB)
+        case .network: return String(format: "%.0fK", downloadSpeedKBps)
+        case .disk:    return String(format: "%.0fG", diskFreeGB)
+        }
+    }
+
+    func renderMenuBarImage() {
+        let valueText = menuBarValueText
+        let h: CGFloat = 16
+
+        let attrs: [NSAttributedString.Key: Any] = [
+            .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium),
+            .foregroundColor: NSColor.white
+        ]
+        let textSize = (valueText as NSString).size(withAttributes: attrs)
+
+        switch menuBarStyle {
+        case .text:
+            let image = NSImage(size: NSSize(width: ceil(textSize.width), height: h), flipped: false) { _ in
+                guard NSGraphicsContext.current != nil else { return false }
+                (valueText as NSString).draw(
+                    at: NSPoint(x: 0, y: (h - textSize.height) / 2),
+                    withAttributes: attrs)
+                return true
+            }
+            menuBarImage = image
+
+        case .sparkline:
+            let history = menuBarSparklineHistory
+            let sparkW: CGFloat = 32
+            let totalW = sparkW + 5 + ceil(textSize.width)
+
+            let image = NSImage(size: NSSize(width: totalW, height: h), flipped: false) { _ in
+                guard let ctx = NSGraphicsContext.current?.cgContext else { return false }
+
+                if history.count > 1 {
+                    let peak = max(history.max() ?? 1, 0.001)
+                    let step = sparkW / CGFloat(history.count - 1)
+
+                    func point(_ i: Int) -> CGPoint {
+                        CGPoint(x: CGFloat(i) * step,
+                                y: 1 + CGFloat(history[i] / peak) * (h - 3))
+                    }
+
+                    ctx.setStrokeColor(NSColor.white.withAlphaComponent(0.85).cgColor)
+                    ctx.setLineWidth(1.5)
+                    ctx.setLineCap(.round)
+                    ctx.setLineJoin(.round)
+                    ctx.beginPath()
+                    ctx.move(to: point(0))
+                    for i in 1..<history.count { ctx.addLine(to: point(i)) }
+                    ctx.strokePath()
+
+                    ctx.beginPath()
+                    ctx.move(to: point(0))
+                    for i in 1..<history.count { ctx.addLine(to: point(i)) }
+                    ctx.addLine(to: CGPoint(x: CGFloat(history.count - 1) * step, y: 0))
+                    ctx.addLine(to: CGPoint(x: 0, y: 0))
+                    ctx.closePath()
+                    ctx.setFillColor(NSColor.white.withAlphaComponent(0.15).cgColor)
+                    ctx.fillPath()
+                }
+
+                (valueText as NSString).draw(
+                    at: NSPoint(x: sparkW + 5, y: (h - textSize.height) / 2),
+                    withAttributes: attrs)
+                return true
+            }
+            menuBarImage = image
         }
     }
 
@@ -280,6 +377,34 @@ final class MetricsEngine: ObservableObject {
         gpuLocation = device.isRemovable ? "External" : "Built-in"
     }
 
+    private func updateGPUUsage() {
+        var iterator: io_iterator_t = 0
+        guard IOServiceGetMatchingServices(kIOMainPortDefault,
+              IOServiceMatching("IOAccelerator"), &iterator) == KERN_SUCCESS else { return }
+        defer { IOObjectRelease(iterator) }
+
+        while case let service = IOIteratorNext(iterator), service != 0 {
+            defer { IOObjectRelease(service) }
+            var props: Unmanaged<CFMutableDictionary>?
+            guard IORegistryEntryCreateCFProperties(service, &props, kCFAllocatorDefault, 0) == KERN_SUCCESS,
+                  let dict = props?.takeRetainedValue() as? [String: Any],
+                  let stats = dict["PerformanceStatistics"] as? [String: Any] else { continue }
+
+            // Apple Silicon: "GPU Core Utilization" is a Double in [0, 1]
+            if let util = stats["GPU Core Utilization"] as? Double {
+                gpuUsagePercent = util * 100
+                appendCapped(gpuUsagePercent, to: &gpuHistory)
+                return
+            }
+            // Fallback (discrete GPUs): "Device Utilization %" is an Int
+            if let util = stats["Device Utilization %"] as? Int {
+                gpuUsagePercent = Double(util)
+                appendCapped(gpuUsagePercent, to: &gpuHistory)
+                return
+            }
+        }
+    }
+
     private func restartTimer() {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: refreshInterval, repeats: true) { [weak self] _ in
@@ -297,7 +422,9 @@ final class MetricsEngine: ObservableObject {
         updateBattery()
         updateWiFiSignal()
         updateBluetooth()
+        updateGPUUsage()
         updateSMC()
+        renderMenuBarImage()
         checkAlerts()
         appendPersistedHistoryRow()
 
