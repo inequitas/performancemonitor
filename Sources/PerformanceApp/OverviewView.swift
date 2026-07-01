@@ -57,16 +57,25 @@ struct OverviewView: View {
                     valueFormatter: formatSpeedCompact
                 ) { openDetail(.disk) }
 
-                ThermalCard(state: engine.thermalState) { openDetail(.cpu) }
+                ThermalCard(
+                    state: engine.thermalState,
+                    cpuTemp: engine.cpuTemperatureC,
+                    gpuTemp: engine.gpuTemperatureC,
+                    batteryTemp: engine.batteryTemperatureC
+                ) { openDetail(.thermal) }
 
                 GPUCard(name: engine.gpuName, displays: engine.displays) { openDetail(.gpu) }
 
                 if let percent = engine.batteryPercent {
+                    let watts: Double? = engine.batteryVoltage.flatMap { v in
+                        engine.batteryAmperage.map { a in v * abs(Double(a)) / 1000 }
+                    }
                     BatteryCard(
                         percent: percent,
                         isCharging: engine.batteryIsCharging,
                         powerSourceName: engine.powerSourceName,
-                        timeRemainingMinutes: engine.batteryTimeRemainingMinutes
+                        timeRemainingMinutes: engine.batteryTimeRemainingMinutes,
+                        watts: watts
                     ) { openDetail(.battery) }
                 }
             }
@@ -112,6 +121,7 @@ struct OverviewView: View {
 private func formatSpeedCompact(_ kbps: Double) -> String {
     kbps > 1024 ? String(format: "%.1fMB/s", kbps / 1024) : String(format: "%.0fKB/s", kbps)
 }
+
 
 // MARK: - Card chart style
 
@@ -180,22 +190,21 @@ private struct OverviewCard: View {
             }
             Button(action: action) {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(valueText)
-                        .font(.system(.body, design: .rounded))
-                        .fontWeight(.semibold)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                    // In gauge mode the % is already shown inside the ring — skip the duplicate label
+                    if style != .gauge {
+                        Text(valueText)
+                            .font(.system(.body, design: .rounded))
+                            .fontWeight(.semibold)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                    }
                     if style == .gauge, let percent = percentValue {
                         HStack {
                             Spacer()
-                            Gauge(value: min(max(percent, 0), 100), in: 0...100) {} currentValueLabel: {
-                                Text(String(format: "%.0f", percent)).font(.caption2)
-                            }
-                            .gaugeStyle(.accessoryCircularCapacity)
-                            .tint(color)
+                            RingGaugeView(value: percent, color: color)
                             Spacer()
                         }
-                        .frame(height: 46)
+                        .frame(height: 66)
                     } else {
                         MetricChart(values: history, unit: unit, fixedMax: fixedMax, showAxes: false, color: color, style: style.asChartDisplayStyle, valueFormatter: valueFormatter)
                             .frame(height: 46)
@@ -215,6 +224,9 @@ private struct OverviewCard: View {
 
 private struct ThermalCard: View {
     let state: ProcessInfo.ThermalState
+    let cpuTemp: Double?
+    let gpuTemp: Double?
+    let batteryTemp: Double?
     let action: () -> Void
 
     var body: some View {
@@ -224,18 +236,42 @@ private struct ThermalCard: View {
                     cardIcon("thermometer.medium", color: state.color)
                     Text("Thermal").font(.caption).foregroundStyle(.secondary)
                 }
-                HStack(spacing: 6) {
-                    Circle().fill(state.color).frame(width: 9, height: 9)
-                    Text(state.label).font(.system(.body, design: .rounded)).fontWeight(.semibold)
+                VStack(alignment: .leading, spacing: 3) {
+                    if let t = cpuTemp {
+                        tempRow("CPU", t, color: MetricTheme.cpu)
+                    }
+                    if let t = gpuTemp {
+                        tempRow("GPU", t, color: MetricTheme.gpu)
+                    }
+                    if let t = batteryTemp {
+                        tempRow("Bat", t, color: MetricTheme.battery)
+                    }
+                    HStack(spacing: 4) {
+                        Circle().fill(state.color).frame(width: 7, height: 7)
+                        Text(state.label).font(.caption2).foregroundStyle(.secondary)
+                    }
+                    .padding(.top, 1)
                 }
-                .frame(height: 46, alignment: .center)
+                .frame(height: 70, alignment: .topLeading)
             }
             .padding(10)
-            .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
+            .frame(maxWidth: .infinity, minHeight: cardHeight, alignment: .topLeading)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
             .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(state.color.opacity(0.15), lineWidth: 1))
         }
         .buttonStyle(.plain)
+    }
+
+    private func tempRow(_ label: String, _ celsius: Double, color: Color) -> some View {
+        HStack(spacing: 4) {
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(color.opacity(0.8))
+                .frame(width: 24, alignment: .leading)
+            Text(String(format: "%.0f°C", celsius))
+                .font(.caption.monospacedDigit().weight(.semibold))
+                .foregroundStyle(.primary)
+        }
     }
 }
 
@@ -246,6 +282,7 @@ private struct BatteryCard: View {
     let isCharging: Bool
     let powerSourceName: String
     let timeRemainingMinutes: Int?
+    let watts: Double?
     let action: () -> Void
 
     private var color: Color {
@@ -255,10 +292,14 @@ private struct BatteryCard: View {
         return .green
     }
 
-    private var timeText: String {
-        guard let minutes = timeRemainingMinutes else { return powerSourceName }
-        let h = minutes / 60, m = minutes % 60
-        return isCharging ? "\(h)h \(m)m to full" : "\(h)h \(m)m left"
+    private var subtitleText: String {
+        if let minutes = timeRemainingMinutes {
+            let h = minutes / 60, m = minutes % 60
+            if let w = watts { return isCharging ? "\(h)h \(m)m · \(String(format: "%.0fW", w))" : "\(h)h \(m)m left" }
+            return isCharging ? "\(h)h \(m)m to full" : "\(h)h \(m)m left"
+        }
+        if let w = watts { return String(format: isCharging ? "%.0f W input" : "%.0f W draw", w) }
+        return powerSourceName
     }
 
     var body: some View {
@@ -269,7 +310,7 @@ private struct BatteryCard: View {
                     Text("Battery").font(.caption).foregroundStyle(.secondary)
                 }
                 Text("\(percent)%").font(.system(.body, design: .rounded)).fontWeight(.semibold)
-                Text(timeText).font(.caption2).foregroundStyle(.secondary).frame(height: 46 - 16, alignment: .top)
+                Text(subtitleText).font(.caption2).foregroundStyle(.secondary).frame(height: 46 - 16, alignment: .top)
             }
             .padding(10)
             .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
@@ -338,6 +379,24 @@ private struct NetworkOverviewCard: View {
                     cardIcon(MetricTheme.icon(for: .network), color: MetricTheme.networkDown)
                     Text("Network").font(.caption).foregroundStyle(.secondary)
                     Spacer()
+                    // Connection type icons — primary is green, secondary is white
+                    HStack(spacing: 5) {
+                        if engine.isWifiAvailable {
+                            Image(systemName: "wifi")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(engine.connectionType == "Wi-Fi" ? Color.green : Color.primary)
+                        }
+                        if engine.isEthernetAvailable {
+                            Image(systemName: "cable.connector")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(engine.connectionType == "Ethernet" ? Color.green : Color.primary)
+                        }
+                        if !engine.isWifiAvailable && !engine.isEthernetAvailable && engine.isConnected {
+                            Image(systemName: "network")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(.green)
+                        }
+                    }
                     HStack(spacing: 10) {
                         Label(formatSpeedCompact(engine.downloadSpeedKBps), systemImage: "arrow.down")
                             .font(.caption.monospacedDigit())
@@ -434,6 +493,29 @@ struct BluetoothOverviewCard: View {
         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.blue.opacity(0.15), lineWidth: 1))
     }
 
+}
+
+// MARK: - Ring gauge
+
+struct RingGaugeView: View {
+    let value: Double   // 0–100
+    let color: Color
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(color.opacity(0.15), lineWidth: 8)
+            Circle()
+                .trim(from: 0, to: CGFloat(min(max(value / 100.0, 0), 1)))
+                .stroke(color, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .animation(.linear(duration: 0.4), value: value)
+            Text(String(format: "%.0f%%", value))
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .foregroundStyle(color)
+        }
+        .frame(width: 60, height: 60)
+    }
 }
 
 // MARK: - Shared icon helper

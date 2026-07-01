@@ -41,18 +41,20 @@ enum MetricTheme {
         case .gpu: return gpu
         case .battery: return battery
         case .bluetooth: return .blue
+        case .thermal:   return temperature
         }
     }
 
     static func icon(for kind: DetailWindow.Kind) -> String {
         switch kind {
-        case .cpu: return "cpu"
-        case .memory: return "memorychip"
-        case .network: return "network"
-        case .disk: return "internaldrive"
-        case .gpu: return "cube.transparent"
-        case .battery: return "battery.100percent"
+        case .cpu:       return "cpu"
+        case .memory:    return "memorychip"
+        case .network:   return "network"
+        case .disk:      return "internaldrive"
+        case .gpu:       return "cube.transparent"
+        case .battery:   return "battery.100percent"
         case .bluetooth: return "dot.radiowaves.left.and.right"
+        case .thermal:   return "thermometer.medium"
         }
     }
 }

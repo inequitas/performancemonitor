@@ -1,19 +1,21 @@
 import SwiftUI
 import AppKit
+import Charts
 
 struct DetailWindow: View {
     enum Kind: String, Codable, Hashable, CaseIterable, Identifiable {
-        case cpu, memory, network, disk, gpu, battery, bluetooth
+        case cpu, memory, network, disk, gpu, battery, bluetooth, thermal
         var id: String { rawValue }
         var title: String {
             switch self {
-            case .cpu: return "CPU"
-            case .memory: return "Memory"
-            case .network: return "Network"
-            case .disk: return "Disk"
-            case .gpu: return "GPU & Displays"
-            case .battery: return "Battery"
+            case .cpu:       return "CPU"
+            case .memory:    return "Memory"
+            case .network:   return "Network"
+            case .disk:      return "Disk"
+            case .gpu:       return "GPU & Displays"
+            case .battery:   return "Battery"
             case .bluetooth: return "Bluetooth"
+            case .thermal:   return "Thermal & Fans"
             }
         }
     }
@@ -32,6 +34,7 @@ struct DetailWindow: View {
                 case .gpu: GPUDetailView(engine: engine)
                 case .battery: BatteryDetailView(engine: engine)
                 case .bluetooth: BluetoothDetailView(engine: engine)
+                case .thermal:   ThermalDetailView(engine: engine)
                 }
             }
             .padding()
@@ -77,6 +80,49 @@ struct EarbudBatteryPill: View {
         HStack(spacing: 2) {
             Text(label).font(.caption2).foregroundStyle(.tertiary)
             Text("\(pct)%").font(.caption2.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
+        }
+    }
+}
+
+struct NetworkButterflyChart: View {
+    let downloadHistory: [Double]
+    let uploadHistory:   [Double]
+    let downloadSpeed:   Double
+    let uploadSpeed:     Double
+
+    // Shared scale so download and upload are proportional to each other
+    private var sharedMax: Double {
+        max(downloadHistory.max() ?? 0, uploadHistory.max() ?? 0, 1)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Label(formatSpeed(downloadSpeed), systemImage: "arrow.down")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundStyle(MetricTheme.networkDown)
+                Spacer()
+                Label(formatSpeed(uploadSpeed), systemImage: "arrow.up")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundStyle(MetricTheme.networkUp)
+            }
+            VStack(spacing: 0) {
+                // Download — grows upward from center
+                MetricChart(values: downloadHistory, unit: "KB/s", fixedMax: sharedMax,
+                            showAxes: false, color: MetricTheme.networkDown, style: .area,
+                            valueFormatter: formatSpeed)
+                    .frame(height: 60)
+                // Center divider
+                Rectangle()
+                    .fill(Color.primary.opacity(0.25))
+                    .frame(height: 1)
+                // Upload — same chart, flipped so it grows downward from center
+                MetricChart(values: uploadHistory, unit: "KB/s", fixedMax: sharedMax,
+                            showAxes: false, color: MetricTheme.networkUp, style: .area,
+                            valueFormatter: formatSpeed)
+                    .frame(height: 60)
+                    .scaleEffect(y: -1)
+            }
         }
     }
 }
@@ -351,17 +397,12 @@ struct MemoryDetailView: View {
 
 struct NetworkDetailView: View {
     @ObservedObject var engine: MetricsEngine
-    @State private var style: ChartDisplayStyle = .area
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Label("Network", systemImage: MetricTheme.icon(for: .network))
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(MetricTheme.networkDown)
-                Spacer()
-                ChartStylePicker(style: $style)
-            }
+            Label("Network", systemImage: MetricTheme.icon(for: .network))
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(MetricTheme.networkDown)
 
             SectionCard {
                 VStack(alignment: .leading, spacing: 8) {
@@ -419,22 +460,13 @@ struct NetworkDetailView: View {
             }
 
             SectionCard {
-                VStack(alignment: .leading, spacing: 8) {
-                    Label("↓ \(formatSpeed(engine.downloadSpeedKBps))", systemImage: "arrow.down")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundStyle(MetricTheme.networkDown)
-                    MetricChart(values: engine.downloadHistory, unit: "KB/s", color: MetricTheme.networkDown, style: style, valueFormatter: formatSpeed)
-                        .frame(height: 90)
-                }
-            }
-            SectionCard {
-                VStack(alignment: .leading, spacing: 8) {
-                    Label("↑ \(formatSpeed(engine.uploadSpeedKBps))", systemImage: "arrow.up")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundStyle(MetricTheme.networkUp)
-                    MetricChart(values: engine.uploadHistory, unit: "KB/s", color: MetricTheme.networkUp, style: style, valueFormatter: formatSpeed)
-                        .frame(height: 90)
-                }
+                NetworkButterflyChart(
+                    downloadHistory: engine.downloadHistory,
+                    uploadHistory: engine.uploadHistory,
+                    downloadSpeed: engine.downloadSpeedKBps,
+                    uploadSpeed: engine.uploadSpeedKBps
+                )
+                .frame(height: 160)
             }
 
             SectionCard {
@@ -599,11 +631,11 @@ struct BatteryDetailView: View {
                             .font(.system(size: 28, weight: .bold, design: .rounded))
                             .foregroundStyle(MetricTheme.battery)
                     }
-                    Text(engine.batteryIsCharging ? "Charging" : "On battery")
-                        .font(.caption).foregroundStyle(.secondary)
+                    detailRow("Source", engine.powerSourceName)
+                    detailRow("State", engine.batteryIsCharging ? "Charging" : "Discharging")
                     if let minutes = engine.batteryTimeRemainingMinutes {
-                        Text("\(minutes / 60)h \(minutes % 60)m \(engine.batteryIsCharging ? "to full" : "remaining")")
-                            .font(.caption).foregroundStyle(.secondary)
+                        detailRow(engine.batteryIsCharging ? "Time to full" : "Time remaining",
+                                  "\(minutes / 60)h \(minutes % 60)m")
                     }
                 }
             }
@@ -631,6 +663,11 @@ struct BatteryDetailView: View {
                         Text("Electrical").font(.subheadline.weight(.semibold))
                         Spacer()
                         InfoButton(text: "Temperature: Read from AppleSmartBattery IORegistry — no special privileges needed. This is the battery cell temperature, not the CPU temperature.\n\nVoltage: Current battery terminal voltage in volts.\n\nCurrent: Positive = charging (current flowing in). Negative = discharging (current flowing out). Values are in milliamps (mA).\n\nAll values come from the AppleSmartBattery driver which is always accessible without entitlements.")
+                    }
+                    if let v = engine.batteryVoltage, let a = engine.batteryAmperage {
+                        let watts = v * abs(Double(a)) / 1000
+                        detailRow(engine.batteryIsCharging ? "Input power" : "Draw",
+                                  String(format: "%.1f W", watts))
                     }
                     if let temp = engine.batteryTemperatureC {
                         detailRow("Temperature", String(format: "%.1f°C", temp))
@@ -716,6 +753,101 @@ struct BluetoothDetailView: View {
                     }
                 }
             }
+            Spacer()
+        }
+    }
+}
+
+// MARK: - Thermal & Fans
+
+struct ThermalDetailView: View {
+    @ObservedObject var engine: MetricsEngine
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Label("Thermal & Fans", systemImage: "thermometer.medium")
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(engine.thermalState.color)
+
+            // Thermal pressure
+            SectionCard {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Thermal Pressure").font(.subheadline.weight(.semibold))
+                        Spacer()
+                        InfoButton(text: "macOS reports four thermal pressure levels:\n\n• Nominal — system operating normally.\n• Fair — some power reduction to prevent overheating.\n• Serious — significant throttling in effect.\n• Critical — aggressive throttling; performance severely impacted.\n\nThis is read from ProcessInfo.thermalState — the same value macOS uses internally to throttle workloads.")
+                    }
+                    HStack(spacing: 8) {
+                        Circle().fill(engine.thermalState.color).frame(width: 10, height: 10)
+                        Text(engine.thermalState.label)
+                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            .foregroundStyle(engine.thermalState.color)
+                    }
+                }
+            }
+
+            // Temperatures
+            SectionCard {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Temperatures").font(.subheadline.weight(.semibold))
+                        Spacer()
+                        InfoButton(text: "Read from the System Management Controller (SMC) via IOKit.\n\nCPU and GPU temperatures are measured at die level. Values vary by Mac model — sensor key names differ between Intel and Apple Silicon.\n\nBattery temperature is read from the AppleSmartBattery IORegistry entry.")
+                    }
+                    if let cpu = engine.cpuTemperatureC {
+                        detailRow("CPU", String(format: "%.1f°C", cpu))
+                    }
+                    if let gpu = engine.gpuTemperatureC {
+                        detailRow("GPU", String(format: "%.1f°C", gpu))
+                    }
+                    if let bat = engine.batteryTemperatureC {
+                        detailRow("Battery", String(format: "%.1f°C", bat))
+                    }
+                    if engine.cpuTemperatureC == nil && engine.gpuTemperatureC == nil {
+                        Text("No temperature sensors found for this Mac model.")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+            }
+
+            // Fan speeds
+            if !engine.fans.isEmpty {
+                SectionCard {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Fans").font(.subheadline.weight(.semibold))
+                            Spacer()
+                            InfoButton(text: "Fan speed is read from the SMC via IOKit.\n\nActual: current measured RPM.\nMin/Max: hardware-defined speed range for this fan.")
+                        }
+                        ForEach(engine.fans) { fan in
+                            VStack(alignment: .leading, spacing: 6) {
+                                if engine.fans.count > 1 {
+                                    Text(fan.label)
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.secondary)
+                                }
+                                detailRow("Speed", "\(fan.actual) RPM")
+                                detailRow("Range", "\(fan.min) – \(fan.max) RPM")
+                                // Progress bar showing position in min-max range
+                                if fan.max > fan.min {
+                                    let progress = Double(fan.actual - fan.min) / Double(fan.max - fan.min)
+                                    GeometryReader { geo in
+                                        ZStack(alignment: .leading) {
+                                            Capsule().fill(Color.secondary.opacity(0.15))
+                                                .frame(height: 5)
+                                            Capsule().fill(engine.thermalState.color)
+                                                .frame(width: geo.size.width * CGFloat(min(max(progress, 0), 1)), height: 5)
+                                        }
+                                    }
+                                    .frame(height: 5)
+                                }
+                            }
+                            if fan.id < engine.fans.count - 1 { Divider() }
+                        }
+                    }
+                }
+            }
+
             Spacer()
         }
     }

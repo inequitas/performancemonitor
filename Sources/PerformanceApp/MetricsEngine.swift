@@ -53,7 +53,9 @@ final class MetricsEngine: ObservableObject {
     @Published var localInterfaces: [LocalInterface] = []
     @Published var isVPNActive: Bool = false
     @Published var isConnected: Bool = false
-    @Published var connectionType: String = "Unknown"
+    @Published var connectionType: String = "Unknown"  // primary interface
+    @Published var isWifiAvailable: Bool = false
+    @Published var isEthernetAvailable: Bool = false
     @Published var wifiSSID: String? = nil
     @Published var wifiRSSI: Int? = nil      // dBm, nil when not on WiFi
 
@@ -65,6 +67,8 @@ final class MetricsEngine: ObservableObject {
     @Published var publicIP: String?
     private var lastPublicIPFetch: Date?
     private var pathMonitor: NWPathMonitor?
+    private var wifiMonitor: NWPathMonitor?
+    private var ethernetMonitor: NWPathMonitor?
 
     @Published var pingLatencyMs: Double?
     @Published var pingHistory: [Double] = []
@@ -86,6 +90,13 @@ final class MetricsEngine: ObservableObject {
     @Published var displays: [DisplayInfo] = []
     @Published var bluetoothDevices: [BluetoothDevice] = []
     @Published var bluetoothAuthState: CBManagerAuthorization = CBCentralManager.authorization
+
+    // SMC — temperatures and fans (read-only; fan writes require a root helper)
+    @Published var cpuTemperatureC: Double?
+    @Published var gpuTemperatureC: Double?
+    @Published var fans: [FanInfo] = []
+    private let smc = SMCReader()
+    private var smcCacheDate: Date = .distantPast
 
     // Held strongly so the permission dialog can fire and the delegate callback arrives.
     private var btAuthManager: CBCentralManager?
@@ -244,6 +255,20 @@ final class MetricsEngine: ObservableObject {
         }
         monitor.start(queue: DispatchQueue(label: "NetworkPathMonitor"))
         pathMonitor = monitor
+
+        let wm = NWPathMonitor(requiredInterfaceType: .wifi)
+        wm.pathUpdateHandler = { [weak self] path in
+            Task { @MainActor in self?.isWifiAvailable = path.status == .satisfied }
+        }
+        wm.start(queue: DispatchQueue(label: "WiFiMonitor"))
+        wifiMonitor = wm
+
+        let em = NWPathMonitor(requiredInterfaceType: .wiredEthernet)
+        em.pathUpdateHandler = { [weak self] path in
+            Task { @MainActor in self?.isEthernetAvailable = path.status == .satisfied }
+        }
+        em.start(queue: DispatchQueue(label: "EthernetMonitor"))
+        ethernetMonitor = em
     }
 
     private func updateGPUInfo() {
@@ -272,6 +297,7 @@ final class MetricsEngine: ObservableObject {
         updateBattery()
         updateWiFiSignal()
         updateBluetooth()
+        updateSMC()
         checkAlerts()
         appendPersistedHistoryRow()
 
@@ -935,6 +961,25 @@ final class MetricsEngine: ObservableObject {
             wifiRSSI = rssi
         } else {
             wifiRSSI = nil
+        }
+    }
+
+    // MARK: - SMC (temperatures + fans)
+
+    private func updateSMC() {
+        guard smc.isOpen else { return }
+        guard Date().timeIntervalSince(smcCacheDate) > 2 else { return }
+        smcCacheDate = Date()
+        let reader = smc  // capture before leaving @MainActor; SMCReader is @unchecked Sendable
+        Task.detached(priority: .utility) { [weak self] in
+            let cpuT = reader.cpuTemperature()
+            let gpuT = reader.gpuTemperature()
+            let f    = reader.fans()
+            await MainActor.run {
+                self?.cpuTemperatureC = cpuT
+                self?.gpuTemperatureC = gpuT
+                self?.fans = f
+            }
         }
     }
 
