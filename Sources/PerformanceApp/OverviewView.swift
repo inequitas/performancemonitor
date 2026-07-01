@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import Charts
 
 struct OverviewView: View {
     @ObservedObject var engine: MetricsEngine
@@ -43,19 +44,7 @@ struct OverviewView: View {
                     allowGauge: true
                 ) { openDetail(.memory) }
 
-                OverviewCard(
-                    title: "Disk",
-                    icon: MetricTheme.icon(for: .disk),
-                    color: MetricTheme.disk,
-                    valueText: String(format: "%.0f GB free", engine.diskFreeGB),
-                    history: engine.diskReadHistory,
-                    unit: "KB/s",
-                    fixedMax: nil,
-                    percentValue: engine.diskTotalGB > 0 ? ((engine.diskTotalGB - engine.diskFreeGB) / engine.diskTotalGB) * 100 : 0,
-                    style: $diskStyle,
-                    allowGauge: true,
-                    valueFormatter: formatSpeedCompact
-                ) { openDetail(.disk) }
+                DiskCard(engine: engine, style: $diskStyle) { openDetail(.disk) }
 
                 ThermalCard(
                     state: engine.thermalState,
@@ -126,25 +115,16 @@ private func formatSpeedCompact(_ kbps: Double) -> String {
 // MARK: - Card chart style
 
 enum CardChartStyle: String, CaseIterable, Identifiable {
-    case line, area, bar, gauge
+    case area, gauge
     var id: String { rawValue }
     var label: String { rawValue.capitalized }
     var systemImage: String {
         switch self {
-        case .line: return "chart.xyaxis.line"
-        case .area: return "chart.bar.fill"
-        case .bar: return "chart.bar"
+        case .area:  return "chart.bar.fill"
         case .gauge: return "gauge.with.dots.needle.50percent"
         }
     }
-    var asChartDisplayStyle: ChartDisplayStyle {
-        switch self {
-        case .line: return .line
-        case .area: return .area
-        case .bar: return .bar
-        case .gauge: return .area
-        }
-    }
+    var asChartDisplayStyle: ChartDisplayStyle { .area }
 }
 
 // Fixed height shared by every grid card so all rows look uniform.
@@ -189,15 +169,7 @@ private struct OverviewCard: View {
                 .frame(width: 16)
             }
             Button(action: action) {
-                VStack(alignment: .leading, spacing: 6) {
-                    // In gauge mode the % is already shown inside the ring — skip the duplicate label
-                    if style != .gauge {
-                        Text(valueText)
-                            .font(.system(.body, design: .rounded))
-                            .fontWeight(.semibold)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                    }
+                VStack(spacing: 6) {
                     if style == .gauge, let percent = percentValue {
                         HStack {
                             Spacer()
@@ -206,6 +178,12 @@ private struct OverviewCard: View {
                         }
                         .frame(height: 66)
                     } else {
+                        Text(valueText)
+                            .font(.system(.body, design: .rounded))
+                            .fontWeight(.semibold)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .frame(maxWidth: .infinity, alignment: .center)
                         MetricChart(values: history, unit: unit, fixedMax: fixedMax, showAxes: false, color: color, style: style.asChartDisplayStyle, valueFormatter: valueFormatter)
                             .frame(height: 46)
                     }
@@ -236,15 +214,15 @@ private struct ThermalCard: View {
                     cardIcon("thermometer.medium", color: state.color)
                     Text("Thermal").font(.caption).foregroundStyle(.secondary)
                 }
-                VStack(alignment: .leading, spacing: 3) {
+                VStack(alignment: .center, spacing: 4) {
                     if let t = cpuTemp {
-                        tempRow("CPU", t, color: MetricTheme.cpu)
+                        tempRow("cpu", "CPU", t)
                     }
                     if let t = gpuTemp {
-                        tempRow("GPU", t, color: MetricTheme.gpu)
+                        tempRow("cube.transparent", "GPU", t)
                     }
                     if let t = batteryTemp {
-                        tempRow("Bat", t, color: MetricTheme.battery)
+                        tempRow("battery.75percent", "Bat", t)
                     }
                     HStack(spacing: 4) {
                         Circle().fill(state.color).frame(width: 7, height: 7)
@@ -252,7 +230,7 @@ private struct ThermalCard: View {
                     }
                     .padding(.top, 1)
                 }
-                .frame(height: 70, alignment: .topLeading)
+                .frame(maxWidth: .infinity, alignment: .center)
             }
             .padding(10)
             .frame(maxWidth: .infinity, minHeight: cardHeight, alignment: .topLeading)
@@ -262,15 +240,138 @@ private struct ThermalCard: View {
         .buttonStyle(.plain)
     }
 
-    private func tempRow(_ label: String, _ celsius: Double, color: Color) -> some View {
-        HStack(spacing: 4) {
+    private func tempColor(_ celsius: Double) -> Color {
+        switch celsius {
+        case ..<60:  return .green
+        case ..<80:  return .yellow
+        case ..<95:  return .orange
+        default:     return .red
+        }
+    }
+
+    private func tempRow(_ icon: String, _ label: String, _ celsius: Double) -> some View {
+        let color = tempColor(celsius)
+        return HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundStyle(color)
+                .frame(width: 14)
             Text(label)
                 .font(.caption2)
-                .foregroundStyle(color.opacity(0.8))
-                .frame(width: 24, alignment: .leading)
+                .foregroundStyle(.secondary)
+                .frame(width: 22, alignment: .leading)
             Text(String(format: "%.0f°C", celsius))
                 .font(.caption.monospacedDigit().weight(.semibold))
-                .foregroundStyle(.primary)
+                .foregroundStyle(color)
+        }
+    }
+}
+
+// MARK: - Disk card
+
+private struct DiskCard: View {
+    @ObservedObject var engine: MetricsEngine
+    @Binding var style: CardChartStyle
+    let action: () -> Void
+
+    private let readColor  = Color.indigo
+    private let writeColor = Color.purple
+
+    private var usedPercent: Double {
+        engine.diskTotalGB > 0 ? ((engine.diskTotalGB - engine.diskFreeGB) / engine.diskTotalGB) * 100 : 0
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                cardIcon(MetricTheme.icon(for: .disk), color: readColor)
+                Text("Disk").font(.caption).foregroundStyle(.secondary)
+                Spacer()
+                Menu {
+                    ForEach(CardChartStyle.allCases) { s in
+                        Button { style = s } label: {
+                            Label(s.label, systemImage: s.systemImage)
+                        }
+                    }
+                } label: {
+                    Image(systemName: style.systemImage).font(.system(size: 10)).foregroundStyle(.secondary)
+                }
+                .menuStyle(.borderlessButton)
+                .frame(width: 16)
+            }
+            Button(action: action) {
+                VStack(alignment: .leading, spacing: 6) {
+                    if style == .gauge {
+                        HStack(spacing: 0) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(String(format: "%.0f GB", engine.diskFreeGB))
+                                    .font(.system(.body, design: .rounded)).fontWeight(.semibold)
+                                Text("free of \(Int(engine.diskTotalGB)) GB")
+                                    .font(.caption2).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            RingGaugeView(value: usedPercent, color: readColor)
+                        }
+                        .frame(maxHeight: .infinity)
+                    } else {
+                        HStack(spacing: 10) {
+                            speedLabel("R", engine.diskReadKBps,  readColor)
+                            speedLabel("W", engine.diskWriteKBps, writeColor)
+                        }
+                        DiskButterflyChart(
+                            readHistory:  engine.diskReadHistory,
+                            writeHistory: engine.diskWriteHistory,
+                            readColor:    readColor,
+                            writeColor:   writeColor,
+                            style: style.asChartDisplayStyle
+                        )
+                        .frame(height: 46)
+                    }
+                }
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(readColor.opacity(0.15), lineWidth: 1))
+    }
+
+    private func speedLabel(_ label: String, _ kbps: Double, _ color: Color) -> some View {
+        HStack(spacing: 3) {
+            Text(label).font(.caption2).foregroundStyle(.secondary)
+            Text(formatSpeedCompact(kbps)).font(.caption2.monospacedDigit()).foregroundStyle(color)
+        }
+    }
+}
+
+// Butterfly chart: read grows upward, write is the same chart flipped downward.
+// Shared fixedMax keeps both halves proportional — same technique as NetworkButterflyChart.
+private struct DiskButterflyChart: View {
+    let readHistory:   [Double]
+    let writeHistory:  [Double]
+    let readColor:     Color
+    let writeColor:    Color
+    let style:         ChartDisplayStyle
+
+    private var sharedMax: Double {
+        max(readHistory.max() ?? 0, writeHistory.max() ?? 0, 1)
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            MetricChart(values: readHistory, unit: "KB/s", fixedMax: sharedMax,
+                        showAxes: false, color: readColor, style: style,
+                        valueFormatter: formatSpeedCompact)
+                .frame(height: 20)
+            Rectangle()
+                .fill(Color.primary.opacity(0.15))
+                .frame(height: 1)
+            MetricChart(values: writeHistory, unit: "KB/s", fixedMax: sharedMax,
+                        showAxes: false, color: writeColor, style: style,
+                        valueFormatter: formatSpeedCompact)
+                .frame(height: 20)
+                .scaleEffect(y: -1)
         }
     }
 }
@@ -309,8 +410,12 @@ private struct BatteryCard: View {
                     cardIcon(isCharging ? "battery.100percent.bolt" : "battery.75percent", color: color)
                     Text("Battery").font(.caption).foregroundStyle(.secondary)
                 }
-                Text("\(percent)%").font(.system(.body, design: .rounded)).fontWeight(.semibold)
-                Text(subtitleText).font(.caption2).foregroundStyle(.secondary).frame(height: 46 - 16, alignment: .top)
+                Text("\(percent)%")
+                    .font(.system(.body, design: .rounded)).fontWeight(.semibold)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                Text(subtitleText)
+                    .font(.caption2).foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
             }
             .padding(10)
             .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
@@ -338,9 +443,11 @@ private struct GPUCard: View {
                 Text(name)
                     .font(.system(.callout, design: .rounded)).fontWeight(.semibold)
                     .lineLimit(1).minimumScaleFactor(0.7)
+                    .frame(maxWidth: .infinity, alignment: .center)
                 if displays.isEmpty {
                     Text("No display info")
                         .font(.caption2).foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
                 } else {
                     ForEach(displays) { d in
                         HStack(spacing: 4) {
@@ -354,6 +461,7 @@ private struct GPUCard: View {
                                     .foregroundStyle(.cyan.opacity(0.7))
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .center)
                     }
                 }
             }
