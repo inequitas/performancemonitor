@@ -6,6 +6,7 @@ APP_NAME="Performance Monitor"
 BUNDLE_ID="com.tribalforce.performancemonitor"
 BUILD_DIR=".build/release"
 APP_DIR="dist/${APP_NAME}.app"
+VERSION="$(cat VERSION | tr -d '[:space:]')"
 
 echo "Building release binary..."
 swift build -c release
@@ -40,9 +41,9 @@ cat > "${APP_DIR}/Contents/Info.plist" << PLIST
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>${VERSION}</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>${VERSION}</string>
     <key>LSUIElement</key>
     <true/>
     <key>LSMinimumSystemVersion</key>

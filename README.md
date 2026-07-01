@@ -2,7 +2,7 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-13%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![License](https://img.shields.io/badge/license-MIT-green)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.1.0-lightgrey)
 
 ---
 
@@ -47,8 +47,7 @@ A lightweight macOS menu bar app that gives you real-time system metrics at a gl
 - Connected and paired device list
 - Battery percentage per device:
   - **AirPods** — Left, Right, and Case shown separately
-  - **BLE devices** (e.g. Logitech MX Master) — read via GATT Battery Service
-- Device type icons (headphones, keyboard, mouse, etc.)
+  - **BLE devices** (e.g. Logitech MX Master) — battery read via GATT Battery Service
 
 ---
 
@@ -56,7 +55,7 @@ A lightweight macOS menu bar app that gives you real-time system metrics at a gl
 
 1. Download the latest `Performance Monitor.app` from [Releases](https://github.com/inequitas/performancemonitor/releases)
 2. Unzip and drag to `/Applications`
-3. Launch the app — it appears in your menu bar
+3. Launch — the app appears in your menu bar
 4. Grant **Bluetooth** permission when prompted to see Bluetooth device info
 
 > **Gatekeeper note:** The app is ad-hoc signed (no Apple Developer ID). On first launch, right-click the app → **Open** to bypass the unidentified developer warning.
@@ -74,7 +73,7 @@ bash build_app.sh
 open "dist/Performance Monitor.app"
 ```
 
-The build script compiles a release binary, assembles the `.app` bundle, embeds the icon, and applies an ad-hoc code signature.
+The build script compiles a release binary, assembles the `.app` bundle, embeds the icon, injects the version from `VERSION`, and applies an ad-hoc code signature.
 
 ---
 
