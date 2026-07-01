@@ -2,7 +2,25 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.1.0-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.2.0-lightgrey)
+
+---
+
+## Releases
+
+### v0.2.0 — SMC temperatures, fan readings, network connection indicators
+- **Thermal card** on the main overview now shows CPU, GPU, and Battery temperatures simultaneously, each colour-coded
+- **SMC temperature fix** — resolved a critical bug where `dataType` was read from the wrong IOKit response, causing temperatures to disappear entirely
+- **Fan RPM fix** — corrected data-type decoding (float vs fixed-point) and key name detection; fans now labelled **Left** / **Right** on two-fan Macs
+- **Fan control removed** — SMC writes require a root-level privileged helper; unprivileged writes return `kIOReturnError`. Fan speeds remain read-only.
+- **Network connection indicators** — WiFi and Ethernet icons shown left of bandwidth speeds; primary connection is green, secondary (when both active) is white; updates in real time when connections change
+
+### v0.1.1
+- Bluetooth battery percentage for AirPods (Left/Right/Case) and BLE devices (e.g. Logitech MX Master via GATT)
+- Ring gauge chart style for CPU, Memory, and Disk cards
+
+### v0.1.0
+- Initial release — CPU, Memory, Network, Disk, GPU, Battery, Bluetooth, Thermal overview
 
 ---
 
@@ -21,6 +39,7 @@ A lightweight macOS menu bar app that gives you real-time system metrics at a gl
 
 ### Network
 - Live upload and download throughput
+- Connection type indicator: WiFi and/or Ethernet icon; primary connection is green, secondary is white
 - Local IP address (tap to copy)
 - Public IP address (tap to copy)
 - Wi-Fi SSID and signal strength in dBm with visual bar indicator
@@ -86,6 +105,12 @@ The build script compiles a release binary, assembles the `.app` bundle, embeds 
 No data is collected or transmitted. Everything runs locally.
 
 ---
+
+### Thermal & Fans
+- CPU, GPU, and Battery temperatures read from the SMC via IOKit
+- All three temperatures shown on the main overview card
+- Fan speeds (Left/Right) with min/max range and position bar
+- System thermal pressure level (Nominal → Critical)
 
 ## Tech Stack
 
