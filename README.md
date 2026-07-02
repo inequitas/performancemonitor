@@ -2,11 +2,17 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.2.2-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.0-lightgrey)
 
 ---
 
 ## Releases
+
+### v0.3.0 — Settings tabs, visual panel manager, configurable alerts
+- **Settings redesigned** into four tabs: General, Metrics, Alerts, History, and Panels
+- **Visual panel manager** — drag-and-drop mini grid in Settings → Panels mirrors the actual layout; drag any card to reorder, including moving Network and Bluetooth between grid rows; tap the eye icon to show or hide individual panels
+- **Configurable alerts** — each metric (CPU, Memory, Disk, GPU, Thermal) has its own enable toggle and threshold slider; alerts are fully independent of each other
+- **Unified panel layout** — full-width cards (Network, Bluetooth) can now be positioned anywhere in the overview, appearing between grid rows as you arrange them
 
 ### v0.2.2 — GPU utilization, menu bar sparkline, Settings fix
 - **GPU utilization %** — live usage read from `IOAccelerator`; GPU card switches between chart, gauge, and info (GPU name + displays) views from the card menu

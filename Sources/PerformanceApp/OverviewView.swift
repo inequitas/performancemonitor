@@ -11,6 +11,10 @@ struct OverviewView: View {
     @State private var memoryStyle: CardChartStyle = .area
     @State private var diskStyle: CardChartStyle = .area
 
+    private var visiblePanels: [MetricsEngine.Panel] {
+        engine.panelOrder.filter { !engine.hiddenPanels.contains($0) }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("System Overview")
@@ -18,68 +22,19 @@ struct OverviewView: View {
                 .padding(.top, 12)
                 .padding(.horizontal, 14)
 
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                OverviewCard(
-                    title: "CPU",
-                    icon: MetricTheme.icon(for: .cpu),
-                    color: MetricTheme.cpu,
-                    valueText: String(format: "%.0f%%", engine.cpuUsagePercent),
-                    history: engine.cpuHistory,
-                    unit: "%",
-                    fixedMax: 100,
-                    percentValue: engine.cpuUsagePercent,
-                    style: $cpuStyle,
-                    allowGauge: true
-                ) { openDetail(.cpu) }
-
-                OverviewCard(
-                    title: "Memory",
-                    icon: MetricTheme.icon(for: .memory),
-                    color: MetricTheme.memory,
-                    valueText: String(format: "%.1f / %.0f GB", engine.memoryUsedGB, engine.memoryTotalGB),
-                    history: engine.memoryHistory,
-                    unit: "GB",
-                    fixedMax: max(engine.memoryTotalGB, 1),
-                    percentValue: engine.memoryTotalGB > 0 ? (engine.memoryUsedGB / engine.memoryTotalGB) * 100 : 0,
-                    style: $memoryStyle,
-                    allowGauge: true
-                ) { openDetail(.memory) }
-
-                DiskCard(engine: engine, style: $diskStyle) { openDetail(.disk) }
-
-                ThermalCard(
-                    state: engine.thermalState,
-                    cpuTemp: engine.cpuTemperatureC,
-                    gpuTemp: engine.gpuTemperatureC,
-                    batteryTemp: engine.batteryTemperatureC
-                ) { openDetail(.thermal) }
-
-                GPUCard(name: engine.gpuName, usagePercent: engine.gpuUsagePercent, history: engine.gpuHistory, displays: engine.displays) { openDetail(.gpu) }
-
-                if let percent = engine.batteryPercent {
-                    let watts: Double? = engine.batteryVoltage.flatMap { v in
-                        engine.batteryAmperage.map { a in v * abs(Double(a)) / 1000 }
+            VStack(spacing: 10) {
+                ForEach(panelRows(visiblePanels), id: \.rowID) { row in
+                    if let full = row.full {
+                        fullWidthCard(for: full)
+                    } else {
+                        HStack(spacing: 10) {
+                            if let a = row.first { gridCard(for: a) }
+                            if let b = row.second { gridCard(for: b) }
+                            else { Color.clear }
+                        }
                     }
-                    BatteryCard(
-                        percent: percent,
-                        isCharging: engine.batteryIsCharging,
-                        powerSourceName: engine.powerSourceName,
-                        timeRemainingMinutes: engine.batteryTimeRemainingMinutes,
-                        watts: watts
-                    ) { openDetail(.battery) }
                 }
             }
-            .padding(.horizontal, 14)
-
-            // Network — full-width with IP copy rows
-            NetworkOverviewCard(engine: engine) { openDetail(.network) }
-                .padding(.horizontal, 14)
-
-            // Bluetooth — full-width with connected device rows
-            BluetoothOverviewCard(
-                devices: engine.bluetoothDevices,
-                action: { openDetail(.bluetooth) }
-            )
             .padding(.horizontal, 14)
 
             Divider().padding(.horizontal, 14)
@@ -104,6 +59,89 @@ struct OverviewView: View {
         }
         .frame(width: 380)
         .background(.regularMaterial)
+    }
+
+    private struct PanelRow {
+        var first: MetricsEngine.Panel?
+        var second: MetricsEngine.Panel?
+        var full: MetricsEngine.Panel?
+        var rowID: String {
+            [first?.id, second?.id, full?.id].compactMap { $0 }.joined(separator: "-")
+        }
+    }
+
+    private func panelRows(_ panels: [MetricsEngine.Panel]) -> [PanelRow] {
+        var rows: [PanelRow] = []
+        var pending: MetricsEngine.Panel? = nil
+        for panel in panels {
+            if panel.isFullWidth {
+                if let p = pending { rows.append(PanelRow(first: p)); pending = nil }
+                rows.append(PanelRow(full: panel))
+            } else {
+                if let p = pending {
+                    rows.append(PanelRow(first: p, second: panel)); pending = nil
+                } else {
+                    pending = panel
+                }
+            }
+        }
+        if let p = pending { rows.append(PanelRow(first: p)) }
+        return rows
+    }
+
+    @ViewBuilder
+    private func gridCard(for panel: MetricsEngine.Panel) -> some View {
+        switch panel {
+        case .cpu:
+            OverviewCard(
+                title: "CPU", icon: MetricTheme.icon(for: .cpu), color: MetricTheme.cpu,
+                valueText: String(format: "%.0f%%", engine.cpuUsagePercent),
+                history: engine.cpuHistory, unit: "%", fixedMax: 100,
+                percentValue: engine.cpuUsagePercent,
+                style: $cpuStyle, allowGauge: true
+            ) { openDetail(.cpu) }
+        case .memory:
+            OverviewCard(
+                title: "Memory", icon: MetricTheme.icon(for: .memory), color: MetricTheme.memory,
+                valueText: String(format: "%.1f / %.0f GB", engine.memoryUsedGB, engine.memoryTotalGB),
+                history: engine.memoryHistory, unit: "GB", fixedMax: max(engine.memoryTotalGB, 1),
+                percentValue: engine.memoryTotalGB > 0 ? (engine.memoryUsedGB / engine.memoryTotalGB) * 100 : 0,
+                style: $memoryStyle, allowGauge: true
+            ) { openDetail(.memory) }
+        case .disk:
+            DiskCard(engine: engine, style: $diskStyle) { openDetail(.disk) }
+        case .thermal:
+            ThermalCard(state: engine.thermalState, cpuTemp: engine.cpuTemperatureC,
+                        gpuTemp: engine.gpuTemperatureC, batteryTemp: engine.batteryTemperatureC
+            ) { openDetail(.thermal) }
+        case .gpu:
+            GPUCard(name: engine.gpuName, usagePercent: engine.gpuUsagePercent,
+                    history: engine.gpuHistory, displays: engine.displays) { openDetail(.gpu) }
+        case .battery:
+            if let percent = engine.batteryPercent {
+                let watts = engine.batteryVoltage.flatMap { v in
+                    engine.batteryAmperage.map { a in v * abs(Double(a)) / 1000 }
+                }
+                BatteryCard(percent: percent, isCharging: engine.batteryIsCharging,
+                            powerSourceName: engine.powerSourceName,
+                            timeRemainingMinutes: engine.batteryTimeRemainingMinutes,
+                            watts: watts) { openDetail(.battery) }
+            }
+        default:
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder
+    private func fullWidthCard(for panel: MetricsEngine.Panel) -> some View {
+        switch panel {
+        case .network:
+            NetworkOverviewCard(engine: engine) { openDetail(.network) }
+        case .bluetooth:
+            BluetoothOverviewCard(devices: engine.bluetoothDevices) { openDetail(.bluetooth) }
+        default:
+            EmptyView()
+        }
     }
 
     private func openDetail(_ kind: DetailWindow.Kind) {

@@ -1,5 +1,6 @@
 import Foundation
 import Darwin
+import SwiftUI
 import IOKit
 import IOKit.storage
 import IOKit.ps
@@ -122,8 +123,15 @@ final class MetricsEngine: ObservableObject {
     @Published var alertsEnabled: Bool = false {
         didSet { if alertsEnabled { requestNotificationAuthorization() } }
     }
+    @Published var cpuAlertEnabled: Bool = true
     @Published var cpuAlertThreshold: Double = 90
+    @Published var memoryAlertEnabled: Bool = false
+    @Published var memoryAlertThresholdPercent: Double = 90
+    @Published var diskAlertEnabled: Bool = true
     @Published var diskFreeAlertThresholdGB: Double = 10
+    @Published var gpuAlertEnabled: Bool = false
+    @Published var gpuAlertThreshold: Double = 90
+    @Published var thermalAlertEnabled: Bool = true
     private var lastAlertFired: [String: Date] = [:]
     private let alertCooldown: TimeInterval = 300
 
@@ -137,6 +145,25 @@ final class MetricsEngine: ObservableObject {
         return dir.appendingPathComponent("history.csv")
     }()
     private var historyFileHandle: FileHandle?
+
+    enum Panel: String, CaseIterable, Identifiable, Codable, Transferable {
+        case cpu        = "CPU"
+        case memory     = "Memory"
+        case disk       = "Disk"
+        case thermal    = "Thermal"
+        case gpu        = "GPU & Displays"
+        case battery    = "Battery"
+        case network    = "Network"
+        case bluetooth  = "Bluetooth"
+        var id: String { rawValue }
+        var isFullWidth: Bool { self == .network || self == .bluetooth }
+        static var transferRepresentation: some TransferRepresentation {
+            ProxyRepresentation(exporting: \.rawValue) { Panel(rawValue: $0) ?? .cpu }
+        }
+    }
+
+    @Published var panelOrder: [Panel] = Panel.allCases
+    @Published var hiddenPanels: Set<Panel> = []
 
     enum MenuBarMetric: String, CaseIterable, Identifiable {
         case cpu = "CPU"
@@ -790,13 +817,22 @@ final class MetricsEngine: ObservableObject {
     private func checkAlerts() {
         guard alertsEnabled else { return }
 
-        if cpuUsagePercent >= cpuAlertThreshold {
-            fireAlert(key: "cpu", title: "High CPU usage", body: String(format: "CPU usage is at %.0f%%", cpuUsagePercent))
+        if cpuAlertEnabled, cpuUsagePercent >= cpuAlertThreshold {
+            fireAlert(key: "cpu", title: "High CPU usage", body: String(format: "CPU is at %.0f%%", cpuUsagePercent))
         }
-        if diskFreeGB > 0, diskFreeGB <= diskFreeAlertThresholdGB {
+        if memoryAlertEnabled, memoryTotalGB > 0 {
+            let memPct = (memoryUsedGB / memoryTotalGB) * 100
+            if memPct >= memoryAlertThresholdPercent {
+                fireAlert(key: "memory", title: "High memory usage", body: String(format: "%.1f / %.0f GB used (%.0f%%)", memoryUsedGB, memoryTotalGB, memPct))
+            }
+        }
+        if diskAlertEnabled, diskFreeGB > 0, diskFreeGB <= diskFreeAlertThresholdGB {
             fireAlert(key: "disk", title: "Low disk space", body: String(format: "Only %.1f GB free", diskFreeGB))
         }
-        if thermalState == .serious || thermalState == .critical {
+        if gpuAlertEnabled, gpuUsagePercent >= gpuAlertThreshold {
+            fireAlert(key: "gpu", title: "High GPU usage", body: String(format: "GPU is at %.0f%%", gpuUsagePercent))
+        }
+        if thermalAlertEnabled, thermalState == .serious || thermalState == .critical {
             fireAlert(key: "thermal", title: "System running hot", body: "Thermal pressure: \(thermalState.label)")
         }
     }
