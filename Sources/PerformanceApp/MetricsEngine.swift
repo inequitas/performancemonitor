@@ -62,7 +62,9 @@ final class MetricsEngine: ObservableObject {
 
     @Published var publicIPEnabled: Bool = true {
         didSet {
+            guard !isLoadingPreferences else { return }
             if publicIPEnabled { fetchPublicIP() } else { publicIP = nil }
+            UserDefaults.standard.set(publicIPEnabled, forKey: Pref.publicIPEnabled)
         }
     }
     @Published var publicIP: String?
@@ -121,23 +123,60 @@ final class MetricsEngine: ObservableObject {
     @Published var gpuHistory: [Double] = []
 
     @Published var alertsEnabled: Bool = false {
-        didSet { if alertsEnabled { requestNotificationAuthorization() } }
+        didSet {
+            guard !isLoadingPreferences else { return }
+            if alertsEnabled { requestNotificationAuthorization() }
+            UserDefaults.standard.set(alertsEnabled, forKey: Pref.alertsEnabled)
+        }
     }
-    @Published var cpuAlertEnabled: Bool = true
-    @Published var cpuAlertThreshold: Double = 90
-    @Published var memoryAlertEnabled: Bool = false
-    @Published var memoryAlertThresholdPercent: Double = 90
-    @Published var diskAlertEnabled: Bool = true
-    @Published var diskFreeAlertThresholdGB: Double = 10
-    @Published var gpuAlertEnabled: Bool = false
-    @Published var gpuAlertThreshold: Double = 90
-    @Published var thermalAlertEnabled: Bool = true
+    @Published var cpuAlertEnabled: Bool = true {
+        didSet { UserDefaults.standard.set(cpuAlertEnabled, forKey: Pref.cpuAlertEnabled) }
+    }
+    @Published var cpuAlertThreshold: Double = 90 {
+        didSet { UserDefaults.standard.set(cpuAlertThreshold, forKey: Pref.cpuAlertThreshold) }
+    }
+    @Published var memoryAlertEnabled: Bool = false {
+        didSet { UserDefaults.standard.set(memoryAlertEnabled, forKey: Pref.memoryAlertEnabled) }
+    }
+    @Published var memoryAlertThresholdPercent: Double = 90 {
+        didSet { UserDefaults.standard.set(memoryAlertThresholdPercent, forKey: Pref.memoryAlertThresholdPct) }
+    }
+    @Published var diskAlertEnabled: Bool = true {
+        didSet { UserDefaults.standard.set(diskAlertEnabled, forKey: Pref.diskAlertEnabled) }
+    }
+    @Published var diskFreeAlertThresholdGB: Double = 10 {
+        didSet { UserDefaults.standard.set(diskFreeAlertThresholdGB, forKey: Pref.diskFreeAlertThresholdGB) }
+    }
+    @Published var gpuAlertEnabled: Bool = false {
+        didSet { UserDefaults.standard.set(gpuAlertEnabled, forKey: Pref.gpuAlertEnabled) }
+    }
+    @Published var gpuAlertThreshold: Double = 90 {
+        didSet { UserDefaults.standard.set(gpuAlertThreshold, forKey: Pref.gpuAlertThreshold) }
+    }
+    @Published var thermalAlertEnabled: Bool = true {
+        didSet { UserDefaults.standard.set(thermalAlertEnabled, forKey: Pref.thermalAlertEnabled) }
+    }
     private var lastAlertFired: [String: Date] = [:]
     private let alertCooldown: TimeInterval = 300
 
-    @Published var topProcessCount: Int = 6
-    @Published var showRemovableVolumes: Bool = true
-    @Published var persistHistoryEnabled: Bool = false
+    @Published var showInDock: Bool = false {
+        didSet {
+            guard !isLoadingPreferences else { return }
+            NSApp.setActivationPolicy(showInDock ? .regular : .accessory)
+            UserDefaults.standard.set(showInDock, forKey: Pref.showInDock)
+        }
+    }
+
+    @Published var topProcessCount: Int = 6 {
+        didSet { UserDefaults.standard.set(topProcessCount, forKey: Pref.topProcessCount) }
+    }
+    @Published var showRemovableVolumes: Bool = true {
+        didSet { UserDefaults.standard.set(showRemovableVolumes, forKey: Pref.showRemovableVolumes) }
+    }
+    @Published var persistHistoryEnabled: Bool = false {
+        didSet { UserDefaults.standard.set(persistHistoryEnabled, forKey: Pref.persistHistoryEnabled) }
+    }
+    private var isLoadingPreferences = false
     private let historyFileURL: URL = {
         let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("PerformanceApp", isDirectory: true)
@@ -162,8 +201,12 @@ final class MetricsEngine: ObservableObject {
         }
     }
 
-    @Published var panelOrder: [Panel] = Panel.allCases
-    @Published var hiddenPanels: Set<Panel> = []
+    @Published var panelOrder: [Panel] = Panel.allCases {
+        didSet { UserDefaults.standard.set(panelOrder.map(\.rawValue), forKey: Pref.panelOrder) }
+    }
+    @Published var hiddenPanels: Set<Panel> = [] {
+        didSet { UserDefaults.standard.set(Array(hiddenPanels).map(\.rawValue), forKey: Pref.hiddenPanels) }
+    }
 
     enum MenuBarMetric: String, CaseIterable, Identifiable {
         case cpu = "CPU"
@@ -179,11 +222,19 @@ final class MetricsEngine: ObservableObject {
         var id: String { rawValue }
     }
 
-    @Published var menuBarMetric: MenuBarMetric = .cpu
-    @Published var menuBarStyle: MenuBarStyle = .sparkline
+    @Published var menuBarMetric: MenuBarMetric = .cpu {
+        didSet { UserDefaults.standard.set(menuBarMetric.rawValue, forKey: Pref.menuBarMetric) }
+    }
+    @Published var menuBarStyle: MenuBarStyle = .sparkline {
+        didSet { UserDefaults.standard.set(menuBarStyle.rawValue, forKey: Pref.menuBarStyle) }
+    }
 
     @Published var refreshInterval: Double = 1.0 {
-        didSet { restartTimer() }
+        didSet {
+            guard !isLoadingPreferences else { return }
+            restartTimer()
+            UserDefaults.standard.set(refreshInterval, forKey: Pref.refreshInterval)
+        }
     }
 
     private let historyLimit = 300 // ~5 min at 1s interval
@@ -328,6 +379,7 @@ final class MetricsEngine: ObservableObject {
         updateVolumes()
         startPathMonitor()
         startPingTimer()
+        loadPreferences()
         if publicIPEnabled { fetchPublicIP() }
         refresh()
         restartTimer()
@@ -866,6 +918,71 @@ final class MetricsEngine: ObservableObject {
         let row = "\(Date().timeIntervalSince1970),\(cpuUsagePercent),\(memoryUsedGB),\(downloadSpeedKBps),\(uploadSpeedKBps),\(diskFreeGB)\n"
         if let data = row.data(using: .utf8) {
             historyFileHandle?.write(data)
+        }
+    }
+
+    // MARK: - Preferences persistence
+
+    private enum Pref {
+        static let showInDock               = "showInDock"
+        static let refreshInterval          = "refreshInterval"
+        static let topProcessCount          = "topProcessCount"
+        static let showRemovableVolumes     = "showRemovableVolumes"
+        static let persistHistoryEnabled    = "persistHistoryEnabled"
+        static let publicIPEnabled          = "publicIPEnabled"
+        static let menuBarMetric            = "menuBarMetric"
+        static let menuBarStyle             = "menuBarStyle"
+        static let panelOrder               = "panelOrder"
+        static let hiddenPanels             = "hiddenPanels"
+        static let alertsEnabled            = "alertsEnabled"
+        static let cpuAlertEnabled          = "cpuAlertEnabled"
+        static let cpuAlertThreshold        = "cpuAlertThreshold"
+        static let memoryAlertEnabled       = "memoryAlertEnabled"
+        static let memoryAlertThresholdPct  = "memoryAlertThresholdPct"
+        static let diskAlertEnabled         = "diskAlertEnabled"
+        static let diskFreeAlertThresholdGB = "diskFreeAlertThresholdGB"
+        static let gpuAlertEnabled          = "gpuAlertEnabled"
+        static let gpuAlertThreshold        = "gpuAlertThreshold"
+        static let thermalAlertEnabled      = "thermalAlertEnabled"
+    }
+
+    private func loadPreferences() {
+        isLoadingPreferences = true
+        defer {
+            isLoadingPreferences = false
+            NSApp.setActivationPolicy(showInDock ? .regular : .accessory)
+        }
+        let ud = UserDefaults.standard
+        func bool(_ k: String) -> Bool?   { ud.object(forKey: k) != nil ? ud.bool(forKey: k) : nil }
+        func dbl(_ k: String)  -> Double? { ud.object(forKey: k) != nil ? ud.double(forKey: k) : nil }
+        func int_(_ k: String) -> Int?    { ud.object(forKey: k) != nil ? ud.integer(forKey: k) : nil }
+
+        if let v = bool(Pref.showInDock)               { showInDock = v }
+        if let v = bool(Pref.publicIPEnabled)           { publicIPEnabled = v }
+        if let v = bool(Pref.showRemovableVolumes)      { showRemovableVolumes = v }
+        if let v = bool(Pref.persistHistoryEnabled)     { persistHistoryEnabled = v }
+        if let v = bool(Pref.alertsEnabled)             { alertsEnabled = v }
+        if let v = bool(Pref.cpuAlertEnabled)           { cpuAlertEnabled = v }
+        if let v = bool(Pref.memoryAlertEnabled)        { memoryAlertEnabled = v }
+        if let v = bool(Pref.diskAlertEnabled)          { diskAlertEnabled = v }
+        if let v = bool(Pref.gpuAlertEnabled)           { gpuAlertEnabled = v }
+        if let v = bool(Pref.thermalAlertEnabled)       { thermalAlertEnabled = v }
+        if let v = dbl(Pref.refreshInterval)            { refreshInterval = v }
+        if let v = dbl(Pref.cpuAlertThreshold)         { cpuAlertThreshold = v }
+        if let v = dbl(Pref.memoryAlertThresholdPct)   { memoryAlertThresholdPercent = v }
+        if let v = dbl(Pref.diskFreeAlertThresholdGB)  { diskFreeAlertThresholdGB = v }
+        if let v = dbl(Pref.gpuAlertThreshold)         { gpuAlertThreshold = v }
+        if let v = int_(Pref.topProcessCount)           { topProcessCount = v }
+        if let v = ud.string(forKey: Pref.menuBarMetric)  { menuBarMetric = MenuBarMetric(rawValue: v) ?? .cpu }
+        if let v = ud.string(forKey: Pref.menuBarStyle)   { menuBarStyle = MenuBarStyle(rawValue: v) ?? .sparkline }
+
+        if let raw = ud.stringArray(forKey: Pref.panelOrder) {
+            let loaded = raw.compactMap { Panel(rawValue: $0) }
+            let missing = Panel.allCases.filter { !loaded.contains($0) }
+            panelOrder = loaded + missing
+        }
+        if let raw = ud.stringArray(forKey: Pref.hiddenPanels) {
+            hiddenPanels = Set(raw.compactMap { Panel(rawValue: $0) })
         }
     }
 

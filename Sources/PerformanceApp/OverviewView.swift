@@ -7,9 +7,19 @@ struct OverviewView: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(\.openSettings) private var openSettings
 
-    @State private var cpuStyle: CardChartStyle = .area
-    @State private var memoryStyle: CardChartStyle = .area
-    @State private var diskStyle: CardChartStyle = .area
+    @AppStorage("card.cpuStyle")    private var cpuStyleRaw: String = CardChartStyle.area.rawValue
+    @AppStorage("card.memoryStyle") private var memoryStyleRaw: String = CardChartStyle.area.rawValue
+    @AppStorage("card.diskStyle")   private var diskStyleRaw: String = CardChartStyle.area.rawValue
+
+    private var cpuStyle: Binding<CardChartStyle> {
+        Binding(get: { CardChartStyle(rawValue: cpuStyleRaw) ?? .area },    set: { cpuStyleRaw = $0.rawValue })
+    }
+    private var memoryStyle: Binding<CardChartStyle> {
+        Binding(get: { CardChartStyle(rawValue: memoryStyleRaw) ?? .area }, set: { memoryStyleRaw = $0.rawValue })
+    }
+    private var diskStyle: Binding<CardChartStyle> {
+        Binding(get: { CardChartStyle(rawValue: diskStyleRaw) ?? .area },   set: { diskStyleRaw = $0.rawValue })
+    }
 
     private var visiblePanels: [MetricsEngine.Panel] {
         engine.panelOrder.filter { !engine.hiddenPanels.contains($0) }
@@ -98,7 +108,7 @@ struct OverviewView: View {
                 valueText: String(format: "%.0f%%", engine.cpuUsagePercent),
                 history: engine.cpuHistory, unit: "%", fixedMax: 100,
                 percentValue: engine.cpuUsagePercent,
-                style: $cpuStyle, allowGauge: true
+                style: cpuStyle, allowGauge: true
             ) { openDetail(.cpu) }
         case .memory:
             OverviewCard(
@@ -106,10 +116,10 @@ struct OverviewView: View {
                 valueText: String(format: "%.1f / %.0f GB", engine.memoryUsedGB, engine.memoryTotalGB),
                 history: engine.memoryHistory, unit: "GB", fixedMax: max(engine.memoryTotalGB, 1),
                 percentValue: engine.memoryTotalGB > 0 ? (engine.memoryUsedGB / engine.memoryTotalGB) * 100 : 0,
-                style: $memoryStyle, allowGauge: true
+                style: memoryStyle, allowGauge: true
             ) { openDetail(.memory) }
         case .disk:
-            DiskCard(engine: engine, style: $diskStyle) { openDetail(.disk) }
+            DiskCard(engine: engine, style: diskStyle) { openDetail(.disk) }
         case .thermal:
             ThermalCard(state: engine.thermalState, cpuTemp: engine.cpuTemperatureC,
                         gpuTemp: engine.gpuTemperatureC, batteryTemp: engine.batteryTemperatureC

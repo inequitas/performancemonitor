@@ -24,6 +24,11 @@ struct SettingsView: View {
         }
         .frame(width: 420)
         .background(.regularMaterial)
+        .onDisappear {
+            if !engine.showInDock {
+                NSApp.setActivationPolicy(.accessory)
+            }
+        }
     }
 }
 
@@ -45,6 +50,10 @@ private struct GeneralTab: View {
                                 .foregroundStyle(.secondary)
                                 .frame(width: 36)
                         }
+                    }
+                    Divider().padding(.vertical, 4)
+                    SettingsRow(label: "Show in Dock") {
+                        Toggle("", isOn: $engine.showInDock).labelsHidden()
                     }
                     Divider().padding(.vertical, 4)
                     SettingsRow(label: "Launch at login") {

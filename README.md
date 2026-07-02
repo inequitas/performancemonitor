@@ -2,11 +2,16 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.0-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.1-lightgrey)
 
 ---
 
 ## Releases
+
+### v0.3.1 — Persistent settings
+- All settings now survive restarts and app updates: panel order and visibility, alert toggles and thresholds, menu bar style and metric, refresh interval, card styles (area/gauge), dock visibility, and all other preferences
+- Dock icon option fixed: no longer reappears after closing Settings
+- Settings use `UserDefaults` with stable keys; new settings added in future versions default gracefully without breaking existing saved data
 
 ### v0.3.0 — Settings tabs, visual panel manager, configurable alerts
 - **Settings redesigned** into four tabs: General, Metrics, Alerts, History, and Panels
