@@ -11,5 +11,8 @@ dist/
 *.xcuserstate
 xcuserdata/
 
+# IDE config
+.vscode/
+
 # Claude Code session data
 .claude/
