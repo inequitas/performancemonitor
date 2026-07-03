@@ -20,15 +20,23 @@ struct MetricChart: View {
     /// Fixed upper bound for the y-axis (e.g. 100 for percentages). If nil, scales to the data's max.
     let fixedMax: Double?
     let showAxes: Bool
+    /// Show horizontal grid lines only — no labels, no current-value rule. Intended for flipped butterfly halves.
+    let showGridLines: Bool
     let color: Color
     let style: ChartDisplayStyle
     let valueFormatter: (Double) -> String
 
-    init(values: [Double], unit: String = "", fixedMax: Double? = nil, showAxes: Bool = true, color: Color = .accentColor, style: ChartDisplayStyle = .area, valueFormatter: @escaping (Double) -> String = { String(format: "%.1f", $0) }) {
+    /// When true, removes the chart's built-in top/bottom scale inset so the data area fills the frame exactly.
+    /// Use this for butterfly halves whose external label columns must align with the chart scale.
+    let fillFrame: Bool
+
+    init(values: [Double], unit: String = "", fixedMax: Double? = nil, showAxes: Bool = true, showGridLines: Bool = false, fillFrame: Bool = false, color: Color = .accentColor, style: ChartDisplayStyle = .area, valueFormatter: @escaping (Double) -> String = { String(format: "%.1f", $0) }) {
         self.values = values
         self.unit = unit
         self.fixedMax = fixedMax
         self.showAxes = showAxes
+        self.showGridLines = showGridLines
+        self.fillFrame = fillFrame
         self.color = color
         self.style = style
         self.valueFormatter = valueFormatter
@@ -86,7 +94,7 @@ struct MetricChart: View {
                     }
             }
         }
-        .chartYScale(domain: 0...upperBound)
+        .chartYScale(domain: 0...upperBound, range: fillFrame ? .plotDimension(padding: 0) : .plotDimension)
         .chartXAxis(.hidden)
         .chartYAxis {
             if showAxes {
@@ -99,6 +107,13 @@ struct MetricChart: View {
                         }
                     }
                 }
+            } else if showGridLines {
+                // No labels — use trailing position so no left margin is reserved
+                AxisMarks(position: .trailing, values: .automatic(desiredCount: 3)) { _ in
+                    AxisGridLine()
+                }
+            } else {
+                AxisMarks { _ in }
             }
         }
     }

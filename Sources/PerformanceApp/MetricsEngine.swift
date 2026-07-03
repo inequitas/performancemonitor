@@ -50,9 +50,11 @@ final class MetricsEngine: ObservableObject {
     @Published var topCPUProcesses: [ProcessUsage] = []
     @Published var topMemoryProcesses: [ProcessUsage] = []
     @Published var topNetworkProcesses: [ProcessUsage] = []
+    @Published var topDiskProcesses: [ProcessUsage] = []
 
     @Published var localInterfaces: [LocalInterface] = []
     @Published var isVPNActive: Bool = false
+    @Published var vpnIsFortiClient: Bool = false
     @Published var isConnected: Bool = false
     @Published var connectionType: String = "Unknown"  // primary interface
     @Published var isWifiAvailable: Bool = false
@@ -159,7 +161,7 @@ final class MetricsEngine: ObservableObject {
     private var lastAlertFired: [String: Date] = [:]
     private let alertCooldown: TimeInterval = 300
 
-    @Published var showInDock: Bool = false {
+    @Published var showInDock: Bool = true {
         didSet {
             guard !isLoadingPreferences else { return }
             NSApp.setActivationPolicy(showInDock ? .regular : .accessory)
@@ -638,9 +640,21 @@ final class MetricsEngine: ObservableObject {
                 var buffer = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
                 if inet_ntop(AF_INET, &addr, &buffer, socklen_t(INET_ADDRSTRLEN)) != nil {
                     let ip = String(cString: buffer)
-                    interfaces.append(LocalInterface(name: name, address: ip))
-                    if name.hasPrefix("utun") || name.hasPrefix("ppp") || name.hasPrefix("ipsec") {
-                        vpnDetected = true
+                    let isVPN = name.hasPrefix("utun") || name.hasPrefix("ppp") || name.hasPrefix("ipsec")
+                    if isVPN { vpnDetected = true }
+                    let wifiIfaceName = CWWiFiClient.shared().interface()?.interfaceName
+                    let kind: LocalInterface.Kind
+                    if isVPN {
+                        kind = .vpn
+                    } else if name == wifiIfaceName {
+                        kind = .wifi
+                    } else if name.hasPrefix("en") || name.hasPrefix("bridge") {
+                        kind = .ethernet
+                    } else {
+                        kind = .other
+                    }
+                    if !isVPN {
+                        interfaces.append(LocalInterface(name: name, address: ip, kind: kind))
                     }
                 }
             }
@@ -649,6 +663,15 @@ final class MetricsEngine: ObservableObject {
 
         localInterfaces = interfaces
         isVPNActive = vpnDetected
+        if vpnDetected {
+            vpnIsFortiClient = NSWorkspace.shared.runningApplications.contains {
+                let id = $0.bundleIdentifier?.lowercased() ?? ""
+                let name = $0.localizedName?.lowercased() ?? ""
+                return id.contains("fortinet") || id.contains("forticlient") || name.contains("forticlient")
+            }
+        } else {
+            vpnIsFortiClient = false
+        }
 
         let now = Date()
         if let prev = previousNetBytes, let prevTime = previousNetTimestamp {
@@ -851,6 +874,8 @@ final class MetricsEngine: ObservableObject {
             networkSamplerInFlight = false
         }
     }
+
+
 
     // MARK: - Process control
 
@@ -1269,9 +1294,9 @@ final class MetricsEngine: ObservableObject {
         displays = NSScreen.screens.enumerated().map { index, screen in
             let scale = screen.backingScaleFactor
             let frame = screen.frame
-            // Use native pixel resolution (points × backing scale factor)
             let nativeW = Int(frame.width * scale)
             let nativeH = Int(frame.height * scale)
+            let screenID = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID ?? 0
             return DisplayInfo(
                 id: index,
                 name: screen.localizedName,
@@ -1279,7 +1304,8 @@ final class MetricsEngine: ObservableObject {
                 height: nativeH,
                 refreshRateHz: screen.maximumFramesPerSecond,
                 scaleFactor: scale,
-                isMain: screen == NSScreen.main
+                isMain: screen == NSScreen.main,
+                isBuiltIn: CGDisplayIsBuiltin(screenID) != 0
             )
         }
     }
@@ -1293,6 +1319,7 @@ struct DisplayInfo: Identifiable {
     let refreshRateHz: Int
     let scaleFactor: Double
     let isMain: Bool
+    let isBuiltIn: Bool
 }
 
 struct VolumeInfo: Identifiable {
@@ -1304,9 +1331,29 @@ struct VolumeInfo: Identifiable {
 }
 
 struct LocalInterface: Identifiable {
+    enum Kind { case wifi, ethernet, vpn, other }
     let name: String
     let address: String
+    let kind: Kind
     var id: String { name }
+
+    var icon: String {
+        switch kind {
+        case .wifi:     return "wifi"
+        case .ethernet: return "cable.connector"
+        case .vpn:      return "lock.shield.fill"
+        case .other:    return "network"
+        }
+    }
+
+    var displayName: String {
+        switch kind {
+        case .wifi:     return "Wi-Fi"
+        case .ethernet: return "Ethernet"
+        case .vpn:      return "VPN"
+        case .other:    return name
+        }
+    }
 }
 
 private extension Double {

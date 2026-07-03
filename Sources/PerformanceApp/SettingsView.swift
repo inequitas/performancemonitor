@@ -24,11 +24,6 @@ struct SettingsView: View {
         }
         .frame(width: 420)
         .background(.regularMaterial)
-        .onDisappear {
-            if !engine.showInDock {
-                NSApp.setActivationPolicy(.accessory)
-            }
-        }
     }
 }
 

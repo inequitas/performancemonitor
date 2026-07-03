@@ -72,6 +72,18 @@ func detailRow(_ label: String, _ value: String) -> some View {
     }
 }
 
+func iconDetailRow(_ icon: String, color: Color, label: String, value: String, valueColor: Color = .primary) -> some View {
+    HStack {
+        Image(systemName: icon)
+            .font(.caption)
+            .foregroundStyle(color)
+            .frame(width: 16)
+        Text(label).font(.caption).foregroundStyle(.secondary)
+        Spacer()
+        Text(value).font(.caption.monospacedDigit()).foregroundStyle(valueColor)
+    }
+}
+
 struct EarbudBatteryPill: View {
     let label: String
     let pct: Int
@@ -106,22 +118,45 @@ struct NetworkButterflyChart: View {
                     .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundStyle(MetricTheme.networkUp)
             }
-            VStack(spacing: 0) {
-                // Download — grows upward from center
-                MetricChart(values: downloadHistory, unit: "KB/s", fixedMax: sharedMax,
-                            showAxes: false, color: MetricTheme.networkDown, style: .area,
-                            valueFormatter: formatSpeed)
-                    .frame(height: 60)
-                // Center divider
-                Rectangle()
-                    .fill(Color.primary.opacity(0.25))
-                    .frame(height: 1)
-                // Upload — same chart, flipped so it grows downward from center
-                MetricChart(values: uploadHistory, unit: "KB/s", fixedMax: sharedMax,
-                            showAxes: false, color: MetricTheme.networkUp, style: .area,
-                            valueFormatter: formatSpeed)
-                    .frame(height: 60)
-                    .scaleEffect(y: -1)
+            HStack(spacing: 4) {
+                // Left-side axis labels — outside the chart so they don't overlap the lines
+                VStack(spacing: 0) {
+                    VStack(alignment: .trailing, spacing: 0) {
+                        Text(formatSpeed(sharedMax)).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                        Spacer()
+                        Text(formatSpeed(sharedMax / 2)).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                        Spacer()
+                    }
+                    .frame(height: 90)
+                    Text(formatSpeed(0)).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .frame(height: 14)
+                    VStack(alignment: .trailing, spacing: 0) {
+                        Spacer()
+                        Text(formatSpeed(sharedMax / 2)).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                        Spacer()
+                        Text(formatSpeed(sharedMax)).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                    }
+                    .frame(height: 90)
+                }
+                .frame(width: 56)
+                // Charts with grid lines only — fillFrame removes the chart's built-in scale inset
+                VStack(spacing: 0) {
+                    MetricChart(values: downloadHistory, unit: "KB/s", fixedMax: sharedMax,
+                                showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkDown, style: .area,
+                                valueFormatter: formatSpeed)
+                        .frame(height: 90)
+                    // Midline height matches the "0" label row so columns stay in sync
+                    Rectangle()
+                        .fill(Color.primary.opacity(0.25))
+                        .frame(height: 1)
+                        .frame(height: 14)
+                    MetricChart(values: uploadHistory, unit: "KB/s", fixedMax: sharedMax,
+                                showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkUp, style: .area,
+                                valueFormatter: formatSpeed)
+                        .frame(height: 90)
+                        .scaleEffect(y: -1)
+                }
             }
         }
     }
@@ -249,7 +284,10 @@ private struct ProcessListView: View {
             presenting: pendingKill
         ) { proc in
             Button("Cancel", role: .cancel) { }
-            Button("Quit", role: .destructive) { engine.terminateProcess(pid: proc.pid) }
+            Button("Quit", role: .destructive) {
+                engine.terminateProcess(pid: proc.pid)
+                paused = false
+            }
         } message: { proc in
             Text("This sends a quit signal to the process (PID \(proc.pid)). Unsaved work may be lost.")
         }
@@ -419,10 +457,10 @@ struct NetworkDetailView: View {
                         InfoButton(text: "Local IPs are read from the system network interfaces.\n\nVPN is detected by the presence of utun, ppp, or ipsec interfaces.\n\nPublic IP is fetched from api.ipify.org over HTTPS. Only your outbound request is sent — no other data. Refreshed every 5 minutes.\n\nConnectivity check is an HTTPS HEAD request to Apple's captive portal endpoint (captive.apple.com). This respects your system proxy settings. True ICMP ping requires root on macOS, so this is used instead.")
                     }
                     ForEach(engine.localInterfaces) { iface in
-                        CopyableIPRow(label: iface.name, value: iface.address)
+                        CopyableIPRow(icon: iface.icon, label: iface.displayName, value: iface.address)
                     }
                     Divider()
-                    CopyableIPRow(label: "Public IP", value: engine.publicIP ?? "Looking up…")
+                    CopyableIPRow(icon: "globe", label: "Public IP", value: engine.publicIP ?? "Looking up…")
                 }
             }
 
@@ -494,31 +532,90 @@ struct NetworkDetailView: View {
 
 // MARK: - Disk
 
+private struct DiskButterflyChart: View {
+    let readHistory:  [Double]
+    let writeHistory: [Double]
+    let readSpeed:    Double
+    let writeSpeed:   Double
+
+    private var sharedMax: Double {
+        max(readHistory.max() ?? 0, writeHistory.max() ?? 0, 1)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Label(formatSpeed(readSpeed), systemImage: "arrow.down")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color.indigo)
+                Text("Read").font(.caption).foregroundStyle(.secondary)
+                Spacer()
+                Text("Write").font(.caption).foregroundStyle(.secondary)
+                Label(formatSpeed(writeSpeed), systemImage: "arrow.up")
+                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color.purple)
+            }
+            HStack(spacing: 4) {
+                VStack(spacing: 0) {
+                    VStack(alignment: .trailing, spacing: 0) {
+                        Text(formatSpeed(sharedMax)).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                        Spacer()
+                        Text(formatSpeed(sharedMax / 2)).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                        Spacer()
+                    }
+                    .frame(height: 90)
+                    Text(formatSpeed(0)).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .frame(height: 14)
+                    VStack(alignment: .trailing, spacing: 0) {
+                        Spacer()
+                        Text(formatSpeed(sharedMax / 2)).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                        Spacer()
+                        Text(formatSpeed(sharedMax)).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
+                    }
+                    .frame(height: 90)
+                }
+                .frame(width: 56)
+                VStack(spacing: 0) {
+                    MetricChart(values: readHistory, unit: "KB/s", fixedMax: sharedMax,
+                                showAxes: false, showGridLines: true, fillFrame: true, color: .indigo, style: .area,
+                                valueFormatter: formatSpeed)
+                        .frame(height: 90)
+                    Rectangle()
+                        .fill(Color.primary.opacity(0.25))
+                        .frame(height: 1)
+                        .frame(height: 14)
+                    MetricChart(values: writeHistory, unit: "KB/s", fixedMax: sharedMax,
+                                showAxes: false, showGridLines: true, fillFrame: true, color: .purple, style: .area,
+                                valueFormatter: formatSpeed)
+                        .frame(height: 90)
+                        .scaleEffect(y: -1)
+                }
+            }
+        }
+    }
+}
+
 struct DiskDetailView: View {
     @ObservedObject var engine: MetricsEngine
-    @State private var style: ChartDisplayStyle = .area
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Label("Disk", systemImage: MetricTheme.icon(for: .disk))
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(MetricTheme.disk)
-                Spacer()
-                ChartStylePicker(style: $style)
-            }
+            Label("Disk", systemImage: MetricTheme.icon(for: .disk))
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(MetricTheme.disk)
 
             SectionCard {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("\(String(format: "%.1f", engine.diskTotalGB - engine.diskFreeGB)) GB used / \(String(format: "%.1f", engine.diskTotalGB)) GB")
                         .font(.system(size: 20, weight: .bold, design: .rounded))
                         .foregroundStyle(MetricTheme.disk)
-                    Text("Read: \(formatSpeed(engine.diskReadKBps))   Write: \(formatSpeed(engine.diskWriteKBps))")
-                        .font(.caption).foregroundStyle(.secondary)
-                    MetricChart(values: engine.diskReadHistory, unit: "KB/s", color: MetricTheme.disk, style: style, valueFormatter: formatSpeed)
-                        .frame(height: 80)
-                    MetricChart(values: engine.diskWriteHistory, unit: "KB/s", color: MetricTheme.disk.opacity(0.7), style: style, valueFormatter: formatSpeed)
-                        .frame(height: 80)
+                    DiskButterflyChart(
+                        readHistory:  engine.diskReadHistory,
+                        writeHistory: engine.diskWriteHistory,
+                        readSpeed:    engine.diskReadKBps,
+                        writeSpeed:   engine.diskWriteKBps
+                    )
                 }
             }
 
@@ -537,12 +634,27 @@ struct DiskDetailView: View {
                     }
                 }
             }
+
+            if !engine.topDiskProcesses.isEmpty {
+                SectionCard {
+                    ProcessListView(title: "Top Disk I/O", icon: "internaldrive", color: MetricTheme.disk,
+                                    processes: engine.topDiskProcesses, unit: " KB/s", engine: engine)
+                }
+            }
+
             Spacer()
         }
     }
 }
 
 // MARK: - GPU & Displays
+
+private func displayIcon(_ display: DisplayInfo) -> String {
+    if display.isBuiltIn { return "laptopcomputer" }
+    let ratio = Double(display.width) / Double(display.height)
+    if ratio >= 2.3 { return "rectangle.ratio.16.to.9.fill" }
+    return "display"
+}
 
 struct GPUDetailView: View {
     @ObservedObject var engine: MetricsEngine
@@ -587,7 +699,11 @@ struct GPUDetailView: View {
                             .font(.caption).foregroundStyle(.secondary)
                     }
                     ForEach(engine.displays) { display in
-                        HStack(alignment: .top) {
+                        HStack(alignment: .top, spacing: 8) {
+                            Image(systemName: displayIcon(display))
+                                .font(.system(size: 15))
+                                .foregroundStyle(.cyan.opacity(0.8))
+                                .frame(width: 20)
                             VStack(alignment: .leading, spacing: 3) {
                                 Text(display.name).font(.caption.weight(.medium))
                                 Text("\(display.width) × \(display.height)  @\(display.refreshRateHz) Hz  (\(display.scaleFactor == 2 ? "Retina" : String(format: "%.0f×", display.scaleFactor)))")
@@ -670,7 +786,13 @@ struct BatteryDetailView: View {
                                   String(format: "%.1f W", watts))
                     }
                     if let temp = engine.batteryTemperatureC {
-                        detailRow("Temperature", String(format: "%.1f°C", temp))
+                        HStack {
+                            Text("Temperature").font(.caption).foregroundStyle(.secondary)
+                            Spacer()
+                            Text(String(format: "%.1f°C", temp))
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(temp < 35 ? Color.green : temp < 45 ? Color.yellow : temp < 55 ? Color.orange : Color.red)
+                        }
                     }
                     if let voltage = engine.batteryVoltage {
                         detailRow("Voltage", String(format: "%.2f V", voltage))
@@ -795,13 +917,19 @@ struct ThermalDetailView: View {
                         InfoButton(text: "Read from the System Management Controller (SMC) via IOKit.\n\nCPU and GPU temperatures are measured at die level. Values vary by Mac model — sensor key names differ between Intel and Apple Silicon.\n\nBattery temperature is read from the AppleSmartBattery IORegistry entry.")
                     }
                     if let cpu = engine.cpuTemperatureC {
-                        detailRow("CPU", String(format: "%.1f°C", cpu))
+                        iconDetailRow("cpu", color: MetricTheme.cpu, label: "CPU",
+                                      value: String(format: "%.1f°C", cpu),
+                                      valueColor: cpu < 60 ? .green : cpu < 75 ? .yellow : cpu < 90 ? .orange : .red)
                     }
                     if let gpu = engine.gpuTemperatureC {
-                        detailRow("GPU", String(format: "%.1f°C", gpu))
+                        iconDetailRow("cube.transparent", color: .cyan, label: "GPU",
+                                      value: String(format: "%.1f°C", gpu),
+                                      valueColor: gpu < 60 ? .green : gpu < 75 ? .yellow : gpu < 90 ? .orange : .red)
                     }
                     if let bat = engine.batteryTemperatureC {
-                        detailRow("Battery", String(format: "%.1f°C", bat))
+                        iconDetailRow("battery.75percent", color: MetricTheme.battery, label: "Battery",
+                                      value: String(format: "%.1f°C", bat),
+                                      valueColor: bat < 35 ? .green : bat < 45 ? .yellow : bat < 55 ? .orange : .red)
                     }
                     if engine.cpuTemperatureC == nil && engine.gpuTemperatureC == nil {
                         Text("No temperature sensors found for this Mac model.")
@@ -822,7 +950,7 @@ struct ThermalDetailView: View {
                         ForEach(engine.fans) { fan in
                             VStack(alignment: .leading, spacing: 6) {
                                 if engine.fans.count > 1 {
-                                    Text(fan.label)
+                                    Label(fan.label, systemImage: "fan.fill")
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(.secondary)
                                 }
@@ -862,18 +990,15 @@ struct BluetoothDeviceRow: View {
                 .font(.system(size: 13))
                 .foregroundStyle(device.isConnected ? .blue : .secondary)
                 .frame(width: 18)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(device.name).font(.caption).lineLimit(1)
-                if device.batteryLeft != nil || device.batteryRight != nil || device.batteryCase != nil {
-                    HStack(spacing: 6) {
-                        if let l = device.batteryLeft  { EarbudBatteryPill("L", l) }
-                        if let r = device.batteryRight { EarbudBatteryPill("R", r) }
-                        if let c = device.batteryCase  { EarbudBatteryPill("Case", c) }
-                    }
-                }
-            }
+            Text(device.name).font(.caption).lineLimit(1)
             Spacer()
-            if let pct = device.batteryPercent, device.batteryLeft == nil && device.batteryRight == nil {
+            if device.batteryLeft != nil || device.batteryRight != nil || device.batteryCase != nil {
+                HStack(spacing: 4) {
+                    if let l = device.batteryLeft  { EarbudBatteryPill("L", l) }
+                    if let r = device.batteryRight { EarbudBatteryPill("R", r) }
+                    if let c = device.batteryCase  { EarbudBatteryPill("Case", c) }
+                }
+            } else if let pct = device.batteryPercent {
                 HStack(spacing: 3) {
                     Image(systemName: batterySystemImage(pct)).font(.caption2)
                     Text("\(pct)%").font(.caption.monospacedDigit())
@@ -942,12 +1067,23 @@ struct WiFiSignalBars: View {
 }
 
 struct CopyableIPRow: View {
+    let icon: String
     let label: String
     let value: String
     @State private var copied = false
 
+    init(icon: String = "network", label: String, value: String) {
+        self.icon = icon
+        self.label = label
+        self.value = value
+    }
+
     var body: some View {
         HStack {
+            Image(systemName: icon)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .frame(width: 14)
             Text(label).font(.caption).foregroundStyle(.secondary)
             Spacer()
             Text(value).font(.caption.monospacedDigit())

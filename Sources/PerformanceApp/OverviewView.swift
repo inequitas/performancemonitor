@@ -54,6 +54,11 @@ struct OverviewView: View {
                     NSApp.setActivationPolicy(.regular)
                     NSApp.activate(ignoringOtherApps: true)
                     openSettings()
+                    if !engine.showInDock {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            NSApp.setActivationPolicy(.accessory)
+                        }
+                    }
                 } label: {
                     Label("Settings", systemImage: "gearshape")
                 }
@@ -589,6 +594,11 @@ private struct NetworkOverviewCard: View {
                 HStack(spacing: 6) {
                     cardIcon(MetricTheme.icon(for: .network), color: MetricTheme.networkDown)
                     Text("Network").font(.caption).foregroundStyle(.secondary)
+                    Image(systemName: engine.isVPNActive ? "lock.shield.fill" : "lock.shield")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(engine.isVPNActive
+                            ? (engine.vpnIsFortiClient ? Color.blue : Color.green)
+                            : Color.secondary)
                     Spacer()
                     // Connection type icons — primary is green, secondary is white
                     HStack(spacing: 5) {
@@ -616,14 +626,9 @@ private struct NetworkOverviewCard: View {
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(MetricTheme.networkUp)
                     }
-                    HStack(spacing: 4) {
-                        Circle()
-                            .fill(engine.isConnected ? Color.green : Color.red)
-                            .frame(width: 7, height: 7)
-                        if engine.isVPNActive {
-                            Image(systemName: "lock.shield.fill").font(.caption2).foregroundStyle(.green)
-                        }
-                    }
+                    Circle()
+                        .fill(engine.isConnected ? Color.green : Color.red)
+                        .frame(width: 7, height: 7)
                     Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
                 }
             }
@@ -633,18 +638,22 @@ private struct NetworkOverviewCard: View {
 
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    if let primary = engine.localInterfaces.first {
-                        CopyableIPRow(label: primary.name, value: primary.address)
+                    if engine.localInterfaces.isEmpty {
+                        CopyableIPRow(icon: "network", label: "Local IP", value: "—")
                     } else {
-                        CopyableIPRow(label: "Local IP", value: "—")
+                        ForEach(engine.localInterfaces) { iface in
+                            CopyableIPRow(icon: iface.icon, label: iface.displayName, value: iface.address)
+                        }
                     }
-                    CopyableIPRow(label: "Public IP", value: engine.publicIP ?? "Looking up…")
+                    CopyableIPRow(icon: "globe", label: "Public IP", value: engine.publicIP ?? "Looking up…")
                 }
                 if let rssi = engine.wifiRSSI {
                     Spacer()
                     WiFiSignalBars(rssi: rssi)
                 }
             }
+            .contentShape(Rectangle())
+            .onTapGesture { action() }
         }
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -682,11 +691,11 @@ struct BluetoothOverviewCard: View {
                         Image(systemName: device.icon).font(.system(size: 12)).foregroundStyle(.blue).frame(width: 16)
                         Text(device.name).font(.caption).lineLimit(1)
                         Spacer()
-                        if device.batteryLeft != nil || device.batteryRight != nil {
-                            HStack(spacing: 5) {
+                        if device.batteryLeft != nil || device.batteryRight != nil || device.batteryCase != nil {
+                            HStack(spacing: 4) {
                                 if let l = device.batteryLeft  { EarbudBatteryPill("L", l) }
                                 if let r = device.batteryRight { EarbudBatteryPill("R", r) }
-                                if let c = device.batteryCase  { EarbudBatteryPill("⬡", c) }
+                                if let c = device.batteryCase  { EarbudBatteryPill("Case", c) }
                             }
                         } else if let pct = device.batteryPercent {
                             HStack(spacing: 3) {

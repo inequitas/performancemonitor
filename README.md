@@ -2,11 +2,16 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.1-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.2-lightgrey)
 
 ---
 
 ## Releases
+
+### v0.3.2 — Butterfly charts, VPN indicator, temperature colours
+- **Network and Disk detail charts** redesigned as butterfly charts: download/read grows upward, upload/write grows downward on a shared scale with max, midpoint, and 0 labels outside the chart area so they never overlap the data
+- **VPN shield** always visible in the Network overview card — green when a VPN is active, blue specifically for FortiClient, grey when off
+- **Temperature colour coding** in the Thermal and Battery detail views — CPU/GPU thresholds at 60 / 75 / 90 °C (green → yellow → orange → red); Battery at 35 / 45 / 55 °C
 
 ### v0.3.1 — Persistent settings
 - All settings now survive restarts and app updates: panel order and visibility, alert toggles and thresholds, menu bar style and metric, refresh interval, card styles (area/gauge), dock visibility, and all other preferences
@@ -61,6 +66,8 @@ A lightweight macOS menu bar app that gives you real-time system metrics at a gl
 
 ### Network
 - Live upload and download throughput
+- Butterfly chart in detail view: download up, upload down, shared scale with axis labels
+- VPN indicator: shield icon always visible — green (VPN on), blue (FortiClient), grey (off)
 - Connection type indicator: WiFi and/or Ethernet icon; primary connection is green, secondary is white
 - Local IP address (tap to copy)
 - Public IP address (tap to copy)
@@ -137,6 +144,7 @@ No data is collected or transmitted. Everything runs locally.
 ### Thermal & Fans
 - CPU, GPU, and Battery temperatures read from the SMC via IOKit
 - All three temperatures shown on the main overview card
+- Temperature values colour-coded: green → yellow → orange → red based on per-sensor thresholds
 - Fan speeds (Left/Right) with min/max range and position bar
 - System thermal pressure level (Nominal → Critical)
 
