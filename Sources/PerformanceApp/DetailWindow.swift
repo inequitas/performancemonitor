@@ -54,13 +54,14 @@ func formatSpeed(_ kbps: Double) -> String {
     kbps > 1024 ? String(format: "%.2f MB/s", kbps / 1024) : String(format: "%.1f KB/s", kbps)
 }
 
-func batterySystemImage(_ pct: Int) -> String {
+func batterySystemImage(_ pct: Int, charging: Bool = false) -> String {
+    let suffix = charging ? ".bolt" : ""
     switch pct {
-    case 76...: return "battery.100percent"
-    case 51...: return "battery.75percent"
-    case 26...: return "battery.50percent"
-    case 11...: return "battery.25percent"
-    default:    return "battery.0percent"
+    case 76...: return "battery.100percent\(suffix)"
+    case 51...: return "battery.75percent\(suffix)"
+    case 26...: return "battery.50percent\(suffix)"
+    case 11...: return "battery.25percent\(suffix)"
+    default:    return charging ? "battery.0percent.bolt" : "battery.0percent"
     }
 }
 
@@ -736,7 +737,10 @@ struct BatteryDetailView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Label("Battery", systemImage: "battery.100percent")
+            Label("Battery", systemImage: batterySystemImage(
+                engine.batteryPercent ?? 100,
+                charging: engine.batteryIsCharging
+            ))
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(MetricTheme.battery)
 

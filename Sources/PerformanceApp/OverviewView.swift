@@ -448,14 +448,23 @@ private struct BatteryCard: View {
         return .green
     }
 
-    private var subtitleText: String {
-        if let minutes = timeRemainingMinutes {
-            let h = minutes / 60, m = minutes % 60
-            if let w = watts { return isCharging ? "\(h)h \(m)m · \(String(format: "%.0fW", w))" : "\(h)h \(m)m left" }
-            return isCharging ? "\(h)h \(m)m to full" : "\(h)h \(m)m left"
+    // Time + wattage detail; nil when there's nothing meaningful to show
+    private var detailText: String? {
+        if isCharging {
+            // macOS reports 0 min when nearly full — skip the time in that case
+            let wattStr = watts.map { String(format: "%.0fW charging", $0) }
+            if let m = timeRemainingMinutes, m > 5 {
+                let h = m / 60, mins = m % 60
+                let timeStr = h > 0 ? "\(h)h \(mins)m to full" : "\(mins)m to full"
+                return [timeStr, wattStr].compactMap { $0 }.joined(separator: " · ")
+            }
+            return wattStr
+        } else {
+            // On battery — time remaining is what matters; skip the draw wattage
+            guard let m = timeRemainingMinutes else { return nil }
+            let h = m / 60, mins = m % 60
+            return h > 0 ? "\(h)h \(mins)m remaining" : "\(mins)m remaining"
         }
-        if let w = watts { return String(format: isCharging ? "%.0f W input" : "%.0f W draw", w) }
-        return powerSourceName
     }
 
     var body: some View {
@@ -465,12 +474,20 @@ private struct BatteryCard: View {
                     cardIcon(isCharging ? "battery.100percent.bolt" : "battery.75percent", color: color)
                     Text("Battery").font(.caption).foregroundStyle(.secondary)
                 }
-                Text("\(percent)%")
-                    .font(.system(.body, design: .rounded)).fontWeight(.semibold)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                Text(subtitleText)
-                    .font(.caption2).foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
+                VStack(spacing: 2) {
+                    Text("\(percent)%")
+                        .font(.system(.body, design: .rounded)).fontWeight(.semibold)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    Text(isCharging ? "Charging" : "On Battery")
+                        .font(.caption2).fontWeight(.medium)
+                        .foregroundStyle(isCharging ? .green : .secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    if let detail = detailText {
+                        Text(detail)
+                            .font(.caption2).foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                }
             }
             .padding(10)
             .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
