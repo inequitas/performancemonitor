@@ -908,45 +908,105 @@ struct ThermalDetailView: View {
                 }
             }
 
-            // Temperatures
+            // Temperatures — each category expandable to individual sensors
             SectionCard {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("Temperatures").font(.subheadline.weight(.semibold))
                         Spacer()
-                        InfoButton(text: "Read from the System Management Controller (SMC) via IOKit.\n\nCPU and GPU temperatures are measured at die level. Values vary by Mac model — sensor key names differ between Intel and Apple Silicon.\n\nBattery temperature is read from the AppleSmartBattery IORegistry entry.")
+                        InfoButton(text: "Read from the System Management Controller (SMC) via IOKit.\n\nCPU and GPU values shown are averages across all cluster sensors. Tap a row to expand individual readings.\n\nBattery temperature is read from the AppleSmartBattery IORegistry entry.")
                     }
-                    if let cpu = engine.cpuTemperatureC {
-                        iconDetailRow("cpu", color: MetricTheme.cpu, label: "CPU",
-                                      value: String(format: "%.1f°C", cpu),
-                                      valueColor: cpu < 60 ? .green : cpu < 75 ? .yellow : cpu < 90 ? .orange : .red)
+
+                    let groups = Dictionary(grouping: engine.extendedTemperatures, by: \.category)
+                    let cpuSensors      = (groups["CPU"]      ?? []).sorted { $0.label < $1.label }
+                    let gpuSensors      = (groups["GPU"]      ?? []).sorted { $0.label < $1.label }
+                    let trackpadSensors = (groups["Trackpad"] ?? []).sorted { $0.label < $1.label }
+
+                    if let avg = engine.cpuTemperatureC {
+                        SensorCategoryRow(
+                            icon: "cpu", iconColor: MetricTheme.cpu, label: "CPU", avgCelsius: avg,
+                            sensors: cpuSensors.map { ($0.label, $0.celsius) },
+                            colorFn: { $0 < 60 ? .green : $0 < 75 ? .yellow : $0 < 90 ? .orange : .red }
+                        )
                     }
-                    if let gpu = engine.gpuTemperatureC {
-                        iconDetailRow("cube.transparent", color: .cyan, label: "GPU",
-                                      value: String(format: "%.1f°C", gpu),
-                                      valueColor: gpu < 60 ? .green : gpu < 75 ? .yellow : gpu < 90 ? .orange : .red)
+                    if let avg = engine.gpuTemperatureC {
+                        SensorCategoryRow(
+                            icon: "cube.transparent", iconColor: .cyan, label: "GPU", avgCelsius: avg,
+                            sensors: gpuSensors.map { ($0.label, $0.celsius) },
+                            colorFn: { $0 < 60 ? .green : $0 < 75 ? .yellow : $0 < 90 ? .orange : .red }
+                        )
                     }
                     if let bat = engine.batteryTemperatureC {
-                        iconDetailRow("battery.75percent", color: MetricTheme.battery, label: "Battery",
-                                      value: String(format: "%.1f°C", bat),
-                                      valueColor: bat < 35 ? .green : bat < 45 ? .yellow : bat < 55 ? .orange : .red)
+                        SensorCategoryRow(
+                            icon: "battery.75percent", iconColor: MetricTheme.battery, label: "Battery",
+                            avgCelsius: bat, sensors: [],
+                            colorFn: { $0 < 35 ? .green : $0 < 45 ? .yellow : $0 < 55 ? .orange : .red }
+                        )
                     }
-                    if engine.cpuTemperatureC == nil && engine.gpuTemperatureC == nil {
+
+                    // Storage group
+                    let storageSensors = (groups["Storage"] ?? []).sorted { $0.label < $1.label }
+                    if !storageSensors.isEmpty {
+                        let avg = storageSensors.map(\.celsius).reduce(0, +) / Double(storageSensors.count)
+                        SensorCategoryRow(
+                            icon: "internaldrive", iconColor: .indigo, label: "Storage", avgCelsius: avg,
+                            sensors: storageSensors.map { ($0.label, $0.celsius) },
+                            colorFn: { Self.sensorTempColor($0, category: "Storage") }
+                        )
+                    }
+
+                    // System group (starts expanded) — Trackpad + board sensors
+                    let systemDisplaySensors: [(label: String, celsius: Double)] = {
+                        var result: [(label: String, celsius: Double)] = []
+                        if !trackpadSensors.isEmpty {
+                            if trackpadSensors.count <= 3 {
+                                result += trackpadSensors.map { ($0.label, $0.celsius) }
+                            } else {
+                                let avg = trackpadSensors.map(\.celsius).reduce(0, +) / Double(trackpadSensors.count)
+                                result.append(("Trackpad", avg))
+                            }
+                        }
+                        result += (groups["System"] ?? []).sorted { $0.label < $1.label }.map { ($0.label, $0.celsius) }
+                        return result
+                    }()
+                    if !systemDisplaySensors.isEmpty {
+                        let avg = systemDisplaySensors.map(\.celsius).reduce(0, +) / Double(systemDisplaySensors.count)
+                        SensorCategoryRow(
+                            icon: "thermometer", iconColor: .orange, label: "System", avgCelsius: avg,
+                            sensors: systemDisplaySensors,
+                            colorFn: { Self.sensorTempColor($0, category: "System") },
+                            initiallyExpanded: true
+                        )
+                    }
+
+                    // Memory group
+                    let memorySensors = (groups["Memory"] ?? []).sorted { $0.label < $1.label }
+                    if !memorySensors.isEmpty {
+                        let avg = memorySensors.map(\.celsius).reduce(0, +) / Double(memorySensors.count)
+                        SensorCategoryRow(
+                            icon: "memorychip", iconColor: MetricTheme.memory, label: "Memory", avgCelsius: avg,
+                            sensors: memorySensors.map { ($0.label, $0.celsius) },
+                            colorFn: { Self.sensorTempColor($0, category: "Memory") }
+                        )
+                    }
+
+                    if engine.cpuTemperatureC == nil && engine.gpuTemperatureC == nil && engine.extendedTemperatures.isEmpty {
                         Text("No temperature sensors found for this Mac model.")
                             .font(.caption).foregroundStyle(.secondary)
                     }
                 }
             }
 
-            // Fan speeds
+            // Fan speeds (+ airflow temperatures where available)
             if !engine.fans.isEmpty {
                 SectionCard {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Text("Fans").font(.subheadline.weight(.semibold))
                             Spacer()
-                            InfoButton(text: "Fan speed is read from the SMC via IOKit.\n\nActual: current measured RPM.\nMin/Max: hardware-defined speed range for this fan.")
+                            InfoButton(text: "Fan speed is read from the SMC via IOKit.\n\nActual: current measured RPM.\nMin/Max: hardware-defined speed range for this fan.\nAirflow: intake air temperature sensor near each fan.")
                         }
+                        let airflow = engine.extendedTemperatures.filter { $0.category == "Airflow" }
                         ForEach(engine.fans) { fan in
                             VStack(alignment: .leading, spacing: 6) {
                                 if engine.fans.count > 1 {
@@ -956,7 +1016,6 @@ struct ThermalDetailView: View {
                                 }
                                 detailRow("Speed", "\(fan.actual) RPM")
                                 detailRow("Range", "\(fan.min) – \(fan.max) RPM")
-                                // Progress bar showing position in min-max range
                                 if fan.max > fan.min {
                                     let progress = Double(fan.actual - fan.min) / Double(fan.max - fan.min)
                                     GeometryReader { geo in
@@ -969,6 +1028,10 @@ struct ThermalDetailView: View {
                                     }
                                     .frame(height: 5)
                                 }
+                                // Airflow sensor matched to this fan by label (Left/Right)
+                                if let a = airflow.first(where: { $0.label.lowercased().contains(fan.label.lowercased()) }) {
+                                    detailRow("Airflow", String(format: "%.1f°C", a.celsius))
+                                }
                             }
                             if fan.id < engine.fans.count - 1 { Divider() }
                         }
@@ -977,6 +1040,104 @@ struct ThermalDetailView: View {
             }
 
             Spacer()
+        }
+    }
+
+    private static func sensorTempColor(_ celsius: Double, category: String) -> Color {
+        switch category {
+        case "CPU", "GPU":
+            return celsius < 60 ? .green : celsius < 75 ? .yellow : celsius < 90 ? .orange : .red
+        case "Battery":
+            return celsius < 35 ? .green : celsius < 45 ? .yellow : celsius < 55 ? .orange : .red
+        default:
+            return celsius < 40 ? .green : celsius < 55 ? .yellow : celsius < 70 ? .orange : .red
+        }
+    }
+
+    private static func categoryIconAndColor(_ category: String) -> (String, Color) {
+        switch category {
+        case "Storage":  return ("internaldrive",   .indigo)
+        case "System":   return ("thermometer",     .orange)
+        case "Memory":   return ("memorychip",      MetricTheme.memory)
+        case "Trackpad": return ("trackpad",        .mint)
+        default:         return ("thermometer.medium", .gray)
+        }
+    }
+}
+
+private struct SensorCategoryRow: View {
+    let icon: String
+    let iconColor: Color
+    let label: String
+    let avgCelsius: Double
+    let sensors: [(label: String, celsius: Double)]
+    let colorFn: (Double) -> Color
+
+    @State private var expanded: Bool
+
+    init(icon: String, iconColor: Color, label: String, avgCelsius: Double,
+         sensors: [(label: String, celsius: Double)], colorFn: @escaping (Double) -> Color,
+         initiallyExpanded: Bool = false) {
+        self.icon = icon
+        self.iconColor = iconColor
+        self.label = label
+        self.avgCelsius = avgCelsius
+        self.sensors = sensors
+        self.colorFn = colorFn
+        _expanded = State(initialValue: initiallyExpanded)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Button {
+                if sensors.count > 1 {
+                    withAnimation(.easeInOut(duration: 0.15)) { expanded.toggle() }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    // Note: contentShape below ensures the Spacer and chevron are tappable
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 5)
+                            .fill(iconColor.opacity(0.15))
+                            .frame(width: 22, height: 22)
+                        Image(systemName: icon)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(iconColor)
+                    }
+                    Text(label)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text(String(format: "%.1f°C", avgCelsius))
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(colorFn(avgCelsius))
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(.tertiary)
+                        .rotationEffect(.degrees(expanded ? 90 : 0))
+                        .opacity(sensors.count > 1 ? 1 : 0)
+                }
+            }
+            .buttonStyle(.plain)
+            .contentShape(Rectangle())
+
+            if expanded {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(sensors, id: \.label) { sensor in
+                        HStack {
+                            Text(sensor.label)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                            Spacer()
+                            Text(String(format: "%.1f°C", sensor.celsius))
+                                .font(.caption2.monospacedDigit())
+                                .foregroundStyle(colorFn(sensor.celsius))
+                        }
+                        .padding(.leading, 30)
+                    }
+                }
+                .padding(.top, 6)
+            }
         }
     }
 }

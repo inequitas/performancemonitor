@@ -149,6 +149,27 @@ final class SMCReader: @unchecked Sendable {
         }
     }
 
+    // Returns all readable temperature sensors as (key, celsius) pairs, sorted by key.
+    // Filters out keys that return out-of-range values (1–130 °C).
+    func readAllTemperatures() -> [(key: String, value: Double)] {
+        guard let countVal = readDouble("#KEY") else { return [] }
+        let count = Int(countVal)
+        var result: [(key: String, value: Double)] = []
+        for i in 0..<count {
+            var input  = SMCKeyData_t()
+            var output = SMCKeyData_t()
+            input.data8  = SMCCmd.readIndex.rawValue
+            input.data32 = UInt32(i)
+            guard callRaw(&input, &output) == kSMCSuccess else { continue }
+            let k = fourCC(output.key)
+            guard k.hasPrefix("T"), k.count == 4 else { continue }
+            if let temp = readTemperature(k), temp > 1, temp < 130 {
+                result.append((key: k, value: temp))
+            }
+        }
+        return result.sorted { $0.key < $1.key }
+    }
+
     // MARK: - Key discovery  (fan control intentionally omitted — SMC writes
     // return kIOReturnError for unprivileged processes; a root-level XPC helper
     // is required, as confirmed by probing against the SMC directly)

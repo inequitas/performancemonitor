@@ -2,11 +2,20 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.2-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.3-lightgrey)
 
 ---
 
 ## Releases
+
+### v0.3.3 — Extended temperature sensors, multi-generation Apple Silicon support
+- **Extended SMC sensor coverage** across all Apple Silicon generations (M1 / M2 / M3 / M4) — CPU and GPU temperatures now read correctly on all chips including M3 (Te\*/Tf\* keys) and M4
+- **Trackpad temperature** — Force Touch haptic actuator sensors (M3/M4 TD\* grid) averaged into a single Trackpad entry; individual palm-rest sensors shown on M1/M2
+- **System group** — Trackpad, WiFi Proximity, Airport Proximity, Charger Proximity, and board sensors grouped under an expandable System row that starts open
+- **Storage group** — SSD temperature shown with expandable sub-rows for Macs with multiple drives (up to 4 SSDs mapped)
+- **Memory group** — Memory module temperatures shown with expandable sub-rows
+- **Airflow temperatures** — Intake air temperature (TaLP / TaRF) shown alongside each fan's RPM in the Fans section
+- **Battery thermistors** suppressed from temperature list (already shown in the Battery detail view)
 
 ### v0.3.2 — Butterfly charts, VPN indicator, temperature colours
 - **Network and Disk detail charts** redesigned as butterfly charts: download/read grows upward, upload/write grows downward on a shared scale with max, midpoint, and 0 labels outside the chart area so they never overlap the data
@@ -142,10 +151,12 @@ No data is collected or transmitted. Everything runs locally.
 - Sparkline shows the last 30 seconds of history, updated every second
 
 ### Thermal & Fans
-- CPU, GPU, and Battery temperatures read from the SMC via IOKit
-- All three temperatures shown on the main overview card
-- Temperature values colour-coded: green → yellow → orange → red based on per-sensor thresholds
-- Fan speeds (Left/Right) with min/max range and position bar
+- CPU, GPU, and Battery temperatures read from the SMC via IOKit — works across all Apple Silicon (M1–M4)
+- All three temperatures shown on the main overview card, colour-coded green → yellow → orange → red
+- **Extended sensor detail** in the Thermal view: individual CPU cores, GPU clusters, Trackpad, Storage, Memory, and System board sensors
+- Grouped rows with expandable chevrons — tap to see individual core or cluster readings
+- System group (Trackpad, WiFi/Airport proximity, Charger) shown expanded by default
+- Fan speeds (Left/Right) with min/max range, position bar, and intake airflow temperature
 - System thermal pressure level (Nominal → Critical)
 
 ## Tech Stack
