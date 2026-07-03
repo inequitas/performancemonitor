@@ -209,6 +209,15 @@ final class MetricsEngine: ObservableObject {
     @Published var pingHistory: [Double] = []
     private var pingTimer: Timer?
 
+    @Published var pingServer: PingServer = .apple {
+        didSet {
+            guard !isLoadingPreferences else { return }
+            UserDefaults.standard.set(pingServer.rawValue, forKey: Pref.pingServer)
+            pingHistory = []
+            startPingTimer()
+        }
+    }
+
     @Published var batteryPercent: Int?
     @Published var batteryIsCharging: Bool = false
     @Published var batteryTimeRemainingMinutes: Int?
@@ -348,6 +357,33 @@ final class MetricsEngine: ObservableObject {
     }
     @Published var hiddenPanels: Set<Panel> = [] {
         didSet { UserDefaults.standard.set(Array(hiddenPanels).map(\.rawValue), forKey: Pref.hiddenPanels) }
+    }
+
+    enum PingServer: String, CaseIterable, Identifiable {
+        case apple      = "apple"
+        case cloudflare = "cloudflare"
+        case google     = "google"
+        case quad9      = "quad9"
+
+        var id: String { rawValue }
+
+        var displayName: String {
+            switch self {
+            case .apple:      return "Apple (default)"
+            case .cloudflare: return "Cloudflare (1.1.1.1)"
+            case .google:     return "Google (8.8.8.8)"
+            case .quad9:      return "Quad9 (9.9.9.9)"
+            }
+        }
+
+        var urlString: String {
+            switch self {
+            case .apple:      return "https://captive.apple.com/hotspot-detect.html"
+            case .cloudflare: return "https://one.one.one.one"
+            case .google:     return "https://dns.google"
+            case .quad9:      return "https://dns.quad9.net"
+            }
+        }
     }
 
     enum MenuBarMetric: String, CaseIterable, Identifiable {
@@ -536,7 +572,7 @@ final class MetricsEngine: ObservableObject {
     }
 
     private func performLatencyCheck() {
-        guard let url = URL(string: "https://captive.apple.com/hotspot-detect.html") else { return }
+        guard let url = URL(string: pingServer.urlString) else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "HEAD"
         request.timeoutInterval = 4
@@ -801,7 +837,13 @@ final class MetricsEngine: ObservableObject {
             ptr = ifa.ifa_next
         }
 
+        // Mark the primary interface and sort it to the top
+        let primaryKind: LocalInterface.Kind = connectionType == "Wi-Fi" ? .wifi : .ethernet
         localInterfaces = interfaces
+            .map { iface in
+                var i = iface; i.isPrimary = (i.kind == primaryKind); return i
+            }
+            .sorted { $0.isPrimary && !$1.isPrimary }
         isVPNActive = vpnDetected
         if vpnDetected {
             vpnIsFortiClient = NSWorkspace.shared.runningApplications.contains {
@@ -1109,6 +1151,7 @@ final class MetricsEngine: ObservableObject {
         static let gpuAlertEnabled          = "gpuAlertEnabled"
         static let gpuAlertThreshold        = "gpuAlertThreshold"
         static let thermalAlertEnabled      = "thermalAlertEnabled"
+        static let pingServer               = "pingServer"
     }
 
     private func loadPreferences() {
@@ -1138,6 +1181,7 @@ final class MetricsEngine: ObservableObject {
         if let v = dbl(Pref.diskFreeAlertThresholdGB)  { diskFreeAlertThresholdGB = v }
         if let v = dbl(Pref.gpuAlertThreshold)         { gpuAlertThreshold = v }
         if let v = int_(Pref.topProcessCount)           { topProcessCount = v }
+        if let v = ud.string(forKey: Pref.pingServer)     { pingServer = PingServer(rawValue: v) ?? .apple }
         if let v = ud.string(forKey: Pref.menuBarMetric)  { menuBarMetric = MenuBarMetric(rawValue: v) ?? .cpu }
         if let v = ud.string(forKey: Pref.menuBarStyle)   { menuBarStyle = MenuBarStyle(rawValue: v) ?? .sparkline }
 
@@ -1502,6 +1546,7 @@ struct LocalInterface: Identifiable {
     let name: String
     let address: String
     let kind: Kind
+    var isPrimary: Bool = false
     var id: String { name }
 
     var icon: String {

@@ -1,5 +1,13 @@
 # Changelog
 
+### v0.3.6 — Network & notification improvements *(2026-07-03)*
+- **Primary network interface** highlighted in green and sorted to the top in both the overview IP list and network detail view
+- **Ping server setting** in Settings → Metrics — choose between Apple (default), Cloudflare (1.1.1.1), Google (8.8.8.8), or Quad9 (9.9.9.9); switching takes effect immediately
+- **Notification permissions** requested at launch so the dialog appears proactively rather than silently failing later
+- **Notification status banner** in Settings → Updates warns when notifications are disabled with a direct link to System Settings
+- **Bundle ID** changed to `com.performancemonitor`
+- **Settings icon flicker** fixed — section icons no longer animate on each metrics update
+
 ### v0.3.5 — Battery card improvements *(2026-07-03)*
 - **Battery overview card** shows an explicit "Charging" / "On Battery" status label, charging wattage clearly labelled as charging speed, and time remaining on battery — "0h 0m" suppressed when nearly full
 - **Battery detail icon** reflects actual charge level (0 / 25 / 50 / 75 / 100%) and adds a bolt when charging, updating live

@@ -614,22 +614,20 @@ private struct NetworkOverviewCard: View {
                             ? (engine.vpnIsFortiClient ? Color.blue : Color.green)
                             : Color.secondary)
                     Spacer()
-                    // Connection type icons — primary is green, secondary is white
+                    // Connection type icons — driven by localInterfaces so primary is
+                    // always green regardless of which interface type is active
                     HStack(spacing: 5) {
-                        if engine.isWifiAvailable {
-                            Image(systemName: "wifi")
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundStyle(engine.connectionType == "Wi-Fi" ? Color.green : Color.primary)
-                        }
-                        if engine.isEthernetAvailable {
-                            Image(systemName: "cable.connector")
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundStyle(engine.connectionType == "Ethernet" ? Color.green : Color.primary)
-                        }
-                        if !engine.isWifiAvailable && !engine.isEthernetAvailable && engine.isConnected {
+                        let visibleIfaces = engine.localInterfaces.filter { $0.kind != .vpn }
+                        if visibleIfaces.isEmpty && engine.isConnected {
                             Image(systemName: "network")
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(.green)
+                        } else {
+                            ForEach(visibleIfaces) { iface in
+                                Image(systemName: iface.icon)
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundStyle(iface.isPrimary ? Color.green : Color.primary)
+                            }
                         }
                     }
                     HStack(spacing: 10) {
@@ -656,7 +654,8 @@ private struct NetworkOverviewCard: View {
                         CopyableIPRow(icon: "network", label: "Local IP", value: "—")
                     } else {
                         ForEach(engine.localInterfaces) { iface in
-                            CopyableIPRow(icon: iface.icon, label: iface.displayName, value: iface.address)
+                            CopyableIPRow(icon: iface.icon, label: iface.displayName, value: iface.address,
+                                          iconColor: iface.isPrimary ? .green : .secondary)
                         }
                     }
                     CopyableIPRow(icon: "globe", label: "Public IP", value: engine.publicIP ?? "Looking up…")

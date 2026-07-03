@@ -458,7 +458,8 @@ struct NetworkDetailView: View {
                         InfoButton(text: "Local IPs are read from the system network interfaces.\n\nVPN is detected by the presence of utun, ppp, or ipsec interfaces.\n\nPublic IP is fetched from api.ipify.org over HTTPS. Only your outbound request is sent — no other data. Refreshed every 5 minutes.\n\nConnectivity check is an HTTPS HEAD request to Apple's captive portal endpoint (captive.apple.com). This respects your system proxy settings. True ICMP ping requires root on macOS, so this is used instead.")
                     }
                     ForEach(engine.localInterfaces) { iface in
-                        CopyableIPRow(icon: iface.icon, label: iface.displayName, value: iface.address)
+                        CopyableIPRow(icon: iface.icon, label: iface.displayName, value: iface.address,
+                                      iconColor: iface.isPrimary ? .green : .secondary)
                     }
                     Divider()
                     CopyableIPRow(icon: "globe", label: "Public IP", value: engine.publicIP ?? "Looking up…")
@@ -1235,19 +1236,21 @@ struct CopyableIPRow: View {
     let icon: String
     let label: String
     let value: String
+    let iconColor: Color
     @State private var copied = false
 
-    init(icon: String = "network", label: String, value: String) {
+    init(icon: String = "network", label: String, value: String, iconColor: Color = .secondary) {
         self.icon = icon
         self.label = label
         self.value = value
+        self.iconColor = iconColor
     }
 
     var body: some View {
         HStack {
             Image(systemName: icon)
                 .font(.caption2)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(iconColor)
                 .frame(width: 14)
             Text(label).font(.caption).foregroundStyle(.secondary)
             Spacer()

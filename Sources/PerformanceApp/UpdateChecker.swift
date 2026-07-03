@@ -16,6 +16,7 @@ final class UpdateChecker: NSObject, ObservableObject {
 
     @Published var state: State = .idle
     @Published var lastChecked: Date?
+    @Published var notificationsEnabled: Bool = true
 
     // Snooze duration setting — persisted, shown as a picker in the Updates tab
     @Published var snoozeDays: Int {
@@ -32,6 +33,7 @@ final class UpdateChecker: NSObject, ObservableObject {
     private static let neverVersionKey     = "updateNeverVersion"
     private static let notifiedVersionKey  = "updateLastNotifiedVersion"
     private static let snoozeDaysKey       = "updateSnoozeDays"
+    private static let lastRunVersionKey   = "updateLastRunVersion"
 
     // Notification identifiers
     private static let categoryID = "PERFORMANCE_UPDATE"
@@ -55,7 +57,21 @@ final class UpdateChecker: NSObject, ObservableObject {
                                               intentIdentifiers: [], options: [])
         center.setNotificationCategories([category])
 
-        Task { await performCheck() }
+        // Clear the notified-version record when the app itself has been updated,
+        // so the next available version always triggers a fresh notification.
+        let lastRun = UserDefaults.standard.string(forKey: Self.lastRunVersionKey)
+        if lastRun != currentVersion {
+            UserDefaults.standard.set(currentVersion, forKey: Self.lastRunVersionKey)
+            UserDefaults.standard.removeObject(forKey: Self.notifiedVersionKey)
+        }
+
+        Task {
+            // Request permission up-front at launch so the dialog appears while
+            // the user is actively launching the app, not later when it fires silently.
+            let granted = (try? await center.requestAuthorization(options: [.alert, .sound])) == true
+            notificationsEnabled = granted
+            await performCheck()
+        }
 
         // Re-check every 3 hours while the app is running
         periodicTimer = Timer.scheduledTimer(withTimeInterval: 3 * 3600, repeats: true) { [weak self] _ in
@@ -65,6 +81,11 @@ final class UpdateChecker: NSObject, ObservableObject {
 
     func checkForUpdates() {
         Task { await performCheck() }
+    }
+
+    func refreshNotificationStatus() async {
+        let status = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
+        notificationsEnabled = status == .authorized
     }
 
     func downloadAndInstall(from downloadURL: URL) {
@@ -114,7 +135,9 @@ final class UpdateChecker: NSObject, ObservableObject {
         if UserDefaults.standard.string(forKey: Self.notifiedVersionKey) == version { return }
 
         let center = UNUserNotificationCenter.current()
-        guard (try? await center.requestAuthorization(options: [.alert, .sound])) == true else { return }
+        let authStatus = await center.notificationSettings().authorizationStatus
+        notificationsEnabled = authStatus == .authorized
+        guard authStatus == .authorized else { return }
 
         let content = UNMutableNotificationContent()
         content.title = "Performance Monitor Update"
@@ -192,6 +215,8 @@ final class UpdateChecker: NSObject, ObservableObject {
             sh.arguments = [scriptURL.path]
             try sh.run()
 
+            // Reset activation policy before quitting so no dock-icon flash on relaunch
+            NSApp.setActivationPolicy(.accessory)
             NSApp.terminate(nil)
         } catch {
             state = .error("Install failed: \(error.localizedDescription)")

@@ -145,6 +145,22 @@ private struct UpdatesTab: View {
 
     var body: some View {
         VStack(spacing: 16) {
+            if !updater.notificationsEnabled {
+                HStack(spacing: 8) {
+                    Image(systemName: "bell.slash.fill").foregroundStyle(.orange)
+                    Text("Update notifications are disabled. Enable them in System Settings → Notifications → Performance Monitor.")
+                        .font(.caption).foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Open Settings") {
+                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.notifications")!)
+                    }
+                    .buttonStyle(.bordered).controlSize(.small)
+                }
+                .padding(10)
+                .background(.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.orange.opacity(0.2), lineWidth: 1))
+            }
+
             SettingsSection(icon: "arrow.down.circle.fill", title: "Updates", color: .blue) {
                 SettingsRow(label: "Current version") {
                     Text(updater.currentVersion)
@@ -156,6 +172,7 @@ private struct UpdatesTab: View {
             }
         }
         .padding(16)
+        .task { await updater.refreshNotificationStatus() }
     }
 
     @ViewBuilder private var statusContent: some View {
@@ -270,6 +287,16 @@ private struct MetricsTab: View {
                 if engine.publicIPEnabled {
                     Text("Fetches from api.ipify.org over HTTPS every 5 min.")
                         .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
+                }
+                Divider().padding(.vertical, 4)
+                SettingsRow(label: "Ping server") {
+                    Picker("", selection: $engine.pingServer) {
+                        ForEach(MetricsEngine.PingServer.allCases) { server in
+                            Text(server.displayName).tag(server)
+                        }
+                    }
+                    .labelsHidden()
+                    .frame(width: 180)
                 }
             }
         }
@@ -542,6 +569,7 @@ private struct SettingsSection<Content: View>: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(color)
                 }
+                .transaction { $0.animation = nil }
                 Text(title).font(.headline)
             }
 

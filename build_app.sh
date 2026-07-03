@@ -3,7 +3,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 APP_NAME="Performance Monitor"
-BUNDLE_ID="com.tribalforce.performancemonitor"
+BUNDLE_ID="com.performancemonitor"
 BUILD_DIR=".build/release"
 APP_DIR="dist/${APP_NAME}.app"
 VERSION="$(cat VERSION | tr -d '[:space:]')"
