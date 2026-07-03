@@ -2,7 +2,8 @@ import SwiftUI
 
 @main
 struct PerformanceApp: App {
-    @StateObject private var engine = MetricsEngine()
+    @StateObject private var engine  = MetricsEngine()
+    @StateObject private var updater = UpdateChecker()
 
     var body: some Scene {
         MenuBarExtra {
@@ -25,7 +26,7 @@ struct PerformanceApp: App {
         .windowResizability(.contentSize)
 
         Settings {
-            SettingsView(engine: engine)
+            SettingsView(engine: engine, updater: updater)
         }
     }
 }

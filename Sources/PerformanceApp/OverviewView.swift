@@ -54,11 +54,8 @@ struct OverviewView: View {
                     NSApp.setActivationPolicy(.regular)
                     NSApp.activate(ignoringOtherApps: true)
                     openSettings()
-                    if !engine.showInDock {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            NSApp.setActivationPolicy(.accessory)
-                        }
-                    }
+                    // Activation policy resets to .accessory in SettingsView's
+                    // WindowFocuser when the window actually closes, not on a timer.
                 } label: {
                     Label("Settings", systemImage: "gearshape")
                 }

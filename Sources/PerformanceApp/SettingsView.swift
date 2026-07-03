@@ -3,6 +3,7 @@ import ServiceManagement
 
 struct SettingsView: View {
     @ObservedObject var engine: MetricsEngine
+    @ObservedObject var updater: UpdateChecker
     @State private var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
 
     var body: some View {
@@ -21,10 +22,43 @@ struct SettingsView: View {
 
             HistoryTab(engine: engine)
                 .tabItem { Label("History", systemImage: "clock.arrow.circlepath") }
+
+            UpdatesTab(updater: updater)
+                .tabItem { Label("Updates", systemImage: "arrow.down.circle.fill") }
         }
         .frame(width: 420)
         .background(.regularMaterial)
+        .background(WindowFocuser(showInDock: engine.showInDock))
     }
+}
+
+// MARK: - Window focus helper
+
+// Makes the Settings window key the moment it appears and resets the activation
+// policy back to .accessory (for dock-hidden mode) when the window closes.
+private struct WindowFocuser: NSViewRepresentable {
+    let showInDock: Bool
+
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        DispatchQueue.main.async {
+            guard let window = view.window else { return }
+            window.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            if !showInDock {
+                NotificationCenter.default.addObserver(
+                    forName: NSWindow.willCloseNotification,
+                    object: window,
+                    queue: .main
+                ) { _ in
+                    let otherVisible = NSApp.windows.contains { $0 !== window && $0.isVisible }
+                    if !otherVisible { NSApp.setActivationPolicy(.accessory) }
+                }
+            }
+        }
+        return view
+    }
+    func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
 // MARK: - General tab
@@ -34,8 +68,7 @@ private struct GeneralTab: View {
     @Binding var launchAtLogin: Bool
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
+        VStack(spacing: 16) {
                 SettingsSection(icon: "gearshape.fill", title: "General", color: .gray) {
                     SettingsRow(label: "Refresh interval") {
                         HStack(spacing: 8) {
@@ -96,8 +129,124 @@ private struct GeneralTab: View {
                 }
             }
             .padding(16)
+    }
+}
+
+// MARK: - Updates tab
+
+private struct UpdatesTab: View {
+    @ObservedObject var updater: UpdateChecker
+
+    private static let relativeFormatter: RelativeDateTimeFormatter = {
+        let f = RelativeDateTimeFormatter()
+        f.unitsStyle = .full
+        return f
+    }()
+
+    var body: some View {
+        VStack(spacing: 16) {
+            SettingsSection(icon: "arrow.down.circle.fill", title: "Updates", color: .blue) {
+                SettingsRow(label: "Current version") {
+                    Text(updater.currentVersion)
+                        .font(.callout.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                }
+                Divider().padding(.vertical, 4)
+                statusContent
+            }
         }
-        .frame(minHeight: 300)
+        .padding(16)
+    }
+
+    @ViewBuilder private var statusContent: some View {
+        switch updater.state {
+        case .idle:
+            SettingsRow(label: "") { checkNowButton }
+
+        case .checking:
+            HStack(spacing: 8) {
+                ProgressView().controlSize(.small)
+                Text("Checking for updates…").font(.callout).foregroundStyle(.secondary)
+                Spacer()
+            }.padding(.vertical, 3)
+
+        case .upToDate:
+            HStack(spacing: 8) {
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("You're up to date").font(.callout)
+                    if let date = updater.lastChecked {
+                        Text("Checked \(Self.relativeFormatter.localizedString(for: date, relativeTo: Date()))")
+                            .font(.caption2).foregroundStyle(.tertiary)
+                    }
+                }
+                Spacer()
+                checkNowButton
+            }.padding(.vertical, 3)
+            Divider().padding(.vertical, 4)
+            snoozePicker
+
+        case .available(let version, let url):
+            HStack(spacing: 8) {
+                Image(systemName: "arrow.down.circle.fill").foregroundStyle(.blue)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("v\(version) is available").font(.callout)
+                    Text("The app will quit and relaunch after installing.")
+                        .font(.caption2).foregroundStyle(.tertiary)
+                }
+                Spacer()
+                Button("Update Now") { updater.downloadAndInstall(from: url) }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+            }.padding(.vertical, 3)
+            Divider().padding(.vertical, 4)
+            snoozePicker
+
+        case .downloading:
+            HStack(spacing: 8) {
+                ProgressView().controlSize(.small)
+                Text("Downloading…").font(.callout).foregroundStyle(.secondary)
+                Spacer()
+            }.padding(.vertical, 3)
+
+        case .installing:
+            HStack(spacing: 8) {
+                ProgressView().controlSize(.small)
+                Text("Installing — app will restart shortly…").font(.callout).foregroundStyle(.secondary)
+                Spacer()
+            }.padding(.vertical, 3)
+
+        case .error(let message):
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(message).font(.callout).foregroundStyle(.secondary)
+                    Button("Try Again") { updater.checkForUpdates() }
+                        .buttonStyle(.bordered).controlSize(.small)
+                }
+                Spacer()
+            }.padding(.vertical, 3)
+        }
+    }
+
+    private var checkNowButton: some View {
+        Button("Check Now") { updater.checkForUpdates() }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+    }
+
+    private var snoozePicker: some View {
+        SettingsRow(label: "Remind me later after") {
+            Picker("", selection: $updater.snoozeDays) {
+                Text("1 day").tag(1)
+                Text("3 days").tag(3)
+                Text("7 days").tag(7)
+                Text("14 days").tag(14)
+            }
+            .labelsHidden()
+            .pickerStyle(.menu)
+            .frame(maxWidth: 100)
+        }
     }
 }
 
@@ -107,27 +256,24 @@ private struct MetricsTab: View {
     @ObservedObject var engine: MetricsEngine
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                SettingsSection(icon: "internaldrive", title: "Disk", color: .indigo) {
-                    SettingsRow(label: "Show removable volumes") {
-                        Toggle("", isOn: $engine.showRemovableVolumes).labelsHidden()
-                    }
-                }
-
-                SettingsSection(icon: "network", title: "Network", color: .green) {
-                    SettingsRow(label: "Show public IP") {
-                        Toggle("", isOn: $engine.publicIPEnabled).labelsHidden()
-                    }
-                    if engine.publicIPEnabled {
-                        Text("Fetches from api.ipify.org over HTTPS every 5 min.")
-                            .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
-                    }
+        VStack(spacing: 16) {
+            SettingsSection(icon: "internaldrive", title: "Disk", color: .indigo) {
+                SettingsRow(label: "Show removable volumes") {
+                    Toggle("", isOn: $engine.showRemovableVolumes).labelsHidden()
                 }
             }
-            .padding(16)
+
+            SettingsSection(icon: "network", title: "Network", color: .green) {
+                SettingsRow(label: "Show public IP") {
+                    Toggle("", isOn: $engine.publicIPEnabled).labelsHidden()
+                }
+                if engine.publicIPEnabled {
+                    Text("Fetches from api.ipify.org over HTTPS every 5 min.")
+                        .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
+                }
+            }
         }
-        .frame(minHeight: 300)
+        .padding(16)
     }
 }
 
@@ -137,57 +283,54 @@ private struct AlertsTab: View {
     @ObservedObject var engine: MetricsEngine
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                SettingsSection(icon: "bell.badge.fill", title: "Alerts", color: .orange) {
-                    SettingsRow(label: "Enable notifications") {
-                        Toggle("", isOn: $engine.alertsEnabled).labelsHidden()
+        VStack(spacing: 16) {
+            SettingsSection(icon: "bell.badge.fill", title: "Alerts", color: .orange) {
+                SettingsRow(label: "Enable notifications") {
+                    Toggle("", isOn: $engine.alertsEnabled).labelsHidden()
+                }
+                if engine.alertsEnabled {
+                    Divider().padding(.vertical, 4)
+                    AlertMetricRow(
+                        icon: "cpu", label: "CPU above",
+                        color: MetricTheme.cpu,
+                        enabled: $engine.cpuAlertEnabled,
+                        value: $engine.cpuAlertThreshold,
+                        range: 50...100, step: 5, format: "%.0f%%"
+                    )
+                    Divider().padding(.vertical, 4)
+                    AlertMetricRow(
+                        icon: "memorychip", label: "Memory above",
+                        color: MetricTheme.memory,
+                        enabled: $engine.memoryAlertEnabled,
+                        value: $engine.memoryAlertThresholdPercent,
+                        range: 50...100, step: 5, format: "%.0f%%"
+                    )
+                    Divider().padding(.vertical, 4)
+                    AlertMetricRow(
+                        icon: "internaldrive", label: "Disk free below",
+                        color: MetricTheme.disk,
+                        enabled: $engine.diskAlertEnabled,
+                        value: $engine.diskFreeAlertThresholdGB,
+                        range: 1...50, step: 1, format: "%.0f GB"
+                    )
+                    Divider().padding(.vertical, 4)
+                    AlertMetricRow(
+                        icon: "cube.transparent", label: "GPU above",
+                        color: .cyan,
+                        enabled: $engine.gpuAlertEnabled,
+                        value: $engine.gpuAlertThreshold,
+                        range: 50...100, step: 5, format: "%.0f%%"
+                    )
+                    Divider().padding(.vertical, 4)
+                    SettingsRow(label: "Thermal pressure") {
+                        Toggle("", isOn: $engine.thermalAlertEnabled).labelsHidden()
                     }
-                    if engine.alertsEnabled {
-                        Divider().padding(.vertical, 4)
-                        AlertMetricRow(
-                            icon: "cpu", label: "CPU above",
-                            color: MetricTheme.cpu,
-                            enabled: $engine.cpuAlertEnabled,
-                            value: $engine.cpuAlertThreshold,
-                            range: 50...100, step: 5, format: "%.0f%%"
-                        )
-                        Divider().padding(.vertical, 4)
-                        AlertMetricRow(
-                            icon: "memorychip", label: "Memory above",
-                            color: MetricTheme.memory,
-                            enabled: $engine.memoryAlertEnabled,
-                            value: $engine.memoryAlertThresholdPercent,
-                            range: 50...100, step: 5, format: "%.0f%%"
-                        )
-                        Divider().padding(.vertical, 4)
-                        AlertMetricRow(
-                            icon: "internaldrive", label: "Disk free below",
-                            color: MetricTheme.disk,
-                            enabled: $engine.diskAlertEnabled,
-                            value: $engine.diskFreeAlertThresholdGB,
-                            range: 1...50, step: 1, format: "%.0f GB"
-                        )
-                        Divider().padding(.vertical, 4)
-                        AlertMetricRow(
-                            icon: "cube.transparent", label: "GPU above",
-                            color: .cyan,
-                            enabled: $engine.gpuAlertEnabled,
-                            value: $engine.gpuAlertThreshold,
-                            range: 50...100, step: 5, format: "%.0f%%"
-                        )
-                        Divider().padding(.vertical, 4)
-                        SettingsRow(label: "Thermal pressure") {
-                            Toggle("", isOn: $engine.thermalAlertEnabled).labelsHidden()
-                        }
-                        Text("Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min.")
-                            .font(.caption2).foregroundStyle(.secondary).padding(.top, 4)
-                    }
+                    Text("Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min.")
+                        .font(.caption2).foregroundStyle(.secondary).padding(.top, 4)
                 }
             }
-            .padding(16)
         }
-        .frame(minHeight: 300)
+        .padding(16)
     }
 }
 
@@ -197,20 +340,17 @@ private struct PanelsTab: View {
     @ObservedObject var engine: MetricsEngine
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Drag cards to reorder. Tap the eye to show or hide.")
-                    .font(.caption).foregroundStyle(.secondary)
-                    .padding(.horizontal, 2)
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Drag cards to reorder. Tap the eye to show or hide.")
+                .font(.caption).foregroundStyle(.secondary)
+                .padding(.horizontal, 2)
 
-                PanelGridPreview(
-                    panelOrder: $engine.panelOrder,
-                    hiddenPanels: $engine.hiddenPanels
-                )
-            }
-            .padding(16)
+            PanelGridPreview(
+                panelOrder: $engine.panelOrder,
+                hiddenPanels: $engine.hiddenPanels
+            )
         }
-        .frame(minHeight: 320)
+        .padding(16)
     }
 }
 
@@ -364,25 +504,22 @@ private struct HistoryTab: View {
     @ObservedObject var engine: MetricsEngine
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                SettingsSection(icon: "clock.arrow.circlepath", title: "History", color: .purple) {
-                    SettingsRow(label: "Save history to disk") {
-                        Toggle("", isOn: $engine.persistHistoryEnabled).labelsHidden()
-                    }
-                    if engine.persistHistoryEnabled {
-                        Divider().padding(.vertical, 4)
-                        SettingsRow(label: "Export") {
-                            Button("Export CSV…") { engine.exportHistoryCSV() }
-                                .buttonStyle(.bordered)
-                                .controlSize(.small)
-                        }
+        VStack(spacing: 16) {
+            SettingsSection(icon: "clock.arrow.circlepath", title: "History", color: .purple) {
+                SettingsRow(label: "Save history to disk") {
+                    Toggle("", isOn: $engine.persistHistoryEnabled).labelsHidden()
+                }
+                if engine.persistHistoryEnabled {
+                    Divider().padding(.vertical, 4)
+                    SettingsRow(label: "Export") {
+                        Button("Export CSV…") { engine.exportHistoryCSV() }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
                     }
                 }
             }
-            .padding(16)
         }
-        .frame(minHeight: 300)
+        .padding(16)
     }
 }
 
