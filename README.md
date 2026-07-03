@@ -2,18 +2,15 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.4-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.5-lightgrey)
 
 ---
 
-## What's new in v0.3.4
+## What's new in v0.3.5
 
-- **Updates tab** in Settings checks GitHub on launch and notifies when a new version is available
-- **System notification** with three actions: Update Now, Remind Me Later, Skip This Version
-- **One-click install** — downloads the release zip, replaces the app bundle, and relaunches automatically
-- **Configurable snooze** — set the "Remind Me Later" duration from Settings → Updates
-- **Settings window focus** fixed — no longer hides behind other apps on open
-- **Settings window sizing** — all tabs now auto-size to their content, no scrolling required
+- **Battery overview card** now shows an explicit "Charging" / "On Battery" status label, charging wattage labelled as charging speed, and time remaining on battery — "0h 0m" suppressed when nearly full
+- **Battery detail icon** reflects actual charge level (0 / 25 / 50 / 75 / 100%) and adds a bolt when charging, updating live
+- **Periodic update checks** every 3 hours while the app is running
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 

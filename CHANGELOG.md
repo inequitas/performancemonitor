@@ -1,5 +1,10 @@
 # Changelog
 
+### v0.3.5 — Battery card improvements *(2026-07-03)*
+- **Battery overview card** shows an explicit "Charging" / "On Battery" status label, charging wattage clearly labelled as charging speed, and time remaining on battery — "0h 0m" suppressed when nearly full
+- **Battery detail icon** reflects actual charge level (0 / 25 / 50 / 75 / 100%) and adds a bolt when charging, updating live
+- **Periodic update checks** every 3 hours while the app is running
+
 ### v0.3.4 — In-app update checker *(2026-07-03)*
 - **Updates tab** in Settings checks GitHub on launch and notifies when a new version is available
 - **System notification** with three actions: Update Now, Remind Me Later, Skip This Version
