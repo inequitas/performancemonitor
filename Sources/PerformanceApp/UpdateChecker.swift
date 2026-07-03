@@ -37,6 +37,8 @@ final class UpdateChecker: NSObject, ObservableObject {
     private static let categoryID = "PERFORMANCE_UPDATE"
     private static let notifID    = "update_available"
 
+    private var periodicTimer: Timer?
+
     override init() {
         snoozeDays = UserDefaults.standard.integer(forKey: Self.snoozeDaysKey).nonZero ?? 7
         super.init()
@@ -54,6 +56,11 @@ final class UpdateChecker: NSObject, ObservableObject {
         center.setNotificationCategories([category])
 
         Task { await performCheck() }
+
+        // Re-check every 3 hours while the app is running
+        periodicTimer = Timer.scheduledTimer(withTimeInterval: 3 * 3600, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in await self?.performCheck() }
+        }
     }
 
     func checkForUpdates() {
