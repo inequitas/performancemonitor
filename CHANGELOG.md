@@ -1,5 +1,10 @@
 # Changelog
 
+### v0.3.7 — UI improvements *(2026-07-03)*
+- **Full-card tap** — every overview panel is now fully tappable to open its detail view, not just the chart area
+- **Disk detail** — new Storage section at the top shows volume name, a used/free fill bar, and GB counts; redundant header text removed from the read/write section
+- **GPU detail** — each display now shows its color profile, True Tone badge, and connection type (Built-in / HDMI / DisplayPort / Thunderbolt)
+
 ### v0.3.6 — Network & notification improvements *(2026-07-03)*
 - **Primary network interface** highlighted in green and sorted to the top in both the overview IP list and network detail view
 - **Ping server setting** in Settings → Metrics — choose between Apple (default), Cloudflare (1.1.1.1), Google (8.8.8.8), or Quad9 (9.9.9.9); switching takes effect immediately

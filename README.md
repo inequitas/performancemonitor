@@ -2,16 +2,15 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.6-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.7-lightgrey)
 
 ---
 
-## What's new in v0.3.6
+## What's new in v0.3.7
 
-- **Primary network interface** highlighted in green and sorted to the top in both the overview IP list and network detail view
-- **Ping server setting** in Settings → Metrics — choose between Apple (default), Cloudflare (1.1.1.1), Google (8.8.8.8), or Quad9 (9.9.9.9)
-- **Notification permissions** requested at launch; status banner in Settings → Updates if disabled
-- **Settings icon flicker** fixed — section icons no longer animate on each metrics update
+- **Full-card tap** — every overview panel is now fully tappable to open its detail view
+- **Disk detail** — Storage section at the top shows volume name, a used/free fill bar, and GB counts
+- **GPU detail** — each display now shows its color profile, True Tone badge, and connection type
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 

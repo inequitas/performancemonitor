@@ -223,33 +223,32 @@ private struct OverviewCard: View {
                 .menuStyle(.borderlessButton)
                 .frame(width: 16)
             }
-            Button(action: action) {
-                VStack(spacing: 6) {
-                    if style == .gauge, let percent = percentValue {
-                        HStack {
-                            Spacer()
-                            RingGaugeView(value: percent, color: color)
-                            Spacer()
-                        }
-                        .frame(height: 66)
-                    } else {
-                        Text(valueText)
-                            .font(.system(.body, design: .rounded))
-                            .fontWeight(.semibold)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                        MetricChart(values: history, unit: unit, fixedMax: fixedMax, showAxes: false, color: color, style: style.asChartDisplayStyle, valueFormatter: valueFormatter)
-                            .frame(height: 46)
+            VStack(spacing: 6) {
+                if style == .gauge, let percent = percentValue {
+                    HStack {
+                        Spacer()
+                        RingGaugeView(value: percent, color: color)
+                        Spacer()
                     }
+                    .frame(height: 66)
+                } else {
+                    Text(valueText)
+                        .font(.system(.body, design: .rounded))
+                        .fontWeight(.semibold)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    MetricChart(values: history, unit: unit, fixedMax: fixedMax, showAxes: false, color: color, style: style.asChartDisplayStyle, valueFormatter: valueFormatter)
+                        .frame(height: 46)
                 }
             }
-            .buttonStyle(.plain)
         }
         .padding(10)
         .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(color.opacity(0.15), lineWidth: 1))
+        .contentShape(Rectangle())
+        .onTapGesture(perform: action)
     }
 }
 
@@ -354,42 +353,41 @@ private struct DiskCard: View {
                 .menuStyle(.borderlessButton)
                 .frame(width: 16)
             }
-            Button(action: action) {
-                VStack(alignment: .leading, spacing: 6) {
-                    if style == .gauge {
-                        HStack(spacing: 0) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(String(format: "%.0f GB", engine.diskFreeGB))
-                                    .font(.system(.body, design: .rounded)).fontWeight(.semibold)
-                                Text("free of \(Int(engine.diskTotalGB)) GB")
-                                    .font(.caption2).foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            RingGaugeView(value: usedPercent, color: readColor)
+            VStack(alignment: .leading, spacing: 6) {
+                if style == .gauge {
+                    HStack(spacing: 0) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(String(format: "%.0f GB", engine.diskFreeGB))
+                                .font(.system(.body, design: .rounded)).fontWeight(.semibold)
+                            Text("free of \(Int(engine.diskTotalGB)) GB")
+                                .font(.caption2).foregroundStyle(.secondary)
                         }
-                        .frame(maxHeight: .infinity)
-                    } else {
-                        HStack(spacing: 10) {
-                            speedLabel("R", engine.diskReadKBps,  readColor)
-                            speedLabel("W", engine.diskWriteKBps, writeColor)
-                        }
-                        DiskButterflyChart(
-                            readHistory:  engine.diskReadHistory,
-                            writeHistory: engine.diskWriteHistory,
-                            readColor:    readColor,
-                            writeColor:   writeColor,
-                            style: style.asChartDisplayStyle
-                        )
-                        .frame(height: 46)
+                        Spacer()
+                        RingGaugeView(value: usedPercent, color: readColor)
                     }
+                    .frame(maxHeight: .infinity)
+                } else {
+                    HStack(spacing: 10) {
+                        speedLabel("R", engine.diskReadKBps,  readColor)
+                        speedLabel("W", engine.diskWriteKBps, writeColor)
+                    }
+                    DiskButterflyChart(
+                        readHistory:  engine.diskReadHistory,
+                        writeHistory: engine.diskWriteHistory,
+                        readColor:    readColor,
+                        writeColor:   writeColor,
+                        style: style.asChartDisplayStyle
+                    )
+                    .frame(height: 46)
                 }
             }
-            .buttonStyle(.plain)
         }
         .padding(10)
         .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(readColor.opacity(0.15), lineWidth: 1))
+        .contentShape(Rectangle())
+        .onTapGesture(perform: action)
     }
 
     private func speedLabel(_ label: String, _ kbps: Double, _ color: Color) -> some View {
@@ -544,55 +542,54 @@ private struct GPUCard: View {
                 .menuStyle(.borderlessButton)
                 .frame(width: 16)
             }
-            Button(action: action) {
-                VStack(spacing: 4) {
-                    switch style {
-                    case .area:
-                        Text(String(format: "%.0f%%", usagePercent))
-                            .font(.system(.body, design: .rounded)).fontWeight(.semibold)
+            VStack(spacing: 4) {
+                switch style {
+                case .area:
+                    Text(String(format: "%.0f%%", usagePercent))
+                        .font(.system(.body, design: .rounded)).fontWeight(.semibold)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    MetricChart(values: history, unit: "%", fixedMax: 100,
+                                showAxes: false, color: .cyan, style: .area)
+                        .frame(height: 46)
+                case .gauge:
+                    HStack {
+                        Spacer()
+                        RingGaugeView(value: usagePercent, color: .cyan)
+                        Spacer()
+                    }
+                    .frame(height: 66)
+                case .info:
+                    Text(name)
+                        .font(.system(.callout, design: .rounded)).fontWeight(.semibold)
+                        .lineLimit(1).minimumScaleFactor(0.7)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    if displays.isEmpty {
+                        Text("No display info")
+                            .font(.caption2).foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity, alignment: .center)
-                        MetricChart(values: history, unit: "%", fixedMax: 100,
-                                    showAxes: false, color: .cyan, style: .area)
-                            .frame(height: 46)
-                    case .gauge:
-                        HStack {
-                            Spacer()
-                            RingGaugeView(value: usagePercent, color: .cyan)
-                            Spacer()
-                        }
-                        .frame(height: 66)
-                    case .info:
-                        Text(name)
-                            .font(.system(.callout, design: .rounded)).fontWeight(.semibold)
-                            .lineLimit(1).minimumScaleFactor(0.7)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                        if displays.isEmpty {
-                            Text("No display info")
-                                .font(.caption2).foregroundStyle(.secondary)
-                                .frame(maxWidth: .infinity, alignment: .center)
-                        } else {
-                            ForEach(displays) { d in
-                                HStack(spacing: 4) {
-                                    Image(systemName: d.isMain ? "display" : "display.2")
-                                        .font(.caption2).foregroundStyle(.cyan)
-                                    Text(d.name)
-                                        .font(.caption2).lineLimit(1).foregroundStyle(.secondary)
-                                    if d.isMain {
-                                        Text("main").font(.caption2).foregroundStyle(.cyan.opacity(0.7))
-                                    }
+                    } else {
+                        ForEach(displays) { d in
+                            HStack(spacing: 4) {
+                                Image(systemName: d.isMain ? "display" : "display.2")
+                                    .font(.caption2).foregroundStyle(.cyan)
+                                Text(d.name)
+                                    .font(.caption2).lineLimit(1).foregroundStyle(.secondary)
+                                if d.isMain {
+                                    Text("main").font(.caption2).foregroundStyle(.cyan.opacity(0.7))
                                 }
-                                .frame(maxWidth: .infinity, alignment: .center)
                             }
+                            .frame(maxWidth: .infinity, alignment: .center)
                         }
                     }
                 }
             }
-            .buttonStyle(.plain)
         }
         .padding(10)
         .frame(maxWidth: .infinity, minHeight: cardHeight, maxHeight: cardHeight, alignment: .topLeading)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.cyan.opacity(0.15), lineWidth: 1))
+        .contentShape(Rectangle())
+        .onTapGesture(perform: action)
     }
 }
 
@@ -604,47 +601,42 @@ private struct NetworkOverviewCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Button(action: action) {
-                HStack(spacing: 6) {
-                    cardIcon(MetricTheme.icon(for: .network), color: MetricTheme.networkDown)
-                    Text("Network").font(.caption).foregroundStyle(.secondary)
-                    Image(systemName: engine.isVPNActive ? "lock.shield.fill" : "lock.shield")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(engine.isVPNActive
-                            ? (engine.vpnIsFortiClient ? Color.blue : Color.green)
-                            : Color.secondary)
-                    Spacer()
-                    // Connection type icons — driven by localInterfaces so primary is
-                    // always green regardless of which interface type is active
-                    HStack(spacing: 5) {
-                        let visibleIfaces = engine.localInterfaces.filter { $0.kind != .vpn }
-                        if visibleIfaces.isEmpty && engine.isConnected {
-                            Image(systemName: "network")
+            HStack(spacing: 6) {
+                cardIcon(MetricTheme.icon(for: .network), color: MetricTheme.networkDown)
+                Text("Network").font(.caption).foregroundStyle(.secondary)
+                Image(systemName: engine.isVPNActive ? "lock.shield.fill" : "lock.shield")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(engine.isVPNActive
+                        ? (engine.vpnIsFortiClient ? Color.blue : Color.green)
+                        : Color.secondary)
+                Spacer()
+                HStack(spacing: 5) {
+                    let visibleIfaces = engine.localInterfaces.filter { $0.kind != .vpn }
+                    if visibleIfaces.isEmpty && engine.isConnected {
+                        Image(systemName: "network")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(.green)
+                    } else {
+                        ForEach(visibleIfaces) { iface in
+                            Image(systemName: iface.icon)
                                 .font(.system(size: 13, weight: .medium))
-                                .foregroundStyle(.green)
-                        } else {
-                            ForEach(visibleIfaces) { iface in
-                                Image(systemName: iface.icon)
-                                    .font(.system(size: 13, weight: .medium))
-                                    .foregroundStyle(iface.isPrimary ? Color.green : Color.primary)
-                            }
+                                .foregroundStyle(iface.isPrimary ? Color.green : Color.primary)
                         }
                     }
-                    HStack(spacing: 10) {
-                        Label(formatSpeedCompact(engine.downloadSpeedKBps), systemImage: "arrow.down")
-                            .font(.caption.monospacedDigit())
-                            .foregroundStyle(MetricTheme.networkDown)
-                        Label(formatSpeedCompact(engine.uploadSpeedKBps), systemImage: "arrow.up")
-                            .font(.caption.monospacedDigit())
-                            .foregroundStyle(MetricTheme.networkUp)
-                    }
-                    Circle()
-                        .fill(engine.isConnected ? Color.green : Color.red)
-                        .frame(width: 7, height: 7)
-                    Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
                 }
+                HStack(spacing: 10) {
+                    Label(formatSpeedCompact(engine.downloadSpeedKBps), systemImage: "arrow.down")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(MetricTheme.networkDown)
+                    Label(formatSpeedCompact(engine.uploadSpeedKBps), systemImage: "arrow.up")
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(MetricTheme.networkUp)
+                }
+                Circle()
+                    .fill(engine.isConnected ? Color.green : Color.red)
+                    .frame(width: 7, height: 7)
+                Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
             }
-            .buttonStyle(.plain)
 
             Divider()
 
@@ -665,13 +657,13 @@ private struct NetworkOverviewCard: View {
                     WiFiSignalBars(rssi: rssi)
                 }
             }
-            .contentShape(Rectangle())
-            .onTapGesture { action() }
         }
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(MetricTheme.networkDown.opacity(0.15), lineWidth: 1))
+        .contentShape(Rectangle())
+        .onTapGesture(perform: action)
     }
 }
 
@@ -685,16 +677,13 @@ struct BluetoothOverviewCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Button(action: action) {
-                HStack(spacing: 6) {
-                    cardIcon("dot.radiowaves.left.and.right", color: .blue)
-                    Text("Bluetooth").font(.caption).foregroundStyle(.secondary)
-                    Spacer()
-                    Text("\(connected.count) connected").font(.caption2).foregroundStyle(.secondary)
-                    Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
-                }
+            HStack(spacing: 6) {
+                cardIcon("dot.radiowaves.left.and.right", color: .blue)
+                Text("Bluetooth").font(.caption).foregroundStyle(.secondary)
+                Spacer()
+                Text("\(connected.count) connected").font(.caption2).foregroundStyle(.secondary)
+                Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
             }
-            .buttonStyle(.plain)
 
             if connected.isEmpty {
                 Text("No devices connected").font(.caption).foregroundStyle(.secondary)
@@ -724,6 +713,8 @@ struct BluetoothOverviewCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
         .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Color.blue.opacity(0.15), lineWidth: 1))
+        .contentShape(Rectangle())
+        .onTapGesture(perform: action)
     }
 
 }

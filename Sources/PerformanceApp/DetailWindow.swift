@@ -609,32 +609,34 @@ struct DiskDetailView: View {
 
             SectionCard {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("\(String(format: "%.1f", engine.diskTotalGB - engine.diskFreeGB)) GB used / \(String(format: "%.1f", engine.diskTotalGB)) GB")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                        .foregroundStyle(MetricTheme.disk)
-                    DiskButterflyChart(
-                        readHistory:  engine.diskReadHistory,
-                        writeHistory: engine.diskWriteHistory,
-                        readSpeed:    engine.diskReadKBps,
-                        writeSpeed:   engine.diskWriteKBps
-                    )
+                    Text("Storage").font(.subheadline.weight(.semibold))
+                    let visibleVolumes = engine.volumes.filter { engine.showRemovableVolumes || !$0.isRemovable }
+                    ForEach(visibleVolumes) { volume in
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text(volume.name).font(.caption).lineLimit(1)
+                                if volume.isRemovable { Text("Removable").font(.caption2).foregroundStyle(.secondary) }
+                            }
+                            DiskUsageBar(used: volume.totalGB - volume.freeGB, total: volume.totalGB)
+                            HStack {
+                                Text(String(format: "%.1f GB used", volume.totalGB - volume.freeGB))
+                                    .font(.caption2).foregroundStyle(.secondary)
+                                Spacer()
+                                Text(String(format: "%.1f GB free", volume.freeGB))
+                                    .font(.caption2).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
                 }
             }
 
             SectionCard {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Volumes").font(.subheadline.weight(.semibold))
-                    let visibleVolumes = engine.volumes.filter { engine.showRemovableVolumes || !$0.isRemovable }
-                    ForEach(visibleVolumes) { volume in
-                        HStack {
-                            Text(volume.name).font(.caption).lineLimit(1)
-                            if volume.isRemovable { Text("(Removable)").font(.caption2).foregroundStyle(.secondary) }
-                            Spacer()
-                            Text(String(format: "%.0f / %.0f GB", volume.totalGB - volume.freeGB, volume.totalGB))
-                                .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
-                        }
-                    }
-                }
+                DiskButterflyChart(
+                    readHistory:  engine.diskReadHistory,
+                    writeHistory: engine.diskWriteHistory,
+                    readSpeed:    engine.diskReadKBps,
+                    writeSpeed:   engine.diskWriteKBps
+                )
             }
 
             if !engine.topDiskProcesses.isEmpty {
@@ -646,6 +648,28 @@ struct DiskDetailView: View {
 
             Spacer()
         }
+    }
+}
+
+// MARK: - Disk storage helpers
+
+private struct DiskUsageBar: View {
+    let used: Double
+    let total: Double
+
+    var body: some View {
+        GeometryReader { geo in
+            HStack(spacing: 0) {
+                Rectangle()
+                    .fill(Color.indigo)
+                    .frame(width: max(2, geo.size.width * used / max(total, 1)))
+                Rectangle()
+                    .fill(Color.gray.opacity(0.15))
+            }
+        }
+        .frame(height: 14)
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .overlay(RoundedRectangle(cornerRadius: 4).strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5))
     }
 }
 
@@ -711,15 +735,33 @@ struct GPUDetailView: View {
                                 Text("\(display.width) × \(display.height)  @\(display.refreshRateHz) Hz  (\(display.scaleFactor == 2 ? "Retina" : String(format: "%.0f×", display.scaleFactor)))")
                                     .font(.caption2.monospacedDigit())
                                     .foregroundStyle(.secondary)
+                                if !display.colorProfile.isEmpty {
+                                    Text(display.colorProfile)
+                                        .font(.caption2).foregroundStyle(.secondary)
+                                }
+                                if !display.connectionType.isEmpty {
+                                    Text(display.connectionType)
+                                        .font(.caption2).foregroundStyle(.secondary)
+                                }
                             }
                             Spacer()
-                            if display.isMain {
-                                Text("Main")
-                                    .font(.caption2)
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color.cyan.opacity(0.15), in: Capsule())
-                                    .foregroundStyle(.cyan)
+                            VStack(alignment: .trailing, spacing: 3) {
+                                if display.isMain {
+                                    Text("Main")
+                                        .font(.caption2)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.cyan.opacity(0.15), in: Capsule())
+                                        .foregroundStyle(.cyan)
+                                }
+                                if display.trueTone {
+                                    Text("True Tone")
+                                        .font(.caption2)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color.yellow.opacity(0.15), in: Capsule())
+                                        .foregroundStyle(.yellow)
+                                }
                             }
                         }
                     }

@@ -1502,7 +1502,7 @@ final class MetricsEngine: ObservableObject {
     // MARK: - Displays
 
     private func updateDisplays() {
-        displays = NSScreen.screens.enumerated().map { index, screen in
+        var infos = NSScreen.screens.enumerated().map { index, screen in
             let scale = screen.backingScaleFactor
             let frame = screen.frame
             let nativeW = Int(frame.width * scale)
@@ -1516,10 +1516,54 @@ final class MetricsEngine: ObservableObject {
                 refreshRateHz: screen.maximumFramesPerSecond,
                 scaleFactor: scale,
                 isMain: screen == NSScreen.main,
-                isBuiltIn: CGDisplayIsBuiltin(screenID) != 0
+                isBuiltIn: CGDisplayIsBuiltin(screenID) != 0,
+                colorProfile: screen.colorSpace?.localizedName ?? ""
             )
         }
+        displays = infos
+
+        Task.detached(priority: .utility) { [weak self] in
+            guard let enriched = self?.enrichDisplaysFromSystemProfiler(base: infos) else { return }
+            await MainActor.run { self?.displays = enriched }
+        }
     }
+
+    private nonisolated func enrichDisplaysFromSystemProfiler(base: [DisplayInfo]) -> [DisplayInfo] {
+        let proc = Process()
+        proc.executableURL = URL(fileURLWithPath: "/usr/sbin/system_profiler")
+        proc.arguments = ["SPDisplaysDataType", "-json"]
+        let pipe = Pipe()
+        proc.standardOutput = pipe
+        proc.standardError = Pipe()
+        guard (try? proc.run()) != nil else { return base }
+        proc.waitUntilExit()
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        guard
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+            let gpus = json["SPDisplaysDataType"] as? [[String: Any]]
+        else { return base }
+
+        // Flatten ndrvs from all GPU entries into a single list
+        let ndrvs = gpus.flatMap { ($0["spdisplays_ndrvs"] as? [[String: Any]]) ?? [] }
+        var result = base
+        for (i, ndrv) in ndrvs.enumerated() {
+            guard i < result.count else { break }
+            let connRaw = ndrv["spdisplays_connection_type"] as? String ?? ""
+            result[i].trueTone = (ndrv["spdisplays_ambient_brightness"] as? String) == "spdisplays_yes"
+            result[i].connectionType = parseConnectionType(connRaw)
+        }
+        return result
+    }
+
+    private nonisolated func parseConnectionType(_ raw: String) -> String {
+        if raw.contains("internal") || raw.contains("built") { return "Built-in" }
+        if raw.contains("hdmi")                              { return "HDMI" }
+        if raw.contains("thunderbolt")                       { return "Thunderbolt" }
+        if raw.contains("displayport") || raw.contains("dp") { return "DisplayPort" }
+        if raw.contains("usb")                              { return "USB-C" }
+        return raw.isEmpty ? "" : raw
+    }
+
 }
 
 struct DisplayInfo: Identifiable {
@@ -1531,7 +1575,11 @@ struct DisplayInfo: Identifiable {
     let scaleFactor: Double
     let isMain: Bool
     let isBuiltIn: Bool
+    var colorProfile: String = ""
+    var trueTone: Bool = false
+    var connectionType: String = ""
 }
+
 
 struct VolumeInfo: Identifiable {
     let name: String
