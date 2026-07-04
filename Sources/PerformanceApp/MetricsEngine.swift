@@ -12,6 +12,7 @@ import Network
 import IOBluetooth
 import CoreBluetooth
 import CoreWLAN
+import SystemConfiguration
 
 // Curated map of known Apple Silicon SMC temperature sensor keys → (friendly label, category).
 // Keys absent from this map are silently dropped; this prevents unnamed/garbage sensors appearing in the UI.
@@ -148,7 +149,7 @@ final class MetricsEngine: ObservableObject {
     @Published var cpuUsagePercent: Double = 0
     @Published var cpuUserPercent: Double = 0
     @Published var cpuSystemPercent: Double = 0
-    @Published var cpuIdlePercent: Double = 100
+    var cpuIdlePercent: Double { max(100 - cpuUsagePercent, 0) }
     @Published var loadAverages: (one: Double, five: Double, fifteen: Double) = (0, 0, 0)
     @Published var perCoreUsage: [Double] = []
     @Published var memoryUsedGB: Double = 0
@@ -172,6 +173,7 @@ final class MetricsEngine: ObservableObject {
     @Published var diskWriteKBps: Double = 0
     @Published var diskReadHistory: [Double] = []
     @Published var diskWriteHistory: [Double] = []
+    @Published var diskFreeHistory: [Double] = []
     @Published var gpuMetricsAvailable: Bool = false
     @Published var volumes: [VolumeInfo] = []
 
@@ -183,6 +185,7 @@ final class MetricsEngine: ObservableObject {
     @Published var topDiskProcesses: [ProcessUsage] = []
 
     @Published var localInterfaces: [LocalInterface] = []
+    @Published var dnsServers: [String] = []
     @Published var isVPNActive: Bool = false
     @Published var vpnIsFortiClient: Bool = false
     @Published var isConnected: Bool = false
@@ -269,46 +272,11 @@ final class MetricsEngine: ObservableObject {
     @Published var gpuRecommendedMemoryGB: Double = 0
     @Published var gpuIsLowPower: Bool = false
     @Published var gpuIsRemovable: Bool = false
-    @Published var gpuLocation: String = "Built-in"
+    var gpuLocation: String { gpuIsRemovable ? "External" : "Built-in" }
     @Published var gpuUsagePercent: Double = 0
     @Published var gpuHistory: [Double] = []
 
-    @Published var alertsEnabled: Bool = false {
-        didSet {
-            guard !isLoadingPreferences else { return }
-            if alertsEnabled { requestNotificationAuthorization() }
-            UserDefaults.standard.set(alertsEnabled, forKey: Pref.alertsEnabled)
-        }
-    }
-    @Published var cpuAlertEnabled: Bool = true {
-        didSet { UserDefaults.standard.set(cpuAlertEnabled, forKey: Pref.cpuAlertEnabled) }
-    }
-    @Published var cpuAlertThreshold: Double = 90 {
-        didSet { UserDefaults.standard.set(cpuAlertThreshold, forKey: Pref.cpuAlertThreshold) }
-    }
-    @Published var memoryAlertEnabled: Bool = false {
-        didSet { UserDefaults.standard.set(memoryAlertEnabled, forKey: Pref.memoryAlertEnabled) }
-    }
-    @Published var memoryAlertThresholdPercent: Double = 90 {
-        didSet { UserDefaults.standard.set(memoryAlertThresholdPercent, forKey: Pref.memoryAlertThresholdPct) }
-    }
-    @Published var diskAlertEnabled: Bool = true {
-        didSet { UserDefaults.standard.set(diskAlertEnabled, forKey: Pref.diskAlertEnabled) }
-    }
-    @Published var diskFreeAlertThresholdGB: Double = 10 {
-        didSet { UserDefaults.standard.set(diskFreeAlertThresholdGB, forKey: Pref.diskFreeAlertThresholdGB) }
-    }
-    @Published var gpuAlertEnabled: Bool = false {
-        didSet { UserDefaults.standard.set(gpuAlertEnabled, forKey: Pref.gpuAlertEnabled) }
-    }
-    @Published var gpuAlertThreshold: Double = 90 {
-        didSet { UserDefaults.standard.set(gpuAlertThreshold, forKey: Pref.gpuAlertThreshold) }
-    }
-    @Published var thermalAlertEnabled: Bool = true {
-        didSet { UserDefaults.standard.set(thermalAlertEnabled, forKey: Pref.thermalAlertEnabled) }
-    }
-    private var lastAlertFired: [String: Date] = [:]
-    private let alertCooldown: TimeInterval = 300
+    let alerts = AlertService()
 
     @Published var showInDock: Bool = true {
         didSet {
@@ -347,9 +315,71 @@ final class MetricsEngine: ObservableObject {
         case bluetooth  = "Bluetooth"
         var id: String { rawValue }
         var isFullWidth: Bool { self == .network || self == .bluetooth }
+
+        var title: String {
+            switch self {
+            case .gpu: return "GPU & Displays"
+            default:   return rawValue
+            }
+        }
+
+        var icon: String {
+            switch self {
+            case .cpu:       return "cpu"
+            case .memory:    return "memorychip"
+            case .disk:      return "internaldrive"
+            case .thermal:   return "thermometer.medium"
+            case .gpu:       return "cube.transparent"
+            case .battery:   return "battery.75percent"
+            case .network:   return "network"
+            case .bluetooth: return "dot.radiowaves.left.and.right"
+            }
+        }
+
+        var color: Color {
+            switch self {
+            case .cpu:       return MetricTheme.cpu
+            case .memory:    return MetricTheme.memory
+            case .disk:      return MetricTheme.disk
+            case .thermal:   return .orange
+            case .gpu:       return MetricTheme.gpu
+            case .battery:   return MetricTheme.battery
+            case .network:   return MetricTheme.networkDown
+            case .bluetooth: return .blue
+            }
+        }
+
         static var transferRepresentation: some TransferRepresentation {
             ProxyRepresentation(exporting: \.rawValue) { Panel(rawValue: $0) ?? .cpu }
         }
+    }
+
+    struct PanelRow: Identifiable {
+        var first:  Panel?
+        var second: Panel?
+        var full:   Panel?
+        var id: String {
+            [first?.id, second?.id, full?.id].compactMap { $0 }.joined(separator: "-")
+        }
+    }
+
+    static func panelLayout(_ panels: [Panel]) -> [PanelRow] {
+        var rows: [PanelRow] = []
+        var pending: Panel?
+        for panel in panels {
+            if panel.isFullWidth {
+                if let p = pending { rows.append(PanelRow(first: p)); pending = nil }
+                rows.append(PanelRow(full: panel))
+            } else {
+                if let p = pending {
+                    rows.append(PanelRow(first: p, second: panel)); pending = nil
+                } else {
+                    pending = panel
+                }
+            }
+        }
+        if let p = pending { rows.append(PanelRow(first: p)) }
+        return rows
     }
 
     @Published var panelOrder: [Panel] = Panel.allCases {
@@ -386,12 +416,34 @@ final class MetricsEngine: ObservableObject {
         }
     }
 
-    enum MenuBarMetric: String, CaseIterable, Identifiable {
+    enum MenuBarMetric: String, CaseIterable, Identifiable, Codable, Transferable {
         case cpu = "CPU"
         case memory = "Memory"
         case network = "Network"
         case disk = "Disk"
+        case gpu = "GPU"
         var id: String { rawValue }
+        var icon: String {
+            switch self {
+            case .cpu:     return "cpu"
+            case .memory:  return "memorychip"
+            case .network: return "network"
+            case .disk:    return "internaldrive"
+            case .gpu:     return "rectangle.3.group"
+            }
+        }
+        var color: Color {
+            switch self {
+            case .cpu:     return MetricTheme.cpu
+            case .memory:  return MetricTheme.memory
+            case .network: return MetricTheme.networkDown
+            case .disk:    return MetricTheme.disk
+            case .gpu:     return MetricTheme.gpu
+            }
+        }
+        static var transferRepresentation: some TransferRepresentation {
+            ProxyRepresentation(exporting: \.rawValue) { MenuBarMetric(rawValue: $0) ?? .cpu }
+        }
     }
 
     enum MenuBarStyle: String, CaseIterable, Identifiable {
@@ -400,11 +452,50 @@ final class MetricsEngine: ObservableObject {
         var id: String { rawValue }
     }
 
-    @Published var menuBarMetric: MenuBarMetric = .cpu {
-        didSet { UserDefaults.standard.set(menuBarMetric.rawValue, forKey: Pref.menuBarMetric) }
+    enum DiskDisplayMode: String, CaseIterable {
+        case io    = "IO"
+        case space = "Space"
     }
-    @Published var menuBarStyle: MenuBarStyle = .sparkline {
-        didSet { UserDefaults.standard.set(menuBarStyle.rawValue, forKey: Pref.menuBarStyle) }
+
+    struct MenuBarConfig {
+        var enabled: Bool
+        var style: MenuBarStyle
+    }
+
+    // Single source of truth for all per-metric menu bar config.
+    // CPU on/sparkline by default; all others off.
+    @Published var menuBarConfig: [MenuBarMetric: MenuBarConfig] = {
+        Dictionary(uniqueKeysWithValues: MenuBarMetric.allCases.map {
+            ($0, MenuBarConfig(enabled: $0 == .cpu, style: .sparkline))
+        })
+    }()
+
+    @Published var menuBarOrder: [MenuBarMetric] = MenuBarMetric.allCases {
+        didSet { UserDefaults.standard.set(menuBarOrder.map(\.rawValue), forKey: "menuBarOrder") }
+    }
+
+    @Published var diskDisplayMode: DiskDisplayMode = .io {
+        didSet { UserDefaults.standard.set(diskDisplayMode.rawValue, forKey: "diskDisplayMode") }
+    }
+
+    @Published var networkSparklineUpload: Bool = false {
+        didSet { UserDefaults.standard.set(networkSparklineUpload, forKey: "networkSparklineUpload") }
+    }
+
+    @Published var diskSparklineWrite: Bool = false {
+        didSet { UserDefaults.standard.set(diskSparklineWrite, forKey: "diskSparklineWrite") }
+    }
+
+    func isEnabled(_ metric: MenuBarMetric) -> Bool { menuBarConfig[metric]?.enabled ?? false }
+    func styleFor(_ metric: MenuBarMetric) -> MenuBarStyle { menuBarConfig[metric]?.style ?? .sparkline }
+
+    func setEnabled(_ enabled: Bool, for metric: MenuBarMetric) {
+        menuBarConfig[metric, default: MenuBarConfig(enabled: false, style: .sparkline)].enabled = enabled
+        UserDefaults.standard.set(enabled, forKey: "extraBar.\(metric.rawValue.lowercased())")
+    }
+    func setStyle(_ style: MenuBarStyle, for metric: MenuBarMetric) {
+        menuBarConfig[metric, default: MenuBarConfig(enabled: false, style: .sparkline)].style = style
+        UserDefaults.standard.set(style.rawValue, forKey: "extraStyle.\(metric.rawValue.lowercased())")
     }
 
     @Published var refreshInterval: Double = 1.0 {
@@ -420,6 +511,8 @@ final class MetricsEngine: ObservableObject {
         array.append(value)
         if array.count > historyLimit { array.removeFirst() }
     }
+    private let dynStore: SCDynamicStore? = SCDynamicStoreCreate(nil, "PerformanceApp" as CFString, nil, nil)
+    private var extraBarController: ExtraMenuBarController?
     private var timer: Timer?
     private var previousCPUTicks: [(user: UInt32, system: UInt32, idle: UInt32, nice: UInt32)] = []
     private var previousNetBytes: (received: UInt64, sent: UInt64)?
@@ -432,100 +525,35 @@ final class MetricsEngine: ObservableObject {
     private var previousProcessNetBytes: [String: (in: Double, out: Double)] = [:]
     private var previousProcessNetTimestamp: Date?
 
-    var menuBarLabel: String {
-        switch menuBarMetric {
-        case .cpu: return String(format: "CPU %.0f%%", cpuUsagePercent)
-        case .memory: return String(format: "MEM %.1fGB", memoryUsedGB)
-        case .network: return String(format: "↓%.0f KB/s", downloadSpeedKBps)
-        case .disk: return String(format: "DISK %.0fGB", diskFreeGB)
+    func sparklineHistory(for metric: MenuBarMetric) -> [Double] {
+        switch metric {
+        case .cpu:     return Array(cpuHistory.suffix(30))
+        case .memory:  return Array(memoryHistory.suffix(30))
+        case .network: return Array((networkSparklineUpload ? uploadHistory : downloadHistory).suffix(30))
+        case .disk:    return Array((diskSparklineWrite ? diskWriteHistory : diskReadHistory).suffix(30))
+        case .gpu:     return Array(gpuHistory.suffix(30))
         }
     }
 
-    @Published var menuBarImage: NSImage = NSImage()
-
-    private var menuBarSparklineHistory: [Double] {
-        let raw: [Double]
-        switch menuBarMetric {
-        case .cpu:     raw = cpuHistory
-        case .memory:  raw = memoryHistory
-        case .network: raw = downloadHistory
-        case .disk:    raw = diskReadHistory
-        }
-        return Array(raw.suffix(30))
-    }
-
-    private var menuBarValueText: String {
-        switch menuBarMetric {
+    func sparklineText(for metric: MenuBarMetric) -> String {
+        switch metric {
         case .cpu:     return String(format: "%.0f%%", cpuUsagePercent)
         case .memory:  return String(format: "%.1fG", memoryUsedGB)
-        case .network: return String(format: "%.0fK", downloadSpeedKBps)
-        case .disk:    return String(format: "%.0fG", diskFreeGB)
+        case .network: return String(format: "%.0fK", networkSparklineUpload ? uploadSpeedKBps : downloadSpeedKBps)
+        case .disk:    return String(format: "%.0fK", diskSparklineWrite ? diskWriteKBps : diskReadKBps)
+        case .gpu:     return String(format: "%.0f%%", gpuUsagePercent)
         }
     }
 
-    func renderMenuBarImage() {
-        let valueText = menuBarValueText
-        let h: CGFloat = 16
-
-        let attrs: [NSAttributedString.Key: Any] = [
-            .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium),
-            .foregroundColor: NSColor.white
-        ]
-        let textSize = (valueText as NSString).size(withAttributes: attrs)
-
-        switch menuBarStyle {
-        case .text:
-            let image = NSImage(size: NSSize(width: ceil(textSize.width), height: h), flipped: false) { _ in
-                guard NSGraphicsContext.current != nil else { return false }
-                (valueText as NSString).draw(
-                    at: NSPoint(x: 0, y: (h - textSize.height) / 2),
-                    withAttributes: attrs)
-                return true
-            }
-            menuBarImage = image
-
-        case .sparkline:
-            let history = menuBarSparklineHistory
-            let sparkW: CGFloat = 32
-            let totalW = sparkW + 5 + ceil(textSize.width)
-
-            let image = NSImage(size: NSSize(width: totalW, height: h), flipped: false) { _ in
-                guard let ctx = NSGraphicsContext.current?.cgContext else { return false }
-
-                if history.count > 1 {
-                    let peak = max(history.max() ?? 1, 0.001)
-                    let step = sparkW / CGFloat(history.count - 1)
-
-                    func point(_ i: Int) -> CGPoint {
-                        CGPoint(x: CGFloat(i) * step,
-                                y: 1 + CGFloat(history[i] / peak) * (h - 3))
-                    }
-
-                    ctx.setStrokeColor(NSColor.white.withAlphaComponent(0.85).cgColor)
-                    ctx.setLineWidth(1.5)
-                    ctx.setLineCap(.round)
-                    ctx.setLineJoin(.round)
-                    ctx.beginPath()
-                    ctx.move(to: point(0))
-                    for i in 1..<history.count { ctx.addLine(to: point(i)) }
-                    ctx.strokePath()
-
-                    ctx.beginPath()
-                    ctx.move(to: point(0))
-                    for i in 1..<history.count { ctx.addLine(to: point(i)) }
-                    ctx.addLine(to: CGPoint(x: CGFloat(history.count - 1) * step, y: 0))
-                    ctx.addLine(to: CGPoint(x: 0, y: 0))
-                    ctx.closePath()
-                    ctx.setFillColor(NSColor.white.withAlphaComponent(0.15).cgColor)
-                    ctx.fillPath()
-                }
-
-                (valueText as NSString).draw(
-                    at: NSPoint(x: sparkW + 5, y: (h - textSize.height) / 2),
-                    withAttributes: attrs)
-                return true
-            }
-            menuBarImage = image
+    func textOnlyLabel(for metric: MenuBarMetric) -> String {
+        switch metric {
+        case .cpu:     return String(format: "CPU %.0f%%", cpuUsagePercent)
+        case .memory:  return String(format: "MEM %.1fG", memoryUsedGB)
+        case .network: return String(format: "↓%.0fK ↑%.0fK", downloadSpeedKBps, uploadSpeedKBps)
+        case .disk:    return diskDisplayMode == .io
+                           ? String(format: "R %.0fK W %.0fK", diskReadKBps, diskWriteKBps)
+                           : String(format: "DSK %.1fG", diskFreeGB)
+        case .gpu:     return String(format: "GPU %.0f%%", gpuUsagePercent)
         }
     }
 
@@ -561,6 +589,7 @@ final class MetricsEngine: ObservableObject {
         if publicIPEnabled { fetchPublicIP() }
         refresh()
         restartTimer()
+        extraBarController = ExtraMenuBarController(engine: self)
     }
 
     private func startPingTimer() {
@@ -585,8 +614,7 @@ final class MetricsEngine: ObservableObject {
                 if error == nil, response != nil {
                     let elapsedMs = Date().timeIntervalSince(start) * 1000
                     self.pingLatencyMs = elapsedMs
-                    self.pingHistory.append(elapsedMs)
-                    if self.pingHistory.count > 60 { self.pingHistory.removeFirst() }
+                    self.appendCapped(elapsedMs, to: &self.pingHistory)
                 } else {
                     self.pingLatencyMs = nil
                 }
@@ -631,7 +659,6 @@ final class MetricsEngine: ObservableObject {
         gpuRecommendedMemoryGB = Double(device.recommendedMaxWorkingSetSize) / 1_073_741_824
         gpuIsLowPower = device.isLowPower
         gpuIsRemovable = device.isRemovable
-        gpuLocation = device.isRemovable ? "External" : "Built-in"
     }
 
     private func updateGPUUsage() {
@@ -681,7 +708,6 @@ final class MetricsEngine: ObservableObject {
         updateBluetooth()
         updateGPUUsage()
         updateSMC()
-        renderMenuBarImage()
         checkAlerts()
         appendPersistedHistoryRow()
 
@@ -746,7 +772,6 @@ final class MetricsEngine: ObservableObject {
             cpuUsagePercent = totalTicks > 0 ? ((totalUser + totalSystem + totalNice) / totalTicks) * 100 : 0
             cpuUserPercent = totalTicks > 0 ? (totalUser / totalTicks) * 100 : 0
             cpuSystemPercent = totalTicks > 0 ? (totalSystem / totalTicks) * 100 : 0
-            cpuIdlePercent = max(100 - cpuUsagePercent, 0)
         }
 
         previousCPUTicks = ticksPerCore
@@ -799,6 +824,7 @@ final class MetricsEngine: ObservableObject {
         var totalSent: UInt64 = 0
         var interfaces: [LocalInterface] = []
         var vpnDetected = false
+        let wifiIfaceName = CWWiFiClient.shared().interface()?.interfaceName
 
         var ptr: UnsafeMutablePointer<ifaddrs>? = firstAddr
         while let current = ptr {
@@ -812,13 +838,13 @@ final class MetricsEngine: ObservableObject {
                 }
             }
             if let sa = ifa.ifa_addr, sa.pointee.sa_family == UInt8(AF_INET), !name.hasPrefix("lo") {
-                var addr = sa.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { $0.pointee.sin_addr }
+                let addrIn = sa.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { $0.pointee }
+                var addr = addrIn.sin_addr
                 var buffer = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
                 if inet_ntop(AF_INET, &addr, &buffer, socklen_t(INET_ADDRSTRLEN)) != nil {
                     let ip = String(cString: buffer)
                     let isVPN = name.hasPrefix("utun") || name.hasPrefix("ppp") || name.hasPrefix("ipsec")
                     if isVPN { vpnDetected = true }
-                    let wifiIfaceName = CWWiFiClient.shared().interface()?.interfaceName
                     let kind: LocalInterface.Kind
                     if isVPN {
                         kind = .vpn
@@ -829,8 +855,27 @@ final class MetricsEngine: ObservableObject {
                     } else {
                         kind = .other
                     }
+                    // Compute subnet prefix and network address from the netmask.
+                    var prefix: Int? = nil
+                    var netAddr: String? = nil
+                    if let nm = ifa.ifa_netmask, nm.pointee.sa_family == UInt8(AF_INET) {
+                        let maskBits = nm.withMemoryRebound(to: sockaddr_in.self, capacity: 1) {
+                            UInt32(bigEndian: $0.pointee.sin_addr.s_addr)
+                        }
+                        prefix = maskBits.nonzeroBitCount
+                        let net = UInt32(bigEndian: addrIn.sin_addr.s_addr) & maskBits
+                        netAddr = "\(net >> 24).\((net >> 16) & 0xFF).\((net >> 8) & 0xFF).\(net & 0xFF)"
+                    }
                     if !isVPN {
-                        interfaces.append(LocalInterface(name: name, address: ip, kind: kind))
+                        var gw: String? = nil
+                        if let store = dynStore,
+                           let dict = SCDynamicStoreCopyValue(store, "State:/Network/Interface/\(name)/IPv4" as CFString) as? [String: Any],
+                           let router = dict["Router"] as? String, !router.contains(":") {
+                            gw = router
+                        }
+                        interfaces.append(LocalInterface(name: name, address: ip, kind: kind,
+                                                         prefixLength: prefix, networkAddress: netAddr,
+                                                         gateway: gw))
                     }
                 }
             }
@@ -870,6 +915,15 @@ final class MetricsEngine: ObservableObject {
         previousNetTimestamp = now
         appendCapped(downloadSpeedKBps, to: &downloadHistory)
         appendCapped(uploadSpeedKBps, to: &uploadHistory)
+
+        // Read active DNS servers from the system dynamic store.
+        if let store = dynStore,
+           let dict = SCDynamicStoreCopyValue(store, "State:/Network/Global/DNS" as CFString) as? [String: Any],
+           let servers = dict["ServerAddresses"] as? [String] {
+            dnsServers = servers.filter { !$0.contains(":") }
+        } else {
+            dnsServers = []
+        }
     }
 
     // MARK: - Disk
@@ -921,6 +975,7 @@ final class MetricsEngine: ObservableObject {
         previousDiskTimestamp = now
         appendCapped(diskReadKBps, to: &diskReadHistory)
         appendCapped(diskWriteKBps, to: &diskWriteHistory)
+        appendCapped(diskFreeGB, to: &diskFreeHistory)
     }
 
     private func updateVolumes() {
@@ -1041,7 +1096,7 @@ final class MetricsEngine: ObservableObject {
                                 list.append(ProcessUsage(pid: 0, name: displayName.isEmpty ? name : displayName, value: kbps))
                             }
                         }
-                        self.topNetworkProcesses = Array(list.sorted { $0.value > $1.value }.prefix(6))
+                        self.topNetworkProcesses = Array(list.sorted { $0.value > $1.value }.prefix(self.topProcessCount))
                     }
                 }
                 self.previousProcessNetBytes = current
@@ -1069,43 +1124,9 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - Alerts
 
-    private func requestNotificationAuthorization() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
-    }
-
     private func checkAlerts() {
-        guard alertsEnabled else { return }
-
-        if cpuAlertEnabled, cpuUsagePercent >= cpuAlertThreshold {
-            fireAlert(key: "cpu", title: "High CPU usage", body: String(format: "CPU is at %.0f%%", cpuUsagePercent))
-        }
-        if memoryAlertEnabled, memoryTotalGB > 0 {
-            let memPct = (memoryUsedGB / memoryTotalGB) * 100
-            if memPct >= memoryAlertThresholdPercent {
-                fireAlert(key: "memory", title: "High memory usage", body: String(format: "%.1f / %.0f GB used (%.0f%%)", memoryUsedGB, memoryTotalGB, memPct))
-            }
-        }
-        if diskAlertEnabled, diskFreeGB > 0, diskFreeGB <= diskFreeAlertThresholdGB {
-            fireAlert(key: "disk", title: "Low disk space", body: String(format: "Only %.1f GB free", diskFreeGB))
-        }
-        if gpuAlertEnabled, gpuUsagePercent >= gpuAlertThreshold {
-            fireAlert(key: "gpu", title: "High GPU usage", body: String(format: "GPU is at %.0f%%", gpuUsagePercent))
-        }
-        if thermalAlertEnabled, thermalState == .serious || thermalState == .critical {
-            fireAlert(key: "thermal", title: "System running hot", body: "Thermal pressure: \(thermalState.label)")
-        }
-    }
-
-    private func fireAlert(key: String, title: String, body: String) {
-        let now = Date()
-        if let last = lastAlertFired[key], now.timeIntervalSince(last) < alertCooldown { return }
-        lastAlertFired[key] = now
-
-        let content = UNMutableNotificationContent()
-        content.title = title
-        content.body = body
-        let request = UNNotificationRequest(identifier: "\(key)-\(now.timeIntervalSince1970)", content: content, trigger: nil)
-        UNUserNotificationCenter.current().add(request)
+        alerts.check(cpu: cpuUsagePercent, memUsed: memoryUsedGB, memTotal: memoryTotalGB,
+                     diskFree: diskFreeGB, gpu: gpuUsagePercent, thermal: thermalState)
     }
 
     // MARK: - History persistence
@@ -1141,16 +1162,6 @@ final class MetricsEngine: ObservableObject {
         static let menuBarStyle             = "menuBarStyle"
         static let panelOrder               = "panelOrder"
         static let hiddenPanels             = "hiddenPanels"
-        static let alertsEnabled            = "alertsEnabled"
-        static let cpuAlertEnabled          = "cpuAlertEnabled"
-        static let cpuAlertThreshold        = "cpuAlertThreshold"
-        static let memoryAlertEnabled       = "memoryAlertEnabled"
-        static let memoryAlertThresholdPct  = "memoryAlertThresholdPct"
-        static let diskAlertEnabled         = "diskAlertEnabled"
-        static let diskFreeAlertThresholdGB = "diskFreeAlertThresholdGB"
-        static let gpuAlertEnabled          = "gpuAlertEnabled"
-        static let gpuAlertThreshold        = "gpuAlertThreshold"
-        static let thermalAlertEnabled      = "thermalAlertEnabled"
         static let pingServer               = "pingServer"
     }
 
@@ -1169,21 +1180,20 @@ final class MetricsEngine: ObservableObject {
         if let v = bool(Pref.publicIPEnabled)           { publicIPEnabled = v }
         if let v = bool(Pref.showRemovableVolumes)      { showRemovableVolumes = v }
         if let v = bool(Pref.persistHistoryEnabled)     { persistHistoryEnabled = v }
-        if let v = bool(Pref.alertsEnabled)             { alertsEnabled = v }
-        if let v = bool(Pref.cpuAlertEnabled)           { cpuAlertEnabled = v }
-        if let v = bool(Pref.memoryAlertEnabled)        { memoryAlertEnabled = v }
-        if let v = bool(Pref.diskAlertEnabled)          { diskAlertEnabled = v }
-        if let v = bool(Pref.gpuAlertEnabled)           { gpuAlertEnabled = v }
-        if let v = bool(Pref.thermalAlertEnabled)       { thermalAlertEnabled = v }
+        alerts.loadPreferences()
         if let v = dbl(Pref.refreshInterval)            { refreshInterval = v }
-        if let v = dbl(Pref.cpuAlertThreshold)         { cpuAlertThreshold = v }
-        if let v = dbl(Pref.memoryAlertThresholdPct)   { memoryAlertThresholdPercent = v }
-        if let v = dbl(Pref.diskFreeAlertThresholdGB)  { diskFreeAlertThresholdGB = v }
-        if let v = dbl(Pref.gpuAlertThreshold)         { gpuAlertThreshold = v }
         if let v = int_(Pref.topProcessCount)           { topProcessCount = v }
         if let v = ud.string(forKey: Pref.pingServer)     { pingServer = PingServer(rawValue: v) ?? .apple }
-        if let v = ud.string(forKey: Pref.menuBarMetric)  { menuBarMetric = MenuBarMetric(rawValue: v) ?? .cpu }
-        if let v = ud.string(forKey: Pref.menuBarStyle)   { menuBarStyle = MenuBarStyle(rawValue: v) ?? .sparkline }
+        if let raw = ud.stringArray(forKey: "menuBarOrder") {
+            let loaded = raw.compactMap { MenuBarMetric(rawValue: $0) }
+            let missing = MenuBarMetric.allCases.filter { !loaded.contains($0) }
+            menuBarOrder = loaded + missing
+        }
+        if let dm = DiskDisplayMode(rawValue: ud.string(forKey: "diskDisplayMode") ?? "") {
+            diskDisplayMode = dm
+        }
+        networkSparklineUpload = ud.bool(forKey: "networkSparklineUpload")
+        diskSparklineWrite     = ud.bool(forKey: "diskSparklineWrite")
 
         if let raw = ud.stringArray(forKey: Pref.panelOrder) {
             let loaded = raw.compactMap { Panel(rawValue: $0) }
@@ -1192,6 +1202,12 @@ final class MetricsEngine: ObservableObject {
         }
         if let raw = ud.stringArray(forKey: Pref.hiddenPanels) {
             hiddenPanels = Set(raw.compactMap { Panel(rawValue: $0) })
+        }
+        for metric in MenuBarMetric.allCases {
+            let key = metric.rawValue.lowercased()
+            let enabled = ud.object(forKey: "extraBar.\(key)") != nil ? ud.bool(forKey: "extraBar.\(key)") : (metric == .cpu)
+            let style   = MenuBarStyle(rawValue: ud.string(forKey: "extraStyle.\(key)") ?? "") ?? .sparkline
+            menuBarConfig[metric] = MenuBarConfig(enabled: enabled, style: style)
         }
     }
 
@@ -1239,8 +1255,9 @@ final class MetricsEngine: ObservableObject {
             batteryTimeRemainingMinutes = nil
         }
 
-        if Date().timeIntervalSince(batteryHealthCacheDate) > 60 {
-            batteryHealthCacheDate = Date()
+        let now = Date()
+        if now.timeIntervalSince(batteryHealthCacheDate) > 60 {
+            batteryHealthCacheDate = now
             updateBatteryHealth()
         }
     }
@@ -1330,8 +1347,9 @@ final class MetricsEngine: ObservableObject {
 
     private func readBluetoothDevices() {
         refreshBTBatteryCache()
-        guard Date().timeIntervalSince(btDevicesCacheDate) > 5 else { return }
-        btDevicesCacheDate = Date()
+        let now = Date()
+        guard now.timeIntervalSince(btDevicesCacheDate) > 5 else { return }
+        btDevicesCacheDate = now
         guard let paired = IOBluetoothDevice.pairedDevices() as? [IOBluetoothDevice] else { return }
         bluetoothDevices = paired.map { device in
             let cod = device.classOfDevice
@@ -1370,7 +1388,9 @@ final class MetricsEngine: ObservableObject {
     }
 
     private func refreshBTBatteryCache() {
-        guard Date().timeIntervalSince(btBatteryCacheDate) > 25 else { return }
+        let now = Date()
+        guard now.timeIntervalSince(btBatteryCacheDate) > 25 else { return }
+        btBatteryCacheDate = now
         // BLE GATT battery read (runs alongside system_profiler parse)
         let reader = BLEBatteryReader()
         bleBatteryReader = reader
@@ -1378,7 +1398,6 @@ final class MetricsEngine: ObservableObject {
             self?.bleBatteryByName[name] = pct
         }
         reader.read()
-        btBatteryCacheDate = Date()
         Task.detached(priority: .utility) { [weak self] in
             let proc = Process()
             proc.executableURL = URL(fileURLWithPath: "/usr/sbin/system_profiler")
@@ -1416,7 +1435,8 @@ final class MetricsEngine: ObservableObject {
                     }
                 }
             }
-            await MainActor.run { self?.btBatteryCache = cache }
+            let captured = cache
+            await MainActor.run { [weak self] in self?.btBatteryCache = captured }
         }
     }
 
@@ -1442,8 +1462,9 @@ final class MetricsEngine: ObservableObject {
             wifiCacheDate = .distantPast
             return
         }
-        guard Date().timeIntervalSince(wifiCacheDate) > 3 else { return }
-        wifiCacheDate = Date()
+        let now = Date()
+        guard now.timeIntervalSince(wifiCacheDate) > 3 else { return }
+        wifiCacheDate = now
         let iface = CWWiFiClient.shared().interface()
         wifiSSID = iface?.ssid()
         if let rssi = iface?.rssiValue(), rssi != 0 {
@@ -1457,8 +1478,9 @@ final class MetricsEngine: ObservableObject {
 
     private func updateSMC() {
         guard smc.isOpen else { return }
-        guard Date().timeIntervalSince(smcCacheDate) > 2 else { return }
-        smcCacheDate = Date()
+        let now = Date()
+        guard now.timeIntervalSince(smcCacheDate) > 2 else { return }
+        smcCacheDate = now
         let reader = smc  // capture before leaving @MainActor; SMCReader is @unchecked Sendable
         Task.detached(priority: .utility) { [weak self] in
             let cpuT     = reader.cpuTemperature()
@@ -1477,18 +1499,23 @@ final class MetricsEngine: ObservableObject {
             // Derive CPU/GPU averages from extended sensors when available.
             // This handles M3/M4 which use Te*/Tf* keys that cpuTemperature()/gpuTemperature()
             // won't find (those only look for Tp*/Tg* prefixes).
-            let cpuSensors = known.filter { $0.category == "CPU" }
-            let gpuSensors = known.filter { $0.category == "GPU" }
+            var cpuSensors: [TempReading] = []
+            var gpuSensors: [TempReading] = []
+            for r in known {
+                if r.category == "CPU" { cpuSensors.append(r) }
+                else if r.category == "GPU" { gpuSensors.append(r) }
+            }
             let finalCpuT = cpuSensors.isEmpty ? cpuT
                 : cpuSensors.map(\.celsius).reduce(0, +) / Double(cpuSensors.count)
             let finalGpuT = gpuSensors.isEmpty ? gpuT
                 : gpuSensors.map(\.celsius).reduce(0, +) / Double(gpuSensors.count)
-            await MainActor.run {
-                self?.cpuTemperatureC          = finalCpuT
-                self?.gpuTemperatureC          = finalGpuT
-                self?.fans                     = f
-                self?.extendedTemperatures     = known
-                self?.unknownSMCTemperatures   = unknown
+            let finalCpu = finalCpuT, finalGpu = finalGpuT, finalFans = f, finalExt = known, finalUnk = unknown
+            await MainActor.run { [weak self] in
+                self?.cpuTemperatureC        = finalCpu
+                self?.gpuTemperatureC        = finalGpu
+                self?.fans                   = finalFans
+                self?.extendedTemperatures   = finalExt
+                self?.unknownSMCTemperatures = finalUnk
             }
         }
     }
@@ -1502,7 +1529,7 @@ final class MetricsEngine: ObservableObject {
     // MARK: - Displays
 
     private func updateDisplays() {
-        var infos = NSScreen.screens.enumerated().map { index, screen in
+        let infos = NSScreen.screens.enumerated().map { index, screen in
             let scale = screen.backingScaleFactor
             let frame = screen.frame
             let nativeW = Int(frame.width * scale)
@@ -1524,7 +1551,7 @@ final class MetricsEngine: ObservableObject {
 
         Task.detached(priority: .utility) { [weak self] in
             guard let enriched = self?.enrichDisplaysFromSystemProfiler(base: infos) else { return }
-            await MainActor.run { self?.displays = enriched }
+            await MainActor.run { [weak self] in self?.displays = enriched }
         }
     }
 
@@ -1595,6 +1622,14 @@ struct LocalInterface: Identifiable {
     let address: String
     let kind: Kind
     var isPrimary: Bool = false
+    var prefixLength: Int? = nil
+    var networkAddress: String? = nil
+    var gateway: String? = nil
+    var subnetMask: String? {
+        guard let p = prefixLength, p > 0 else { return nil }
+        let bits = p >= 32 ? UInt32.max : ~(UInt32.max >> p)
+        return "\(bits >> 24).\((bits >> 16) & 0xFF).\((bits >> 8) & 0xFF).\(bits & 0xFF)"
+    }
     var id: String { name }
 
     var icon: String {

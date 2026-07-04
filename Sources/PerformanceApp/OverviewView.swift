@@ -7,19 +7,9 @@ struct OverviewView: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(\.openSettings) private var openSettings
 
-    @AppStorage("card.cpuStyle")    private var cpuStyleRaw: String = CardChartStyle.area.rawValue
-    @AppStorage("card.memoryStyle") private var memoryStyleRaw: String = CardChartStyle.area.rawValue
-    @AppStorage("card.diskStyle")   private var diskStyleRaw: String = CardChartStyle.area.rawValue
-
-    private var cpuStyle: Binding<CardChartStyle> {
-        Binding(get: { CardChartStyle(rawValue: cpuStyleRaw) ?? .area },    set: { cpuStyleRaw = $0.rawValue })
-    }
-    private var memoryStyle: Binding<CardChartStyle> {
-        Binding(get: { CardChartStyle(rawValue: memoryStyleRaw) ?? .area }, set: { memoryStyleRaw = $0.rawValue })
-    }
-    private var diskStyle: Binding<CardChartStyle> {
-        Binding(get: { CardChartStyle(rawValue: diskStyleRaw) ?? .area },   set: { diskStyleRaw = $0.rawValue })
-    }
+    @AppStorage("card.cpuStyle")    private var cpuStyle:    CardChartStyle = .area
+    @AppStorage("card.memoryStyle") private var memoryStyle: CardChartStyle = .area
+    @AppStorage("card.diskStyle")   private var diskStyle:   CardChartStyle = .area
 
     private var visiblePanels: [MetricsEngine.Panel] {
         engine.panelOrder.filter { !engine.hiddenPanels.contains($0) }
@@ -33,7 +23,7 @@ struct OverviewView: View {
                 .padding(.horizontal, 14)
 
             VStack(spacing: 10) {
-                ForEach(panelRows(visiblePanels), id: \.rowID) { row in
+                ForEach(MetricsEngine.panelLayout(visiblePanels)) { row in
                     if let full = row.full {
                         fullWidthCard(for: full)
                     } else {
@@ -73,55 +63,28 @@ struct OverviewView: View {
         .background(.regularMaterial)
     }
 
-    private struct PanelRow {
-        var first: MetricsEngine.Panel?
-        var second: MetricsEngine.Panel?
-        var full: MetricsEngine.Panel?
-        var rowID: String {
-            [first?.id, second?.id, full?.id].compactMap { $0 }.joined(separator: "-")
-        }
-    }
-
-    private func panelRows(_ panels: [MetricsEngine.Panel]) -> [PanelRow] {
-        var rows: [PanelRow] = []
-        var pending: MetricsEngine.Panel? = nil
-        for panel in panels {
-            if panel.isFullWidth {
-                if let p = pending { rows.append(PanelRow(first: p)); pending = nil }
-                rows.append(PanelRow(full: panel))
-            } else {
-                if let p = pending {
-                    rows.append(PanelRow(first: p, second: panel)); pending = nil
-                } else {
-                    pending = panel
-                }
-            }
-        }
-        if let p = pending { rows.append(PanelRow(first: p)) }
-        return rows
-    }
 
     @ViewBuilder
     private func gridCard(for panel: MetricsEngine.Panel) -> some View {
         switch panel {
         case .cpu:
             OverviewCard(
-                title: "CPU", icon: MetricTheme.icon(for: .cpu), color: MetricTheme.cpu,
+                title: "CPU", icon: MetricsEngine.Panel.cpu.icon, color: MetricTheme.cpu,
                 valueText: String(format: "%.0f%%", engine.cpuUsagePercent),
                 history: engine.cpuHistory, unit: "%", fixedMax: 100,
                 percentValue: engine.cpuUsagePercent,
-                style: cpuStyle, allowGauge: true
+                style: $cpuStyle, allowGauge: true
             ) { openDetail(.cpu) }
         case .memory:
             OverviewCard(
-                title: "Memory", icon: MetricTheme.icon(for: .memory), color: MetricTheme.memory,
+                title: "Memory", icon: MetricsEngine.Panel.memory.icon, color: MetricTheme.memory,
                 valueText: String(format: "%.1f / %.0f GB", engine.memoryUsedGB, engine.memoryTotalGB),
                 history: engine.memoryHistory, unit: "GB", fixedMax: max(engine.memoryTotalGB, 1),
                 percentValue: engine.memoryTotalGB > 0 ? (engine.memoryUsedGB / engine.memoryTotalGB) * 100 : 0,
-                style: memoryStyle, allowGauge: true
+                style: $memoryStyle, allowGauge: true
             ) { openDetail(.memory) }
         case .disk:
-            DiskCard(engine: engine, style: diskStyle) { openDetail(.disk) }
+            DiskCard(engine: engine, style: $diskStyle) { openDetail(.disk) }
         case .thermal:
             ThermalCard(state: engine.thermalState, cpuTemp: engine.cpuTemperatureC,
                         gpuTemp: engine.gpuTemperatureC, batteryTemp: engine.batteryTemperatureC
@@ -156,9 +119,9 @@ struct OverviewView: View {
         }
     }
 
-    private func openDetail(_ kind: DetailWindow.Kind) {
+    private func openDetail(_ panel: MetricsEngine.Panel) {
         NSApp.activate(ignoringOtherApps: true)
-        openWindow(id: "detail", value: kind)
+        openWindow(id: "detail", value: panel)
     }
 }
 
@@ -179,7 +142,7 @@ enum CardChartStyle: String, CaseIterable, Identifiable {
         case .gauge: return "gauge.with.dots.needle.50percent"
         }
     }
-    var asChartDisplayStyle: ChartDisplayStyle { .area }
+
 }
 
 // Fixed height shared by every grid card so all rows look uniform.
@@ -238,7 +201,7 @@ private struct OverviewCard: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                         .frame(maxWidth: .infinity, alignment: .center)
-                    MetricChart(values: history, unit: unit, fixedMax: fixedMax, showAxes: false, color: color, style: style.asChartDisplayStyle, valueFormatter: valueFormatter)
+                    MetricChart(values: history, unit: unit, fixedMax: fixedMax, showAxes: false, color: color, style: .area, valueFormatter: valueFormatter)
                         .frame(height: 46)
                 }
             }
@@ -338,7 +301,7 @@ private struct DiskCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
-                cardIcon(MetricTheme.icon(for: .disk), color: readColor)
+                cardIcon(MetricsEngine.Panel.disk.icon, color: readColor)
                 Text("Disk").font(.caption).foregroundStyle(.secondary)
                 Spacer()
                 Menu {
@@ -375,8 +338,7 @@ private struct DiskCard: View {
                         readHistory:  engine.diskReadHistory,
                         writeHistory: engine.diskWriteHistory,
                         readColor:    readColor,
-                        writeColor:   writeColor,
-                        style: style.asChartDisplayStyle
+                        writeColor:   writeColor
                     )
                     .frame(height: 46)
                 }
@@ -398,32 +360,19 @@ private struct DiskCard: View {
     }
 }
 
-// Butterfly chart: read grows upward, write is the same chart flipped downward.
-// Shared fixedMax keeps both halves proportional — same technique as NetworkButterflyChart.
 private struct DiskButterflyChart: View {
-    let readHistory:   [Double]
-    let writeHistory:  [Double]
-    let readColor:     Color
-    let writeColor:    Color
-    let style:         ChartDisplayStyle
+    let readHistory:  [Double]
+    let writeHistory: [Double]
+    let readColor:    Color
+    let writeColor:   Color
 
-    private var sharedMax: Double {
-        max(readHistory.max() ?? 0, writeHistory.max() ?? 0, 1)
-    }
+    private var sharedMax: Double { absoluteMax(readHistory, writeHistory) }
 
     var body: some View {
         VStack(spacing: 0) {
-            MetricChart(values: readHistory, unit: "KB/s", fixedMax: sharedMax,
-                        showAxes: false, color: readColor, style: style,
-                        valueFormatter: formatSpeedCompact)
-                .frame(height: 20)
-            Rectangle()
-                .fill(Color.primary.opacity(0.15))
-                .frame(height: 1)
-            MetricChart(values: writeHistory, unit: "KB/s", fixedMax: sharedMax,
-                        showAxes: false, color: writeColor, style: style,
-                        valueFormatter: formatSpeedCompact)
-                .frame(height: 20)
+            MetricChart(values: readHistory, fixedMax: sharedMax, showAxes: false, fillFrame: true, color: readColor, style: .area) { _ in "" }
+            Color.primary.opacity(0.25).frame(height: 1)
+            MetricChart(values: writeHistory, fixedMax: sharedMax, showAxes: false, fillFrame: true, color: writeColor, style: .area) { _ in "" }
                 .scaleEffect(y: -1)
         }
     }
@@ -602,7 +551,7 @@ private struct NetworkOverviewCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
-                cardIcon(MetricTheme.icon(for: .network), color: MetricTheme.networkDown)
+                cardIcon(MetricsEngine.Panel.network.icon, color: MetricTheme.networkDown)
                 Text("Network").font(.caption).foregroundStyle(.secondary)
                 Image(systemName: engine.isVPNActive ? "lock.shield.fill" : "lock.shield")
                     .font(.system(size: 13, weight: .medium))

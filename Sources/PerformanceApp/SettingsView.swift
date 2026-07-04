@@ -11,6 +11,9 @@ struct SettingsView: View {
             GeneralTab(engine: engine, launchAtLogin: $launchAtLogin)
                 .tabItem { Label("General", systemImage: "gearshape.fill") }
 
+            MenuBarTab(engine: engine)
+                .tabItem { Label("Menu Bar", systemImage: "menubar.rectangle") }
+
             MetricsTab(engine: engine)
                 .tabItem { Label("Metrics", systemImage: "chart.bar.fill") }
 
@@ -98,27 +101,6 @@ private struct GeneralTab: View {
                     }
                 }
 
-                SettingsSection(icon: "menubar.rectangle", title: "Menu Bar", color: .gray) {
-                    SettingsRow(label: "Shows") {
-                        Picker("", selection: $engine.menuBarMetric) {
-                            ForEach(MetricsEngine.MenuBarMetric.allCases) { m in
-                                Text(m.rawValue).tag(m)
-                            }
-                        }
-                        .labelsHidden().pickerStyle(.menu).frame(maxWidth: 140)
-                    }
-                    Divider().padding(.vertical, 4)
-                    SettingsRow(label: "Style") {
-                        Picker("", selection: $engine.menuBarStyle) {
-                            ForEach(MetricsEngine.MenuBarStyle.allCases) { s in
-                                Text(s.rawValue).tag(s)
-                            }
-                        }
-                        .labelsHidden().pickerStyle(.menu).frame(maxWidth: 140)
-                        .onChange(of: engine.menuBarStyle) { _, _ in engine.renderMenuBarImage() }
-                    }
-                }
-
                 SettingsSection(icon: "list.number", title: "Processes", color: .blue) {
                     SettingsRow(label: "Top processes shown") {
                         Stepper(value: $engine.topProcessCount, in: 3...15) {
@@ -129,6 +111,186 @@ private struct GeneralTab: View {
                 }
             }
             .padding(16)
+    }
+}
+
+// MARK: - Menu Bar tab
+
+private struct MenuBarTab: View {
+    @ObservedObject var engine: MetricsEngine
+    @State private var dragging:    MetricsEngine.MenuBarMetric? = nil
+    @State private var dragY:       CGFloat = 0
+    @State private var dragSrc:     Int = 0
+    @State private var dragDst:     Int = 0
+    @State private var grabOffset:  CGFloat = 0  // mouse Y within the grabbed row at drag start
+
+    private let rowH: CGFloat = 50
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 8) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.indigo.opacity(0.18))
+                        .frame(width: 28, height: 28)
+                    Image(systemName: "menubar.rectangle")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.indigo)
+                }
+                .transaction { $0.animation = nil }
+                Text("Menu Bar Icons").font(.headline)
+            }
+
+            Text("Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            ZStack(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: 14).fill(.ultraThinMaterial)
+                ForEach(Array(engine.menuBarOrder.enumerated()), id: \.element) { i, metric in
+                    let isMe = dragging == metric
+                    HStack(spacing: 0) {
+                        dragHandle(for: metric, at: i)
+                        MenuBarMetricRow(metric: metric, engine: engine)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: rowH, maxHeight: rowH)
+                    .background(isMe ? Color.primary.opacity(0.07) : Color.clear,
+                                in: RoundedRectangle(cornerRadius: 8))
+                    .padding(.horizontal, 8)
+                    .scaleEffect(isMe ? 1.015 : 1, anchor: .center)
+                    .shadow(color: isMe ? .black.opacity(0.18) : .clear, radius: 6, y: 3)
+                    .zIndex(isMe ? 1 : 0)
+                    .offset(y: rowY(index: i, metric: metric))
+                    .animation(isMe ? nil : .interactiveSpring(response: 0.28, dampingFraction: 0.78),
+                               value: dragDst)
+                }
+            }
+            .coordinateSpace(name: "menuBarList")
+            .frame(maxWidth: .infinity)
+            .frame(height: rowH * CGFloat(engine.menuBarOrder.count))
+        }
+        .padding(16)
+    }
+
+    @ViewBuilder
+    private func dragHandle(for metric: MetricsEngine.MenuBarMetric, at i: Int) -> some View {
+        Image(systemName: "line.3.horizontal")
+            .foregroundStyle(.tertiary)
+            .font(.system(size: 12))
+            .frame(width: 28, height: rowH)
+            .contentShape(Rectangle())
+            .onHover { over in over ? NSCursor.openHand.push() : NSCursor.pop() }
+            .gesture(
+                DragGesture(minimumDistance: 2, coordinateSpace: .named("menuBarList"))
+                    .onChanged { v in
+                        if dragging == nil {
+                            dragging    = metric
+                            dragSrc     = i
+                            dragDst     = i
+                            // Record where within the row the grab started so the
+                            // item stays anchored to the grab point as it moves.
+                            grabOffset  = v.startLocation.y - CGFloat(i) * rowH
+                        }
+                        // Position item so grab point stays under the mouse.
+                        dragY = v.location.y - grabOffset - CGFloat(dragSrc) * rowH
+                        // Slot = whichever row the mouse is currently over.
+                        let nd = max(0, min(engine.menuBarOrder.count - 1,
+                                           Int(v.location.y / rowH)))
+                        if nd != dragDst {
+                            withAnimation(.interactiveSpring(response: 0.28, dampingFraction: 0.78)) {
+                                dragDst = nd
+                            }
+                        }
+                    }
+                    .onEnded { _ in
+                        var order = engine.menuBarOrder
+                        order.move(fromOffsets: IndexSet(integer: dragSrc),
+                                   toOffset: dragDst > dragSrc ? dragDst + 1 : dragDst)
+                        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                            engine.menuBarOrder = order
+                            dragging = nil
+                            dragY    = 0
+                        }
+                    }
+            )
+    }
+
+    private func rowY(index i: Int, metric: MetricsEngine.MenuBarMetric) -> CGFloat {
+        if dragging == metric { return CGFloat(dragSrc) * rowH + dragY }
+        return CGFloat(i) * rowH + rowShift(i)
+    }
+
+    private func rowShift(_ i: Int) -> CGFloat {
+        guard dragging != nil, i != dragSrc else { return 0 }
+        if dragSrc < dragDst { return (i > dragSrc && i <= dragDst) ? -rowH : 0 }
+        return (i >= dragDst && i < dragSrc) ? rowH : 0
+    }
+}
+
+private struct MenuBarMetricRow: View {
+    let metric: MetricsEngine.MenuBarMetric
+    @ObservedObject var engine: MetricsEngine
+
+    private var enabled: Binding<Bool> {
+        Binding(get: { engine.isEnabled(metric) },
+                set: { engine.setEnabled($0, for: metric) })
+    }
+
+    private var style: Binding<MetricsEngine.MenuBarStyle> {
+        Binding(get: { engine.styleFor(metric) },
+                set: { engine.setStyle($0, for: metric) })
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(metric.color.opacity(0.15))
+                    .frame(width: 26, height: 26)
+                Image(systemName: metric.icon)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(metric.color)
+            }
+            Text(metric.rawValue).font(.callout)
+            Spacer()
+            if enabled.wrappedValue {
+                // Disk: IO vs Space toggle
+                if metric == .disk {
+                    Picker("", selection: $engine.diskDisplayMode) {
+                        Text("IO").tag(MetricsEngine.DiskDisplayMode.io)
+                        Text("Space").tag(MetricsEngine.DiskDisplayMode.space)
+                    }
+                    .labelsHidden().pickerStyle(.segmented).frame(width: 80)
+                }
+
+                // Sparkline metric picker — which series drives the graph
+                if style.wrappedValue == .sparkline {
+                    if metric == .network {
+                        Picker("", selection: $engine.networkSparklineUpload) {
+                            Text("↓").tag(false)
+                            Text("↑").tag(true)
+                        }
+                        .labelsHidden().pickerStyle(.segmented).frame(width: 52)
+                    } else if metric == .disk && engine.diskDisplayMode == .io {
+                        Picker("", selection: $engine.diskSparklineWrite) {
+                            Text("R").tag(false)
+                            Text("W").tag(true)
+                        }
+                        .labelsHidden().pickerStyle(.segmented).frame(width: 52)
+                    }
+                }
+
+                // Style picker — hidden for disk+space (always text)
+                if !(metric == .disk && engine.diskDisplayMode == .space) {
+                    Picker("", selection: style) {
+                        Text("Text").tag(MetricsEngine.MenuBarStyle.text)
+                        Text("Graph").tag(MetricsEngine.MenuBarStyle.sparkline)
+                    }
+                    .labelsHidden().pickerStyle(.segmented).frame(width: 100)
+                }
+            }
+            Toggle("", isOn: enabled).labelsHidden()
+        }
     }
 }
 
@@ -308,49 +470,55 @@ private struct MetricsTab: View {
 
 private struct AlertsTab: View {
     @ObservedObject var engine: MetricsEngine
+    @ObservedObject private var alerts: AlertService
+
+    init(engine: MetricsEngine) {
+        self.engine = engine
+        self.alerts = engine.alerts
+    }
 
     var body: some View {
         VStack(spacing: 16) {
             SettingsSection(icon: "bell.badge.fill", title: "Alerts", color: .orange) {
                 SettingsRow(label: "Enable notifications") {
-                    Toggle("", isOn: $engine.alertsEnabled).labelsHidden()
+                    Toggle("", isOn: $alerts.alertsEnabled).labelsHidden()
                 }
-                if engine.alertsEnabled {
+                if alerts.alertsEnabled {
                     Divider().padding(.vertical, 4)
                     AlertMetricRow(
                         icon: "cpu", label: "CPU above",
                         color: MetricTheme.cpu,
-                        enabled: $engine.cpuAlertEnabled,
-                        value: $engine.cpuAlertThreshold,
+                        enabled: $alerts.cpuEnabled,
+                        value: $alerts.cpuThreshold,
                         range: 50...100, step: 5, format: "%.0f%%"
                     )
                     Divider().padding(.vertical, 4)
                     AlertMetricRow(
                         icon: "memorychip", label: "Memory above",
                         color: MetricTheme.memory,
-                        enabled: $engine.memoryAlertEnabled,
-                        value: $engine.memoryAlertThresholdPercent,
+                        enabled: $alerts.memoryEnabled,
+                        value: $alerts.memoryThresholdPercent,
                         range: 50...100, step: 5, format: "%.0f%%"
                     )
                     Divider().padding(.vertical, 4)
                     AlertMetricRow(
                         icon: "internaldrive", label: "Disk free below",
                         color: MetricTheme.disk,
-                        enabled: $engine.diskAlertEnabled,
-                        value: $engine.diskFreeAlertThresholdGB,
+                        enabled: $alerts.diskEnabled,
+                        value: $alerts.diskFreeThresholdGB,
                         range: 1...50, step: 1, format: "%.0f GB"
                     )
                     Divider().padding(.vertical, 4)
                     AlertMetricRow(
                         icon: "cube.transparent", label: "GPU above",
                         color: .cyan,
-                        enabled: $engine.gpuAlertEnabled,
-                        value: $engine.gpuAlertThreshold,
+                        enabled: $alerts.gpuEnabled,
+                        value: $alerts.gpuThreshold,
                         range: 50...100, step: 5, format: "%.0f%%"
                     )
                     Divider().padding(.vertical, 4)
                     SettingsRow(label: "Thermal pressure") {
-                        Toggle("", isOn: $engine.thermalAlertEnabled).labelsHidden()
+                        Toggle("", isOn: $alerts.thermalEnabled).labelsHidden()
                     }
                     Text("Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min.")
                         .font(.caption2).foregroundStyle(.secondary).padding(.top, 4)
@@ -382,59 +550,52 @@ private struct PanelsTab: View {
 }
 
 private struct PanelGridPreview: View {
-    @Binding var panelOrder: [MetricsEngine.Panel]
+    @Binding var panelOrder:   [MetricsEngine.Panel]
     @Binding var hiddenPanels: Set<MetricsEngine.Panel>
+    @State private var dragTarget: MetricsEngine.Panel? = nil
+    @State private var clearTask:  Task<Void, Never>? = nil
 
-    private struct PreviewRow: Identifiable {
-        var first: MetricsEngine.Panel?
-        var second: MetricsEngine.Panel?
-        var full: MetricsEngine.Panel?
-        var id: String {
-            [first?.id, second?.id, full?.id].compactMap { $0 }.joined(separator: "-")
-        }
-    }
-
-    private var rows: [PreviewRow] {
-        var result: [PreviewRow] = []
-        var pending: MetricsEngine.Panel? = nil
-        for panel in panelOrder {
-            if panel.isFullWidth {
-                if let p = pending { result.append(PreviewRow(first: p)); pending = nil }
-                result.append(PreviewRow(full: panel))
-            } else {
-                if let p = pending {
-                    result.append(PreviewRow(first: p, second: panel)); pending = nil
-                } else {
-                    pending = panel
-                }
-            }
-        }
-        if let p = pending { result.append(PreviewRow(first: p)) }
-        return result
-    }
+    private var rows: [MetricsEngine.PanelRow] { MetricsEngine.panelLayout(panelOrder) }
 
     var body: some View {
         VStack(spacing: 6) {
             ForEach(rows) { row in
                 if let full = row.full {
-                    PanelMiniCard(panel: full, fullWidth: true,
-                                  hidden: hiddenPanels.contains(full),
-                                  panelOrder: $panelOrder, hiddenPanels: $hiddenPanels)
-                        .frame(maxWidth: .infinity)
+                    card(full, fullWidth: true)
                 } else {
                     HStack(spacing: 6) {
-                        if let a = row.first {
-                            PanelMiniCard(panel: a, fullWidth: false,
-                                          hidden: hiddenPanels.contains(a),
-                                          panelOrder: $panelOrder, hiddenPanels: $hiddenPanels)
-                        }
-                        if let b = row.second {
-                            PanelMiniCard(panel: b, fullWidth: false,
-                                          hidden: hiddenPanels.contains(b),
-                                          panelOrder: $panelOrder, hiddenPanels: $hiddenPanels)
-                        } else {
-                            Color.clear.frame(height: 58)
-                        }
+                        if let a = row.first  { card(a, fullWidth: false) }
+                        if let b = row.second { card(b, fullWidth: false) }
+                        else                  { Color.clear.frame(height: 58) }
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func card(_ panel: MetricsEngine.Panel, fullWidth: Bool) -> some View {
+        PanelMiniCard(
+            panel: panel, fullWidth: fullWidth,
+            hidden: hiddenPanels.contains(panel),
+            isTarget: dragTarget == panel,
+            panelOrder: $panelOrder, hiddenPanels: $hiddenPanels
+        ) { over in
+            if over {
+                // Cancel any pending clear so transitioning between cards is seamless
+                clearTask?.cancel()
+                clearTask = nil
+                withAnimation(.interactiveSpring(response: 0.28, dampingFraction: 0.78)) {
+                    dragTarget = panel
+                }
+            } else {
+                // Delay the clear so the next card's entry can cancel it first,
+                // preventing a one-frame flicker as the drag crosses card boundaries.
+                clearTask = Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 80_000_000)
+                    guard !Task.isCancelled else { return }
+                    withAnimation(.interactiveSpring(response: 0.28, dampingFraction: 0.78)) {
+                        if dragTarget == panel { dragTarget = nil }
                     }
                 }
             }
@@ -443,19 +604,20 @@ private struct PanelGridPreview: View {
 }
 
 private struct PanelMiniCard: View {
-    let panel: MetricsEngine.Panel
-    let fullWidth: Bool
-    let hidden: Bool
-    @Binding var panelOrder: [MetricsEngine.Panel]
+    let panel:      MetricsEngine.Panel
+    let fullWidth:  Bool
+    let hidden:     Bool
+    let isTarget:   Bool
+    @Binding var panelOrder:   [MetricsEngine.Panel]
     @Binding var hiddenPanels: Set<MetricsEngine.Panel>
-    @State private var isTargeted = false
+    let onTargeted: (Bool) -> Void
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
             VStack(spacing: 5) {
-                Image(systemName: panelIcon(panel))
+                Image(systemName: panel.icon)
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(hidden ? .secondary : panelColor(panel))
+                    .foregroundStyle(hidden ? .secondary : panel.color)
                 Text(panel.rawValue)
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(hidden ? .tertiary : .secondary)
@@ -465,15 +627,17 @@ private struct PanelMiniCard: View {
             .frame(height: 58)
             .background(
                 RoundedRectangle(cornerRadius: 10)
-                    .fill(isTargeted ? panelColor(panel).opacity(0.25) :
-                          hidden ? Color.primary.opacity(0.04) : panelColor(panel).opacity(0.1))
+                    .fill(isTarget ? panel.color.opacity(0.25) :
+                          hidden ? Color.primary.opacity(0.04) : panel.color.opacity(0.1))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .strokeBorder(isTargeted ? panelColor(panel) :
-                                  panelColor(panel).opacity(hidden ? 0.1 : 0.3), lineWidth: 1)
+                    .strokeBorder(isTarget ? panel.color :
+                                  panel.color.opacity(hidden ? 0.1 : 0.3), lineWidth: isTarget ? 2 : 1)
             )
             .opacity(hidden ? 0.45 : 1)
+            .scaleEffect(isTarget ? 1.04 : 1, anchor: .center)
+            .animation(.interactiveSpring(response: 0.25, dampingFraction: 0.78), value: isTarget)
 
             Button {
                 if hidden { hiddenPanels.remove(panel) } else { hiddenPanels.insert(panel) }
@@ -486,44 +650,18 @@ private struct PanelMiniCard: View {
             .buttonStyle(.plain)
         }
         .draggable(panel)
-        .dropDestination(for: MetricsEngine.Panel.self, action: { dropped, _ in
-            guard let source = dropped.first, source != panel else { return false }
-            guard let from = panelOrder.firstIndex(of: source),
+        .dropDestination(for: MetricsEngine.Panel.self) { dropped, _ in
+            guard let source = dropped.first, source != panel,
+                  let from = panelOrder.firstIndex(of: source),
                   let to   = panelOrder.firstIndex(of: panel) else { return false }
             var order = panelOrder
-            order.move(fromOffsets: IndexSet(integer: from),
-                       toOffset: to >= from ? to + 1 : to)
-            panelOrder = order
+            order.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
+            withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) { panelOrder = order }
             return true
-        }, isTargeted: { isTargeted = $0 })
+        } isTargeted: { onTargeted($0) }
     }
 }
 
-private func panelIcon(_ panel: MetricsEngine.Panel) -> String {
-    switch panel {
-    case .cpu:       return MetricTheme.icon(for: .cpu)
-    case .memory:    return MetricTheme.icon(for: .memory)
-    case .disk:      return MetricTheme.icon(for: .disk)
-    case .thermal:   return "thermometer.medium"
-    case .gpu:       return "cube.transparent"
-    case .battery:   return "battery.75percent"
-    case .network:   return MetricTheme.icon(for: .network)
-    case .bluetooth: return "dot.radiowaves.left.and.right"
-    }
-}
-
-private func panelColor(_ panel: MetricsEngine.Panel) -> Color {
-    switch panel {
-    case .cpu:       return MetricTheme.cpu
-    case .memory:    return MetricTheme.memory
-    case .disk:      return MetricTheme.disk
-    case .thermal:   return .orange
-    case .gpu:       return .cyan
-    case .battery:   return .green
-    case .network:   return MetricTheme.networkDown
-    case .bluetooth: return .blue
-    }
-}
 
 // MARK: - History tab
 

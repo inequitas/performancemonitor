@@ -3,36 +3,19 @@ import AppKit
 import Charts
 
 struct DetailWindow: View {
-    enum Kind: String, Codable, Hashable, CaseIterable, Identifiable {
-        case cpu, memory, network, disk, gpu, battery, bluetooth, thermal
-        var id: String { rawValue }
-        var title: String {
-            switch self {
-            case .cpu:       return "CPU"
-            case .memory:    return "Memory"
-            case .network:   return "Network"
-            case .disk:      return "Disk"
-            case .gpu:       return "GPU & Displays"
-            case .battery:   return "Battery"
-            case .bluetooth: return "Bluetooth"
-            case .thermal:   return "Thermal & Fans"
-            }
-        }
-    }
-
-    let kind: Kind
+    let kind: MetricsEngine.Panel
     @ObservedObject var engine: MetricsEngine
 
     var body: some View {
         ScrollView {
             Group {
                 switch kind {
-                case .cpu: CPUDetailView(engine: engine)
-                case .memory: MemoryDetailView(engine: engine)
-                case .network: NetworkDetailView(engine: engine)
-                case .disk: DiskDetailView(engine: engine)
-                case .gpu: GPUDetailView(engine: engine)
-                case .battery: BatteryDetailView(engine: engine)
+                case .cpu:       CPUDetailView(engine: engine)
+                case .memory:    MemoryDetailView(engine: engine)
+                case .network:   NetworkDetailView(engine: engine)
+                case .disk:      DiskDetailView(engine: engine)
+                case .gpu:       GPUDetailView(engine: engine)
+                case .battery:   BatteryDetailView(engine: engine)
                 case .bluetooth: BluetoothDetailView(engine: engine)
                 case .thermal:   ThermalDetailView(engine: engine)
                 }
@@ -61,7 +44,7 @@ func batterySystemImage(_ pct: Int, charging: Bool = false) -> String {
     case 51...: return "battery.75percent\(suffix)"
     case 26...: return "battery.50percent\(suffix)"
     case 11...: return "battery.25percent\(suffix)"
-    default:    return charging ? "battery.0percent.bolt" : "battery.0percent"
+    default:    return "battery.0percent\(suffix)"
     }
 }
 
@@ -97,16 +80,56 @@ struct EarbudBatteryPill: View {
     }
 }
 
+// Shared butterfly bar chart. sharedMax is passed in so axis labels in the
+// parent always match the scale the chart is actually using.
+struct ButterflyBarChart: View {
+    let upHistory:    [Double]
+    let downHistory:  [Double]
+    let upColor:      Color
+    let downColor:    Color
+    let sharedMax:    Double
+    var displayCount: Int = 60
+
+    private var paddedUp: [Double] {
+        let slice = Array(upHistory.suffix(displayCount))
+        return slice + Array(repeating: 0.0, count: displayCount - slice.count)
+    }
+    private var paddedDown: [Double] {
+        let slice = Array(downHistory.suffix(displayCount))
+        return slice + Array(repeating: 0.0, count: displayCount - slice.count)
+    }
+
+    var body: some View {
+        Chart {
+            ForEach(Array(paddedUp.enumerated()), id: \.offset) { i, val in
+                BarMark(x: .value("t", i), yStart: .value("v", 0.0), yEnd: .value("v", val),
+                        width: .inset(1))
+                    .foregroundStyle(upColor)
+            }
+            ForEach(Array(paddedDown.enumerated()), id: \.offset) { i, val in
+                BarMark(x: .value("t", i), yStart: .value("v", -val), yEnd: .value("v", 0.0),
+                        width: .inset(1))
+                    .foregroundStyle(downColor)
+            }
+        }
+        .chartYScale(domain: -sharedMax ... sharedMax)
+        .chartXAxis(.hidden)
+        .chartYAxis {
+            AxisMarks(values: [0.0]) {
+                AxisGridLine().foregroundStyle(Color.primary.opacity(0.25))
+            }
+        }
+    }
+}
+
+
 struct NetworkButterflyChart: View {
     let downloadHistory: [Double]
     let uploadHistory:   [Double]
     let downloadSpeed:   Double
     let uploadSpeed:     Double
 
-    // Shared scale so download and upload are proportional to each other
-    private var sharedMax: Double {
-        max(downloadHistory.max() ?? 0, uploadHistory.max() ?? 0, 1)
-    }
+    private var sharedMax: Double { absoluteMax(downloadHistory, uploadHistory) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -120,7 +143,6 @@ struct NetworkButterflyChart: View {
                     .foregroundStyle(MetricTheme.networkUp)
             }
             HStack(spacing: 4) {
-                // Left-side axis labels — outside the chart so they don't overlap the lines
                 VStack(spacing: 0) {
                     VStack(alignment: .trailing, spacing: 0) {
                         Text(formatSpeed(sharedMax)).font(.caption2.monospacedDigit()).foregroundStyle(.secondary)
@@ -141,23 +163,15 @@ struct NetworkButterflyChart: View {
                     .frame(height: 90)
                 }
                 .frame(width: 56)
-                // Charts with grid lines only — fillFrame removes the chart's built-in scale inset
                 VStack(spacing: 0) {
-                    MetricChart(values: downloadHistory, unit: "KB/s", fixedMax: sharedMax,
-                                showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkDown, style: .area,
-                                valueFormatter: formatSpeed)
+                    MetricChart(values: downloadHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkDown, style: .area) { formatSpeed($0) }
                         .frame(height: 90)
-                    // Midline height matches the "0" label row so columns stay in sync
-                    Rectangle()
-                        .fill(Color.primary.opacity(0.25))
-                        .frame(height: 1)
-                        .frame(height: 14)
-                    MetricChart(values: uploadHistory, unit: "KB/s", fixedMax: sharedMax,
-                                showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkUp, style: .area,
-                                valueFormatter: formatSpeed)
+                    Color.primary.opacity(0.25).frame(height: 1).frame(height: 14)
+                    MetricChart(values: uploadHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkUp, style: .area) { formatSpeed($0) }
                         .frame(height: 90)
                         .scaleEffect(y: -1)
                 }
+                .frame(height: 194)
             }
         }
     }
@@ -304,7 +318,7 @@ struct CPUDetailView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Label("CPU", systemImage: MetricTheme.icon(for: .cpu))
+                Label("CPU", systemImage: MetricsEngine.Panel.cpu.icon)
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(MetricTheme.cpu)
                 Spacer()
@@ -395,7 +409,7 @@ struct MemoryDetailView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Label("Memory", systemImage: MetricTheme.icon(for: .memory))
+                Label("Memory", systemImage: MetricsEngine.Panel.memory.icon)
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(MetricTheme.memory)
                 Spacer()
@@ -436,10 +450,11 @@ struct MemoryDetailView: View {
 
 struct NetworkDetailView: View {
     @ObservedObject var engine: MetricsEngine
+    @State private var expandedInterfaces: Set<String> = []
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Label("Network", systemImage: MetricTheme.icon(for: .network))
+            Label("Network", systemImage: MetricsEngine.Panel.network.icon)
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(MetricTheme.networkDown)
 
@@ -458,8 +473,7 @@ struct NetworkDetailView: View {
                         InfoButton(text: "Local IPs are read from the system network interfaces.\n\nVPN is detected by the presence of utun, ppp, or ipsec interfaces.\n\nPublic IP is fetched from api.ipify.org over HTTPS. Only your outbound request is sent — no other data. Refreshed every 5 minutes.\n\nConnectivity check is an HTTPS HEAD request to Apple's captive portal endpoint (captive.apple.com). This respects your system proxy settings. True ICMP ping requires root on macOS, so this is used instead.")
                     }
                     ForEach(engine.localInterfaces) { iface in
-                        CopyableIPRow(icon: iface.icon, label: iface.displayName, value: iface.address,
-                                      iconColor: iface.isPrimary ? .green : .secondary)
+                        interfaceRow(iface)
                     }
                     Divider()
                     CopyableIPRow(icon: "globe", label: "Public IP", value: engine.publicIP ?? "Looking up…")
@@ -530,6 +544,58 @@ struct NetworkDetailView: View {
             Spacer()
         }
     }
+
+    @ViewBuilder
+    private func interfaceRow(_ iface: LocalInterface) -> some View {
+        let isExpanded = expandedInterfaces.contains(iface.id)
+        let suffix = iface.prefixLength.map { "/\($0)" } ?? ""
+
+        VStack(alignment: .leading, spacing: 4) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.18)) {
+                    if isExpanded { expandedInterfaces.remove(iface.id) }
+                    else          { expandedInterfaces.insert(iface.id) }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: iface.icon)
+                        .font(.caption2)
+                        .foregroundStyle(iface.isPrimary ? Color.green : Color.secondary)
+                        .frame(width: 14)
+                    Text(iface.displayName)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    if !isExpanded {
+                        Text(iface.address + suffix)
+                            .font(.caption.monospacedDigit())
+                    }
+                    Image(systemName: "chevron.right")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                        .rotationEffect(.degrees(isExpanded ? 90 : 0))
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                VStack(alignment: .leading, spacing: 4) {
+                    CopyableIPRow(label: "IP", value: iface.address)
+                    if let mask = iface.subnetMask {
+                        CopyableIPRow(label: "Subnet", value: mask)
+                    }
+                    if let gw = iface.gateway {
+                        CopyableIPRow(label: "Gateway", value: gw)
+                    }
+                    ForEach(engine.dnsServers, id: \.self) { dns in
+                        CopyableIPRow(icon: "server.rack", label: "DNS", value: dns)
+                    }
+                }
+                .padding(.leading, 22)
+            }
+        }
+    }
 }
 
 // MARK: - Disk
@@ -540,9 +606,7 @@ private struct DiskButterflyChart: View {
     let readSpeed:    Double
     let writeSpeed:   Double
 
-    private var sharedMax: Double {
-        max(readHistory.max() ?? 0, writeHistory.max() ?? 0, 1)
-    }
+    private var sharedMax: Double { absoluteMax(readHistory, writeHistory) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -579,20 +643,14 @@ private struct DiskButterflyChart: View {
                 }
                 .frame(width: 56)
                 VStack(spacing: 0) {
-                    MetricChart(values: readHistory, unit: "KB/s", fixedMax: sharedMax,
-                                showAxes: false, showGridLines: true, fillFrame: true, color: .indigo, style: .area,
-                                valueFormatter: formatSpeed)
+                    MetricChart(values: readHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: .indigo, style: .area) { formatSpeed($0) }
                         .frame(height: 90)
-                    Rectangle()
-                        .fill(Color.primary.opacity(0.25))
-                        .frame(height: 1)
-                        .frame(height: 14)
-                    MetricChart(values: writeHistory, unit: "KB/s", fixedMax: sharedMax,
-                                showAxes: false, showGridLines: true, fillFrame: true, color: .purple, style: .area,
-                                valueFormatter: formatSpeed)
+                    Color.primary.opacity(0.25).frame(height: 1).frame(height: 14)
+                    MetricChart(values: writeHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: .purple, style: .area) { formatSpeed($0) }
                         .frame(height: 90)
                         .scaleEffect(y: -1)
                 }
+                .frame(height: 194)
             }
         }
     }
@@ -603,7 +661,7 @@ struct DiskDetailView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Label("Disk", systemImage: MetricTheme.icon(for: .disk))
+            Label("Disk", systemImage: MetricsEngine.Panel.disk.icon)
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(MetricTheme.disk)
 
@@ -838,7 +896,7 @@ struct BatteryDetailView: View {
                             Spacer()
                             Text(String(format: "%.1f°C", temp))
                                 .font(.caption.monospacedDigit())
-                                .foregroundStyle(temp < 35 ? Color.green : temp < 45 ? Color.yellow : temp < 55 ? Color.orange : Color.red)
+                                .foregroundStyle(MetricTheme.sensorTempColor(temp, category: "Battery"))
                         }
                     }
                     if let voltage = engine.batteryVoltage {
@@ -973,21 +1031,21 @@ struct ThermalDetailView: View {
                         SensorCategoryRow(
                             icon: "cpu", iconColor: MetricTheme.cpu, label: "CPU", avgCelsius: avg,
                             sensors: cpuSensors.map { ($0.label, $0.celsius) },
-                            colorFn: { $0 < 60 ? .green : $0 < 75 ? .yellow : $0 < 90 ? .orange : .red }
+                            colorFn: { MetricTheme.sensorTempColor($0, category: "CPU") }
                         )
                     }
                     if let avg = engine.gpuTemperatureC {
                         SensorCategoryRow(
                             icon: "cube.transparent", iconColor: .cyan, label: "GPU", avgCelsius: avg,
                             sensors: gpuSensors.map { ($0.label, $0.celsius) },
-                            colorFn: { $0 < 60 ? .green : $0 < 75 ? .yellow : $0 < 90 ? .orange : .red }
+                            colorFn: { MetricTheme.sensorTempColor($0, category: "GPU") }
                         )
                     }
                     if let bat = engine.batteryTemperatureC {
                         SensorCategoryRow(
                             icon: "battery.75percent", iconColor: MetricTheme.battery, label: "Battery",
                             avgCelsius: bat, sensors: [],
-                            colorFn: { $0 < 35 ? .green : $0 < 45 ? .yellow : $0 < 55 ? .orange : .red }
+                            colorFn: { MetricTheme.sensorTempColor($0, category: "Battery") }
                         )
                     }
 
@@ -998,7 +1056,7 @@ struct ThermalDetailView: View {
                         SensorCategoryRow(
                             icon: "internaldrive", iconColor: .indigo, label: "Storage", avgCelsius: avg,
                             sensors: storageSensors.map { ($0.label, $0.celsius) },
-                            colorFn: { Self.sensorTempColor($0, category: "Storage") }
+                            colorFn: { MetricTheme.sensorTempColor($0, category: "Storage") }
                         )
                     }
 
@@ -1021,7 +1079,7 @@ struct ThermalDetailView: View {
                         SensorCategoryRow(
                             icon: "thermometer", iconColor: .orange, label: "System", avgCelsius: avg,
                             sensors: systemDisplaySensors,
-                            colorFn: { Self.sensorTempColor($0, category: "System") },
+                            colorFn: { MetricTheme.sensorTempColor($0, category: "System") },
                             initiallyExpanded: true
                         )
                     }
@@ -1033,7 +1091,7 @@ struct ThermalDetailView: View {
                         SensorCategoryRow(
                             icon: "memorychip", iconColor: MetricTheme.memory, label: "Memory", avgCelsius: avg,
                             sensors: memorySensors.map { ($0.label, $0.celsius) },
-                            colorFn: { Self.sensorTempColor($0, category: "Memory") }
+                            colorFn: { MetricTheme.sensorTempColor($0, category: "Memory") }
                         )
                     }
 
@@ -1090,26 +1148,6 @@ struct ThermalDetailView: View {
         }
     }
 
-    private static func sensorTempColor(_ celsius: Double, category: String) -> Color {
-        switch category {
-        case "CPU", "GPU":
-            return celsius < 60 ? .green : celsius < 75 ? .yellow : celsius < 90 ? .orange : .red
-        case "Battery":
-            return celsius < 35 ? .green : celsius < 45 ? .yellow : celsius < 55 ? .orange : .red
-        default:
-            return celsius < 40 ? .green : celsius < 55 ? .yellow : celsius < 70 ? .orange : .red
-        }
-    }
-
-    private static func categoryIconAndColor(_ category: String) -> (String, Color) {
-        switch category {
-        case "Storage":  return ("internaldrive",   .indigo)
-        case "System":   return ("thermometer",     .orange)
-        case "Memory":   return ("memorychip",      MetricTheme.memory)
-        case "Trackpad": return ("trackpad",        .mint)
-        default:         return ("thermometer.medium", .gray)
-        }
-    }
 }
 
 private struct SensorCategoryRow: View {

@@ -23,38 +23,24 @@ extension ProcessInfo.ThermalState {
 }
 
 enum MetricTheme {
-    static let cpu = Color.blue
-    static let memory = Color.purple
+    static let cpu         = Color.blue
+    static let memory      = Color.purple
     static let networkDown = Color.green
-    static let networkUp = Color.orange
-    static let disk = Color.indigo
+    static let networkUp   = Color.orange
+    static let disk        = Color.indigo
     static let temperature = Color.red
-    static let gpu = Color.cyan
-    static let battery = Color.green
+    static let gpu         = Color.cyan
+    static let battery     = Color.green
 
-    static func color(for kind: DetailWindow.Kind) -> Color {
-        switch kind {
-        case .cpu: return cpu
-        case .memory: return memory
-        case .network: return networkDown
-        case .disk: return disk
-        case .gpu: return gpu
-        case .battery: return battery
-        case .bluetooth: return .blue
-        case .thermal:   return temperature
-        }
-    }
-
-    static func icon(for kind: DetailWindow.Kind) -> String {
-        switch kind {
-        case .cpu:       return "cpu"
-        case .memory:    return "memorychip"
-        case .network:   return "network"
-        case .disk:      return "internaldrive"
-        case .gpu:       return "cube.transparent"
-        case .battery:   return "battery.100percent"
-        case .bluetooth: return "dot.radiowaves.left.and.right"
-        case .thermal:   return "thermometer.medium"
+    // Temperature colour thresholds vary by sensor category (CPU runs hotter than battery).
+    static func sensorTempColor(_ celsius: Double, category: String) -> Color {
+        switch category {
+        case "CPU", "GPU":
+            return celsius < 60 ? .green : celsius < 75 ? .yellow : celsius < 90 ? .orange : .red
+        case "Battery":
+            return celsius < 35 ? .green : celsius < 45 ? .yellow : celsius < 55 ? .orange : .red
+        default:
+            return celsius < 40 ? .green : celsius < 55 ? .yellow : celsius < 70 ? .orange : .red
         }
     }
 }

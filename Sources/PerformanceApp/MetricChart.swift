@@ -1,6 +1,17 @@
 import SwiftUI
 import Charts
 
+// 95th-percentile max — prevents rare big spikes from collapsing all smaller bars.
+func p95Max(_ a: [Double], _ b: [Double]) -> Double {
+    let all = (a + b).filter { $0 > 0 }.sorted()
+    guard !all.isEmpty else { return 1 }
+    return max(all[Int(Double(all.count) * 0.95)], 1)
+}
+
+func absoluteMax(_ a: [Double], _ b: [Double]) -> Double {
+    max(a.max() ?? 0, b.max() ?? 0, 1)
+}
+
 enum ChartDisplayStyle: String, CaseIterable, Identifiable {
     case line, area, bar
     var id: String { rawValue }
@@ -52,7 +63,8 @@ struct MetricChart: View {
 
     var body: some View {
         Chart {
-            ForEach(Array(values.enumerated()), id: \.offset) { index, value in
+            ForEach(values.indices, id: \.self) { index in
+                let value = values[index]
                 switch style {
                 case .area:
                     AreaMark(

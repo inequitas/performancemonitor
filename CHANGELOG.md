@@ -1,5 +1,12 @@
 # Changelog
 
+### v0.3.8 — Network detail expansion, menu bar & settings improvements *(2026-07-04)*
+- **Network detail expansion** — each interface row (Ethernet, Wi-Fi, etc.) now expands to show IP, Subnet mask, Gateway, and DNS server; collapsed state shows IP and prefix length at a glance
+- **IPv4 only** — network details filter out IPv6 addresses throughout; only human-friendly addresses shown
+- **Menu bar drag fix** — reordering menu bar metrics now tracks the mouse precisely regardless of where within the row you grab
+- **Panel reordering fix** — drag-to-reorder in Settings → Panels no longer flickers when crossing card boundaries
+- **Settings row spacing** — metric rows in Settings now have consistent horizontal padding
+
 ### v0.3.7 — UI improvements *(2026-07-03)*
 - **Full-card tap** — every overview panel is now fully tappable to open its detail view, not just the chart area
 - **Disk detail** — new Storage section at the top shows volume name, a used/free fill bar, and GB counts; redundant header text removed from the read/write section
