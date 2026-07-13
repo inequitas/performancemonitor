@@ -876,10 +876,19 @@ final class MetricsEngine: ObservableObject {
                     }
                     if !isVPN {
                         var gw: String? = nil
-                        if let store = dynStore,
-                           let dict = SCDynamicStoreCopyValue(store, "State:/Network/Interface/\(name)/IPv4" as CFString) as? [String: Any],
-                           let router = dict["Router"] as? String, !router.contains(":") {
-                            gw = router
+                        if let store = dynStore {
+                            // Per-interface key (present when DHCP assigns the route)
+                            if let dict = SCDynamicStoreCopyValue(store, "State:/Network/Interface/\(name)/IPv4" as CFString) as? [String: Any],
+                               let router = dict["Router"] as? String, !router.contains(":") {
+                                gw = router
+                            }
+                            // Fallback: global default gateway for the primary interface
+                            if gw == nil,
+                               let globalDict = SCDynamicStoreCopyValue(store, "State:/Network/Global/IPv4" as CFString) as? [String: Any],
+                               (globalDict["PrimaryInterface"] as? String) == name,
+                               let router = globalDict["Router"] as? String, !router.contains(":") {
+                                gw = router
+                            }
                         }
                         interfaces.append(LocalInterface(name: name, address: ip, kind: kind,
                                                          prefixLength: prefix, networkAddress: netAddr,

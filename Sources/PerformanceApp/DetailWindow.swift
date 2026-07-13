@@ -133,6 +133,8 @@ struct NetworkButterflyChart: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            Label("Throughput", systemImage: "arrow.up.arrow.down")
+                .font(.subheadline.weight(.semibold))
             HStack {
                 Label(formatSpeed(downloadSpeed), systemImage: "arrow.down")
                     .font(.system(size: 18, weight: .bold, design: .rounded))
@@ -520,7 +522,6 @@ struct NetworkDetailView: View {
                     downloadSpeed: engine.downloadSpeedKBps,
                     uploadSpeed: engine.uploadSpeedKBps
                 )
-                .frame(height: 160)
             }
 
             SectionCard {
