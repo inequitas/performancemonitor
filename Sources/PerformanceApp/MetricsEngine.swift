@@ -535,11 +535,19 @@ final class MetricsEngine: ObservableObject {
         }
     }
 
+    private func formatNetSpeed(_ kbps: Double) -> String {
+        if kbps < 1000 { return String(format: "%.0fk", kbps) }
+        let mbps = kbps / 1000
+        if mbps < 1000 { return mbps < 10 ? String(format: "%.1fm", mbps) : String(format: "%.0fm", mbps) }
+        let gbps = mbps / 1000
+        return gbps < 10 ? String(format: "%.1fg", gbps) : String(format: "%.0fg", gbps)
+    }
+
     func sparklineText(for metric: MenuBarMetric) -> String {
         switch metric {
         case .cpu:     return String(format: "%.0f%%", cpuUsagePercent)
         case .memory:  return String(format: "%.1fG", memoryUsedGB)
-        case .network: return String(format: "%.0fK", networkSparklineUpload ? uploadSpeedKBps : downloadSpeedKBps)
+        case .network: return formatNetSpeed(networkSparklineUpload ? uploadSpeedKBps : downloadSpeedKBps)
         case .disk:    return String(format: "%.0fK", diskSparklineWrite ? diskWriteKBps : diskReadKBps)
         case .gpu:     return String(format: "%.0f%%", gpuUsagePercent)
         }
@@ -549,7 +557,7 @@ final class MetricsEngine: ObservableObject {
         switch metric {
         case .cpu:     return String(format: "CPU %.0f%%", cpuUsagePercent)
         case .memory:  return String(format: "MEM %.1fG", memoryUsedGB)
-        case .network: return String(format: "↓%.0fK ↑%.0fK", downloadSpeedKBps, uploadSpeedKBps)
+        case .network: return "↓\(formatNetSpeed(downloadSpeedKBps)) ↑\(formatNetSpeed(uploadSpeedKBps))"
         case .disk:    return diskDisplayMode == .io
                            ? String(format: "R %.0fK W %.0fK", diskReadKBps, diskWriteKBps)
                            : String(format: "DSK %.1fG", diskFreeGB)

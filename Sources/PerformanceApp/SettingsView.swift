@@ -707,7 +707,6 @@ private struct SettingsSection<Content: View>: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(color)
                 }
-                .transaction { $0.animation = nil }
                 Text(title).font(.headline)
             }
 
@@ -719,6 +718,7 @@ private struct SettingsSection<Content: View>: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
         }
+        .transaction { $0.animation = nil }
     }
 }
 

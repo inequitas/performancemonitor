@@ -1,5 +1,9 @@
 # Changelog
 
+### v0.3.9 — Adaptive network speed units, settings icon fix *(2026-07-04)*
+- **Adaptive network units** — menu bar network speed now scales automatically: K below 1 MB/s, M up to 1 GB/s, G above that (e.g. `30k`, `1.4m`, `0.2g`)
+- **Settings icon jump fixed** — section icons no longer shift position when section content changes height (e.g. toggling alerts on/off)
+
 ### v0.3.8 — Network detail expansion, menu bar & settings improvements *(2026-07-04)*
 - **Network detail expansion** — each interface row (Ethernet, Wi-Fi, etc.) now expands to show IP, Subnet mask, Gateway, and DNS server; collapsed state shows IP and prefix length at a glance
 - **IPv4 only** — network details filter out IPv6 addresses throughout; only human-friendly addresses shown

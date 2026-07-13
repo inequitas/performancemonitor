@@ -2,15 +2,14 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.8-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.9-lightgrey)
 
 ---
 
-## What's new in v0.3.8
+## What's new in v0.3.9
 
-- **Network detail expansion** — each interface row expands to show IP, Subnet mask, Gateway, and DNS; IPv4 only
-- **Menu bar drag fix** — reordering menu bar metrics tracks the mouse precisely wherever you grab
-- **Panel reordering fix** — drag-to-reorder in Settings → Panels no longer flickers when crossing cards
+- **Adaptive network units** — menu bar network speed scales automatically: K / M / G (e.g. `30k`, `1.4m`, `0.2g`)
+- **Settings icon jump fixed** — section icons no longer shift when content height changes
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
