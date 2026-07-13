@@ -1,5 +1,16 @@
 # Changelog
 
+### v0.3.11 — Settings icon jump fix, brightness removed *(2026-07-13)*
+- **Settings icons fixed** — SF Symbol animations fully suppressed across all settings tabs; icons no longer jump on each metrics refresh
+- **Brightness removed** — display brightness control removed; macOS 15+ restricts the private CoreDisplay API to entitled system apps, making it a no-op
+
+### v0.3.10 — Bug fixes: SMART status, global shortcut, appearance, brightness *(2026-07-13)*
+- **SMART status** — disk health now reads correctly on Apple Silicon via `diskutil`, checked at startup and every 5 minutes; shows in GPU & Disk detail
+- **Global shortcut** — ⌥⌘P now works system-wide (from desktop, other apps) using Carbon `RegisterEventHotKey`; no Accessibility permission needed
+- **Appearance** — System/Light/Dark picker now correctly applies to the main popover (overview) and all detail windows, not just Settings
+- **Brightness controls** — moved from Settings to the GPU & Displays detail view; shows a per-display brightness slider for each controllable display
+- **Settings icon flicker** — animation suppression broadened to cover the full Settings tab view
+
 ### v0.3.9 — Adaptive network speed units, settings icon fix *(2026-07-04)*
 - **Adaptive network units** — menu bar network speed now scales automatically: K below 1 MB/s, M up to 1 GB/s, G above that (e.g. `30k`, `1.4m`, `0.2g`)
 - **Settings icon jump fixed** — section icons no longer shift position when section content changes height (e.g. toggling alerts on/off)

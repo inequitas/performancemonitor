@@ -174,6 +174,8 @@ final class MetricsEngine: ObservableObject {
     @Published var diskReadHistory: [Double] = []
     @Published var diskWriteHistory: [Double] = []
     @Published var diskFreeHistory: [Double] = []
+    @Published var diskSmartStatus: String? = nil   // e.g. "Verified", "Not Supported", nil while loading
+    private var smartFetchTick = 0
     @Published var gpuMetricsAvailable: Bool = false
     @Published var volumes: [VolumeInfo] = []
 
@@ -455,6 +457,33 @@ final class MetricsEngine: ObservableObject {
     enum DiskDisplayMode: String, CaseIterable {
         case io    = "IO"
         case space = "Space"
+    }
+
+    enum AppAppearance: String, CaseIterable, Identifiable {
+        case system = "System", light = "Light", dark = "Dark"
+        var id: String { rawValue }
+    }
+    @Published var appAppearance: AppAppearance = .system {
+        didSet {
+            guard !isLoadingPreferences else { return }
+            UserDefaults.standard.set(appAppearance.rawValue, forKey: "appAppearance")
+            applyAppearance()
+        }
+    }
+    func applyAppearance() {
+        NSApp.appearance = switch appAppearance {
+        case .system: nil
+        case .light:  NSAppearance(named: .aqua)
+        case .dark:   NSAppearance(named: .darkAqua)
+        }
+    }
+
+    var preferredColorScheme: ColorScheme? {
+        switch appAppearance {
+        case .system: return nil
+        case .light:  return .light
+        case .dark:   return .dark
+        }
     }
 
     struct MenuBarConfig {
@@ -970,12 +999,14 @@ final class MetricsEngine: ObservableObject {
                   let dict = props?.takeRetainedValue() as? [String: Any],
                   let stats = dict["Statistics"] as? [String: Any] else { continue }
 
-            if let read = stats["Bytes (Read)"] as? UInt64 {
-                totalRead += read
-            }
-            if let write = stats["Bytes (Write)"] as? UInt64 {
-                totalWrite += write
-            }
+            if let read = stats["Bytes (Read)"] as? UInt64 { totalRead += read }
+            if let write = stats["Bytes (Write)"] as? UInt64 { totalWrite += write }
+        }
+
+        // Fetch SMART once at startup then every 5 min — diskutil is the reliable source on Apple Silicon
+        smartFetchTick += 1
+        if smartFetchTick == 1 || smartFetchTick % 300 == 0 {
+            fetchSmartStatus()
         }
 
         let now = Date()
@@ -993,6 +1024,28 @@ final class MetricsEngine: ObservableObject {
         appendCapped(diskReadKBps, to: &diskReadHistory)
         appendCapped(diskWriteKBps, to: &diskWriteHistory)
         appendCapped(diskFreeGB, to: &diskFreeHistory)
+    }
+
+    private func fetchSmartStatus() {
+        Task {
+            let status = await Task.detached(priority: .background) { () -> String? in
+                let proc = Process()
+                proc.executableURL = URL(fileURLWithPath: "/usr/sbin/diskutil")
+                proc.arguments = ["info", "/dev/disk0"]
+                let pipe = Pipe()
+                proc.standardOutput = pipe
+                proc.standardError = Pipe()
+                guard (try? proc.run()) != nil else { return nil }
+                proc.waitUntilExit()
+                let out = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+                return out.components(separatedBy: "\n")
+                    .first { $0.contains("SMART Status") }?
+                    .components(separatedBy: ":")
+                    .last?
+                    .trimmingCharacters(in: .whitespaces)
+            }.value
+            self.diskSmartStatus = status
+        }
     }
 
     private func updateVolumes() {
@@ -1187,6 +1240,7 @@ final class MetricsEngine: ObservableObject {
         defer {
             isLoadingPreferences = false
             NSApp.setActivationPolicy(showInDock ? .regular : .accessory)
+            applyAppearance()
         }
         let ud = UserDefaults.standard
         func bool(_ k: String) -> Bool?   { ud.object(forKey: k) != nil ? ud.bool(forKey: k) : nil }
@@ -1208,6 +1262,9 @@ final class MetricsEngine: ObservableObject {
         }
         if let dm = DiskDisplayMode(rawValue: ud.string(forKey: "diskDisplayMode") ?? "") {
             diskDisplayMode = dm
+        }
+        if let a = AppAppearance(rawValue: ud.string(forKey: "appAppearance") ?? "") {
+            appAppearance = a
         }
         networkSparklineUpload = ud.bool(forKey: "networkSparklineUpload")
         diskSparklineWrite     = ud.bool(forKey: "diskSparklineWrite")

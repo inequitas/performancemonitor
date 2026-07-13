@@ -27,6 +27,7 @@ struct DetailWindow: View {
         .navigationTitle(kind.title)
         .background(.regularMaterial)
         .background(WindowFloatAccessor())
+        .preferredColorScheme(engine.preferredColorScheme)
     }
 }
 
@@ -668,7 +669,16 @@ struct DiskDetailView: View {
 
             SectionCard {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Storage").font(.subheadline.weight(.semibold))
+                    HStack {
+                        Text("Storage").font(.subheadline.weight(.semibold))
+                        Spacer()
+                        if let smart = engine.diskSmartStatus {
+                            let ok = smart == "Verified"
+                            Label(ok ? "SMART OK" : smart, systemImage: ok ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(ok ? .green : .red)
+                        }
+                    }
                     let visibleVolumes = engine.volumes.filter { engine.showRemovableVolumes || !$0.isRemovable }
                     ForEach(visibleVolumes) { volume in
                         VStack(alignment: .leading, spacing: 6) {
@@ -783,43 +793,45 @@ struct GPUDetailView: View {
                         Text("No display info available")
                             .font(.caption).foregroundStyle(.secondary)
                     }
-                    ForEach(engine.displays) { display in
-                        HStack(alignment: .top, spacing: 8) {
-                            Image(systemName: displayIcon(display))
-                                .font(.system(size: 15))
-                                .foregroundStyle(.cyan.opacity(0.8))
-                                .frame(width: 20)
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(display.name).font(.caption.weight(.medium))
-                                Text("\(display.width) × \(display.height)  @\(display.refreshRateHz) Hz  (\(display.scaleFactor == 2 ? "Retina" : String(format: "%.0f×", display.scaleFactor)))")
-                                    .font(.caption2.monospacedDigit())
-                                    .foregroundStyle(.secondary)
-                                if !display.colorProfile.isEmpty {
-                                    Text(display.colorProfile)
-                                        .font(.caption2).foregroundStyle(.secondary)
+                    ForEach(engine.displays) { info in
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack(alignment: .top, spacing: 8) {
+                                Image(systemName: displayIcon(info))
+                                    .font(.system(size: 15))
+                                    .foregroundStyle(.cyan.opacity(0.8))
+                                    .frame(width: 20)
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(info.name).font(.caption.weight(.medium))
+                                    Text("\(info.width) × \(info.height)  @\(info.refreshRateHz) Hz  (\(info.scaleFactor == 2 ? "Retina" : String(format: "%.0f×", info.scaleFactor)))")
+                                        .font(.caption2.monospacedDigit())
+                                        .foregroundStyle(.secondary)
+                                    if !info.colorProfile.isEmpty {
+                                        Text(info.colorProfile)
+                                            .font(.caption2).foregroundStyle(.secondary)
+                                    }
+                                    if !info.connectionType.isEmpty {
+                                        Text(info.connectionType)
+                                            .font(.caption2).foregroundStyle(.secondary)
+                                    }
                                 }
-                                if !display.connectionType.isEmpty {
-                                    Text(display.connectionType)
-                                        .font(.caption2).foregroundStyle(.secondary)
-                                }
-                            }
-                            Spacer()
-                            VStack(alignment: .trailing, spacing: 3) {
-                                if display.isMain {
-                                    Text("Main")
-                                        .font(.caption2)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(Color.cyan.opacity(0.15), in: Capsule())
-                                        .foregroundStyle(.cyan)
-                                }
-                                if display.trueTone {
-                                    Text("True Tone")
-                                        .font(.caption2)
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(Color.yellow.opacity(0.15), in: Capsule())
-                                        .foregroundStyle(.yellow)
+                                Spacer()
+                                VStack(alignment: .trailing, spacing: 3) {
+                                    if info.isMain {
+                                        Text("Main")
+                                            .font(.caption2)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.cyan.opacity(0.15), in: Capsule())
+                                            .foregroundStyle(.cyan)
+                                    }
+                                    if info.trueTone {
+                                        Text("True Tone")
+                                            .font(.caption2)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.yellow.opacity(0.15), in: Capsule())
+                                            .foregroundStyle(.yellow)
+                                    }
                                 }
                             }
                         }

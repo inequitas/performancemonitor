@@ -2,8 +2,11 @@ import SwiftUI
 import ServiceManagement
 
 struct SettingsView: View {
-    @ObservedObject var engine: MetricsEngine
-    @ObservedObject var updater: UpdateChecker
+    // Plain let — no @ObservedObject. Each child tab observes engine directly,
+    // so the TabView (and its tab-bar SF Symbol icons) is never re-rendered by
+    // engine ticks. Appearance / dock changes are handled by SettingsWindowModifier.
+    let engine: MetricsEngine
+    let updater: UpdateChecker
     @State private var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
 
     var body: some View {
@@ -31,7 +34,21 @@ struct SettingsView: View {
         }
         .frame(width: 420)
         .background(.regularMaterial)
-        .background(WindowFocuser(showInDock: engine.showInDock))
+        .modifier(SettingsWindowModifier(engine: engine))
+        .transaction { $0.animation = nil }
+    }
+}
+
+// Isolated observer for the two engine properties that affect window-level
+// presentation. Keeps appearance and dock changes working without forcing
+// the entire TabView to re-render on every metrics tick.
+private struct SettingsWindowModifier: ViewModifier {
+    @ObservedObject var engine: MetricsEngine
+
+    func body(content: Content) -> some View {
+        content
+            .background(WindowFocuser(showInDock: engine.showInDock))
+            .preferredColorScheme(engine.preferredColorScheme)
     }
 }
 
@@ -72,45 +89,65 @@ private struct GeneralTab: View {
 
     var body: some View {
         VStack(spacing: 16) {
-                SettingsSection(icon: "gearshape.fill", title: "General", color: .gray) {
-                    SettingsRow(label: "Refresh interval") {
-                        HStack(spacing: 8) {
-                            Slider(value: $engine.refreshInterval, in: 0.5...5.0, step: 0.5)
-                            Text(String(format: "%.1fs", engine.refreshInterval))
-                                .font(.caption.monospacedDigit())
-                                .foregroundStyle(.secondary)
-                                .frame(width: 36)
-                        }
-                    }
-                    Divider().padding(.vertical, 4)
-                    SettingsRow(label: "Show in Dock") {
-                        Toggle("", isOn: $engine.showInDock).labelsHidden()
-                    }
-                    Divider().padding(.vertical, 4)
-                    SettingsRow(label: "Launch at login") {
-                        Toggle("", isOn: $launchAtLogin)
-                            .labelsHidden()
-                            .onChange(of: launchAtLogin) { _, newValue in
-                                do {
-                                    if newValue { try SMAppService.mainApp.register() }
-                                    else { try SMAppService.mainApp.unregister() }
-                                } catch {
-                                    launchAtLogin = SMAppService.mainApp.status == .enabled
-                                }
-                            }
+            SettingsSection(icon: "gearshape.fill", title: "General", color: .gray) {
+                SettingsRow(label: "Refresh interval") {
+                    HStack(spacing: 8) {
+                        Slider(value: $engine.refreshInterval, in: 0.5...5.0, step: 0.5)
+                        Text(String(format: "%.1fs", engine.refreshInterval))
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                            .frame(width: 36)
                     }
                 }
-
-                SettingsSection(icon: "list.number", title: "Processes", color: .blue) {
-                    SettingsRow(label: "Top processes shown") {
-                        Stepper(value: $engine.topProcessCount, in: 3...15) {
-                            Text("\(engine.topProcessCount)")
-                                .font(.system(.body, design: .rounded).weight(.semibold))
+                Divider().padding(.vertical, 4)
+                SettingsRow(label: "Appearance") {
+                    Picker("", selection: $engine.appAppearance) {
+                        ForEach(MetricsEngine.AppAppearance.allCases) { a in
+                            Text(a.rawValue).tag(a)
                         }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.segmented)
+                    .frame(width: 160)
+                }
+                Divider().padding(.vertical, 4)
+                SettingsRow(label: "Show in Dock") {
+                    Toggle("", isOn: $engine.showInDock).labelsHidden()
+                }
+                Divider().padding(.vertical, 4)
+                SettingsRow(label: "Launch at login") {
+                    Toggle("", isOn: $launchAtLogin)
+                        .labelsHidden()
+                        .onChange(of: launchAtLogin) { _, newValue in
+                            do {
+                                if newValue { try SMAppService.mainApp.register() }
+                                else { try SMAppService.mainApp.unregister() }
+                            } catch {
+                                launchAtLogin = SMAppService.mainApp.status == .enabled
+                            }
+                        }
+                }
+                Divider().padding(.vertical, 4)
+                SettingsRow(label: "Open / close popover") {
+                    Text(ExtraMenuBarController.shortcutDisplay)
+                        .font(.system(.callout, design: .monospaced))
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
+                }
+            }
+
+            SettingsSection(icon: "list.number", title: "Processes", color: .blue) {
+                SettingsRow(label: "Top processes shown") {
+                    Stepper(value: $engine.topProcessCount, in: 3...15) {
+                        Text("\(engine.topProcessCount)")
+                            .font(.system(.body, design: .rounded).weight(.semibold))
                     }
                 }
             }
-            .padding(16)
+        }
+        .padding(16)
+        .transaction { $0.animation = nil }
     }
 }
 
@@ -170,6 +207,7 @@ private struct MenuBarTab: View {
             .frame(height: rowH * CGFloat(engine.menuBarOrder.count))
         }
         .padding(16)
+        .transaction { $0.animation = nil }
     }
 
     @ViewBuilder
@@ -250,7 +288,9 @@ private struct MenuBarMetricRow: View {
                 Image(systemName: metric.icon)
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(metric.color)
+                    .symbolEffectsRemoved()
             }
+            .transaction { $0.animation = nil }
             Text(metric.rawValue).font(.callout)
             Spacer()
             if enabled.wrappedValue {
@@ -463,6 +503,7 @@ private struct MetricsTab: View {
             }
         }
         .padding(16)
+        .transaction { $0.animation = nil }
     }
 }
 
@@ -526,6 +567,7 @@ private struct AlertsTab: View {
             }
         }
         .padding(16)
+        .transaction { $0.animation = nil }
     }
 }
 
@@ -546,6 +588,7 @@ private struct PanelsTab: View {
             )
         }
         .padding(16)
+        .transaction { $0.animation = nil }
     }
 }
 
@@ -618,6 +661,7 @@ private struct PanelMiniCard: View {
                 Image(systemName: panel.icon)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(hidden ? .secondary : panel.color)
+                    .symbolEffectsRemoved()
                 Text(panel.rawValue)
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(hidden ? .tertiary : .secondary)
@@ -685,6 +729,7 @@ private struct HistoryTab: View {
             }
         }
         .padding(16)
+        .transaction { $0.animation = nil }
     }
 }
 
@@ -706,7 +751,9 @@ private struct SettingsSection<Content: View>: View {
                     Image(systemName: icon)
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(color)
+                        .symbolEffectsRemoved()
                 }
+                .transaction { $0.animation = nil }
                 Text(title).font(.headline)
             }
 

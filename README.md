@@ -6,10 +6,13 @@ A lightweight macOS menu bar app that gives you real-time system metrics at a gl
 
 ---
 
-## What's new in v0.3.9
+## What's new in v0.3.10
 
-- **Adaptive network units** — menu bar network speed scales automatically: K / M / G (e.g. `30k`, `1.4m`, `0.2g`)
-- **Settings icon jump fixed** — section icons no longer shift when content height changes
+- **SMART status** — disk health reads correctly on Apple Silicon via `diskutil`; shown in the Disk and GPU detail views
+- **Global shortcut** — ⌥⌘P now works from anywhere (desktop, other apps) without requiring Accessibility permission
+- **Appearance** — Light/Dark/System picker now applies to the overview popover and all detail windows
+- **Brightness** — moved to GPU & Displays detail view with per-display sliders for controllable displays
+- **Settings stability** — icon flicker in Settings tabs eliminated
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 

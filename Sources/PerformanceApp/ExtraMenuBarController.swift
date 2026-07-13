@@ -1,6 +1,7 @@
 import AppKit
 import SwiftUI
 import Combine
+import Carbon
 
 /// Owns the single NSStatusItem that shows all enabled metrics side-by-side.
 /// Subscribes to the engine's raw metric publishers and renders images itself,
@@ -11,6 +12,14 @@ final class ExtraMenuBarController: NSObject {
     private var statusItem: NSStatusItem?
     private var sharedPopover: NSPopover?
     private var cancellables: Set<AnyCancellable> = []
+    private var localMonitor: Any?
+    private var hotKeyRef: EventHotKeyRef?
+    private var carbonHandlerRef: EventHandlerRef?
+
+    // Global shortcut: ⌥⌘P — works system-wide to open/close the popover
+    static let shortcutDisplay = "⌥⌘P"
+    private static let shortcutKeyCode: UInt16 = 35   // P
+    private static let shortcutFlags: NSEvent.ModifierFlags = [.option, .command]
 
     // Fixed font/colour attributes — allocated once, shared across all renders.
     private static let attrs: [NSAttributedString.Key: Any] = [
@@ -52,10 +61,50 @@ final class ExtraMenuBarController: NSObject {
         // many @Published vars only triggers one draw pass.
         engine.objectWillChange
             .debounce(for: .milliseconds(32), scheduler: RunLoop.main)
-            .sink { [weak self] _ in self?.render() }
+            .sink { [weak self] _ in
+                self?.render()
+                self?.syncPopoverAppearance()
+            }
             .store(in: &cancellables)
 
         render()
+        registerShortcut()
+    }
+
+    deinit {
+        if let m = localMonitor  { NSEvent.removeMonitor(m) }
+        if let r = carbonHandlerRef { RemoveEventHandler(r) }
+        if let h = hotKeyRef        { UnregisterEventHotKey(h) }
+    }
+
+    // MARK: - Global shortcut
+
+    private func registerShortcut() {
+        // Local monitor catches the shortcut when one of our own windows is focused.
+        let flags = Self.shortcutFlags
+        let code  = Self.shortcutKeyCode
+        localMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] e in
+            if e.modifierFlags.intersection(.deviceIndependentFlagsMask) == flags, e.keyCode == code {
+                self?.handleClick()
+                return nil
+            }
+            return e
+        }
+
+        // Carbon RegisterEventHotKey fires system-wide without Accessibility permission,
+        // unlike NSEvent.addGlobalMonitorForEvents which requires Input Monitoring entitlement.
+        var eventSpec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard),
+                                      eventKind: OSType(kEventHotKeyPressed))
+        InstallEventHandler(GetApplicationEventTarget(), { _, _, userData -> OSStatus in
+            guard let userData else { return OSStatus(eventNotHandledErr) }
+            let ctrl = Unmanaged<ExtraMenuBarController>.fromOpaque(userData).takeUnretainedValue()
+            Task { @MainActor in ctrl.handleClick() }
+            return noErr
+        }, 1, &eventSpec, Unmanaged.passUnretained(self).toOpaque(), &carbonHandlerRef)
+
+        let hotKeyID = EventHotKeyID(signature: 0x504D4150, id: 1)  // 'PMAP'
+        RegisterEventHotKey(UInt32(kVK_ANSI_P), UInt32(cmdKey | optionKey), hotKeyID,
+                            GetApplicationEventTarget(), 0, &hotKeyRef)
     }
 
     // MARK: - Status item
@@ -169,8 +218,18 @@ final class ExtraMenuBarController: NSObject {
         if popover.isShown {
             popover.performClose(nil)
         } else {
+            syncPopoverAppearance()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             NSApp.activate(ignoringOtherApps: true)
+        }
+    }
+
+    private func syncPopoverAppearance() {
+        guard let engine else { return }
+        sharedPopover?.appearance = switch engine.appAppearance {
+        case .system: nil
+        case .light:  NSAppearance(named: .aqua)
+        case .dark:   NSAppearance(named: .darkAqua)
         }
     }
 }
