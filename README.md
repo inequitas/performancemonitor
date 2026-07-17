@@ -2,13 +2,13 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.12-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.13-lightgrey)
 
 ---
 
-## What's new in v0.3.12
+## What's new in v0.3.13
 
-- **Dock icon fix** — opening a detail window (or Settings while another window was still open) could permanently pin the Dock icon visible for the rest of the session, even with Show in Dock off; both now correctly restore the accessory policy on close
+- **Dock icon fix, root cause** — the check for "is another window still open" was always true because of an always-visible internal status-bar window, so the Dock icon never actually got hidden again after opening Settings or a detail card; now fixed at the root
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
