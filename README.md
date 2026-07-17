@@ -2,17 +2,13 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.9-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.12-lightgrey)
 
 ---
 
-## What's new in v0.3.10
+## What's new in v0.3.12
 
-- **SMART status** — disk health reads correctly on Apple Silicon via `diskutil`; shown in the Disk and GPU detail views
-- **Global shortcut** — ⌥⌘P now works from anywhere (desktop, other apps) without requiring Accessibility permission
-- **Appearance** — Light/Dark/System picker now applies to the overview popover and all detail windows
-- **Brightness** — moved to GPU & Displays detail view with per-display sliders for controllable displays
-- **Settings stability** — icon flicker in Settings tabs eliminated
+- **Dock icon fix** — opening a detail window (or Settings while another window was still open) could permanently pin the Dock icon visible for the rest of the session, even with Show in Dock off; both now correctly restore the accessory policy on close
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
