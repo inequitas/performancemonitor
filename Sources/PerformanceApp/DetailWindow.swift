@@ -1390,8 +1390,9 @@ private struct WindowFloatAccessor: NSViewRepresentable {
             ) { [weak engine] _ in
                 Task { @MainActor in
                     guard let engine, !engine.showInDock else { return }
-                    let otherVisible = NSApp.windows.contains { $0 !== window && $0.isVisible }
-                    if !otherVisible { NSApp.setActivationPolicy(.accessory) }
+                    if !NSApp.hasOtherVisibleTitledWindow(besides: window) {
+                        NSApp.setActivationPolicy(.accessory)
+                    }
                 }
             }
         }

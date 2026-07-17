@@ -1,5 +1,8 @@
 # Changelog
 
+### v0.3.13 — Fix Dock icon fix (for real this time) *(2026-07-17)*
+- **Dock icon fix, root cause** — v0.3.12 fixed a stale-snapshot bug but the underlying "is another window still open" check was itself broken: `NSStatusBarWindow` (the menu bar icon's backing window) reports `isVisible == true` permanently, so the check always thought another window was open and never restored the accessory activation policy. It now only counts other real, titled app windows via a new `NSApp.hasOtherVisibleTitledWindow(besides:)` helper, ignoring status-bar/popover plumbing windows.
+
 ### v0.3.12 — Fix Dock icon getting stuck on *(2026-07-17)*
 - **Dock icon fix** — opening a detail window (or Settings while another window was still open) could permanently pin the Dock icon visible for the rest of the session, even with Show in Dock off; `WindowFloatAccessor` had no restore-on-close logic at all, and `WindowFocuser` only decided once, at first open, whether to ever restore it. Both now read `showInDock` live when the window closes instead of a stale snapshot.
 

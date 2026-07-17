@@ -1,5 +1,20 @@
 import SwiftUI
 import Foundation
+import AppKit
+
+extension NSApplication {
+    // NSApp.windows always includes internal plumbing windows (NSStatusBarWindow
+    // for each status item, the shared NSPopover's window, MenuBarExtra's hidden
+    // anchor window) that report isVisible == true even when nothing user-facing
+    // is on screen. Naively checking isVisible alone means "is another window
+    // still open" is always true, so the accessory activation policy never gets
+    // restored. Only standard titled windows (Settings, detail windows) count.
+    func hasOtherVisibleTitledWindow(besides excluded: NSWindow) -> Bool {
+        windows.contains {
+            $0 !== excluded && $0.isVisible && $0.styleMask.contains(.titled)
+        }
+    }
+}
 
 extension ProcessInfo.ThermalState {
     var label: String {
