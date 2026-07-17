@@ -47,7 +47,7 @@ private struct SettingsWindowModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .background(WindowFocuser(showInDock: engine.showInDock))
+            .background(WindowFocuser(engine: engine))
             .preferredColorScheme(engine.preferredColorScheme)
     }
 }
@@ -56,8 +56,14 @@ private struct SettingsWindowModifier: ViewModifier {
 
 // Makes the Settings window key the moment it appears and resets the activation
 // policy back to .accessory (for dock-hidden mode) when the window closes.
+//
+// The close observer is always registered and reads engine.showInDock live
+// (rather than a value captured at makeNSView time), because makeNSView only
+// runs once per window instance — if it only registered the observer when
+// showInDock was false at first-open, toggling the setting later on the same
+// window instance would leave the dock icon stuck.
 private struct WindowFocuser: NSViewRepresentable {
-    let showInDock: Bool
+    let engine: MetricsEngine
 
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
@@ -65,12 +71,13 @@ private struct WindowFocuser: NSViewRepresentable {
             guard let window = view.window else { return }
             window.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
-            if !showInDock {
-                NotificationCenter.default.addObserver(
-                    forName: NSWindow.willCloseNotification,
-                    object: window,
-                    queue: .main
-                ) { _ in
+            NotificationCenter.default.addObserver(
+                forName: NSWindow.willCloseNotification,
+                object: window,
+                queue: .main
+            ) { [weak engine] _ in
+                Task { @MainActor in
+                    guard let engine, !engine.showInDock else { return }
                     let otherVisible = NSApp.windows.contains { $0 !== window && $0.isVisible }
                     if !otherVisible { NSApp.setActivationPolicy(.accessory) }
                 }

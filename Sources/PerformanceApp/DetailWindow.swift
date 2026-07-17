@@ -26,7 +26,7 @@ struct DetailWindow: View {
         .frame(width: detailWindowWidth, height: detailWindowHeight)
         .navigationTitle(kind.title)
         .background(.regularMaterial)
-        .background(WindowFloatAccessor())
+        .background(WindowFloatAccessor(engine: engine))
         .preferredColorScheme(engine.preferredColorScheme)
     }
 }
@@ -1363,7 +1363,14 @@ struct CopyableIPRow: View {
     }
 }
 
+// Detail windows are standard titled windows, so opening one makes macOS show
+// a Dock icon regardless of the accessory activation policy. Restore .accessory
+// on close (if Show in Dock is off and this was the last visible window) the
+// same way SettingsView's WindowFocuser does — otherwise opening a metric card
+// permanently pins the Dock icon for the rest of the session.
 private struct WindowFloatAccessor: NSViewRepresentable {
+    let engine: MetricsEngine
+
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
         DispatchQueue.main.async {
@@ -1376,6 +1383,17 @@ private struct WindowFloatAccessor: NSViewRepresentable {
             // been resized or when content height differs between tabs.
             window.setContentSize(NSSize(width: detailWindowWidth, height: detailWindowHeight))
             window.styleMask.remove(.resizable)
+            NotificationCenter.default.addObserver(
+                forName: NSWindow.willCloseNotification,
+                object: window,
+                queue: .main
+            ) { [weak engine] _ in
+                Task { @MainActor in
+                    guard let engine, !engine.showInDock else { return }
+                    let otherVisible = NSApp.windows.contains { $0 !== window && $0.isVisible }
+                    if !otherVisible { NSApp.setActivationPolicy(.accessory) }
+                }
+            }
         }
         return view
     }

@@ -1,5 +1,8 @@
 # Changelog
 
+### v0.3.12 — Fix Dock icon getting stuck on *(2026-07-17)*
+- **Dock icon fix** — opening a detail window (or Settings while another window was still open) could permanently pin the Dock icon visible for the rest of the session, even with Show in Dock off; `WindowFloatAccessor` had no restore-on-close logic at all, and `WindowFocuser` only decided once, at first open, whether to ever restore it. Both now read `showInDock` live when the window closes instead of a stale snapshot.
+
 ### v0.3.11 — Settings icon jump fix, brightness removed *(2026-07-13)*
 - **Settings icons fixed** — SF Symbol animations fully suppressed across all settings tabs; icons no longer jump on each metrics refresh
 - **Brightness removed** — display brightness control removed; macOS 15+ restricts the private CoreDisplay API to entitled system apps, making it a no-op
