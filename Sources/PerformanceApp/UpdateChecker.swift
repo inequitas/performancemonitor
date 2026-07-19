@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import UserNotifications
+import CryptoKit
 
 @MainActor
 final class UpdateChecker: NSObject, ObservableObject {
@@ -27,6 +28,26 @@ final class UpdateChecker: NSObject, ObservableObject {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
 
     private let apiURL = URL(string: "https://api.github.com/repos/inequitas/performancemonitor/releases/latest")!
+
+    // Ed25519 (Curve25519) public key for verifying update downloads, base64.
+    // The matching private key lives only in scripts/private_key.txt (git-ignored)
+    // and signs each release's .zip. Generated once by scripts/generate_keys.swift.
+    // This app has no Apple Developer ID, so downloads are not notarised; this
+    // signature check is what replaces Gatekeeper's trust guarantee (see below).
+    private static let publicKeyBase64 = "5hWpqy+Ee2iiiZUPILmSQlVF/2kg3RSQxM47mZPmu1g="
+
+    // Only these hosts may serve an update download or its signature. GitHub
+    // release assets are served from github.com and redirected to
+    // objects.githubusercontent.com; anything else is refused.
+    private static let allowedDownloadHosts: Set<String> = ["github.com", "objects.githubusercontent.com"]
+
+    private static func isAllowedDownloadURL(_ url: URL) -> Bool {
+        guard url.scheme?.lowercased() == "https",
+              let host = url.host?.lowercased(),
+              allowedDownloadHosts.contains(host)
+        else { return false }
+        return true
+    }
 
     // UserDefaults keys
     private static let snoozeUntilKey      = "updateSnoozeUntil"
@@ -112,6 +133,10 @@ final class UpdateChecker: NSObject, ObservableObject {
                 state = .error("Could not read release info from GitHub.")
                 return
             }
+            guard Self.isAllowedDownloadURL(downloadURL) else {
+                state = .error("Update refused — download is not served from a trusted GitHub host.")
+                return
+            }
             lastChecked = Date()
             let latest = tag.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
             if isNewer(latest, than: currentVersion) {
@@ -156,7 +181,20 @@ final class UpdateChecker: NSObject, ObservableObject {
         let tmp = FileManager.default.temporaryDirectory
             .appendingPathComponent("PerfMonUpdate-\(UUID().uuidString)")
 
+        // Clean up the temp directory on every failure path. On success we set
+        // `handedOff` before launching the installer script (which lives inside
+        // tmp and runs after we quit), so the files survive until then.
+        var handedOff = false
+        defer { if !handedOff { try? FileManager.default.removeItem(at: tmp) } }
+
         do {
+            // Reject anything not served from the trusted GitHub hosts, even if a
+            // manipulated release pointed the download elsewhere.
+            guard Self.isAllowedDownloadURL(downloadURL) else {
+                state = .error("Update refused — download is not served from a trusted GitHub host.")
+                return
+            }
+
             try FileManager.default.createDirectory(at: tmp, withIntermediateDirectories: true)
             let zipPath = tmp.appendingPathComponent("update.zip")
 
@@ -166,6 +204,46 @@ final class UpdateChecker: NSObject, ObservableObject {
                 return
             }
             try data.write(to: zipPath)
+
+            // --- Cryptographic verification, BEFORE we unpack anything ---
+            // The signature asset sits next to the zip as "<zip>.sig" in the same
+            // release. We verify the raw zip bytes against the embedded public key.
+            // This is the transition to signed updates: the first signed release
+            // ships this code and its own .sig; from that release on, an update
+            // with a missing or invalid signature is refused outright (fail-closed).
+            guard let verifyingKey = try? Curve25519.Signing.PublicKey(
+                    rawRepresentation: Data(base64Encoded: Self.publicKeyBase64) ?? Data()) else {
+                state = .error("Update aborted — internal verification key is invalid.")
+                return
+            }
+
+            guard let sigURL = URL(string: downloadURL.absoluteString + ".sig"),
+                  Self.isAllowedDownloadURL(sigURL) else {
+                state = .error("Update aborted — could not locate the signature file.")
+                return
+            }
+
+            let signature: Data
+            do {
+                let (sigData, sigResponse) = try await URLSession.shared.data(from: sigURL)
+                guard (sigResponse as? HTTPURLResponse)?.statusCode == 200,
+                      let sigB64 = String(data: sigData, encoding: .utf8)?
+                          .trimmingCharacters(in: .whitespacesAndNewlines),
+                      let decoded = Data(base64Encoded: sigB64) else {
+                    state = .error("Update aborted — signature is missing or unreadable. This release cannot be verified.")
+                    return
+                }
+                signature = decoded
+            } catch {
+                state = .error("Update aborted — could not download the signature file.")
+                return
+            }
+
+            guard verifyingKey.isValidSignature(signature, for: data) else {
+                state = .error("Update aborted — the download failed signature verification and may have been tampered with.")
+                return
+            }
+            // --- Verification passed: the zip bytes are authentic ---
 
             state = .installing
 
@@ -192,6 +270,14 @@ final class UpdateChecker: NSObject, ObservableObject {
 
             // Shell script runs after we quit: replace bundle, clear quarantine, relaunch.
             // Falls back to revealing the new app in Finder if permissions prevent replacement.
+            //
+            // `xattr -cr` (clearing the quarantine attribute) only runs here, AFTER the
+            // download passed Ed25519 signature verification above. That ordering is the
+            // whole point: this app has no Apple Developer ID, so the bundle isn't
+            // notarised and Gatekeeper would otherwise block it. Our own signature check
+            // has already established that the bytes are authentic and untampered, so
+            // clearing quarantine at this stage is safe — the signature verification is
+            // standing in for the trust Gatekeeper normally provides.
             let script = """
             #!/bin/bash
             sleep 1.5
@@ -209,6 +295,10 @@ final class UpdateChecker: NSObject, ObservableObject {
             chmod.executableURL = URL(fileURLWithPath: "/bin/chmod")
             chmod.arguments = ["+x", scriptURL.path]
             try chmod.run(); chmod.waitUntilExit()
+
+            // Hand off to the installer script (it lives in tmp and runs after we
+            // quit), so tmp must survive: suppress the cleanup defer from here on.
+            handedOff = true
 
             let sh = Process()
             sh.executableURL = URL(fileURLWithPath: "/bin/sh")

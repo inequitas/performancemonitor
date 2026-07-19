@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- **Signed auto-updates** — updates downloaded in-app are now cryptographically verified with an Ed25519 (Curve25519) signature before the archive is unpacked or its quarantine flag is cleared. Because this app has no Apple Developer ID and is not notarised, this signature check is what stands in for Gatekeeper's trust guarantee. Downloads are also restricted to trusted GitHub hosts (`github.com`, `objects.githubusercontent.com`).
+  - **Transition note:** the next release is the **first signed** release — it ships both the verifying client and its own signature. Older installed clients (which predate this change) will still install that release without verifying, since their code has no verification step. From the release **after** the first signed one, verification is effectively enforced everywhere: every client in the field verifies, and any update whose signature is missing or invalid is refused. Each release must upload both `PerformanceApp.zip` and `PerformanceApp.zip.sig`.
+
 ### v0.3.13 — Fix Dock icon fix (for real this time) *(2026-07-17)*
 - **Dock icon fix, root cause** — v0.3.12 fixed a stale-snapshot bug but the underlying "is another window still open" check was itself broken: `NSStatusBarWindow` (the menu bar icon's backing window) reports `isVisible == true` permanently, so the check always thought another window was open and never restored the accessory activation policy. It now only counts other real, titled app windows via a new `NSApp.hasOtherVisibleTitledWindow(besides:)` helper, ignoring status-bar/popover plumbing windows.
 

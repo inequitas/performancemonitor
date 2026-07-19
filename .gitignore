@@ -16,3 +16,6 @@ xcuserdata/
 
 # Claude Code session data
 .claude/
+
+# Update-signing private key — NEVER commit this
+scripts/private_key.txt

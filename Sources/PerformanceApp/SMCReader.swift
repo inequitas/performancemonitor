@@ -65,7 +65,6 @@ private struct SMCKeyData_t {
 private enum SMCCmd: UInt8 {
     case getKeyInfo = 9
     case readKey    = 5
-    case writeKey   = 6
     case readIndex  = 8
 }
 private let kSMCSuccess: UInt8 = 0
@@ -217,19 +216,6 @@ final class SMCReader: @unchecked Sendable {
         val.dataType = fourCC(typeCode)
         val.bytes = withUnsafeBytes(of: output.bytes) { Array($0.prefix(Int(size))) }
         return val
-    }
-
-    private func writeVal(_ val: SMCVal) {
-        var input  = SMCKeyData_t()
-        var output = SMCKeyData_t()
-        input.key              = encode(val.key)
-        input.data8            = SMCCmd.writeKey.rawValue
-        input.keyInfo.dataSize = val.dataSize
-        input.keyInfo.dataType = encode(val.dataType)  // required: kernel validates type on writes
-        withUnsafeMutableBytes(of: &input.bytes) { ptr in
-            for i in 0..<min(val.bytes.count, 32) { ptr[i] = val.bytes[i] }
-        }
-        _ = callRaw(&input, &output)
     }
 
     private func readDouble(_ key: String) -> Double? {

@@ -61,6 +61,26 @@ PLIST
 echo "Code signing (ad-hoc, no Developer ID available)..."
 codesign --force --deep --sign - "${APP_DIR}"
 
+# Package the app into a zip for distribution via GitHub Releases.
+ZIP_PATH="dist/PerformanceApp.zip"
+echo "Packaging ${ZIP_PATH}..."
+ditto -c -k --keepParent "${APP_DIR}" "${ZIP_PATH}"
+
+# Sign the zip for verified auto-updates. The app verifies this signature
+# (see UpdateChecker.swift) before unpacking any download. Signing needs the
+# private key; without it we warn but do not fail (e.g. CI without the secret).
+PRIVATE_KEY="scripts/private_key.txt"
+if [ -f "${PRIVATE_KEY}" ]; then
+    echo "Signing ${ZIP_PATH}..."
+    swift scripts/sign_release.swift "${ZIP_PATH}"
+    echo "Signature written: ${ZIP_PATH}.sig"
+else
+    echo "WARNING: ${PRIVATE_KEY} not found — the release zip was NOT signed."
+    echo "         Auto-updating clients will refuse an unsigned release."
+    echo "         Run scripts/generate_keys.swift once to create the signing key."
+fi
+
 echo "Done: ${APP_DIR}"
 echo "Run with: open \"${APP_DIR}\""
 echo "Or move it to /Applications: mv \"${APP_DIR}\" /Applications/"
+echo "Upload BOTH ${ZIP_PATH} and ${ZIP_PATH}.sig to the GitHub Release."
