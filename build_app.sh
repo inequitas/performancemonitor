@@ -2,10 +2,34 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-APP_NAME="Performance Monitor"
-BUNDLE_ID="com.performancemonitor"
+BETA=false
+for arg in "$@"; do
+    case "$arg" in
+        --beta) BETA=true ;;
+        *) echo "Unknown flag: $arg" >&2; exit 1 ;;
+    esac
+done
+
+if [ "$BETA" = true ]; then
+    APP_NAME="Performance Monitor Beta"
+    BUNDLE_ID="com.performancemonitor.beta"
+    CHANNEL="beta"
+    ZIP_BASENAME="PerformanceApp-Beta"
+    ICON_SRC="icon/AppIconBeta.icns"
+else
+    APP_NAME="Performance Monitor"
+    BUNDLE_ID="com.performancemonitor"
+    CHANNEL="stable"
+    ZIP_BASENAME="PerformanceApp"
+    ICON_SRC="icon/AppIcon.icns"
+fi
+
 BUILD_DIR=".build/release"
-APP_DIR="dist/${APP_NAME}.app"
+# The assembled .app lives under the hidden .build/ directory, not dist/, so
+# Spotlight never indexes it (and never surfaces a stray, unsigned/ad-hoc-signed
+# "Performance Monitor" as a search result). Only the zip (+ .sig) goes to dist/.
+BUNDLE_DIR=".build/bundle"
+APP_DIR="${BUNDLE_DIR}/${APP_NAME}.app"
 VERSION="$(cat VERSION | tr -d '[:space:]')"
 
 echo "Building release binary (arm64-only)..."
@@ -20,16 +44,22 @@ if [ "${BUILT_ARCHS}" != "arm64" ]; then
     exit 1
 fi
 
+if [ "$BETA" = true ]; then
+    echo "Preparing beta app icon (cached — only regenerated when the source icon changes)..."
+    bash scripts/build_beta_icon.sh
+fi
+
 echo "Assembling .app bundle..."
-rm -rf "dist"
+mkdir -p "${BUNDLE_DIR}"
+rm -rf "${APP_DIR}"
 mkdir -p "${APP_DIR}/Contents/MacOS"
 mkdir -p "${APP_DIR}/Contents/Resources"
 
 cp "${BUILD_DIR}/PerformanceApp" "${APP_DIR}/Contents/MacOS/${APP_NAME}"
 chmod +x "${APP_DIR}/Contents/MacOS/${APP_NAME}"
 
-if [ -f "icon/AppIcon.icns" ]; then
-    cp "icon/AppIcon.icns" "${APP_DIR}/Contents/Resources/AppIcon.icns"
+if [ -f "${ICON_SRC}" ]; then
+    cp "${ICON_SRC}" "${APP_DIR}/Contents/Resources/AppIcon.icns"
 fi
 
 cat > "${APP_DIR}/Contents/Info.plist" << PLIST
@@ -53,6 +83,8 @@ cat > "${APP_DIR}/Contents/Info.plist" << PLIST
     <string>${VERSION}</string>
     <key>CFBundleVersion</key>
     <string>${VERSION}</string>
+    <key>PMUpdateChannel</key>
+    <string>${CHANNEL}</string>
     <key>LSUIElement</key>
     <true/>
     <key>LSMinimumSystemVersion</key>
@@ -70,9 +102,13 @@ PLIST
 echo "Code signing (ad-hoc, no Developer ID available)..."
 codesign --force --deep --sign - "${APP_DIR}"
 
-# Package the app into a zip for distribution via GitHub Releases.
-ZIP_PATH="dist/PerformanceApp.zip"
+# Package the app into a zip for distribution via GitHub Releases. dist/ is
+# kept to just the zip + its signature — the app bundle itself never lands
+# there (see BUNDLE_DIR above).
+mkdir -p dist
+ZIP_PATH="dist/${ZIP_BASENAME}.zip"
 echo "Packaging ${ZIP_PATH}..."
+rm -f "${ZIP_PATH}" "${ZIP_PATH}.sig"
 ditto -c -k --keepParent "${APP_DIR}" "${ZIP_PATH}"
 
 # Sign the zip for verified auto-updates. The app verifies this signature
@@ -90,6 +126,7 @@ else
 fi
 
 echo "Done: ${APP_DIR}"
-echo "Run with: open \"${APP_DIR}\""
-echo "Or move it to /Applications: mv \"${APP_DIR}\" /Applications/"
+echo "(dist/ contains only ${ZIP_PATH}(.sig) — ${BUNDLE_DIR} is hidden from Spotlight.)"
+echo "Install locally with:"
+echo "  ditto \"${APP_DIR}\" \"/Applications/${APP_NAME}.app\""
 echo "Upload BOTH ${ZIP_PATH} and ${ZIP_PATH}.sig to the GitHub Release."

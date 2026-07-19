@@ -81,6 +81,16 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
 ---
 
+## Beta releases
+
+Beta builds let early testers try upcoming changes before they reach the stable channel.
+
+- **Workflow:** new features are developed on the `beta` branch (branched from `main`). Beta builds are tagged `vX.Y.Z-beta.N` (e.g. `v1.1.0-beta.1`) and published as GitHub **pre-releases**. Stable releases are still tagged `vX.Y.Z` from `main`, as before.
+- **Building a beta:** `bash build_app.sh --beta` produces "Performance Monitor Beta" with its own bundle ID (`com.performancemonitor.beta`, so its settings are separate from the stable app) and a badged icon. `scripts/release.sh X.Y.Z-beta.N --beta [--publish]` builds, tags, and publishes it as a pre-release.
+- **Update channel:** each build embeds a `PMUpdateChannel` key (`stable` or `beta`) in its `Info.plist`. Stable installs only ever see stable releases (GitHub's "latest" endpoint never returns a pre-release). Beta installs check the full releases list and are offered the newest version — beta or stable — so a beta install eventually rolls onto the corresponding stable release once one ships. The channel is shown in Settings → Updates when running the beta build.
+
+---
+
 ## Building from Source
 
 Requires an Apple Silicon Mac, Xcode Command Line Tools, and Swift 5.10+.
@@ -89,10 +99,10 @@ Requires an Apple Silicon Mac, Xcode Command Line Tools, and Swift 5.10+.
 git clone https://github.com/inequitas/performancemonitor.git
 cd performancemonitor
 bash build_app.sh
-open "dist/Performance Monitor.app"
+open ".build/bundle/Performance Monitor.app"
 ```
 
-The build script compiles a release binary, assembles the `.app` bundle, embeds the icon, injects the version from `VERSION`, and applies an ad-hoc code signature.
+The build script compiles a release binary, assembles the `.app` bundle (under the hidden `.build/bundle/`, so Spotlight doesn't index it), embeds the icon, injects the version from `VERSION`, and applies an ad-hoc code signature. Only the signed `.zip` for distribution is written to `dist/`. Pass `--beta` to build the beta-channel variant instead.
 
 ---
 

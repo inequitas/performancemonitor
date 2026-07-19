@@ -48,4 +48,55 @@ struct VersionComparisonTests {
         #expect(!VersionComparison.isNewer("", than: ""))
         #expect(!VersionComparison.isNewer("abc", than: "def"))
     }
+
+    // MARK: - Pre-release (semver) ordering
+
+    @Test func prereleaseIsLowerThanSameReleaseVersion() {
+        #expect(VersionComparison.isNewer("1.1.0", than: "1.1.0-beta.1"))
+        #expect(!VersionComparison.isNewer("1.1.0-beta.1", than: "1.1.0"))
+    }
+
+    @Test func prereleaseNumericIdentifiersCompareNumerically() {
+        #expect(VersionComparison.isNewer("1.1.0-beta.2", than: "1.1.0-beta.1"))
+        #expect(VersionComparison.isNewer("1.1.0-beta.10", than: "1.1.0-beta.2"))
+        #expect(!VersionComparison.isNewer("1.1.0-beta.2", than: "1.1.0-beta.10"))
+        #expect(!VersionComparison.isNewer("1.1.0-beta.1", than: "1.1.0-beta.1"))
+    }
+
+    @Test func prereleaseOfDifferentBaseVersionsComparesByBaseFirst() {
+        #expect(VersionComparison.isNewer("1.2.0-beta.1", than: "1.1.0-beta.99"))
+        #expect(!VersionComparison.isNewer("1.1.0-beta.99", than: "1.2.0-beta.1"))
+        // A newer base version's pre-release still beats an older base's final release.
+        #expect(VersionComparison.isNewer("1.2.0-beta.1", than: "1.1.0"))
+    }
+
+    @Test func prereleaseWithFewerIdentifiersSortsLower() {
+        // "beta" (1 identifier) < "beta.1" (2 identifiers) when the shared prefix matches.
+        #expect(VersionComparison.isNewer("1.0.0-beta.1", than: "1.0.0-beta"))
+        #expect(!VersionComparison.isNewer("1.0.0-beta", than: "1.0.0-beta.1"))
+    }
+
+    @Test func numericPrereleaseIdentifierAlwaysBelowAlphanumeric() {
+        // Per semver: numeric identifiers always have lower precedence than
+        // alphanumeric ones at the same position.
+        #expect(VersionComparison.isNewer("1.0.0-beta", than: "1.0.0-1"))
+        #expect(!VersionComparison.isNewer("1.0.0-1", than: "1.0.0-beta"))
+    }
+
+    @Test func nonNumericPrereleaseIdentifiersCompareLexically() {
+        #expect(VersionComparison.isNewer("1.0.0-beta", than: "1.0.0-alpha"))
+        #expect(!VersionComparison.isNewer("1.0.0-alpha", than: "1.0.0-beta"))
+    }
+
+    @Test func equalPrereleaseVersionsAreNotNewer() {
+        #expect(!VersionComparison.isNewer("1.1.0-beta.3", than: "1.1.0-beta.3"))
+    }
+
+    @Test func differentBaseVersionComparisonUnaffectedByPrereleaseLogic() {
+        // Plain (non-prerelease) comparisons across different base versions
+        // must behave exactly as before this feature was added.
+        #expect(VersionComparison.isNewer("1.2.0", than: "1.1.9"))
+        #expect(!VersionComparison.isNewer("1.1.9", than: "1.2.0"))
+        #expect(VersionComparison.isNewer("2.0.0", than: "1.99.99"))
+    }
 }

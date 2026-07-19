@@ -386,9 +386,18 @@ private struct UpdatesTab: View {
 
             SettingsSection(icon: "arrow.down.circle.fill", title: "Updates", color: .blue) {
                 SettingsRow(label: "Current version") {
-                    Text(updater.currentVersion)
-                        .font(.callout.monospacedDigit())
-                        .foregroundStyle(.secondary)
+                    HStack(spacing: 6) {
+                        Text(updater.currentVersion)
+                            .font(.callout.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                        if updater.isBetaChannel {
+                            Text("Beta channel")
+                                .font(.caption2.weight(.semibold))
+                                .padding(.horizontal, 6).padding(.vertical, 2)
+                                .background(.orange.opacity(0.15), in: Capsule())
+                                .foregroundStyle(.orange)
+                        }
+                    }
                 }
                 Divider().padding(.vertical, 4)
                 statusContent

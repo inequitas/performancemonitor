@@ -28,7 +28,24 @@ final class UpdateChecker: NSObject, ObservableObject {
     let currentVersion: String =
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
 
-    private let apiURL = URL(string: "https://api.github.com/repos/inequitas/performancemonitor/releases/latest")!
+    enum Channel: String {
+        case stable
+        case beta
+    }
+
+    /// Determined once at launch from the `PMUpdateChannel` Info.plist key
+    /// (set by build_app.sh --beta). Missing or unrecognised falls back to stable.
+    let channel: Channel = {
+        let raw = (Bundle.main.infoDictionary?["PMUpdateChannel"] as? String ?? "").lowercased()
+        return Channel(rawValue: raw) ?? .stable
+    }()
+
+    var isBetaChannel: Bool { channel == .beta }
+
+    // Stable: GitHub's "latest" endpoint, which never returns pre-releases.
+    private let stableAPIURL = URL(string: "https://api.github.com/repos/inequitas/performancemonitor/releases/latest")!
+    // Beta: the full releases list, so pre-releases are visible too.
+    private let releasesListAPIURL = URL(string: "https://api.github.com/repos/inequitas/performancemonitor/releases")!
 
     // Ed25519 (Curve25519) public key for verifying update downloads, base64.
     // The matching private key lives only in scripts/private_key.txt (git-ignored)
@@ -119,18 +136,7 @@ final class UpdateChecker: NSObject, ObservableObject {
     private func performCheck() async {
         state = .checking
         do {
-            var req = URLRequest(url: apiURL)
-            req.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
-            req.timeoutInterval = 10
-            let (data, _) = try await URLSession.shared.data(for: req)
-            guard
-                let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                let tag = json["tag_name"] as? String,
-                let assets = json["assets"] as? [[String: Any]],
-                let zipAsset = assets.first(where: { ($0["name"] as? String)?.hasSuffix(".zip") == true }),
-                let urlStr = zipAsset["browser_download_url"] as? String,
-                let downloadURL = URL(string: urlStr)
-            else {
+            guard let (tag, downloadURL) = try await fetchCandidateRelease() else {
                 state = .error("Could not read release info from GitHub.")
                 return
             }
@@ -149,6 +155,53 @@ final class UpdateChecker: NSObject, ObservableObject {
         } catch {
             state = .error("Network error: \(error.localizedDescription)")
         }
+    }
+
+    /// Fetches the best candidate release for the active channel.
+    /// Stable uses GitHub's "latest" endpoint (never a pre-release). Beta
+    /// fetches the full releases list, drops drafts, and picks the highest
+    /// version by `VersionComparison` — which orders pre-releases too — so a
+    /// beta install is offered both newer betas and the eventual stable release.
+    private func fetchCandidateRelease() async throws -> (tag: String, downloadURL: URL)? {
+        switch channel {
+        case .stable:
+            var req = URLRequest(url: stableAPIURL)
+            req.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
+            req.timeoutInterval = 10
+            let (data, _) = try await URLSession.shared.data(for: req)
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                return nil
+            }
+            return Self.candidate(from: json)
+
+        case .beta:
+            var req = URLRequest(url: releasesListAPIURL)
+            req.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
+            req.timeoutInterval = 10
+            let (data, _) = try await URLSession.shared.data(for: req)
+            guard let releases = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
+                return nil
+            }
+            let candidates = releases
+                .filter { ($0["draft"] as? Bool) != true }
+                .compactMap { Self.candidate(from: $0) }
+            return candidates.max { lhs, rhs in
+                let lv = lhs.tag.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
+                let rv = rhs.tag.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
+                return VersionComparison.isNewer(rv, than: lv)
+            }
+        }
+    }
+
+    private static func candidate(from json: [String: Any]) -> (tag: String, downloadURL: URL)? {
+        guard
+            let tag = json["tag_name"] as? String,
+            let assets = json["assets"] as? [[String: Any]],
+            let zipAsset = assets.first(where: { ($0["name"] as? String)?.hasSuffix(".zip") == true }),
+            let urlStr = zipAsset["browser_download_url"] as? String,
+            let downloadURL = URL(string: urlStr)
+        else { return nil }
+        return (tag, downloadURL)
     }
 
     private func sendUpdateNotification(version: String, downloadURL: URL) async {
