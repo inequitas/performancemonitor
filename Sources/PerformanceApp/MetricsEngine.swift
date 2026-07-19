@@ -46,7 +46,6 @@ final class MetricsEngine: ObservableObject {
     @Published var diskWriteHistory: [Double] = []
     @Published var diskFreeHistory: [Double] = []
     @Published var diskSmartStatus: String? = nil   // e.g. "Verified", "Not Supported", nil while loading
-    private var smartFetchTick = 0
     @Published var gpuMetricsAvailable: Bool = false
     @Published var volumes: [VolumeInfo] = []
 
@@ -101,27 +100,7 @@ final class MetricsEngine: ObservableObject {
     @Published var fans: [FanInfo] = []
     @Published var extendedTemperatures: [TempReading] = []
     @Published var unknownSMCTemperatures: [TempReading] = []
-    private let smc = SMCReader()
-    private var smcCacheDate: Date = .distantPast
 
-    struct TempReading: Identifiable {
-        var id: String { key }
-        let key: String
-        let label: String
-        let category: String
-        let celsius: Double
-    }
-
-    // Held strongly so the permission dialog can fire and the delegate callback arrives.
-    private var btAuthManager: CBCentralManager?
-    private var btDelegate: BluetoothAuthDelegate?
-    private var btBatteryCache: [String: BtBatteryInfo] = [:]
-    private var btBatteryCacheDate: Date = .distantPast
-    private var bleBatteryByName: [String: Int] = [:]
-    private var bleBatteryReader: BLEBatteryReader?
-    private var wifiCacheDate: Date = .distantPast
-    private var batteryHealthCacheDate: Date = .distantPast
-    private var btDevicesCacheDate: Date = .distantPast
     @Published var performanceCoreCount: Int = 0
     @Published var efficiencyCoreCount: Int = 0
 
@@ -139,6 +118,23 @@ final class MetricsEngine: ObservableObject {
     let settings = SettingsStore()
     /// On-disk history CSV persistence + export.
     let history = HistoryStore()
+
+    // MARK: - Per-domain samplers
+    //
+    // Each sampler owns its own delta/cache/throttle state and returns an
+    // immutable snapshot; the engine is a thin coordinator that copies snapshots
+    // onto the @Published properties above. See Sources/PerformanceApp/Samplers.
+    private let cpuSampler: CPUSampling = CPUSampler()
+    private let memorySampler: MemorySampling = MemorySampler()
+    private let networkSampler: NetworkSampling = NetworkSampler()
+    private let diskSampler: DiskSampling = DiskSampler()
+    private let processSampler: ProcessSampling = ProcessSampler()
+    private let networkProcessSampler: NetworkProcessSampling = NetworkProcessSampler()
+    private let batterySampler: BatterySampling = BatterySampler()
+    private let wifiSampler: WiFiSampling = WiFiSampler()
+    private let gpuSampler: GPUSampling = GPUSampler()
+    private let smcSampler: SMCSampling = SMCSampler()
+    private let bluetoothSampler = BluetoothSampler()
 
     enum Panel: String, CaseIterable, Identifiable, Codable, Transferable, PanelLayoutItem {
         case cpu        = "CPU"
@@ -233,19 +229,9 @@ final class MetricsEngine: ObservableObject {
         array.append(value)
         if array.count > historyLimit { array.removeFirst() }
     }
-    private let dynStore: SCDynamicStore? = SCDynamicStoreCreate(nil, "PerformanceApp" as CFString, nil, nil)
     private var extraBarController: ExtraMenuBarController?
     private var timer: Timer?
-    private var previousCPUTicks: [(user: UInt32, system: UInt32, idle: UInt32, nice: UInt32)] = []
-    private var previousNetBytes: (received: UInt64, sent: UInt64)?
-    private var previousNetTimestamp: Date?
-    private var previousDiskBytes: (read: UInt64, write: UInt64)?
-    private var previousDiskTimestamp: Date?
     private var thermalObserver: NSObjectProtocol?
-    private var processSamplerInFlight = false
-    private var networkSamplerInFlight = false
-    private var previousProcessNetBytes: [String: (in: Double, out: Double)] = [:]
-    private var previousProcessNetTimestamp: Date?
 
     func sparklineHistory(for metric: MenuBarMetric) -> [Double] {
         switch metric {
@@ -317,6 +303,10 @@ final class MetricsEngine: ObservableObject {
             if enabled { self?.fetchPublicIP() } else { self?.publicIP = nil }
         }
         alerts.loadPreferences()
+
+        // Publish Bluetooth results as the sampler produces them.
+        bluetoothSampler.onDevices = { [weak self] in self?.bluetoothDevices = $0 }
+        bluetoothSampler.onAuth = { [weak self] in self?.bluetoothAuthState = $0 }
 
         updateGPUInfo()
         readCoreClusterCounts()
@@ -392,39 +382,11 @@ final class MetricsEngine: ObservableObject {
     }
 
     private func updateGPUInfo() {
-        guard let device = MTLCreateSystemDefaultDevice() else { return }
-        gpuName = device.name
-        gpuRecommendedMemoryGB = Double(device.recommendedMaxWorkingSetSize) / 1_073_741_824
-        gpuIsLowPower = device.isLowPower
-        gpuIsRemovable = device.isRemovable
-    }
-
-    private func updateGPUUsage() {
-        var iterator: io_iterator_t = 0
-        guard IOServiceGetMatchingServices(kIOMainPortDefault,
-              IOServiceMatching("IOAccelerator"), &iterator) == KERN_SUCCESS else { return }
-        defer { IOObjectRelease(iterator) }
-
-        while case let service = IOIteratorNext(iterator), service != 0 {
-            defer { IOObjectRelease(service) }
-            var props: Unmanaged<CFMutableDictionary>?
-            guard IORegistryEntryCreateCFProperties(service, &props, kCFAllocatorDefault, 0) == KERN_SUCCESS,
-                  let dict = props?.takeRetainedValue() as? [String: Any],
-                  let stats = dict["PerformanceStatistics"] as? [String: Any] else { continue }
-
-            // Apple Silicon: "GPU Core Utilization" is a Double in [0, 1]
-            if let util = stats["GPU Core Utilization"] as? Double {
-                gpuUsagePercent = util * 100
-                appendCapped(gpuUsagePercent, to: &gpuHistory)
-                return
-            }
-            // Fallback (discrete GPUs): "Device Utilization %" is an Int
-            if let util = stats["Device Utilization %"] as? Int {
-                gpuUsagePercent = Double(util)
-                appendCapped(gpuUsagePercent, to: &gpuHistory)
-                return
-            }
-        }
+        guard let info = gpuSampler.staticInfo() else { return }
+        gpuName = info.name
+        gpuRecommendedMemoryGB = info.recommendedMemoryGB
+        gpuIsLowPower = info.isLowPower
+        gpuIsRemovable = info.isRemovable
     }
 
     private func restartTimer() {
@@ -434,17 +396,23 @@ final class MetricsEngine: ObservableObject {
         }
     }
 
+    // MARK: - Refresh coordinator
+    //
+    // Preserves the original ordering and throttle cadence exactly: the
+    // per-domain throttles (SMC 2s, Wi-Fi 3s, BT devices 5s, BT battery 25s,
+    // battery health 60s, SMART 5min, public IP 5min) now live inside the
+    // respective samplers.
     func refresh() {
-        updateCPU()
-        updateMemory()
-        updateNetwork()
-        updateDisk()
+        applyCPU()
+        applyMemory()
+        applyNetwork()
+        applyDisk()
         updateProcesses()
         updateNetworkProcesses()
-        updateBattery()
-        updateWiFiSignal()
-        updateBluetooth()
-        updateGPUUsage()
+        applyBattery()
+        applyWiFi()
+        bluetoothSampler.update()
+        applyGPU()
         updateSMC()
         checkAlerts()
         history.append(enabled: settings.persistHistoryEnabled,
@@ -461,442 +429,94 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - CPU
 
-    private func updateCPU() {
-        var numCPUsU: natural_t = 0
-        var cpuInfo: processor_info_array_t!
-        var numCPUInfo: mach_msg_type_number_t = 0
-
-        let result = host_processor_info(mach_host_self(),
-                                          PROCESSOR_CPU_LOAD_INFO,
-                                          &numCPUsU,
-                                          &cpuInfo,
-                                          &numCPUInfo)
-        guard result == KERN_SUCCESS else { return }
-
-        let numCPUs = Int(numCPUsU)
-        var ticksPerCore: [(user: UInt32, system: UInt32, idle: UInt32, nice: UInt32)] = []
-        let cpuLoadInfo = cpuInfo.withMemoryRebound(to: integer_t.self, capacity: Int(numCPUInfo)) { $0 }
-
-        for i in 0..<numCPUs {
-            let base = i * Int(CPU_STATE_MAX)
-            let user = UInt32(cpuLoadInfo[base + Int(CPU_STATE_USER)])
-            let system = UInt32(cpuLoadInfo[base + Int(CPU_STATE_SYSTEM)])
-            let idle = UInt32(cpuLoadInfo[base + Int(CPU_STATE_IDLE)])
-            let nice = UInt32(cpuLoadInfo[base + Int(CPU_STATE_NICE)])
-            ticksPerCore.append((user, system, idle, nice))
-        }
-
-        vm_deallocate(mach_task_self_, vm_address_t(bitPattern: cpuInfo), vm_size_t(Int(numCPUInfo) * MemoryLayout<integer_t>.stride))
-
-        if previousCPUTicks.count == ticksPerCore.count {
-            var coreUsages: [Double] = []
-            var totalUser: Double = 0
-            var totalSystem: Double = 0
-            var totalNice: Double = 0
-            var totalTicks: Double = 0
-
-            for i in 0..<ticksPerCore.count {
-                let prev = previousCPUTicks[i]
-                let curr = ticksPerCore[i]
-                let userDelta = Double(curr.user &- prev.user)
-                let systemDelta = Double(curr.system &- prev.system)
-                let niceDelta = Double(curr.nice &- prev.nice)
-                let idleDelta = Double(curr.idle &- prev.idle)
-                let usedDelta = userDelta + systemDelta + niceDelta
-                let total = usedDelta + idleDelta
-                coreUsages.append(total > 0 ? (usedDelta / total) * 100 : 0)
-                totalUser += userDelta
-                totalSystem += systemDelta
-                totalNice += niceDelta
-                totalTicks += total
-            }
-
-            perCoreUsage = coreUsages
-            cpuUsagePercent = totalTicks > 0 ? ((totalUser + totalSystem + totalNice) / totalTicks) * 100 : 0
-            cpuUserPercent = totalTicks > 0 ? (totalUser / totalTicks) * 100 : 0
-            cpuSystemPercent = totalTicks > 0 ? (totalSystem / totalTicks) * 100 : 0
-        }
-
-        previousCPUTicks = ticksPerCore
-
-        var loadavg = [Double](repeating: 0, count: 3)
-        if getloadavg(&loadavg, 3) == 3 {
-            loadAverages = (loadavg[0], loadavg[1], loadavg[2])
-        }
+    private func applyCPU() {
+        guard let s = cpuSampler.sample() else { return }
+        cpuUsagePercent = s.usagePercent
+        cpuUserPercent = s.userPercent
+        cpuSystemPercent = s.systemPercent
+        perCoreUsage = s.perCore
+        loadAverages = s.loadAverages
         appendCapped(cpuUsagePercent, to: &cpuHistory)
     }
 
     // MARK: - Memory
 
-    private func updateMemory() {
-        var stats = vm_statistics64()
-        var count = mach_msg_type_number_t(MemoryLayout<vm_statistics64>.stride / MemoryLayout<integer_t>.stride)
-        let result = withUnsafeMutablePointer(to: &stats) {
-            $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
-                host_statistics64(mach_host_self(), HOST_VM_INFO64, $0, &count)
-            }
-        }
-        guard result == KERN_SUCCESS else { return }
-
-        let pageSize = Double(vm_kernel_page_size)
-        let used = Double(stats.active_count + stats.inactive_count + stats.wire_count) * pageSize
-        let total = Double(ProcessInfo.processInfo.physicalMemory)
-
-        memoryUsedGB = used / 1_073_741_824
-        memoryTotalGB = total / 1_073_741_824
-        memoryAppGB = Double(stats.active_count + stats.inactive_count) * pageSize / 1_073_741_824
-        memoryWiredGB = Double(stats.wire_count) * pageSize / 1_073_741_824
-        memoryCompressedGB = Double(stats.compressor_page_count) * pageSize / 1_073_741_824
-
-        var swapUsage = xsw_usage()
-        var size = MemoryLayout<xsw_usage>.stride
-        if sysctlbyname("vm.swapusage", &swapUsage, &size, nil, 0) == 0 {
-            swapUsedGB = Double(swapUsage.xsu_used) / 1_073_741_824
-        }
+    private func applyMemory() {
+        guard let s = memorySampler.sample() else { return }
+        memoryUsedGB = s.usedGB
+        memoryTotalGB = s.totalGB
+        memoryAppGB = s.appGB
+        memoryWiredGB = s.wiredGB
+        memoryCompressedGB = s.compressedGB
+        if let swap = s.swapUsedGB { swapUsedGB = swap }
         appendCapped(memoryUsedGB, to: &memoryHistory)
     }
 
     // MARK: - Network
 
-    private func updateNetwork() {
-        var ifaddrPtr: UnsafeMutablePointer<ifaddrs>?
-        guard getifaddrs(&ifaddrPtr) == 0, let firstAddr = ifaddrPtr else { return }
-        defer { freeifaddrs(ifaddrPtr) }
-
-        var totalReceived: UInt64 = 0
-        var totalSent: UInt64 = 0
-        var interfaces: [LocalInterface] = []
-        var vpnDetected = false
-        let wifiIfaceName = CWWiFiClient.shared().interface()?.interfaceName
-
-        var ptr: UnsafeMutablePointer<ifaddrs>? = firstAddr
-        while let current = ptr {
-            let ifa = current.pointee
-            let name = String(cString: ifa.ifa_name)
-            if let sa = ifa.ifa_addr, sa.pointee.sa_family == UInt8(AF_LINK), !name.hasPrefix("lo") {
-                if let data = ifa.ifa_data {
-                    let networkData = data.withMemoryRebound(to: if_data.self, capacity: 1) { $0.pointee }
-                    totalReceived += UInt64(networkData.ifi_ibytes)
-                    totalSent += UInt64(networkData.ifi_obytes)
-                }
-            }
-            if let sa = ifa.ifa_addr, sa.pointee.sa_family == UInt8(AF_INET), !name.hasPrefix("lo") {
-                let addrIn = sa.withMemoryRebound(to: sockaddr_in.self, capacity: 1) { $0.pointee }
-                var addr = addrIn.sin_addr
-                var buffer = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
-                if inet_ntop(AF_INET, &addr, &buffer, socklen_t(INET_ADDRSTRLEN)) != nil {
-                    let ip = String(cString: buffer)
-                    let isVPN = name.hasPrefix("utun") || name.hasPrefix("ppp") || name.hasPrefix("ipsec")
-                    if isVPN { vpnDetected = true }
-                    let kind: LocalInterface.Kind
-                    if isVPN {
-                        kind = .vpn
-                    } else if name == wifiIfaceName {
-                        kind = .wifi
-                    } else if name.hasPrefix("en") || name.hasPrefix("bridge") {
-                        kind = .ethernet
-                    } else {
-                        kind = .other
-                    }
-                    // Compute subnet prefix and network address from the netmask.
-                    var prefix: Int? = nil
-                    var netAddr: String? = nil
-                    if let nm = ifa.ifa_netmask, nm.pointee.sa_family == UInt8(AF_INET) {
-                        let maskBits = nm.withMemoryRebound(to: sockaddr_in.self, capacity: 1) {
-                            UInt32(bigEndian: $0.pointee.sin_addr.s_addr)
-                        }
-                        prefix = maskBits.nonzeroBitCount
-                        let net = UInt32(bigEndian: addrIn.sin_addr.s_addr) & maskBits
-                        netAddr = "\(net >> 24).\((net >> 16) & 0xFF).\((net >> 8) & 0xFF).\(net & 0xFF)"
-                    }
-                    if !isVPN {
-                        var gw: String? = nil
-                        if let store = dynStore {
-                            // Per-interface key (present when DHCP assigns the route)
-                            if let dict = SCDynamicStoreCopyValue(store, "State:/Network/Interface/\(name)/IPv4" as CFString) as? [String: Any],
-                               let router = dict["Router"] as? String, !router.contains(":") {
-                                gw = router
-                            }
-                            // Fallback: global default gateway for the primary interface
-                            if gw == nil,
-                               let globalDict = SCDynamicStoreCopyValue(store, "State:/Network/Global/IPv4" as CFString) as? [String: Any],
-                               (globalDict["PrimaryInterface"] as? String) == name,
-                               let router = globalDict["Router"] as? String, !router.contains(":") {
-                                gw = router
-                            }
-                        }
-                        interfaces.append(LocalInterface(name: name, address: ip, kind: kind,
-                                                         prefixLength: prefix, networkAddress: netAddr,
-                                                         gateway: gw))
-                    }
-                }
-            }
-            ptr = ifa.ifa_next
-        }
-
-        // Mark the primary interface and sort it to the top
-        let primaryKind: LocalInterface.Kind = connectionType == "Wi-Fi" ? .wifi : .ethernet
-        localInterfaces = interfaces
-            .map { iface in
-                var i = iface; i.isPrimary = (i.kind == primaryKind); return i
-            }
-            .sorted { $0.isPrimary && !$1.isPrimary }
-        isVPNActive = vpnDetected
-        if vpnDetected {
-            vpnIsFortiClient = NSWorkspace.shared.runningApplications.contains {
-                let id = $0.bundleIdentifier?.lowercased() ?? ""
-                let name = $0.localizedName?.lowercased() ?? ""
-                return id.contains("fortinet") || id.contains("forticlient") || name.contains("forticlient")
-            }
-        } else {
-            vpnIsFortiClient = false
-        }
-
-        let now = Date()
-        if let prev = previousNetBytes, let prevTime = previousNetTimestamp {
-            let elapsed = now.timeIntervalSince(prevTime)
-            if elapsed > 0 {
-                let receivedDelta = Double(totalReceived &- prev.received)
-                let sentDelta = Double(totalSent &- prev.sent)
-                downloadSpeedKBps = max(receivedDelta, 0) / elapsed / 1024
-                uploadSpeedKBps = max(sentDelta, 0) / elapsed / 1024
-            }
-        }
-
-        previousNetBytes = (totalReceived, totalSent)
-        previousNetTimestamp = now
+    private func applyNetwork() {
+        guard let s = networkSampler.sample(connectionType: connectionType) else { return }
+        downloadSpeedKBps = s.downloadKBps
+        uploadSpeedKBps = s.uploadKBps
+        localInterfaces = s.interfaces
+        dnsServers = s.dnsServers
+        isVPNActive = s.isVPNActive
+        vpnIsFortiClient = s.vpnIsFortiClient
         appendCapped(downloadSpeedKBps, to: &downloadHistory)
         appendCapped(uploadSpeedKBps, to: &uploadHistory)
-
-        // Read active DNS servers from the system dynamic store.
-        if let store = dynStore,
-           let dict = SCDynamicStoreCopyValue(store, "State:/Network/Global/DNS" as CFString) as? [String: Any],
-           let servers = dict["ServerAddresses"] as? [String] {
-            dnsServers = servers.filter { !$0.contains(":") }
-        } else {
-            dnsServers = []
-        }
     }
 
     // MARK: - Disk
 
-    private func updateDisk() {
-        var fsStat = statfs()
-        if statfs("/", &fsStat) == 0 {
-            let blockSize = Double(fsStat.f_bsize)
-            diskTotalGB = Double(fsStat.f_blocks) * blockSize / 1_073_741_824
-            diskFreeGB = Double(fsStat.f_bavail) * blockSize / 1_073_741_824
-        }
-
-        var (totalRead, totalWrite): (UInt64, UInt64) = (0, 0)
-        var iterator: io_iterator_t = 0
-        let matching = IOServiceMatching("IOBlockStorageDriver")
-        guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else { return }
-        defer { IOObjectRelease(iterator) }
-
-        var service = IOIteratorNext(iterator)
-        while service != 0 {
-            defer {
-                IOObjectRelease(service)
-                service = IOIteratorNext(iterator)
-            }
-            var props: Unmanaged<CFMutableDictionary>?
-            guard IORegistryEntryCreateCFProperties(service, &props, kCFAllocatorDefault, 0) == KERN_SUCCESS,
-                  let dict = props?.takeRetainedValue() as? [String: Any],
-                  let stats = dict["Statistics"] as? [String: Any] else { continue }
-
-            if let read = stats["Bytes (Read)"] as? UInt64 { totalRead += read }
-            if let write = stats["Bytes (Write)"] as? UInt64 { totalWrite += write }
-        }
-
-        // Fetch SMART once at startup then every 5 min — diskutil is the reliable source on Apple Silicon
-        smartFetchTick += 1
-        if smartFetchTick == 1 || smartFetchTick % 300 == 0 {
-            fetchSmartStatus()
-        }
-
-        let now = Date()
-        if let prev = previousDiskBytes, let prevTime = previousDiskTimestamp {
-            let elapsed = now.timeIntervalSince(prevTime)
-            if elapsed > 0 {
-                let readDelta = Double(totalRead &- prev.read)
-                let writeDelta = Double(totalWrite &- prev.write)
-                diskReadKBps = max(readDelta, 0) / elapsed / 1024
-                diskWriteKBps = max(writeDelta, 0) / elapsed / 1024
+    private func applyDisk() {
+        let s = diskSampler.sample()
+        diskTotalGB = s.totalGB
+        diskFreeGB = s.freeGB
+        guard let io = s.io else { return }
+        diskReadKBps = io.readKBps
+        diskWriteKBps = io.writeKBps
+        if io.shouldFetchSMART {
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                self.diskSmartStatus = await self.diskSampler.fetchSMART()
             }
         }
-        previousDiskBytes = (totalRead, totalWrite)
-        previousDiskTimestamp = now
         appendCapped(diskReadKBps, to: &diskReadHistory)
         appendCapped(diskWriteKBps, to: &diskWriteHistory)
         appendCapped(diskFreeGB, to: &diskFreeHistory)
     }
 
-    private func fetchSmartStatus() {
-        Task {
-            let status = await Task.detached(priority: .background) { () -> String? in
-                let proc = Process()
-                proc.executableURL = URL(fileURLWithPath: "/usr/sbin/diskutil")
-                proc.arguments = ["info", "/dev/disk0"]
-                let pipe = Pipe()
-                proc.standardOutput = pipe
-                proc.standardError = Pipe()
-                guard (try? proc.run()) != nil else { return nil }
-                proc.waitUntilExit()
-                let out = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
-                return out.components(separatedBy: "\n")
-                    .first { $0.contains("SMART Status") }?
-                    .components(separatedBy: ":")
-                    .last?
-                    .trimmingCharacters(in: .whitespaces)
-            }.value
-            self.diskSmartStatus = status
-        }
-    }
-
     private func updateVolumes() {
-        let keys: [URLResourceKey] = [.volumeNameKey, .volumeTotalCapacityKey, .volumeAvailableCapacityKey, .volumeIsRemovableKey]
-        guard let urls = FileManager.default.mountedVolumeURLs(includingResourceValuesForKeys: keys, options: [.skipHiddenVolumes]) else {
-            return
-        }
-
-        volumes = urls.compactMap { url -> VolumeInfo? in
-            guard let values = try? url.resourceValues(forKeys: Set(keys)),
-                  let total = values.volumeTotalCapacity,
-                  let available = values.volumeAvailableCapacity else { return nil }
-            let name = values.volumeName ?? url.lastPathComponent
-            return VolumeInfo(
-                name: name,
-                totalGB: Double(total) / 1_073_741_824,
-                freeGB: Double(available) / 1_073_741_824,
-                isRemovable: values.volumeIsRemovable ?? false
-            )
-        }
+        volumes = diskSampler.volumes()
     }
 
     // MARK: - Top processes
 
     private func updateProcesses() {
-        guard !processSamplerInFlight else { return }
-        processSamplerInFlight = true
-
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: "/bin/ps")
-        task.arguments = ["-arcwwwxo", "pid,comm,%cpu,%mem"]
-        let outPipe = Pipe()
-        task.standardOutput = outPipe
-        task.standardError = Pipe()
-
-        let capturedCount = settings.topProcessCount
-        task.terminationHandler = { [weak self] _ in
-            let data = outPipe.fileHandleForReading.readDataToEndOfFile()
-            let output = String(data: data, encoding: .utf8) ?? ""
-            let lines = output.split(separator: "\n").dropFirst()
-
-            var cpuList: [ProcessUsage] = []
-            var memList: [ProcessUsage] = []
-            // ps %cpu is per-core: a process using 2 cores fully shows 200%.
-            // Divide by logical CPU count to express as % of total system capacity.
-            let logicalCPUs = Double(ProcessInfo.processInfo.processorCount).clamped(to: 1...256)
-
-            for line in lines {
-                let parts = line.split(separator: " ", omittingEmptySubsequences: true)
-                guard parts.count >= 4,
-                      let pid = Int32(parts[0]),
-                      let rawCPU = Double(parts[parts.count - 2]),
-                      let mem = Double(parts[parts.count - 1]) else { continue }
-                let name = parts[1..<(parts.count - 2)].joined(separator: " ")
-                let cpu = (rawCPU / logicalCPUs * 10).rounded() / 10
-                cpuList.append(ProcessUsage(pid: pid, name: name, value: cpu))
-                memList.append(ProcessUsage(pid: pid, name: name, value: mem))
-            }
-
-            let topCPU = Array(cpuList.sorted { $0.value > $1.value }.prefix(capturedCount))
-            let topMem = Array(memList.sorted { $0.value > $1.value }.prefix(capturedCount))
-
-            DispatchQueue.main.async {
-                self?.topCPUProcesses = topCPU
-                self?.topMemoryProcesses = topMem
-                self?.processSamplerInFlight = false
-            }
-        }
-
-        do {
-            try task.run()
-        } catch {
-            processSamplerInFlight = false
+        let count = settings.topProcessCount
+        Task { @MainActor [weak self] in
+            guard let self, let snap = await self.processSampler.sample(topCount: count) else { return }
+            self.topCPUProcesses = snap.topCPU
+            self.topMemoryProcesses = snap.topMemory
         }
     }
 
     // MARK: - Per-app network usage
 
     private func updateNetworkProcesses() {
-        guard !networkSamplerInFlight else { return }
-        networkSamplerInFlight = true
-
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: "/usr/bin/nettop")
-        task.arguments = ["-P", "-x", "-L", "1", "-J", "bytes_in,bytes_out"]
-        let outPipe = Pipe()
-        task.standardOutput = outPipe
-        task.standardError = Pipe()
-
-        task.terminationHandler = { [weak self] _ in
-            let data = outPipe.fileHandleForReading.readDataToEndOfFile()
-            let output = String(data: data, encoding: .utf8) ?? ""
-            let lines = output.split(separator: "\n").dropFirst()
-
-            var current: [String: (in: Double, out: Double)] = [:]
-            for line in lines {
-                let parts = line.split(separator: ",", omittingEmptySubsequences: false)
-                guard parts.count >= 3 else { continue }
-                let name = String(parts[0])
-                guard let bytesIn = Double(parts[1]), let bytesOut = Double(parts[2]) else { continue }
-                current[name] = (bytesIn, bytesOut)
-            }
-
-            DispatchQueue.main.async {
-                guard let self else { return }
-                let now = Date()
-                if let prevTime = self.previousProcessNetTimestamp {
-                    let elapsed = now.timeIntervalSince(prevTime)
-                    if elapsed > 0 {
-                        var list: [ProcessUsage] = []
-                        for (name, bytes) in current {
-                            let prev = self.previousProcessNetBytes[name] ?? (0, 0)
-                            let deltaIn = max(bytes.in - prev.in, 0)
-                            let deltaOut = max(bytes.out - prev.out, 0)
-                            let kbps = (deltaIn + deltaOut) / elapsed / 1024
-                            if kbps > 0.05 {
-                                let displayName = name.split(separator: ".").dropLast().joined(separator: ".")
-                                list.append(ProcessUsage(pid: 0, name: displayName.isEmpty ? name : displayName, value: kbps))
-                            }
-                        }
-                        self.topNetworkProcesses = Array(list.sorted { $0.value > $1.value }.prefix(self.settings.topProcessCount))
-                    }
-                }
-                self.previousProcessNetBytes = current
-                self.previousProcessNetTimestamp = now
-                self.networkSamplerInFlight = false
-            }
-        }
-
-        do {
-            try task.run()
-        } catch {
-            networkSamplerInFlight = false
+        Task { @MainActor [weak self] in
+            guard let self,
+                  let list = await self.networkProcessSampler.sample(topCount: self.settings.topProcessCount)
+            else { return }
+            self.topNetworkProcesses = list
         }
     }
-
-
 
     // MARK: - Process control
 
     func terminateProcess(pid: Int32) {
         kill(pid, SIGTERM)
     }
-
-
 
     // MARK: - Alerts
 
@@ -920,33 +540,33 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - Battery / Power
 
-    private func updateBattery() {
-        guard let snapshot = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
-              let sources = IOPSCopyPowerSourcesList(snapshot)?.takeRetainedValue() as? [CFTypeRef],
-              let source = sources.first,
-              let info = IOPSGetPowerSourceDescription(snapshot, source)?.takeUnretainedValue() as? [String: Any] else {
+    private func applyBattery() {
+        switch batterySampler.sample() {
+        case .noBattery:
             batteryPercent = nil
             powerSourceName = "No battery"
-            return
+        case let .present(percent, isCharging, timeRemaining, powerSourceName, health):
+            batteryPercent = percent
+            batteryIsCharging = isCharging
+            batteryTimeRemainingMinutes = timeRemaining
+            self.powerSourceName = powerSourceName
+            applyBatteryHealth(health)
         }
+    }
 
-        batteryPercent = info[kIOPSCurrentCapacityKey] as? Int
-        let state = info[kIOPSPowerSourceStateKey] as? String
-        batteryIsCharging = (state == kIOPSACPowerValue)
-        powerSourceName = batteryIsCharging ? "AC Power" : "Battery"
-
-        if let timeToEmpty = info[kIOPSTimeToEmptyKey] as? Int, timeToEmpty >= 0, !batteryIsCharging {
-            batteryTimeRemainingMinutes = timeToEmpty
-        } else if let timeToFull = info[kIOPSTimeToFullChargeKey] as? Int, timeToFull >= 0, batteryIsCharging {
-            batteryTimeRemainingMinutes = timeToFull
-        } else {
-            batteryTimeRemainingMinutes = nil
-        }
-
-        let now = Date()
-        if now.timeIntervalSince(batteryHealthCacheDate) > 60 {
-            batteryHealthCacheDate = now
-            updateBatteryHealth()
+    private func applyBatteryHealth(_ health: BatteryHealthSnapshot?) {
+        guard let health else { return }
+        switch health {
+        case .unavailable:
+            batteryCycleCount = nil
+        case let .values(cycleCount, designCycleCount, healthPercent, temperatureC, voltage, amperage, condition):
+            batteryCycleCount = cycleCount
+            batteryDesignCycleCount = designCycleCount
+            batteryHealthPercent = healthPercent
+            batteryAmperage = amperage
+            if let temperatureC { batteryTemperatureC = temperatureC }
+            if let voltage { batteryVoltage = voltage }
+            if let condition { batteryCondition = condition }
         }
     }
 
@@ -963,169 +583,10 @@ final class MetricsEngine: ObservableObject {
         }.resume()
     }
 
-    private func updateBatteryHealth() {
-        let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("AppleSmartBattery"))
-        guard service != 0 else {
-            batteryCycleCount = nil
-            return
-        }
-        defer { IOObjectRelease(service) }
-
-        var propsRef: Unmanaged<CFMutableDictionary>?
-        guard IORegistryEntryCreateCFProperties(service, &propsRef, kCFAllocatorDefault, 0) == KERN_SUCCESS,
-              let props = propsRef?.takeRetainedValue() as? [String: Any] else {
-            batteryCycleCount = nil
-            return
-        }
-
-        batteryCycleCount = props["CycleCount"] as? Int
-        batteryDesignCycleCount = props["DesignCycleCount9C"] as? Int
-
-        if let designCapacity = props["DesignCapacity"] as? Int, designCapacity > 0,
-           let nominalCapacity = props["NominalChargeCapacity"] as? Int {
-            batteryHealthPercent = (Double(nominalCapacity) / Double(designCapacity)) * 100
-        } else {
-            batteryHealthPercent = nil
-        }
-
-        if let temp = props["Temperature"] as? Int {
-            batteryTemperatureC = Double(temp) / 100.0
-        }
-        if let voltage = props["Voltage"] as? Int {
-            batteryVoltage = Double(voltage) / 1000.0
-        }
-        batteryAmperage = props["Amperage"] as? Int
-
-        if let health = batteryHealthPercent {
-            batteryCondition = health >= 80 ? "Normal" : "Service Recommended"
-        }
-    }
-
     // MARK: - Bluetooth
 
     func requestBluetoothAccess() {
-        guard btDelegate == nil else { return }
-        let delegate = BluetoothAuthDelegate { [weak self] auth in
-            guard let self else { return }
-            self.bluetoothAuthState = auth
-            if auth == .allowedAlways {
-                self.readBluetoothDevices()
-            }
-        }
-        btDelegate = delegate
-        btAuthManager = CBCentralManager(delegate: delegate, queue: .main)
-    }
-
-    private func updateBluetooth() {
-        let auth = CBCentralManager.authorization
-        bluetoothAuthState = auth
-        switch auth {
-        case .allowedAlways:
-            // Ensure CBCentralManager exists — needed for BLE disconnect.
-            // If already authorised at launch, requestBluetoothAccess() is never
-            // called by the notDetermined path, leaving btAuthManager nil.
-            if btAuthManager == nil { requestBluetoothAccess() }
-            readBluetoothDevices()
-        case .notDetermined:
-            requestBluetoothAccess()
-        default:
-            break
-        }
-    }
-
-    private func readBluetoothDevices() {
-        refreshBTBatteryCache()
-        let now = Date()
-        guard now.timeIntervalSince(btDevicesCacheDate) > 5 else { return }
-        btDevicesCacheDate = now
-        guard let paired = IOBluetoothDevice.pairedDevices() as? [IOBluetoothDevice] else { return }
-        bluetoothDevices = paired.map { device in
-            let cod = device.classOfDevice
-            let majorClass = (Int(cod) & 0x1F00) >> 8
-            let icon: String
-            switch majorClass {
-            case 1: icon = "laptopcomputer"
-            case 2: icon = "iphone"
-            case 4: icon = "headphones"
-            case 5: icon = "keyboard"
-            default: icon = "dot.radiowaves.left.and.right"
-            }
-            let addr = (device.addressString ?? "").lowercased().replacingOccurrences(of: "-", with: ":")
-            let name = device.nameOrAddress ?? "Unknown"
-            let info = btBatteryCache[addr]
-            let earbud: Int? = info.flatMap { i in [i.left, i.right].compactMap { $0 }.min() }
-            let primary: Int? = info?.main ?? earbud ?? bleBatteryByName[name]
-            return BluetoothDevice(
-                id: device.addressString ?? UUID().uuidString,
-                name: name,
-                isConnected: device.isConnected(),
-                batteryPercent: primary,
-                batteryLeft: info?.left,
-                batteryRight: info?.right,
-                batteryCase: info?.caseLevel,
-                icon: icon
-            )
-        }
-    }
-
-    private struct BtBatteryInfo {
-        var main: Int?
-        var left: Int?
-        var right: Int?
-        var caseLevel: Int?
-    }
-
-    private func refreshBTBatteryCache() {
-        let now = Date()
-        guard now.timeIntervalSince(btBatteryCacheDate) > 25 else { return }
-        btBatteryCacheDate = now
-        // BLE GATT battery read (runs alongside system_profiler parse)
-        let reader = BLEBatteryReader()
-        bleBatteryReader = reader
-        reader.onResult = { [weak self] name, pct in
-            self?.bleBatteryByName[name] = pct
-        }
-        reader.read()
-        Task.detached(priority: .utility) { [weak self] in
-            let proc = Process()
-            proc.executableURL = URL(fileURLWithPath: "/usr/sbin/system_profiler")
-            proc.arguments = ["SPBluetoothDataType", "-json"]
-            let pipe = Pipe()
-            proc.standardOutput = pipe
-            proc.standardError = Pipe()
-            guard (try? proc.run()) != nil else { return }
-            proc.waitUntilExit()
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let btArray = json["SPBluetoothDataType"] as? [[String: Any]] else { return }
-
-            func parsePct(_ info: [String: Any], _ key: String) -> Int? {
-                guard let s = info[key] as? String else { return nil }
-                return Int(s.replacingOccurrences(of: "%", with: "").trimmingCharacters(in: .whitespaces))
-            }
-
-            var cache: [String: BtBatteryInfo] = [:]
-            for entry in btArray {
-                for listKey in ["device_connected", "device_not_connected"] {
-                    guard let deviceList = entry[listKey] as? [[String: Any]] else { continue }
-                    for deviceDict in deviceList {
-                        for (_, infoAny) in deviceDict {
-                            guard let info = infoAny as? [String: Any],
-                                  let addr = info["device_address"] as? String else { continue }
-                            let norm = addr.lowercased().replacingOccurrences(of: "-", with: ":")
-                            cache[norm] = BtBatteryInfo(
-                                main:      parsePct(info, "device_batteryLevel"),
-                                left:      parsePct(info, "device_batteryLevelLeft"),
-                                right:     parsePct(info, "device_batteryLevelRight"),
-                                caseLevel: parsePct(info, "device_batteryLevelCase")
-                            )
-                        }
-                    }
-                }
-            }
-            let captured = cache
-            await MainActor.run { [weak self] in self?.btBatteryCache = captured }
-        }
+        bluetoothSampler.requestAccess()
     }
 
     // MARK: - CPU Core Clusters
@@ -1143,74 +604,38 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - WiFi Signal
 
-    private func updateWiFiSignal() {
-        guard connectionType == "Wi-Fi" else {
+    private func applyWiFi() {
+        switch wifiSampler.sample(connectionType: connectionType) {
+        case .clear:
             wifiSSID = nil
             wifiRSSI = nil
-            wifiCacheDate = .distantPast
-            return
-        }
-        let now = Date()
-        guard now.timeIntervalSince(wifiCacheDate) > 3 else { return }
-        wifiCacheDate = now
-        let iface = CWWiFiClient.shared().interface()
-        wifiSSID = iface?.ssid()
-        if let rssi = iface?.rssiValue(), rssi != 0 {
+        case .throttled:
+            break
+        case let .value(ssid, rssi):
+            wifiSSID = ssid
             wifiRSSI = rssi
-        } else {
-            wifiRSSI = nil
         }
+    }
+
+    // MARK: - GPU usage
+
+    private func applyGPU() {
+        guard let usage = gpuSampler.usage() else { return }
+        gpuUsagePercent = usage
+        appendCapped(gpuUsagePercent, to: &gpuHistory)
     }
 
     // MARK: - SMC (temperatures + fans)
 
     private func updateSMC() {
-        guard smc.isOpen else { return }
-        let now = Date()
-        guard now.timeIntervalSince(smcCacheDate) > 2 else { return }
-        smcCacheDate = now
-        let reader = smc  // capture before leaving @MainActor; SMCReader is @unchecked Sendable
-        Task.detached(priority: .utility) { [weak self] in
-            let cpuT     = reader.cpuTemperature()
-            let gpuT     = reader.gpuTemperature()
-            let f        = reader.fans()
-            let allTemps = reader.readAllTemperatures()
-            var known: [TempReading] = []
-            var unknown: [TempReading] = []
-            for (key, value) in allTemps {
-                if let (label, category) = MetricsEngine.categorize(key: key) {
-                    known.append(TempReading(key: key, label: label, category: category, celsius: value))
-                } else {
-                    unknown.append(TempReading(key: key, label: key, category: "Unknown", celsius: value))
-                }
-            }
-            // Derive CPU/GPU averages from extended sensors when available.
-            // This handles M3/M4 which use Te*/Tf* keys that cpuTemperature()/gpuTemperature()
-            // won't find (those only look for Tp*/Tg* prefixes).
-            var cpuSensors: [TempReading] = []
-            var gpuSensors: [TempReading] = []
-            for r in known {
-                if r.category == "CPU" { cpuSensors.append(r) }
-                else if r.category == "GPU" { gpuSensors.append(r) }
-            }
-            let finalCpuT = cpuSensors.isEmpty ? cpuT
-                : cpuSensors.map(\.celsius).reduce(0, +) / Double(cpuSensors.count)
-            let finalGpuT = gpuSensors.isEmpty ? gpuT
-                : gpuSensors.map(\.celsius).reduce(0, +) / Double(gpuSensors.count)
-            let finalCpu = finalCpuT, finalGpu = finalGpuT, finalFans = f, finalExt = known, finalUnk = unknown
-            await MainActor.run { [weak self] in
-                self?.cpuTemperatureC        = finalCpu
-                self?.gpuTemperatureC        = finalGpu
-                self?.fans                   = finalFans
-                self?.extendedTemperatures   = finalExt
-                self?.unknownSMCTemperatures = finalUnk
-            }
+        Task { @MainActor [weak self] in
+            guard let self, let s = await self.smcSampler.sample() else { return }
+            self.cpuTemperatureC        = s.cpuTemperatureC
+            self.gpuTemperatureC        = s.gpuTemperatureC
+            self.fans                   = s.fans
+            self.extendedTemperatures   = s.extendedTemperatures
+            self.unknownSMCTemperatures = s.unknownSMCTemperatures
         }
-    }
-
-    // Returns nil for any key not in the curated map — prevents surfacing unnamed sensors.
-    private nonisolated static func categorize(key: String) -> (label: String, category: String)? {
-        SMCSensorCatalog.categorize(key: key)
     }
 
     // MARK: - Displays
@@ -1278,81 +703,4 @@ final class MetricsEngine: ObservableObject {
         return raw.isEmpty ? "" : raw
     }
 
-}
-
-private extension Double {
-    func clamped(to range: ClosedRange<Double>) -> Double {
-        Swift.min(Swift.max(self, range.lowerBound), range.upperBound)
-    }
-}
-
-// NSObject subclass required for CBCentralManagerDelegate conformance.
-final class BluetoothAuthDelegate: NSObject, CBCentralManagerDelegate {
-    private let onUpdate: (CBManagerAuthorization) -> Void
-
-    init(onUpdate: @escaping (CBManagerAuthorization) -> Void) {
-        self.onUpdate = onUpdate
-    }
-
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        onUpdate(CBCentralManager.authorization)
-    }
-}
-
-// Reads GATT Battery Service (0x180F) from BLE peripherals already connected to the system.
-final class BLEBatteryReader: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
-    private static let batterySvc  = CBUUID(string: "180F")
-    private static let batteryChar = CBUUID(string: "2A19")
-
-    private var central: CBCentralManager?
-    private var inFlight: Set<CBPeripheral> = []
-    var onResult: ((String, Int) -> Void)?   // peripheral.name → percent
-
-    func read() {
-        // Re-create central each time so state machine resets cleanly
-        central = CBCentralManager(delegate: self, queue: .main,
-                                   options: [CBCentralManagerOptionShowPowerAlertKey: false])
-    }
-
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        guard central.state == .poweredOn else { return }
-        let peripherals = central.retrieveConnectedPeripherals(withServices: [Self.batterySvc])
-        for p in peripherals {
-            p.delegate = self
-            inFlight.insert(p)
-            central.connect(p, options: nil)
-        }
-    }
-
-    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        peripheral.discoverServices([Self.batterySvc])
-    }
-
-    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
-        inFlight.remove(peripheral)
-    }
-
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        guard let services = peripheral.services else { inFlight.remove(peripheral); return }
-        for svc in services where svc.uuid == Self.batterySvc {
-            peripheral.discoverCharacteristics([Self.batteryChar], for: svc)
-        }
-    }
-
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        guard let chars = service.characteristics else { inFlight.remove(peripheral); return }
-        for c in chars where c.uuid == Self.batteryChar {
-            peripheral.readValue(for: c)
-        }
-    }
-
-    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        defer { inFlight.remove(peripheral); central?.cancelPeripheralConnection(peripheral) }
-        guard characteristic.uuid == Self.batteryChar,
-              let data = characteristic.value, let raw = data.first,
-              let name = peripheral.name else { return }
-        let pct = Int(raw)
-        guard pct >= 0, pct <= 100 else { return }
-        onResult?(name, pct)
-    }
 }

@@ -1,9 +1,11 @@
 import Foundation
+import PerformanceAppCore
 
 // Plain value types describing metric snapshots the engine produces and the
 // views render. Extracted from MetricsEngine.swift in the Part-A decomposition.
-// `LocalInterface` lives in PerformanceAppCore (pure, unit-tested); these
-// remain app-level as they are simple data holders consumed only by the UI.
+// `LocalInterface`, `ProcessUsage` and `TempReading` live in PerformanceAppCore
+// (pure, unit-tested); these remain app-level as they are simple data holders
+// consumed only by the UI.
 
 struct DisplayInfo: Identifiable {
     let id: Int
@@ -25,13 +27,6 @@ struct VolumeInfo: Identifiable {
     let freeGB: Double
     let isRemovable: Bool
     var id: String { name }
-}
-
-struct ProcessUsage: Identifiable {
-    let pid: Int32
-    let name: String
-    let value: Double
-    var id: String { "\(pid)-\(name)" }
 }
 
 struct BluetoothDevice: Identifiable {
