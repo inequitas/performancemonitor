@@ -2,7 +2,7 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-0.3.13-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.0.0-lightgrey)
 
 ---
 
@@ -13,9 +13,12 @@ A lightweight macOS menu bar app that gives you real-time system metrics at a gl
 
 ---
 
-## What's new in v0.3.13
+## What's new in v1.0.0
 
-- **Dock icon fix, root cause** — the check for "is another window still open" was always true because of an always-visible internal status-bar window, so the Dock icon never actually got hidden again after opening Settings or a detail card; now fixed at the root
+- **Signed auto-updates** — in-app updates are cryptographically verified (Ed25519) before installation
+- **Beta channel** — separate "Performance Monitor Beta" app for testing pre-releases alongside the stable app
+- **Lighter footprint** — process sampling only runs while visible; all system reads off the main thread
+- **First-run onboarding, VoiceOver support, and local (never uploaded) crash reports**
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 

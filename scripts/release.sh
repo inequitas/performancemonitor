@@ -126,7 +126,11 @@ fi
 
 # --- (d) test + build ----------------------------------------------------
 echo "==> Running swift test..."
-swift test
+# PM_SWIFT_TEST_FLAGS: extra flags for machines where Testing.framework is not
+# on the default search path (Command Line Tools without full Xcode), e.g.
+#   PM_SWIFT_TEST_FLAGS="-Xswiftc -F -Xswiftc /Library/Developer/CommandLineTools/Library/Developer/Frameworks"
+# shellcheck disable=SC2086
+swift test ${PM_SWIFT_TEST_FLAGS:-}
 
 echo "==> Running build_app.sh $([ "$BETA" = true ] && echo '--beta')..."
 if [ "$BETA" = true ]; then
