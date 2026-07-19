@@ -58,18 +58,6 @@ func detailRow(_ label: String, _ value: String) -> some View {
     }
 }
 
-func iconDetailRow(_ icon: String, color: Color, label: String, value: String, valueColor: Color = .primary) -> some View {
-    HStack {
-        Image(systemName: icon)
-            .font(.caption)
-            .foregroundStyle(color)
-            .frame(width: 16)
-        Text(label).font(.caption).foregroundStyle(.secondary)
-        Spacer()
-        Text(value).font(.caption.monospacedDigit()).foregroundStyle(valueColor)
-    }
-}
-
 struct EarbudBatteryPill: View {
     let label: String
     let pct: Int
@@ -82,48 +70,6 @@ struct EarbudBatteryPill: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
         .accessibilityValue(pct < 20 ? "\(pct) percent, low battery" : "\(pct) percent")
-    }
-}
-
-// Shared butterfly bar chart. sharedMax is passed in so axis labels in the
-// parent always match the scale the chart is actually using.
-struct ButterflyBarChart: View {
-    let upHistory:    [Double]
-    let downHistory:  [Double]
-    let upColor:      Color
-    let downColor:    Color
-    let sharedMax:    Double
-    var displayCount: Int = 60
-
-    private var paddedUp: [Double] {
-        let slice = Array(upHistory.suffix(displayCount))
-        return slice + Array(repeating: 0.0, count: displayCount - slice.count)
-    }
-    private var paddedDown: [Double] {
-        let slice = Array(downHistory.suffix(displayCount))
-        return slice + Array(repeating: 0.0, count: displayCount - slice.count)
-    }
-
-    var body: some View {
-        Chart {
-            ForEach(Array(paddedUp.enumerated()), id: \.offset) { i, val in
-                BarMark(x: .value("t", i), yStart: .value("v", 0.0), yEnd: .value("v", val),
-                        width: .inset(1))
-                    .foregroundStyle(upColor)
-            }
-            ForEach(Array(paddedDown.enumerated()), id: \.offset) { i, val in
-                BarMark(x: .value("t", i), yStart: .value("v", -val), yEnd: .value("v", 0.0),
-                        width: .inset(1))
-                    .foregroundStyle(downColor)
-            }
-        }
-        .chartYScale(domain: -sharedMax ... sharedMax)
-        .chartXAxis(.hidden)
-        .chartYAxis {
-            AxisMarks(values: [0.0]) {
-                AxisGridLine().foregroundStyle(Color.primary.opacity(0.25))
-            }
-        }
     }
 }
 
