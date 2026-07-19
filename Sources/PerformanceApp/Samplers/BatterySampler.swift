@@ -33,59 +33,107 @@ enum BatterySnapshot {
 }
 
 protocol BatterySampling: AnyObject {
-    func sample() -> BatterySnapshot
+    /// Reads power-source info (and, throttled, battery health) off the main
+    /// thread. Returns `.noBattery` when a previous call is still in flight,
+    /// matching the "nothing to report" path the engine already handles.
+    func sample() async -> BatterySnapshot
 }
 
-/// Owns the battery-health refresh throttle. Extracted verbatim from
+private struct RawHealthRead: Sendable {
+    let cycleCount: Int?
+    let designCycleCount: Int?
+    let healthPercent: Double?
+    let temperatureC: Double?
+    let voltage: Double?
+    let amperage: Int?
+    let condition: String?
+    let available: Bool
+}
+
+/// Owns the battery-health refresh throttle. The IOKit power-source/battery
+/// reads run detached from the main thread; the 60s throttle check (a cheap
+/// Date compare) stays on the main actor. Extracted verbatim from
 /// `MetricsEngine.updateBattery`/`updateBatteryHealth`.
+@MainActor
 final class BatterySampler: BatterySampling {
     private var healthCacheDate: Date = .distantPast
+    private var inFlight = false
 
-    func sample() -> BatterySnapshot {
-        guard let snapshot = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
-              let sources = IOPSCopyPowerSourcesList(snapshot)?.takeRetainedValue() as? [CFTypeRef],
-              let source = sources.first,
-              let info = IOPSGetPowerSourceDescription(snapshot, source)?.takeUnretainedValue() as? [String: Any] else {
-            return .noBattery
-        }
+    func sample() async -> BatterySnapshot {
+        guard !inFlight else { return .noBattery }
+        inFlight = true
+        defer { inFlight = false }
 
-        let percent = info[kIOPSCurrentCapacityKey] as? Int
-        let state = info[kIOPSPowerSourceStateKey] as? String
-        let isCharging = (state == kIOPSACPowerValue)
-        let powerSourceName = isCharging ? "AC Power" : "Battery"
-
-        let timeRemaining: Int?
-        if let timeToEmpty = info[kIOPSTimeToEmptyKey] as? Int, timeToEmpty >= 0, !isCharging {
-            timeRemaining = timeToEmpty
-        } else if let timeToFull = info[kIOPSTimeToFullChargeKey] as? Int, timeToFull >= 0, isCharging {
-            timeRemaining = timeToFull
-        } else {
-            timeRemaining = nil
-        }
-
-        var health: BatteryHealthSnapshot? = nil
         let now = Date()
-        if now.timeIntervalSince(healthCacheDate) > 60 {
-            healthCacheDate = now
-            health = readHealth()
+        let shouldReadHealth = now.timeIntervalSince(healthCacheDate) > 60
+        if shouldReadHealth { healthCacheDate = now }
+
+        guard let raw = await Self.readRaw(includeHealth: shouldReadHealth) else { return .noBattery }
+
+        let health: BatteryHealthSnapshot?
+        if let h = raw.health {
+            health = h.available
+                ? .values(cycleCount: h.cycleCount, designCycleCount: h.designCycleCount,
+                          healthPercent: h.healthPercent, temperatureC: h.temperatureC,
+                          voltage: h.voltage, amperage: h.amperage, condition: h.condition)
+                : .unavailable
+        } else {
+            health = nil
         }
 
-        return .present(percent: percent,
-                        isCharging: isCharging,
-                        timeRemainingMinutes: timeRemaining,
-                        powerSourceName: powerSourceName,
+        return .present(percent: raw.percent,
+                        isCharging: raw.isCharging,
+                        timeRemainingMinutes: raw.timeRemaining,
+                        powerSourceName: raw.powerSourceName,
                         health: health)
     }
 
-    private func readHealth() -> BatteryHealthSnapshot {
+    /// Pure IOKit reads, no shared state — safe to run detached.
+    private static func readRaw(includeHealth: Bool) async -> (percent: Int?, isCharging: Bool, timeRemaining: Int?, powerSourceName: String, health: RawHealthRead?)? {
+        await Task.detached(priority: .utility) { () -> (percent: Int?, isCharging: Bool, timeRemaining: Int?, powerSourceName: String, health: RawHealthRead?)? in
+            guard let snapshot = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
+                  let sources = IOPSCopyPowerSourcesList(snapshot)?.takeRetainedValue() as? [CFTypeRef],
+                  let source = sources.first,
+                  let info = IOPSGetPowerSourceDescription(snapshot, source)?.takeUnretainedValue() as? [String: Any] else {
+                return nil
+            }
+
+            let percent = info[kIOPSCurrentCapacityKey] as? Int
+            let state = info[kIOPSPowerSourceStateKey] as? String
+            let isCharging = (state == kIOPSACPowerValue)
+            let powerSourceName = isCharging ? "AC Power" : "Battery"
+
+            let timeRemaining: Int?
+            if let timeToEmpty = info[kIOPSTimeToEmptyKey] as? Int, timeToEmpty >= 0, !isCharging {
+                timeRemaining = timeToEmpty
+            } else if let timeToFull = info[kIOPSTimeToFullChargeKey] as? Int, timeToFull >= 0, isCharging {
+                timeRemaining = timeToFull
+            } else {
+                timeRemaining = nil
+            }
+
+            let health = includeHealth ? readHealth() : nil
+
+            return (percent: percent, isCharging: isCharging, timeRemaining: timeRemaining,
+                    powerSourceName: powerSourceName, health: health)
+        }.value
+    }
+
+    /// Pure IOKit read, no shared state — marked `nonisolated` so it can be
+    /// called from the detached (non-main-actor) closure in `readRaw`.
+    private nonisolated static func readHealth() -> RawHealthRead {
         let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("AppleSmartBattery"))
-        guard service != 0 else { return .unavailable }
+        guard service != 0 else {
+            return RawHealthRead(cycleCount: nil, designCycleCount: nil, healthPercent: nil,
+                                 temperatureC: nil, voltage: nil, amperage: nil, condition: nil, available: false)
+        }
         defer { IOObjectRelease(service) }
 
         var propsRef: Unmanaged<CFMutableDictionary>?
         guard IORegistryEntryCreateCFProperties(service, &propsRef, kCFAllocatorDefault, 0) == KERN_SUCCESS,
               let props = propsRef?.takeRetainedValue() as? [String: Any] else {
-            return .unavailable
+            return RawHealthRead(cycleCount: nil, designCycleCount: nil, healthPercent: nil,
+                                 temperatureC: nil, voltage: nil, amperage: nil, condition: nil, available: false)
         }
 
         let cycleCount = props["CycleCount"] as? Int
@@ -113,12 +161,8 @@ final class BatterySampler: BatterySampling {
         // Original only updates `batteryCondition` when a health % is available.
         let condition: String? = healthPercent.map { $0 >= 80 ? "Normal" : "Service Recommended" }
 
-        return .values(cycleCount: cycleCount,
-                       designCycleCount: designCycleCount,
-                       healthPercent: healthPercent,
-                       temperatureC: temperatureC,
-                       voltage: voltage,
-                       amperage: amperage,
-                       condition: condition)
+        return RawHealthRead(cycleCount: cycleCount, designCycleCount: designCycleCount,
+                             healthPercent: healthPercent, temperatureC: temperatureC,
+                             voltage: voltage, amperage: amperage, condition: condition, available: true)
     }
 }

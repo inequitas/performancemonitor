@@ -27,7 +27,7 @@ struct DetailWindow: View {
         .frame(width: detailWindowWidth, height: detailWindowHeight)
         .navigationTitle(kind.title)
         .background(.regularMaterial)
-        .background(WindowFloatAccessor(engine: engine))
+        .background(WindowFloatAccessor(kind: kind, engine: engine))
         .preferredColorScheme(engine.settings.preferredColorScheme)
     }
 }
@@ -1357,7 +1357,13 @@ struct CopyableIPRow: View {
 // on close (if Show in Dock is off and this was the last visible window) the
 // same way SettingsView's WindowFocuser does — otherwise opening a metric card
 // permanently pins the Dock icon for the rest of the session.
+//
+// Also reports this window's actual on-screen visibility to the engine via
+// `setPanelVisible`, so ps/nettop sampling for the CPU/Memory/Network panels
+// only runs while their window is really visible (not minimized/fully
+// occluded) — see `MetricsEngine.setPanelVisible`.
 private struct WindowFloatAccessor: NSViewRepresentable {
+    let kind: MetricsEngine.Panel
     let engine: MetricsEngine
 
     func makeNSView(context: Context) -> NSView {
@@ -1372,12 +1378,27 @@ private struct WindowFloatAccessor: NSViewRepresentable {
             // been resized or when content height differs between tabs.
             window.setContentSize(NSSize(width: detailWindowWidth, height: detailWindowHeight))
             window.styleMask.remove(.resizable)
+
+            engine.setPanelVisible(window.occlusionState.contains(.visible), for: kind)
+
+            NotificationCenter.default.addObserver(
+                forName: NSWindow.didChangeOcclusionStateNotification,
+                object: window,
+                queue: .main
+            ) { [weak engine] note in
+                guard let win = note.object as? NSWindow else { return }
+                Task { @MainActor in
+                    engine?.setPanelVisible(win.occlusionState.contains(.visible), for: kind)
+                }
+            }
+
             NotificationCenter.default.addObserver(
                 forName: NSWindow.willCloseNotification,
                 object: window,
                 queue: .main
             ) { [weak engine] _ in
                 Task { @MainActor in
+                    engine?.setPanelVisible(false, for: kind)
                     guard let engine, !engine.settings.showInDock else { return }
                     if !NSApp.hasOtherVisibleTitledWindow(besides: window) {
                         NSApp.setActivationPolicy(.accessory)

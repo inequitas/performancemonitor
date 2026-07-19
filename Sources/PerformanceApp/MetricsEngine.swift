@@ -232,6 +232,45 @@ final class MetricsEngine: ObservableObject {
     private var extraBarController: ExtraMenuBarController?
     private var timer: Timer?
     private var thermalObserver: NSObjectProtocol?
+    private var isRefreshing = false
+
+    // MARK: - Panel visibility (drives process-list sampling cadence)
+    //
+    // ps/nettop are heavy relative to the other samplers, so they only run
+    // while a window that actually displays their output is visible: the CPU
+    // and Memory detail windows show `topCPUProcesses`/`topMemoryProcesses`
+    // (ps), the Network detail window shows `topNetworkProcesses` (nettop).
+    // The popover (OverviewView) doesn't display process lists at all, so it
+    // isn't part of this gate. Nothing that feeds the menu bar depends on
+    // these three published arrays, so MenuBarConfig-driven metrics are
+    // unaffected and keep sampling every tick regardless of visibility.
+    private var visiblePanels: Set<Panel> = []
+
+    /// Called by `DetailWindow` (via `WindowFloatAccessor`) whenever one of its
+    /// windows becomes visible or invisible (open/close, occlusion, miniaturize).
+    func setPanelVisible(_ visible: Bool, for kind: Panel) {
+        let changed = visible ? visiblePanels.insert(kind).inserted : visiblePanels.remove(kind) != nil
+        guard changed else { return }
+
+        switch kind {
+        case .cpu, .memory:
+            if visible {
+                processSampler.resetThrottle()
+                updateProcesses()
+            }
+        case .network:
+            if visible {
+                networkProcessSampler.resetThrottle()
+                updateNetworkProcesses()
+            } else {
+                // Drop the rate baseline so the next visible sample starts
+                // fresh instead of averaging over the whole invisible span.
+                networkProcessSampler.invalidateBaseline()
+            }
+        default:
+            break
+        }
+    }
 
     func sparklineHistory(for metric: MenuBarMetric) -> [Double] {
         switch metric {
@@ -401,18 +440,30 @@ final class MetricsEngine: ObservableObject {
     // Preserves the original ordering and throttle cadence exactly: the
     // per-domain throttles (SMC 2s, Wi-Fi 3s, BT devices 5s, BT battery 25s,
     // battery health 60s, SMART 5min, public IP 5min) now live inside the
-    // respective samplers.
+    // respective samplers. CPU/Memory/Disk/GPU/Battery now read off the main
+    // thread (see the samplers' `Task.detached` reads); `refresh()` guards
+    // against overlapping ticks the same way the individual samplers guard
+    // against overlapping reads, so slow reads never let ticks stack up.
     func refresh() {
-        applyCPU()
-        applyMemory()
+        guard !isRefreshing else { return }
+        isRefreshing = true
+        Task { @MainActor [weak self] in
+            await self?.performRefresh()
+            self?.isRefreshing = false
+        }
+    }
+
+    private func performRefresh() async {
+        await applyCPU()
+        await applyMemory()
         applyNetwork()
-        applyDisk()
+        await applyDisk()
         updateProcesses()
         updateNetworkProcesses()
-        applyBattery()
+        await applyBattery()
         applyWiFi()
         bluetoothSampler.update()
-        applyGPU()
+        await applyGPU()
         updateSMC()
         checkAlerts()
         history.append(enabled: settings.persistHistoryEnabled,
@@ -429,8 +480,8 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - CPU
 
-    private func applyCPU() {
-        guard let s = cpuSampler.sample() else { return }
+    private func applyCPU() async {
+        guard let s = await cpuSampler.sample() else { return }
         cpuUsagePercent = s.usagePercent
         cpuUserPercent = s.userPercent
         cpuSystemPercent = s.systemPercent
@@ -441,8 +492,8 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - Memory
 
-    private func applyMemory() {
-        guard let s = memorySampler.sample() else { return }
+    private func applyMemory() async {
+        guard let s = await memorySampler.sample() else { return }
         memoryUsedGB = s.usedGB
         memoryTotalGB = s.totalGB
         memoryAppGB = s.appGB
@@ -468,8 +519,8 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - Disk
 
-    private func applyDisk() {
-        let s = diskSampler.sample()
+    private func applyDisk() async {
+        guard let s = await diskSampler.sample() else { return }
         diskTotalGB = s.totalGB
         diskFreeGB = s.freeGB
         guard let io = s.io else { return }
@@ -493,6 +544,9 @@ final class MetricsEngine: ObservableObject {
     // MARK: - Top processes
 
     private func updateProcesses() {
+        // ps is only sampled while the CPU or Memory detail window is open —
+        // see `setPanelVisible`. The sampler itself throttles to a 3s cadence.
+        guard visiblePanels.contains(.cpu) || visiblePanels.contains(.memory) else { return }
         let count = settings.topProcessCount
         Task { @MainActor [weak self] in
             guard let self, let snap = await self.processSampler.sample(topCount: count) else { return }
@@ -504,6 +558,9 @@ final class MetricsEngine: ObservableObject {
     // MARK: - Per-app network usage
 
     private func updateNetworkProcesses() {
+        // nettop is only sampled while the Network detail window is open —
+        // see `setPanelVisible`. The sampler itself throttles to a 3s cadence.
+        guard visiblePanels.contains(.network) else { return }
         Task { @MainActor [weak self] in
             guard let self,
                   let list = await self.networkProcessSampler.sample(topCount: self.settings.topProcessCount)
@@ -540,8 +597,8 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - Battery / Power
 
-    private func applyBattery() {
-        switch batterySampler.sample() {
+    private func applyBattery() async {
+        switch await batterySampler.sample() {
         case .noBattery:
             batteryPercent = nil
             powerSourceName = "No battery"
@@ -619,8 +676,8 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - GPU usage
 
-    private func applyGPU() {
-        guard let usage = gpuSampler.usage() else { return }
+    private func applyGPU() async {
+        guard let usage = await gpuSampler.usage() else { return }
         gpuUsagePercent = usage
         appendCapped(gpuUsagePercent, to: &gpuHistory)
     }

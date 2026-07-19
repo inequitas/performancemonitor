@@ -22,8 +22,12 @@ struct DiskIO {
     let shouldFetchSMART: Bool
 }
 
+@MainActor
 protocol DiskSampling: AnyObject {
-    func sample() -> DiskSnapshot
+    /// Reads free/total space and block-storage IO counters off the main
+    /// thread. Returns `nil` when a previous call is still in flight (engine
+    /// then leaves disk state untouched).
+    func sample() async -> DiskSnapshot?
     /// Runs `diskutil info /dev/disk0` off the main thread and parses the SMART
     /// status. Returns `nil` when the tool could not be launched.
     func fetchSMART() async -> String?
@@ -31,44 +35,35 @@ protocol DiskSampling: AnyObject {
     func volumes() -> [VolumeInfo]
 }
 
-/// Owns the previous byte counters and the SMART-fetch throttle tick.
+private struct RawDiskRead: Sendable {
+    let freeGB: Double
+    let totalGB: Double
+    let totalRead: UInt64
+    let totalWrite: UInt64
+    /// `false` when the IOBlockStorageDriver query failed entirely — mirrors
+    /// the original early-return-with-io-nil path.
+    let ioAvailable: Bool
+}
+
+/// Owns the previous byte counters and the SMART-fetch throttle tick. The
+/// statfs/IOKit reads run off the main thread; the (cheap, no I/O) delta math
+/// against `previousBytes`/`previousTimestamp` stays on the main actor.
 /// Extracted verbatim from `MetricsEngine.updateDisk`/`fetchSmartStatus`/`updateVolumes`.
+@MainActor
 final class DiskSampler: DiskSampling {
     private var previousBytes: (read: UInt64, write: UInt64)?
     private var previousTimestamp: Date?
     private var smartFetchTick = 0
+    private var inFlight = false
 
-    func sample() -> DiskSnapshot {
-        var freeGB: Double = 0
-        var totalGB: Double = 0
-        var fsStat = statfs()
-        if statfs("/", &fsStat) == 0 {
-            let blockSize = Double(fsStat.f_bsize)
-            totalGB = Double(fsStat.f_blocks) * blockSize / 1_073_741_824
-            freeGB = Double(fsStat.f_bavail) * blockSize / 1_073_741_824
-        }
+    func sample() async -> DiskSnapshot? {
+        guard !inFlight else { return nil }
+        inFlight = true
+        defer { inFlight = false }
 
-        var (totalRead, totalWrite): (UInt64, UInt64) = (0, 0)
-        var iterator: io_iterator_t = 0
-        let matching = IOServiceMatching("IOBlockStorageDriver")
-        guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else {
-            return DiskSnapshot(freeGB: freeGB, totalGB: totalGB, io: nil)
-        }
-        defer { IOObjectRelease(iterator) }
-
-        var service = IOIteratorNext(iterator)
-        while service != 0 {
-            defer {
-                IOObjectRelease(service)
-                service = IOIteratorNext(iterator)
-            }
-            var props: Unmanaged<CFMutableDictionary>?
-            guard IORegistryEntryCreateCFProperties(service, &props, kCFAllocatorDefault, 0) == KERN_SUCCESS,
-                  let dict = props?.takeRetainedValue() as? [String: Any],
-                  let stats = dict["Statistics"] as? [String: Any] else { continue }
-
-            if let read = stats["Bytes (Read)"] as? UInt64 { totalRead += read }
-            if let write = stats["Bytes (Write)"] as? UInt64 { totalWrite += write }
+        let raw = await Self.readRaw()
+        guard raw.ioAvailable else {
+            return DiskSnapshot(freeGB: raw.freeGB, totalGB: raw.totalGB, io: nil)
         }
 
         // Fetch SMART once at startup then every 5 min — diskutil is the reliable
@@ -82,18 +77,58 @@ final class DiskSampler: DiskSampling {
         if let prev = previousBytes, let prevTime = previousTimestamp {
             let elapsed = now.timeIntervalSince(prevTime)
             if elapsed > 0 {
-                let readDelta = Double(totalRead &- prev.read)
-                let writeDelta = Double(totalWrite &- prev.write)
+                let readDelta = Double(raw.totalRead &- prev.read)
+                let writeDelta = Double(raw.totalWrite &- prev.write)
                 readKBps = max(readDelta, 0) / elapsed / 1024
                 writeKBps = max(writeDelta, 0) / elapsed / 1024
             }
         }
-        previousBytes = (totalRead, totalWrite)
+        previousBytes = (raw.totalRead, raw.totalWrite)
         previousTimestamp = now
 
-        return DiskSnapshot(freeGB: freeGB, totalGB: totalGB,
+        return DiskSnapshot(freeGB: raw.freeGB, totalGB: raw.totalGB,
                             io: DiskIO(readKBps: readKBps, writeKBps: writeKBps,
                                        shouldFetchSMART: shouldFetchSMART))
+    }
+
+    /// Reads free/total space and cumulative block-storage IO byte counters.
+    /// Pure syscalls/IOKit walk, no shared state — safe to run detached.
+    private static func readRaw() async -> RawDiskRead {
+        await Task.detached(priority: .utility) { () -> RawDiskRead in
+            var freeGB: Double = 0
+            var totalGB: Double = 0
+            var fsStat = statfs()
+            if statfs("/", &fsStat) == 0 {
+                let blockSize = Double(fsStat.f_bsize)
+                totalGB = Double(fsStat.f_blocks) * blockSize / 1_073_741_824
+                freeGB = Double(fsStat.f_bavail) * blockSize / 1_073_741_824
+            }
+
+            var (totalRead, totalWrite): (UInt64, UInt64) = (0, 0)
+            var iterator: io_iterator_t = 0
+            let matching = IOServiceMatching("IOBlockStorageDriver")
+            guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else {
+                return RawDiskRead(freeGB: freeGB, totalGB: totalGB, totalRead: 0, totalWrite: 0, ioAvailable: false)
+            }
+            defer { IOObjectRelease(iterator) }
+
+            var service = IOIteratorNext(iterator)
+            while service != 0 {
+                defer {
+                    IOObjectRelease(service)
+                    service = IOIteratorNext(iterator)
+                }
+                var props: Unmanaged<CFMutableDictionary>?
+                guard IORegistryEntryCreateCFProperties(service, &props, kCFAllocatorDefault, 0) == KERN_SUCCESS,
+                      let dict = props?.takeRetainedValue() as? [String: Any],
+                      let stats = dict["Statistics"] as? [String: Any] else { continue }
+
+                if let read = stats["Bytes (Read)"] as? UInt64 { totalRead += read }
+                if let write = stats["Bytes (Write)"] as? UInt64 { totalWrite += write }
+            }
+
+            return RawDiskRead(freeGB: freeGB, totalGB: totalGB, totalRead: totalRead, totalWrite: totalWrite, ioAvailable: true)
+        }.value
     }
 
     func fetchSMART() async -> String? {

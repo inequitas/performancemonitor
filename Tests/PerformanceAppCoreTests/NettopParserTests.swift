@@ -83,4 +83,17 @@ struct NettopParserTests {
         let current: [String: NetBytes] = ["App.1": NetBytes(bytesIn: 100_000, bytesOut: 0)]
         #expect(NettopParser.rates(current: current, previous: [:], elapsed: 0, topCount: 10).isEmpty)
     }
+
+    // Process-list sampling now runs on its own throttled (~3s) cadence rather
+    // than every 1s engine tick, so the elapsed gap between two nettop samples
+    // varies. `rates` must divide by the *actual* elapsed time, not assume 1s.
+    @Test func variableElapsedIntervalComputesCorrectRate() {
+        let previous: [String: NetBytes] = ["Safari.6789": NetBytes(bytesIn: 0, bytesOut: 0)]
+        let current: [String: NetBytes] = ["Safari.6789": NetBytes(bytesIn: 3072, bytesOut: 3072)]
+        // 6144 bytes over 3s = 2 kB/s — half of what a naive "assume 1s" calc
+        // would report for the same byte delta.
+        let rows = NettopParser.rates(current: current, previous: previous, elapsed: 3, topCount: 10)
+        #expect(rows.count == 1)
+        #expect(rows[0].value == 2.0)
+    }
 }
