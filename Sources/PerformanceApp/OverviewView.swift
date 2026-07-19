@@ -13,7 +13,7 @@ struct OverviewView: View {
     @AppStorage("card.diskStyle")   private var diskStyle:   CardChartStyle = .area
 
     private var visiblePanels: [MetricsEngine.Panel] {
-        engine.panelOrder.filter { !engine.hiddenPanels.contains($0) }
+        engine.settings.panelOrder.filter { !engine.settings.hiddenPanels.contains($0) }
     }
 
     var body: some View {

@@ -3,31 +3,33 @@ import ServiceManagement
 import PerformanceAppCore
 
 struct SettingsView: View {
-    // Plain let — no @ObservedObject. Each child tab observes engine directly,
-    // so the TabView (and its tab-bar SF Symbol icons) is never re-rendered by
-    // engine ticks. Appearance / dock changes are handled by SettingsWindowModifier.
+    // Plain let — no @ObservedObject. Each child tab observes the SettingsStore
+    // directly (not the engine), so the TabView (and its tab-bar SF Symbol
+    // icons) is never re-rendered by engine ticks — and, since settings only
+    // change on user action, the tabs no longer redraw on every metrics tick at
+    // all. Appearance / dock changes are handled by SettingsWindowModifier.
     let engine: MetricsEngine
     let updater: UpdateChecker
     @State private var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
 
     var body: some View {
         TabView {
-            GeneralTab(engine: engine, launchAtLogin: $launchAtLogin)
+            GeneralTab(settings: engine.settings, launchAtLogin: $launchAtLogin)
                 .tabItem { Label("General", systemImage: "gearshape.fill") }
 
-            MenuBarTab(engine: engine)
+            MenuBarTab(settings: engine.settings)
                 .tabItem { Label("Menu Bar", systemImage: "menubar.rectangle") }
 
-            MetricsTab(engine: engine)
+            MetricsTab(settings: engine.settings)
                 .tabItem { Label("Metrics", systemImage: "chart.bar.fill") }
 
-            AlertsTab(engine: engine)
+            AlertsTab(alerts: engine.alerts)
                 .tabItem { Label("Alerts", systemImage: "bell.badge.fill") }
 
-            PanelsTab(engine: engine)
+            PanelsTab(settings: engine.settings)
                 .tabItem { Label("Panels", systemImage: "square.grid.2x2") }
 
-            HistoryTab(engine: engine)
+            HistoryTab(engine: engine, settings: engine.settings)
                 .tabItem { Label("History", systemImage: "clock.arrow.circlepath") }
 
             UpdatesTab(updater: updater)
@@ -35,21 +37,21 @@ struct SettingsView: View {
         }
         .frame(width: 420)
         .background(.regularMaterial)
-        .modifier(SettingsWindowModifier(engine: engine))
+        .modifier(SettingsWindowModifier(settings: engine.settings))
         .transaction { $0.animation = nil }
     }
 }
 
-// Isolated observer for the two engine properties that affect window-level
+// Isolated observer for the two settings properties that affect window-level
 // presentation. Keeps appearance and dock changes working without forcing
 // the entire TabView to re-render on every metrics tick.
 private struct SettingsWindowModifier: ViewModifier {
-    @ObservedObject var engine: MetricsEngine
+    @ObservedObject var settings: SettingsStore
 
     func body(content: Content) -> some View {
         content
-            .background(WindowFocuser(engine: engine))
-            .preferredColorScheme(engine.preferredColorScheme)
+            .background(WindowFocuser(settings: settings))
+            .preferredColorScheme(settings.preferredColorScheme)
     }
 }
 
@@ -58,13 +60,13 @@ private struct SettingsWindowModifier: ViewModifier {
 // Makes the Settings window key the moment it appears and resets the activation
 // policy back to .accessory (for dock-hidden mode) when the window closes.
 //
-// The close observer is always registered and reads engine.showInDock live
+// The close observer is always registered and reads settings.showInDock live
 // (rather than a value captured at makeNSView time), because makeNSView only
 // runs once per window instance — if it only registered the observer when
 // showInDock was false at first-open, toggling the setting later on the same
 // window instance would leave the dock icon stuck.
 private struct WindowFocuser: NSViewRepresentable {
-    let engine: MetricsEngine
+    let settings: SettingsStore
 
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
@@ -76,9 +78,9 @@ private struct WindowFocuser: NSViewRepresentable {
                 forName: NSWindow.willCloseNotification,
                 object: window,
                 queue: .main
-            ) { [weak engine] _ in
+            ) { [weak settings] _ in
                 Task { @MainActor in
-                    guard let engine, !engine.showInDock else { return }
+                    guard let settings, !settings.showInDock else { return }
                     if !NSApp.hasOtherVisibleTitledWindow(besides: window) {
                         NSApp.setActivationPolicy(.accessory)
                     }
@@ -93,7 +95,7 @@ private struct WindowFocuser: NSViewRepresentable {
 // MARK: - General tab
 
 private struct GeneralTab: View {
-    @ObservedObject var engine: MetricsEngine
+    @ObservedObject var settings: SettingsStore
     @Binding var launchAtLogin: Bool
 
     var body: some View {
@@ -101,8 +103,8 @@ private struct GeneralTab: View {
             SettingsSection(icon: "gearshape.fill", title: "General", color: .gray) {
                 SettingsRow(label: "Refresh interval") {
                     HStack(spacing: 8) {
-                        Slider(value: $engine.refreshInterval, in: 0.5...5.0, step: 0.5)
-                        Text(String(format: "%.1fs", engine.refreshInterval))
+                        Slider(value: $settings.refreshInterval, in: 0.5...5.0, step: 0.5)
+                        Text(String(format: "%.1fs", settings.refreshInterval))
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(.secondary)
                             .frame(width: 36)
@@ -110,8 +112,8 @@ private struct GeneralTab: View {
                 }
                 Divider().padding(.vertical, 4)
                 SettingsRow(label: "Appearance") {
-                    Picker("", selection: $engine.appAppearance) {
-                        ForEach(MetricsEngine.AppAppearance.allCases) { a in
+                    Picker("", selection: $settings.appAppearance) {
+                        ForEach(AppAppearance.allCases) { a in
                             Text(a.rawValue).tag(a)
                         }
                     }
@@ -121,7 +123,7 @@ private struct GeneralTab: View {
                 }
                 Divider().padding(.vertical, 4)
                 SettingsRow(label: "Show in Dock") {
-                    Toggle("", isOn: $engine.showInDock).labelsHidden()
+                    Toggle("", isOn: $settings.showInDock).labelsHidden()
                 }
                 Divider().padding(.vertical, 4)
                 SettingsRow(label: "Launch at login") {
@@ -148,8 +150,8 @@ private struct GeneralTab: View {
 
             SettingsSection(icon: "list.number", title: "Processes", color: .blue) {
                 SettingsRow(label: "Top processes shown") {
-                    Stepper(value: $engine.topProcessCount, in: 3...15) {
-                        Text("\(engine.topProcessCount)")
+                    Stepper(value: $settings.topProcessCount, in: 3...15) {
+                        Text("\(settings.topProcessCount)")
                             .font(.system(.body, design: .rounded).weight(.semibold))
                     }
                 }
@@ -163,8 +165,8 @@ private struct GeneralTab: View {
 // MARK: - Menu Bar tab
 
 private struct MenuBarTab: View {
-    @ObservedObject var engine: MetricsEngine
-    @State private var dragging:    MetricsEngine.MenuBarMetric? = nil
+    @ObservedObject var settings: SettingsStore
+    @State private var dragging:    MenuBarMetric? = nil
     @State private var dragY:       CGFloat = 0
     @State private var dragSrc:     Int = 0
     @State private var dragDst:     Int = 0
@@ -193,11 +195,11 @@ private struct MenuBarTab: View {
 
             ZStack(alignment: .topLeading) {
                 RoundedRectangle(cornerRadius: 14).fill(.ultraThinMaterial)
-                ForEach(Array(engine.menuBarOrder.enumerated()), id: \.element) { i, metric in
+                ForEach(Array(settings.menuBarOrder.enumerated()), id: \.element) { i, metric in
                     let isMe = dragging == metric
                     HStack(spacing: 0) {
                         dragHandle(for: metric, at: i)
-                        MenuBarMetricRow(metric: metric, engine: engine)
+                        MenuBarMetricRow(metric: metric, settings: settings)
                     }
                     .frame(maxWidth: .infinity, minHeight: rowH, maxHeight: rowH)
                     .background(isMe ? Color.primary.opacity(0.07) : Color.clear,
@@ -213,14 +215,14 @@ private struct MenuBarTab: View {
             }
             .coordinateSpace(name: "menuBarList")
             .frame(maxWidth: .infinity)
-            .frame(height: rowH * CGFloat(engine.menuBarOrder.count))
+            .frame(height: rowH * CGFloat(settings.menuBarOrder.count))
         }
         .padding(16)
         .transaction { $0.animation = nil }
     }
 
     @ViewBuilder
-    private func dragHandle(for metric: MetricsEngine.MenuBarMetric, at i: Int) -> some View {
+    private func dragHandle(for metric: MenuBarMetric, at i: Int) -> some View {
         Image(systemName: "line.3.horizontal")
             .foregroundStyle(.tertiary)
             .font(.system(size: 12))
@@ -241,7 +243,7 @@ private struct MenuBarTab: View {
                         // Position item so grab point stays under the mouse.
                         dragY = v.location.y - grabOffset - CGFloat(dragSrc) * rowH
                         // Slot = whichever row the mouse is currently over.
-                        let nd = max(0, min(engine.menuBarOrder.count - 1,
+                        let nd = max(0, min(settings.menuBarOrder.count - 1,
                                            Int(v.location.y / rowH)))
                         if nd != dragDst {
                             withAnimation(.interactiveSpring(response: 0.28, dampingFraction: 0.78)) {
@@ -250,11 +252,11 @@ private struct MenuBarTab: View {
                         }
                     }
                     .onEnded { _ in
-                        var order = engine.menuBarOrder
+                        var order = settings.menuBarOrder
                         order.move(fromOffsets: IndexSet(integer: dragSrc),
                                    toOffset: dragDst > dragSrc ? dragDst + 1 : dragDst)
                         withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
-                            engine.menuBarOrder = order
+                            settings.menuBarOrder = order
                             dragging = nil
                             dragY    = 0
                         }
@@ -262,7 +264,7 @@ private struct MenuBarTab: View {
             )
     }
 
-    private func rowY(index i: Int, metric: MetricsEngine.MenuBarMetric) -> CGFloat {
+    private func rowY(index i: Int, metric: MenuBarMetric) -> CGFloat {
         if dragging == metric { return CGFloat(dragSrc) * rowH + dragY }
         return CGFloat(i) * rowH + rowShift(i)
     }
@@ -275,17 +277,17 @@ private struct MenuBarTab: View {
 }
 
 private struct MenuBarMetricRow: View {
-    let metric: MetricsEngine.MenuBarMetric
-    @ObservedObject var engine: MetricsEngine
+    let metric: MenuBarMetric
+    @ObservedObject var settings: SettingsStore
 
     private var enabled: Binding<Bool> {
-        Binding(get: { engine.isEnabled(metric) },
-                set: { engine.setEnabled($0, for: metric) })
+        Binding(get: { settings.isEnabled(metric) },
+                set: { settings.setEnabled($0, for: metric) })
     }
 
-    private var style: Binding<MetricsEngine.MenuBarStyle> {
-        Binding(get: { engine.styleFor(metric) },
-                set: { engine.setStyle($0, for: metric) })
+    private var style: Binding<MenuBarStyle> {
+        Binding(get: { settings.styleFor(metric) },
+                set: { settings.setStyle($0, for: metric) })
     }
 
     var body: some View {
@@ -305,7 +307,7 @@ private struct MenuBarMetricRow: View {
             if enabled.wrappedValue {
                 // Disk: IO vs Space toggle
                 if metric == .disk {
-                    Picker("", selection: $engine.diskDisplayMode) {
+                    Picker("", selection: $settings.diskDisplayMode) {
                         Text("IO").tag(MetricsEngine.DiskDisplayMode.io)
                         Text("Space").tag(MetricsEngine.DiskDisplayMode.space)
                     }
@@ -315,13 +317,13 @@ private struct MenuBarMetricRow: View {
                 // Sparkline metric picker — which series drives the graph
                 if style.wrappedValue == .sparkline {
                     if metric == .network {
-                        Picker("", selection: $engine.networkSparklineUpload) {
+                        Picker("", selection: $settings.networkSparklineUpload) {
                             Text("↓").tag(false)
                             Text("↑").tag(true)
                         }
                         .labelsHidden().pickerStyle(.segmented).frame(width: 52)
-                    } else if metric == .disk && engine.diskDisplayMode == .io {
-                        Picker("", selection: $engine.diskSparklineWrite) {
+                    } else if metric == .disk && settings.diskDisplayMode == .io {
+                        Picker("", selection: $settings.diskSparklineWrite) {
                             Text("R").tag(false)
                             Text("W").tag(true)
                         }
@@ -330,10 +332,10 @@ private struct MenuBarMetricRow: View {
                 }
 
                 // Style picker — hidden for disk+space (always text)
-                if !(metric == .disk && engine.diskDisplayMode == .space) {
+                if !(metric == .disk && settings.diskDisplayMode == .space) {
                     Picker("", selection: style) {
-                        Text("Text").tag(MetricsEngine.MenuBarStyle.text)
-                        Text("Graph").tag(MetricsEngine.MenuBarStyle.sparkline)
+                        Text("Text").tag(MenuBarStyle.text)
+                        Text("Graph").tag(MenuBarStyle.sparkline)
                     }
                     .labelsHidden().pickerStyle(.segmented).frame(width: 100)
                 }
@@ -481,27 +483,27 @@ private struct UpdatesTab: View {
 // MARK: - Metrics tab
 
 private struct MetricsTab: View {
-    @ObservedObject var engine: MetricsEngine
+    @ObservedObject var settings: SettingsStore
 
     var body: some View {
         VStack(spacing: 16) {
             SettingsSection(icon: "internaldrive", title: "Disk", color: .indigo) {
                 SettingsRow(label: "Show removable volumes") {
-                    Toggle("", isOn: $engine.showRemovableVolumes).labelsHidden()
+                    Toggle("", isOn: $settings.showRemovableVolumes).labelsHidden()
                 }
             }
 
             SettingsSection(icon: "network", title: "Network", color: .green) {
                 SettingsRow(label: "Show public IP") {
-                    Toggle("", isOn: $engine.publicIPEnabled).labelsHidden()
+                    Toggle("", isOn: $settings.publicIPEnabled).labelsHidden()
                 }
-                if engine.publicIPEnabled {
+                if settings.publicIPEnabled {
                     Text("Fetches from api.ipify.org over HTTPS every 5 min.")
                         .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
                 }
                 Divider().padding(.vertical, 4)
                 SettingsRow(label: "Ping server") {
-                    Picker("", selection: $engine.pingServer) {
+                    Picker("", selection: $settings.pingServer) {
                         ForEach(MetricsEngine.PingServer.allCases) { server in
                             Text(server.displayName).tag(server)
                         }
@@ -519,13 +521,7 @@ private struct MetricsTab: View {
 // MARK: - Alerts tab
 
 private struct AlertsTab: View {
-    @ObservedObject var engine: MetricsEngine
-    @ObservedObject private var alerts: AlertService
-
-    init(engine: MetricsEngine) {
-        self.engine = engine
-        self.alerts = engine.alerts
-    }
+    @ObservedObject var alerts: AlertService
 
     var body: some View {
         VStack(spacing: 16) {
@@ -583,7 +579,7 @@ private struct AlertsTab: View {
 // MARK: - Panels tab
 
 private struct PanelsTab: View {
-    @ObservedObject var engine: MetricsEngine
+    @ObservedObject var settings: SettingsStore
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -592,8 +588,8 @@ private struct PanelsTab: View {
                 .padding(.horizontal, 2)
 
             PanelGridPreview(
-                panelOrder: $engine.panelOrder,
-                hiddenPanels: $engine.hiddenPanels
+                panelOrder: $settings.panelOrder,
+                hiddenPanels: $settings.hiddenPanels
             )
         }
         .padding(16)
@@ -719,15 +715,16 @@ private struct PanelMiniCard: View {
 // MARK: - History tab
 
 private struct HistoryTab: View {
-    @ObservedObject var engine: MetricsEngine
+    let engine: MetricsEngine
+    @ObservedObject var settings: SettingsStore
 
     var body: some View {
         VStack(spacing: 16) {
             SettingsSection(icon: "clock.arrow.circlepath", title: "History", color: .purple) {
                 SettingsRow(label: "Save history to disk") {
-                    Toggle("", isOn: $engine.persistHistoryEnabled).labelsHidden()
+                    Toggle("", isOn: $settings.persistHistoryEnabled).labelsHidden()
                 }
-                if engine.persistHistoryEnabled {
+                if settings.persistHistoryEnabled {
                     Divider().padding(.vertical, 4)
                     SettingsRow(label: "Export") {
                         Button("Export CSV…") { engine.exportHistoryCSV() }

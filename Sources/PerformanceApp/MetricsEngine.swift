@@ -68,13 +68,6 @@ final class MetricsEngine: ObservableObject {
     @Published var wifiSSID: String? = nil
     @Published var wifiRSSI: Int? = nil      // dBm, nil when not on WiFi
 
-    @Published var publicIPEnabled: Bool = true {
-        didSet {
-            guard !isLoadingPreferences else { return }
-            if publicIPEnabled { fetchPublicIP() } else { publicIP = nil }
-            UserDefaults.standard.set(publicIPEnabled, forKey: Pref.publicIPEnabled)
-        }
-    }
     @Published var publicIP: String?
     private var lastPublicIPFetch: Date?
     private var pathMonitor: NWPathMonitor?
@@ -84,15 +77,6 @@ final class MetricsEngine: ObservableObject {
     @Published var pingLatencyMs: Double?
     @Published var pingHistory: [Double] = []
     private var pingTimer: Timer?
-
-    @Published var pingServer: PingServer = .apple {
-        didSet {
-            guard !isLoadingPreferences else { return }
-            UserDefaults.standard.set(pingServer.rawValue, forKey: Pref.pingServer)
-            pingHistory = []
-            startPingTimer()
-        }
-    }
 
     @Published var batteryPercent: Int?
     @Published var batteryIsCharging: Bool = false
@@ -151,31 +135,10 @@ final class MetricsEngine: ObservableObject {
 
     let alerts = AlertService()
 
-    @Published var showInDock: Bool = true {
-        didSet {
-            guard !isLoadingPreferences else { return }
-            NSApp.setActivationPolicy(showInDock ? .regular : .accessory)
-            UserDefaults.standard.set(showInDock, forKey: Pref.showInDock)
-        }
-    }
-
-    @Published var topProcessCount: Int = 6 {
-        didSet { UserDefaults.standard.set(topProcessCount, forKey: Pref.topProcessCount) }
-    }
-    @Published var showRemovableVolumes: Bool = true {
-        didSet { UserDefaults.standard.set(showRemovableVolumes, forKey: Pref.showRemovableVolumes) }
-    }
-    @Published var persistHistoryEnabled: Bool = false {
-        didSet { UserDefaults.standard.set(persistHistoryEnabled, forKey: Pref.persistHistoryEnabled) }
-    }
-    private var isLoadingPreferences = false
-    private let historyFileURL: URL = {
-        let dir = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("PerformanceApp", isDirectory: true)
-        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        return dir.appendingPathComponent("history.csv")
-    }()
-    private var historyFileHandle: FileHandle?
+    /// User preferences (persistence + app appearance / activation policy).
+    let settings = SettingsStore()
+    /// On-disk history CSV persistence + export.
+    let history = HistoryStore()
 
     enum Panel: String, CaseIterable, Identifiable, Codable, Transferable, PanelLayoutItem {
         case cpu        = "CPU"
@@ -233,13 +196,6 @@ final class MetricsEngine: ObservableObject {
         PerformanceAppCore.PanelLayout.compute(panels)
     }
 
-    @Published var panelOrder: [Panel] = Panel.allCases {
-        didSet { UserDefaults.standard.set(panelOrder.map(\.rawValue), forKey: Pref.panelOrder) }
-    }
-    @Published var hiddenPanels: Set<Panel> = [] {
-        didSet { UserDefaults.standard.set(Array(hiddenPanels).map(\.rawValue), forKey: Pref.hiddenPanels) }
-    }
-
     enum PingServer: String, CaseIterable, Identifiable {
         case apple      = "apple"
         case cloudflare = "cloudflare"
@@ -267,121 +223,9 @@ final class MetricsEngine: ObservableObject {
         }
     }
 
-    enum MenuBarMetric: String, CaseIterable, Identifiable, Codable, Transferable {
-        case cpu = "CPU"
-        case memory = "Memory"
-        case network = "Network"
-        case disk = "Disk"
-        case gpu = "GPU"
-        var id: String { rawValue }
-        var icon: String {
-            switch self {
-            case .cpu:     return "cpu"
-            case .memory:  return "memorychip"
-            case .network: return "network"
-            case .disk:    return "internaldrive"
-            case .gpu:     return "rectangle.3.group"
-            }
-        }
-        var color: Color {
-            switch self {
-            case .cpu:     return MetricTheme.cpu
-            case .memory:  return MetricTheme.memory
-            case .network: return MetricTheme.networkDown
-            case .disk:    return MetricTheme.disk
-            case .gpu:     return MetricTheme.gpu
-            }
-        }
-        static var transferRepresentation: some TransferRepresentation {
-            ProxyRepresentation(exporting: \.rawValue) { MenuBarMetric(rawValue: $0) ?? .cpu }
-        }
-    }
-
-    enum MenuBarStyle: String, CaseIterable, Identifiable {
-        case sparkline = "Sparkline"
-        case text      = "Text only"
-        var id: String { rawValue }
-    }
-
     enum DiskDisplayMode: String, CaseIterable {
         case io    = "IO"
         case space = "Space"
-    }
-
-    enum AppAppearance: String, CaseIterable, Identifiable {
-        case system = "System", light = "Light", dark = "Dark"
-        var id: String { rawValue }
-    }
-    @Published var appAppearance: AppAppearance = .system {
-        didSet {
-            guard !isLoadingPreferences else { return }
-            UserDefaults.standard.set(appAppearance.rawValue, forKey: "appAppearance")
-            applyAppearance()
-        }
-    }
-    func applyAppearance() {
-        NSApp.appearance = switch appAppearance {
-        case .system: nil
-        case .light:  NSAppearance(named: .aqua)
-        case .dark:   NSAppearance(named: .darkAqua)
-        }
-    }
-
-    var preferredColorScheme: ColorScheme? {
-        switch appAppearance {
-        case .system: return nil
-        case .light:  return .light
-        case .dark:   return .dark
-        }
-    }
-
-    struct MenuBarConfig {
-        var enabled: Bool
-        var style: MenuBarStyle
-    }
-
-    // Single source of truth for all per-metric menu bar config.
-    // CPU on/sparkline by default; all others off.
-    @Published var menuBarConfig: [MenuBarMetric: MenuBarConfig] = {
-        Dictionary(uniqueKeysWithValues: MenuBarMetric.allCases.map {
-            ($0, MenuBarConfig(enabled: $0 == .cpu, style: .sparkline))
-        })
-    }()
-
-    @Published var menuBarOrder: [MenuBarMetric] = MenuBarMetric.allCases {
-        didSet { UserDefaults.standard.set(menuBarOrder.map(\.rawValue), forKey: "menuBarOrder") }
-    }
-
-    @Published var diskDisplayMode: DiskDisplayMode = .io {
-        didSet { UserDefaults.standard.set(diskDisplayMode.rawValue, forKey: "diskDisplayMode") }
-    }
-
-    @Published var networkSparklineUpload: Bool = false {
-        didSet { UserDefaults.standard.set(networkSparklineUpload, forKey: "networkSparklineUpload") }
-    }
-
-    @Published var diskSparklineWrite: Bool = false {
-        didSet { UserDefaults.standard.set(diskSparklineWrite, forKey: "diskSparklineWrite") }
-    }
-
-    func isEnabled(_ metric: MenuBarMetric) -> Bool { menuBarConfig[metric]?.enabled ?? false }
-    func styleFor(_ metric: MenuBarMetric) -> MenuBarStyle { menuBarConfig[metric]?.style ?? .sparkline }
-
-    func setEnabled(_ enabled: Bool, for metric: MenuBarMetric) {
-        menuBarConfig[metric, default: MenuBarConfig(enabled: false, style: .sparkline)].enabled = enabled
-        UserDefaults.standard.set(enabled, forKey: "extraBar.\(metric.rawValue.lowercased())")
-    }
-    func setStyle(_ style: MenuBarStyle, for metric: MenuBarMetric) {
-        menuBarConfig[metric, default: MenuBarConfig(enabled: false, style: .sparkline)].style = style
-        UserDefaults.standard.set(style.rawValue, forKey: "extraStyle.\(metric.rawValue.lowercased())")
-    }
-
-    @Published var refreshInterval: Double = 1.0 {
-        didSet {
-            guard !isLoadingPreferences else { return }
-            restartTimer()
-            UserDefaults.standard.set(refreshInterval, forKey: Pref.refreshInterval)
-        }
     }
 
     private let historyLimit = 300 // ~5 min at 1s interval
@@ -407,8 +251,8 @@ final class MetricsEngine: ObservableObject {
         switch metric {
         case .cpu:     return Array(cpuHistory.suffix(30))
         case .memory:  return Array(memoryHistory.suffix(30))
-        case .network: return Array((networkSparklineUpload ? uploadHistory : downloadHistory).suffix(30))
-        case .disk:    return Array((diskSparklineWrite ? diskWriteHistory : diskReadHistory).suffix(30))
+        case .network: return Array((settings.networkSparklineUpload ? uploadHistory : downloadHistory).suffix(30))
+        case .disk:    return Array((settings.diskSparklineWrite ? diskWriteHistory : diskReadHistory).suffix(30))
         case .gpu:     return Array(gpuHistory.suffix(30))
         }
     }
@@ -421,8 +265,8 @@ final class MetricsEngine: ObservableObject {
         switch metric {
         case .cpu:     return String(format: "%.0f%%", cpuUsagePercent)
         case .memory:  return String(format: "%.1fG", memoryUsedGB)
-        case .network: return formatNetSpeed(networkSparklineUpload ? uploadSpeedKBps : downloadSpeedKBps)
-        case .disk:    return String(format: "%.0fK", diskSparklineWrite ? diskWriteKBps : diskReadKBps)
+        case .network: return formatNetSpeed(settings.networkSparklineUpload ? uploadSpeedKBps : downloadSpeedKBps)
+        case .disk:    return String(format: "%.0fK", settings.diskSparklineWrite ? diskWriteKBps : diskReadKBps)
         case .gpu:     return String(format: "%.0f%%", gpuUsagePercent)
         }
     }
@@ -432,7 +276,7 @@ final class MetricsEngine: ObservableObject {
         case .cpu:     return String(format: "CPU %.0f%%", cpuUsagePercent)
         case .memory:  return String(format: "MEM %.1fG", memoryUsedGB)
         case .network: return "↓\(formatNetSpeed(downloadSpeedKBps)) ↑\(formatNetSpeed(uploadSpeedKBps))"
-        case .disk:    return diskDisplayMode == .io
+        case .disk:    return settings.diskDisplayMode == .io
                            ? String(format: "R %.0fK W %.0fK", diskReadKBps, diskWriteKBps)
                            : String(format: "DSK %.1fG", diskFreeGB)
         case .gpu:     return String(format: "GPU %.0f%%", gpuUsagePercent)
@@ -461,17 +305,29 @@ final class MetricsEngine: ObservableObject {
             forName: NSWorkspace.didUnmountNotification,
             object: nil, queue: .main
         ) { [weak self] _ in Task { @MainActor in self?.updateVolumes() } }
+        // Preference side-effects that require engine action. SettingsStore has
+        // already loaded persisted values in its own init; these fire only on
+        // subsequent user changes (the load path is guarded).
+        settings.onRefreshIntervalChanged = { [weak self] in self?.restartTimer() }
+        settings.onPingServerChanged = { [weak self] in
+            self?.pingHistory = []
+            self?.startPingTimer()
+        }
+        settings.onPublicIPEnabledChanged = { [weak self] enabled in
+            if enabled { self?.fetchPublicIP() } else { self?.publicIP = nil }
+        }
+        alerts.loadPreferences()
+
         updateGPUInfo()
         readCoreClusterCounts()
         updateDisplays()
         updateVolumes()
         startPathMonitor()
         startPingTimer()
-        loadPreferences()
-        if publicIPEnabled { fetchPublicIP() }
+        if settings.publicIPEnabled { fetchPublicIP() }
         refresh()
         restartTimer()
-        extraBarController = ExtraMenuBarController(engine: self)
+        extraBarController = ExtraMenuBarController(engine: self, settings: settings)
     }
 
     private func startPingTimer() {
@@ -483,7 +339,7 @@ final class MetricsEngine: ObservableObject {
     }
 
     private func performLatencyCheck() {
-        guard let url = URL(string: pingServer.urlString) else { return }
+        guard let url = URL(string: settings.pingServer.urlString) else { return }
         var request = URLRequest(url: url)
         request.httpMethod = "HEAD"
         request.timeoutInterval = 4
@@ -573,7 +429,7 @@ final class MetricsEngine: ObservableObject {
 
     private func restartTimer() {
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: refreshInterval, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: settings.refreshInterval, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.refresh() }
         }
     }
@@ -591,9 +447,14 @@ final class MetricsEngine: ObservableObject {
         updateGPUUsage()
         updateSMC()
         checkAlerts()
-        appendPersistedHistoryRow()
+        history.append(enabled: settings.persistHistoryEnabled,
+                       cpu: cpuUsagePercent,
+                       memory: memoryUsedGB,
+                       download: downloadSpeedKBps,
+                       upload: uploadSpeedKBps,
+                       diskFree: diskFreeGB)
 
-        if publicIPEnabled, lastPublicIPFetch.map({ Date().timeIntervalSince($0) > 300 }) ?? true {
+        if settings.publicIPEnabled, lastPublicIPFetch.map({ Date().timeIntervalSince($0) > 300 }) ?? true {
             fetchPublicIP()
         }
     }
@@ -926,7 +787,7 @@ final class MetricsEngine: ObservableObject {
         task.standardOutput = outPipe
         task.standardError = Pipe()
 
-        let capturedCount = topProcessCount
+        let capturedCount = settings.topProcessCount
         task.terminationHandler = { [weak self] _ in
             let data = outPipe.fileHandleForReading.readDataToEndOfFile()
             let output = String(data: data, encoding: .utf8) ?? ""
@@ -1011,7 +872,7 @@ final class MetricsEngine: ObservableObject {
                                 list.append(ProcessUsage(pid: 0, name: displayName.isEmpty ? name : displayName, value: kbps))
                             }
                         }
-                        self.topNetworkProcesses = Array(list.sorted { $0.value > $1.value }.prefix(self.topProcessCount))
+                        self.topNetworkProcesses = Array(list.sorted { $0.value > $1.value }.prefix(self.settings.topProcessCount))
                     }
                 }
                 self.previousProcessNetBytes = current
@@ -1044,109 +905,17 @@ final class MetricsEngine: ObservableObject {
                      diskFree: diskFreeGB, gpu: gpuUsagePercent, thermal: thermalState)
     }
 
-    // MARK: - History persistence
+    // MARK: - History export
 
-    private func appendPersistedHistoryRow() {
-        guard persistHistoryEnabled else { return }
-
-        if historyFileHandle == nil {
-            if !FileManager.default.fileExists(atPath: historyFileURL.path) {
-                let header = "timestamp,cpu_percent,memory_gb,download_kbps,upload_kbps,disk_free_gb\n"
-                try? header.write(to: historyFileURL, atomically: true, encoding: .utf8)
-            }
-            historyFileHandle = try? FileHandle(forWritingTo: historyFileURL)
-            historyFileHandle?.seekToEndOfFile()
-        }
-
-        let row = "\(Date().timeIntervalSince1970),\(cpuUsagePercent),\(memoryUsedGB),\(downloadSpeedKBps),\(uploadSpeedKBps),\(diskFreeGB)\n"
-        if let data = row.data(using: .utf8) {
-            historyFileHandle?.write(data)
-        }
-    }
-
-    // MARK: - Preferences persistence
-
-    private enum Pref {
-        static let showInDock               = "showInDock"
-        static let refreshInterval          = "refreshInterval"
-        static let topProcessCount          = "topProcessCount"
-        static let showRemovableVolumes     = "showRemovableVolumes"
-        static let persistHistoryEnabled    = "persistHistoryEnabled"
-        static let publicIPEnabled          = "publicIPEnabled"
-        static let menuBarMetric            = "menuBarMetric"
-        static let menuBarStyle             = "menuBarStyle"
-        static let panelOrder               = "panelOrder"
-        static let hiddenPanels             = "hiddenPanels"
-        static let pingServer               = "pingServer"
-    }
-
-    private func loadPreferences() {
-        isLoadingPreferences = true
-        defer {
-            isLoadingPreferences = false
-            NSApp.setActivationPolicy(showInDock ? .regular : .accessory)
-            applyAppearance()
-        }
-        let ud = UserDefaults.standard
-        func bool(_ k: String) -> Bool?   { ud.object(forKey: k) != nil ? ud.bool(forKey: k) : nil }
-        func dbl(_ k: String)  -> Double? { ud.object(forKey: k) != nil ? ud.double(forKey: k) : nil }
-        func int_(_ k: String) -> Int?    { ud.object(forKey: k) != nil ? ud.integer(forKey: k) : nil }
-
-        if let v = bool(Pref.showInDock)               { showInDock = v }
-        if let v = bool(Pref.publicIPEnabled)           { publicIPEnabled = v }
-        if let v = bool(Pref.showRemovableVolumes)      { showRemovableVolumes = v }
-        if let v = bool(Pref.persistHistoryEnabled)     { persistHistoryEnabled = v }
-        alerts.loadPreferences()
-        if let v = dbl(Pref.refreshInterval)            { refreshInterval = v }
-        if let v = int_(Pref.topProcessCount)           { topProcessCount = v }
-        if let v = ud.string(forKey: Pref.pingServer)     { pingServer = PingServer(rawValue: v) ?? .apple }
-        if let raw = ud.stringArray(forKey: "menuBarOrder") {
-            let loaded = raw.compactMap { MenuBarMetric(rawValue: $0) }
-            let missing = MenuBarMetric.allCases.filter { !loaded.contains($0) }
-            menuBarOrder = loaded + missing
-        }
-        if let dm = DiskDisplayMode(rawValue: ud.string(forKey: "diskDisplayMode") ?? "") {
-            diskDisplayMode = dm
-        }
-        if let a = AppAppearance(rawValue: ud.string(forKey: "appAppearance") ?? "") {
-            appAppearance = a
-        }
-        networkSparklineUpload = ud.bool(forKey: "networkSparklineUpload")
-        diskSparklineWrite     = ud.bool(forKey: "diskSparklineWrite")
-
-        if let raw = ud.stringArray(forKey: Pref.panelOrder) {
-            let loaded = raw.compactMap { Panel(rawValue: $0) }
-            let missing = Panel.allCases.filter { !loaded.contains($0) }
-            panelOrder = loaded + missing
-        }
-        if let raw = ud.stringArray(forKey: Pref.hiddenPanels) {
-            hiddenPanels = Set(raw.compactMap { Panel(rawValue: $0) })
-        }
-        for metric in MenuBarMetric.allCases {
-            let key = metric.rawValue.lowercased()
-            let enabled = ud.object(forKey: "extraBar.\(key)") != nil ? ud.bool(forKey: "extraBar.\(key)") : (metric == .cpu)
-            let style   = MenuBarStyle(rawValue: ud.string(forKey: "extraStyle.\(key)") ?? "") ?? .sparkline
-            menuBarConfig[metric] = MenuBarConfig(enabled: enabled, style: style)
-        }
-    }
-
+    /// Thin wrapper delegating to HistoryStore with the engine's in-memory
+    /// ring buffers. Kept on the engine so existing call sites are unchanged.
     func exportHistoryCSV() {
-        let panel = NSSavePanel()
-        panel.allowedContentTypes = [.commaSeparatedText]
-        panel.nameFieldStringValue = "performance-history.csv"
-        guard panel.runModal() == .OK, let url = panel.url else { return }
-
-        var csv = "timestamp,cpu_percent,memory_gb,download_kbps,upload_kbps,disk_read_kbps,disk_write_kbps\n"
-        let count = cpuHistory.count
-        for i in 0..<count {
-            let mem = i < memoryHistory.count ? memoryHistory[i] : 0
-            let down = i < downloadHistory.count ? downloadHistory[i] : 0
-            let up = i < uploadHistory.count ? uploadHistory[i] : 0
-            let dr = i < diskReadHistory.count ? diskReadHistory[i] : 0
-            let dw = i < diskWriteHistory.count ? diskWriteHistory[i] : 0
-            csv += "\(i),\(cpuHistory[i]),\(mem),\(down),\(up),\(dr),\(dw)\n"
-        }
-        try? csv.write(to: url, atomically: true, encoding: .utf8)
+        history.exportCSV(cpu: cpuHistory,
+                          memory: memoryHistory,
+                          download: downloadHistory,
+                          upload: uploadHistory,
+                          diskRead: diskReadHistory,
+                          diskWrite: diskWriteHistory)
     }
 
     // MARK: - Battery / Power
@@ -1511,84 +1280,10 @@ final class MetricsEngine: ObservableObject {
 
 }
 
-struct DisplayInfo: Identifiable {
-    let id: Int
-    let name: String
-    let width: Int
-    let height: Int
-    let refreshRateHz: Int
-    let scaleFactor: Double
-    let isMain: Bool
-    let isBuiltIn: Bool
-    var colorProfile: String = ""
-    var trueTone: Bool = false
-    var connectionType: String = ""
-}
-
-
-struct VolumeInfo: Identifiable {
-    let name: String
-    let totalGB: Double
-    let freeGB: Double
-    let isRemovable: Bool
-    var id: String { name }
-}
-
-struct LocalInterface: Identifiable {
-    enum Kind { case wifi, ethernet, vpn, other }
-    let name: String
-    let address: String
-    let kind: Kind
-    var isPrimary: Bool = false
-    var prefixLength: Int? = nil
-    var networkAddress: String? = nil
-    var gateway: String? = nil
-    var subnetMask: String? {
-        SubnetMask.string(forPrefixLength: prefixLength)
-    }
-    var id: String { name }
-
-    var icon: String {
-        switch kind {
-        case .wifi:     return "wifi"
-        case .ethernet: return "cable.connector"
-        case .vpn:      return "lock.shield.fill"
-        case .other:    return "network"
-        }
-    }
-
-    var displayName: String {
-        switch kind {
-        case .wifi:     return "Wi-Fi"
-        case .ethernet: return "Ethernet"
-        case .vpn:      return "VPN"
-        case .other:    return name
-        }
-    }
-}
-
 private extension Double {
     func clamped(to range: ClosedRange<Double>) -> Double {
         Swift.min(Swift.max(self, range.lowerBound), range.upperBound)
     }
-}
-
-struct ProcessUsage: Identifiable {
-    let pid: Int32
-    let name: String
-    let value: Double
-    var id: String { "\(pid)-\(name)" }
-}
-
-struct BluetoothDevice: Identifiable {
-    let id: String
-    let name: String
-    let isConnected: Bool
-    let batteryPercent: Int?    // primary / overall; for earbuds = min(L, R)
-    let batteryLeft: Int?       // AirPods left earbud
-    let batteryRight: Int?      // AirPods right earbud
-    let batteryCase: Int?       // AirPods case
-    let icon: String
 }
 
 // NSObject subclass required for CBCentralManagerDelegate conformance.

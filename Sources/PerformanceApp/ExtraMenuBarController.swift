@@ -9,6 +9,7 @@ import Carbon
 @MainActor
 final class ExtraMenuBarController: NSObject {
     private weak var engine: MetricsEngine?
+    private let settings: SettingsStore
     private var statusItem: NSStatusItem?
     private var sharedPopover: NSPopover?
     private var cancellables: Set<AnyCancellable> = []
@@ -28,16 +29,16 @@ final class ExtraMenuBarController: NSObject {
     ]
 
     // Widest string each metric/style combo will ever produce, used to fix slot widths.
-    private static let maxTextLabel: [MetricsEngine.MenuBarMetric: String] = [
+    private static let maxTextLabel: [MenuBarMetric: String] = [
         .cpu: "CPU 100%", .memory: "MEM 16.0G",
         .network: "↓9.9m ↑9.9m", .disk: "R 9999K W 9999K", .gpu: "GPU 100%"
     ]
     private static let maxTextLabelDiskSpace = "DSK 16.0G"
-    private static let maxSparkLabel: [MetricsEngine.MenuBarMetric: String] = [
+    private static let maxSparkLabel: [MenuBarMetric: String] = [
         .cpu: "100%", .memory: "16.0G", .network: "9.9m", .disk: "16.0G", .gpu: "100%"
     ]
     // Pre-measured widths so NSString.size() is never called at render time.
-    private static let textSlotW: [MetricsEngine.MenuBarMetric: CGFloat] = {
+    private static let textSlotW: [MenuBarMetric: CGFloat] = {
         let a = attrs
         var d = Dictionary(uniqueKeysWithValues: maxTextLabel.map { metric, s in
             (metric, ceil((s as NSString).size(withAttributes: a).width))
@@ -45,21 +46,24 @@ final class ExtraMenuBarController: NSObject {
         d[.disk] = max(d[.disk] ?? 0, ceil((maxTextLabelDiskSpace as NSString).size(withAttributes: a).width))
         return d
     }()
-    private static let sparkSlotW: [MetricsEngine.MenuBarMetric: CGFloat] = {
+    private static let sparkSlotW: [MenuBarMetric: CGFloat] = {
         let a = attrs
         return Dictionary(uniqueKeysWithValues: maxSparkLabel.map { metric, s in
             (metric, ceil((s as NSString).size(withAttributes: a).width))
         })
     }()
 
-    init(engine: MetricsEngine) {
+    init(engine: MetricsEngine, settings: SettingsStore) {
         self.engine = engine
+        self.settings = settings
         super.init()
         createStatusItem()
 
-        // Re-render on metric/config changes, debounced so a single tick that updates
-        // many @Published vars only triggers one draw pass.
+        // Re-render on metric ticks (engine) AND on menu-bar config / appearance
+        // changes (settings), debounced so a burst of @Published updates triggers
+        // only one draw pass.
         engine.objectWillChange
+            .merge(with: settings.objectWillChange)
             .debounce(for: .milliseconds(32), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 self?.render()
@@ -127,26 +131,26 @@ final class ExtraMenuBarController: NSObject {
 
     private func render() {
         guard let engine else { return }
-        let images = engine.menuBarOrder
-            .filter { engine.isEnabled($0) }
-            .map { makeImage(for: $0, style: engine.styleFor($0), engine: engine) }
+        let images = settings.menuBarOrder
+            .filter { settings.isEnabled($0) }
+            .map { makeImage(for: $0, style: settings.styleFor($0), engine: engine) }
         statusItem?.button?.image = images.isEmpty ? nil : combinedImage(from: images)
     }
 
-    private func makeImage(for metric: MetricsEngine.MenuBarMetric,
-                           style: MetricsEngine.MenuBarStyle,
+    private func makeImage(for metric: MenuBarMetric,
+                           style: MenuBarStyle,
                            engine: MetricsEngine) -> NSImage {
         let h: CGFloat = 16
         let attrs = Self.attrs
 
         // Disk in Space mode is always rendered as text — no sparkline applies.
-        let effectiveStyle: MetricsEngine.MenuBarStyle =
-            (metric == .disk && engine.diskDisplayMode == .space) ? .text : style
+        let effectiveStyle: MenuBarStyle =
+            (metric == .disk && settings.diskDisplayMode == .space) ? .text : style
 
         switch effectiveStyle {
         case .text:
             let text   = engine.textOnlyLabel(for: metric)
-            let fixedW = (metric == .disk && engine.diskDisplayMode == .space)
+            let fixedW = (metric == .disk && settings.diskDisplayMode == .space)
                 ? Self.textSlotW[.disk]! // disk-space slot pre-measured from "DSK 16.0G"
                 : Self.textSlotW[metric] ?? ceil((text as NSString).size(withAttributes: attrs).width)
             let sz     = (text as NSString).size(withAttributes: attrs)
@@ -225,8 +229,7 @@ final class ExtraMenuBarController: NSObject {
     }
 
     private func syncPopoverAppearance() {
-        guard let engine else { return }
-        sharedPopover?.appearance = switch engine.appAppearance {
+        sharedPopover?.appearance = switch settings.appAppearance {
         case .system: nil
         case .light:  NSAppearance(named: .aqua)
         case .dark:   NSAppearance(named: .darkAqua)

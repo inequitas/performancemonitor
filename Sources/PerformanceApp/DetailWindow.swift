@@ -28,7 +28,7 @@ struct DetailWindow: View {
         .navigationTitle(kind.title)
         .background(.regularMaterial)
         .background(WindowFloatAccessor(engine: engine))
-        .preferredColorScheme(engine.preferredColorScheme)
+        .preferredColorScheme(engine.settings.preferredColorScheme)
     }
 }
 
@@ -254,7 +254,7 @@ private struct ProcessListView: View {
                     .foregroundStyle(color)
                 Spacer()
                 Button {
-                    if !paused { frozenList = Array(processes.prefix(engine.topProcessCount)) }
+                    if !paused { frozenList = Array(processes.prefix(engine.settings.topProcessCount)) }
                     paused.toggle()
                 } label: {
                     Image(systemName: paused ? "play.circle.fill" : "pause.circle")
@@ -269,7 +269,7 @@ private struct ProcessListView: View {
                 Text(paused ? "No data captured." : "Loading…")
                     .font(.caption).foregroundStyle(.secondary)
             } else {
-                ForEach(displayed.prefix(engine.topProcessCount)) { proc in
+                ForEach(displayed.prefix(engine.settings.topProcessCount)) { proc in
                     HStack(spacing: 6) {
                         Text(proc.name)
                             .font(.caption)
@@ -680,7 +680,7 @@ struct DiskDetailView: View {
                                 .foregroundStyle(ok ? .green : .red)
                         }
                     }
-                    let visibleVolumes = engine.volumes.filter { engine.showRemovableVolumes || !$0.isRemovable }
+                    let visibleVolumes = engine.volumes.filter { engine.settings.showRemovableVolumes || !$0.isRemovable }
                     ForEach(visibleVolumes) { volume in
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
@@ -1378,7 +1378,7 @@ private struct WindowFloatAccessor: NSViewRepresentable {
                 queue: .main
             ) { [weak engine] _ in
                 Task { @MainActor in
-                    guard let engine, !engine.showInDock else { return }
+                    guard let engine, !engine.settings.showInDock else { return }
                     if !NSApp.hasOtherVisibleTitledWindow(besides: window) {
                         NSApp.setActivationPolicy(.accessory)
                     }
