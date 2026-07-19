@@ -2,7 +2,14 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9-orange) ![Version](https://img.shields.io/badge/version-0.3.13-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-0.3.13-lightgrey)
+
+---
+
+## Requirements
+
+- **Apple Silicon (M1 or later)** — this build is arm64-only and will not run on Intel Macs
+- **macOS 14 (Sonoma) or later**
 
 ---
 
@@ -76,7 +83,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
 ## Building from Source
 
-Requires Xcode Command Line Tools and Swift 5.9+.
+Requires an Apple Silicon Mac, Xcode Command Line Tools, and Swift 5.10+.
 
 ```bash
 git clone https://github.com/inequitas/performancemonitor.git

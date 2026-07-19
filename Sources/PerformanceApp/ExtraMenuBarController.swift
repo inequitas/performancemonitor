@@ -131,10 +131,20 @@ final class ExtraMenuBarController: NSObject {
 
     private func render() {
         guard let engine else { return }
-        let images = settings.menuBarOrder
-            .filter { settings.isEnabled($0) }
-            .map { makeImage(for: $0, style: settings.styleFor($0), engine: engine) }
+        let enabledMetrics = settings.menuBarOrder.filter { settings.isEnabled($0) }
+        let images = enabledMetrics.map { makeImage(for: $0, style: settings.styleFor($0), engine: engine) }
         statusItem?.button?.image = images.isEmpty ? nil : combinedImage(from: images)
+        statusItem?.button?.setAccessibilityLabel(accessibilityLabel(for: enabledMetrics, engine: engine))
+    }
+
+    // VoiceOver reads the icon-drawn image as nothing meaningful on its own, so the
+    // status item needs an explicit label describing the actual current values —
+    // e.g. "Performance Monitor: CPU 32%, Memory 61%". Rebuilt on every render pass
+    // (already debounced), so it always reflects what's currently on screen.
+    private func accessibilityLabel(for metrics: [MenuBarMetric], engine: MetricsEngine) -> String {
+        guard !metrics.isEmpty else { return "Performance Monitor" }
+        let parts = metrics.map { engine.textOnlyLabel(for: $0) }
+        return "Performance Monitor: " + parts.joined(separator: ", ")
     }
 
     private func makeImage(for metric: MenuBarMetric,

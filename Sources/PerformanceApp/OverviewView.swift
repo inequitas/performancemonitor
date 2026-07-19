@@ -202,7 +202,7 @@ private struct OverviewCard: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                         .frame(maxWidth: .infinity, alignment: .center)
-                    MetricChart(values: history, unit: unit, fixedMax: fixedMax, showAxes: false, color: color, style: .area, valueFormatter: valueFormatter)
+                    MetricChart(values: history, unit: unit, fixedMax: fixedMax, showAxes: false, color: color, style: .area, accessibilityDescription: "\(title) history", valueFormatter: valueFormatter)
                         .frame(height: 46)
                 }
             }
@@ -243,7 +243,7 @@ private struct ThermalCard: View {
                         tempRow("battery.75percent", "Bat", t)
                     }
                     HStack(spacing: 4) {
-                        Circle().fill(state.color).frame(width: 7, height: 7)
+                        Circle().fill(state.color).frame(width: 7, height: 7).accessibilityHidden(true)
                         Text(state.label).font(.caption2).foregroundStyle(.secondary)
                     }
                     .padding(.top, 1)
@@ -267,6 +267,17 @@ private struct ThermalCard: View {
         }
     }
 
+    // Mirrors tempColor's thresholds in words, so the severity conveyed by
+    // colour alone is also available to VoiceOver / colour-blind users.
+    private func tempSeverityWord(_ celsius: Double) -> String {
+        switch celsius {
+        case ..<60:  return "normal"
+        case ..<80:  return "warm"
+        case ..<95:  return "hot"
+        default:     return "critical"
+        }
+    }
+
     private func tempRow(_ icon: String, _ label: String, _ celsius: Double) -> some View {
         let color = tempColor(celsius)
         return HStack(spacing: 5) {
@@ -282,6 +293,9 @@ private struct ThermalCard: View {
                 .font(.caption.monospacedDigit().weight(.semibold))
                 .foregroundStyle(color)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue("\(Int(celsius.rounded()))°C, \(tempSeverityWord(celsius))")
     }
 }
 
@@ -371,9 +385,9 @@ private struct DiskButterflyChart: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            MetricChart(values: readHistory, fixedMax: sharedMax, showAxes: false, fillFrame: true, color: readColor, style: .area) { _ in "" }
+            MetricChart(values: readHistory, fixedMax: sharedMax, showAxes: false, fillFrame: true, color: readColor, style: .area, accessibilityDescription: "Disk read speed history", valueFormatter: formatSpeedCompact)
             Color.primary.opacity(0.25).frame(height: 1)
-            MetricChart(values: writeHistory, fixedMax: sharedMax, showAxes: false, fillFrame: true, color: writeColor, style: .area) { _ in "" }
+            MetricChart(values: writeHistory, fixedMax: sharedMax, showAxes: false, fillFrame: true, color: writeColor, style: .area, accessibilityDescription: "Disk write speed history", valueFormatter: formatSpeedCompact)
                 .scaleEffect(y: -1)
         }
     }
@@ -394,6 +408,13 @@ private struct BatteryCard: View {
         if percent < 20 { return .red }
         if percent < 50 { return .orange }
         return .green
+    }
+
+    // Only the number's colour flags a low battery today — say it in words too.
+    private var batteryAccessibilityValue: String {
+        guard !isCharging else { return "\(percent) percent, charging" }
+        if percent < 20 { return "\(percent) percent, low battery" }
+        return "\(percent) percent"
     }
 
     // Time + wattage detail; nil when there's nothing meaningful to show
@@ -426,6 +447,7 @@ private struct BatteryCard: View {
                     Text("\(percent)%")
                         .font(.system(.body, design: .rounded)).fontWeight(.semibold)
                         .frame(maxWidth: .infinity, alignment: .center)
+                        .accessibilityValue(batteryAccessibilityValue)
                     Text(isCharging ? "Charging" : "On Battery")
                         .font(.caption2).fontWeight(.medium)
                         .foregroundStyle(isCharging ? .green : .secondary)
@@ -499,7 +521,8 @@ private struct GPUCard: View {
                         .font(.system(.body, design: .rounded)).fontWeight(.semibold)
                         .frame(maxWidth: .infinity, alignment: .center)
                     MetricChart(values: history, unit: "%", fixedMax: 100,
-                                showAxes: false, color: .cyan, style: .area)
+                                showAxes: false, color: .cyan, style: .area,
+                                accessibilityDescription: "GPU usage history") { String(format: "%.0f%%", $0) }
                         .frame(height: 46)
                 case .gauge:
                     HStack {
@@ -559,6 +582,9 @@ private struct NetworkOverviewCard: View {
                     .foregroundStyle(engine.isVPNActive
                         ? (engine.vpnIsFortiClient ? Color.blue : Color.green)
                         : Color.secondary)
+                    .accessibilityLabel(engine.isVPNActive
+                        ? (engine.vpnIsFortiClient ? "VPN active, FortiClient" : "VPN active")
+                        : "VPN inactive")
                 Spacer()
                 HStack(spacing: 5) {
                     let visibleIfaces = engine.localInterfaces.filter { $0.kind != .vpn }
@@ -566,11 +592,15 @@ private struct NetworkOverviewCard: View {
                         Image(systemName: "network")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(.green)
+                            .accessibilityLabel("Connected")
                     } else {
                         ForEach(visibleIfaces) { iface in
                             Image(systemName: iface.icon)
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(iface.isPrimary ? Color.green : Color.primary)
+                                .accessibilityLabel(iface.isPrimary
+                                    ? "\(iface.displayName), primary connection"
+                                    : iface.displayName)
                         }
                     }
                 }
@@ -585,6 +615,7 @@ private struct NetworkOverviewCard: View {
                 Circle()
                     .fill(engine.isConnected ? Color.green : Color.red)
                     .frame(width: 7, height: 7)
+                    .accessibilityLabel(engine.isConnected ? "Connected" : "Disconnected")
                 Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
             }
 
@@ -654,6 +685,9 @@ struct BluetoothOverviewCard: View {
                                 Image(systemName: batterySystemImage(pct)).font(.caption2).foregroundStyle(pct < 20 ? .red : pct < 40 ? .orange : .green)
                                 Text("\(pct)%").font(.caption.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
                             }
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel("Battery")
+                            .accessibilityValue(pct < 20 ? "\(pct) percent, low" : "\(pct) percent")
                         }
                     }
                 }

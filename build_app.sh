@@ -8,8 +8,17 @@ BUILD_DIR=".build/release"
 APP_DIR="dist/${APP_NAME}.app"
 VERSION="$(cat VERSION | tr -d '[:space:]')"
 
-echo "Building release binary..."
-swift build -c release
+echo "Building release binary (arm64-only)..."
+swift build -c release --arch arm64
+
+# This app targets Apple Silicon exclusively (no Intel fallback, no dependencies
+# that need a universal slice). Guard against an accidental universal/x86_64
+# build slipping into a release artifact.
+BUILT_ARCHS="$(lipo -archs "${BUILD_DIR}/PerformanceApp")"
+if [ "${BUILT_ARCHS}" != "arm64" ]; then
+    echo "ERROR: expected an arm64-only binary, got architectures: ${BUILT_ARCHS}"
+    exit 1
+fi
 
 echo "Assembling .app bundle..."
 rm -rf "dist"

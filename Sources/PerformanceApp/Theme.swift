@@ -57,4 +57,15 @@ enum MetricTheme {
         case .critical: return .red
         }
     }
+
+    // Word form of the same severity bucket `sensorTempColor` renders as a colour,
+    // so VoiceOver / colour-blind users get the same signal as the colour conveys.
+    static func sensorTempSeverityWord(_ celsius: Double, category: String) -> String {
+        switch TempSeverityMapper.severity(celsius: celsius, category: category) {
+        case .normal:   return "normal"
+        case .warning:  return "warning"
+        case .elevated: return "elevated"
+        case .critical: return "critical"
+        }
+    }
 }

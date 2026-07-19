@@ -40,7 +40,12 @@ struct MetricChart: View {
     /// Use this for butterfly halves whose external label columns must align with the chart scale.
     let fillFrame: Bool
 
-    init(values: [Double], unit: String = "", fixedMax: Double? = nil, showAxes: Bool = true, showGridLines: Bool = false, fillFrame: Bool = false, color: Color = .accentColor, style: ChartDisplayStyle = .area, valueFormatter: @escaping (Double) -> String = { String(format: "%.1f", $0) }) {
+    /// What VoiceOver announces for this chart, e.g. "CPU usage". When empty, the chart
+    /// is treated as decorative (paired with a visible value elsewhere) and hidden from
+    /// the accessibility tree instead of announcing per-data-point marks.
+    let accessibilityDescription: String
+
+    init(values: [Double], unit: String = "", fixedMax: Double? = nil, showAxes: Bool = true, showGridLines: Bool = false, fillFrame: Bool = false, color: Color = .accentColor, style: ChartDisplayStyle = .area, accessibilityDescription: String = "", valueFormatter: @escaping (Double) -> String = { String(format: "%.1f", $0) }) {
         self.values = values
         self.unit = unit
         self.fixedMax = fixedMax
@@ -49,6 +54,7 @@ struct MetricChart: View {
         self.fillFrame = fillFrame
         self.color = color
         self.style = style
+        self.accessibilityDescription = accessibilityDescription
         self.valueFormatter = valueFormatter
     }
 
@@ -127,5 +133,14 @@ struct MetricChart: View {
                 AxisMarks { _ in }
             }
         }
+        // Collapse the chart into one accessibility element with a plain-language
+        // summary instead of Swift Charts' default (a separate element per data
+        // point, which VoiceOver reads as a long, low-signal list). When no
+        // description is given, the chart is purely decorative — its value is
+        // already shown as text next to it — so hide it entirely instead.
+        .accessibilityElement(children: .ignore)
+        .accessibilityHidden(accessibilityDescription.isEmpty)
+        .accessibilityLabel(accessibilityDescription)
+        .accessibilityValue("\(valueFormatter(currentValue)) currently, range 0 to \(valueFormatter(upperBound))")
     }
 }

@@ -79,6 +79,9 @@ struct EarbudBatteryPill: View {
             Text(label).font(.caption2).foregroundStyle(.tertiary)
             Text("\(pct)%").font(.caption2.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(label)
+        .accessibilityValue(pct < 20 ? "\(pct) percent, low battery" : "\(pct) percent")
     }
 }
 
@@ -168,10 +171,10 @@ struct NetworkButterflyChart: View {
                 }
                 .frame(width: 56)
                 VStack(spacing: 0) {
-                    MetricChart(values: downloadHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkDown, style: .area) { formatSpeed($0) }
+                    MetricChart(values: downloadHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkDown, style: .area, accessibilityDescription: "Download speed history") { formatSpeed($0) }
                         .frame(height: 90)
                     Color.primary.opacity(0.25).frame(height: 1).frame(height: 14)
-                    MetricChart(values: uploadHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkUp, style: .area) { formatSpeed($0) }
+                    MetricChart(values: uploadHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkUp, style: .area, accessibilityDescription: "Upload speed history") { formatSpeed($0) }
                         .frame(height: 90)
                         .scaleEffect(y: -1)
                 }
@@ -334,7 +337,7 @@ struct CPUDetailView: View {
                     Text(String(format: "%.1f%%", engine.cpuUsagePercent))
                         .font(.system(size: 28, weight: .bold, design: .rounded))
                         .foregroundStyle(MetricTheme.cpu)
-                    MetricChart(values: engine.cpuHistory, unit: "%", fixedMax: 100, color: MetricTheme.cpu, style: style) { String(format: "%.0f%%", $0) }
+                    MetricChart(values: engine.cpuHistory, unit: "%", fixedMax: 100, color: MetricTheme.cpu, style: style, accessibilityDescription: "CPU usage history") { String(format: "%.0f%%", $0) }
                         .frame(height: 110)
                     HStack(spacing: 16) {
                         Label(String(format: "User %.0f%%", engine.cpuUserPercent), systemImage: "person.fill")
@@ -390,6 +393,7 @@ struct CPUDetailView: View {
                     }
                     HStack(spacing: 8) {
                         Circle().fill(engine.thermalState.color).frame(width: 10, height: 10)
+                            .accessibilityHidden(true)
                         Text(engine.thermalState.label)
                             .font(.system(size: 18, weight: .bold, design: .rounded))
                     }
@@ -425,7 +429,7 @@ struct MemoryDetailView: View {
                     Text("\(String(format: "%.2f", engine.memoryUsedGB)) GB / \(String(format: "%.2f", engine.memoryTotalGB)) GB")
                         .font(.system(size: 22, weight: .bold, design: .rounded))
                         .foregroundStyle(MetricTheme.memory)
-                    MetricChart(values: engine.memoryHistory, unit: "GB", fixedMax: max(engine.memoryTotalGB, 1), color: MetricTheme.memory, style: style) { String(format: "%.1f GB", $0) }
+                    MetricChart(values: engine.memoryHistory, unit: "GB", fixedMax: max(engine.memoryTotalGB, 1), color: MetricTheme.memory, style: style, accessibilityDescription: "Memory usage history") { String(format: "%.1f GB", $0) }
                         .frame(height: 110)
                     HStack(spacing: 4) {
                         HStack(spacing: 16) {
@@ -466,6 +470,7 @@ struct NetworkDetailView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 8) {
                         Circle().fill(engine.isConnected ? Color.green : Color.red).frame(width: 9, height: 9)
+                            .accessibilityHidden(true)
                         Text(engine.isConnected ? "Connected — \(engine.connectionType)" : "No connection")
                             .font(.system(size: 16, weight: .semibold, design: .rounded))
                         if engine.isVPNActive {
@@ -508,11 +513,12 @@ struct NetworkDetailView: View {
                             Text(String(format: "%.0f ms", ms))
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                                 .foregroundStyle(ms < 100 ? .green : ms < 300 ? .orange : .red)
+                                .accessibilityValue("\(Int(ms.rounded())) milliseconds, \(ms < 100 ? "good" : ms < 300 ? "fair" : "poor")")
                         } else {
                             Text("Timeout").font(.caption).foregroundStyle(.red)
                         }
                     }
-                    MetricChart(values: engine.pingHistory, unit: "ms", showAxes: true, color: .teal) { String(format: "%.0fms", $0) }
+                    MetricChart(values: engine.pingHistory, unit: "ms", showAxes: true, color: .teal, accessibilityDescription: "Ping latency history") { String(format: "%.0fms", $0) }
                         .frame(height: 60)
                 }
             }
@@ -565,9 +571,11 @@ struct NetworkDetailView: View {
                         .font(.caption2)
                         .foregroundStyle(iface.isPrimary ? Color.green : Color.secondary)
                         .frame(width: 14)
+                        .accessibilityHidden(true)
                     Text(iface.displayName)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        .accessibilityValue(iface.isPrimary ? "primary connection" : "")
                     Spacer()
                     if !isExpanded {
                         Text(iface.address + suffix)
@@ -646,10 +654,10 @@ private struct DiskButterflyChart: View {
                 }
                 .frame(width: 56)
                 VStack(spacing: 0) {
-                    MetricChart(values: readHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: .indigo, style: .area) { formatSpeed($0) }
+                    MetricChart(values: readHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: .indigo, style: .area, accessibilityDescription: "Disk read speed history") { formatSpeed($0) }
                         .frame(height: 90)
                     Color.primary.opacity(0.25).frame(height: 1).frame(height: 14)
-                    MetricChart(values: writeHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: .purple, style: .area) { formatSpeed($0) }
+                    MetricChart(values: writeHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: .purple, style: .area, accessibilityDescription: "Disk write speed history") { formatSpeed($0) }
                         .frame(height: 90)
                         .scaleEffect(y: -1)
                 }
@@ -911,6 +919,7 @@ struct BatteryDetailView: View {
                             Text(String(format: "%.1f°C", temp))
                                 .font(.caption.monospacedDigit())
                                 .foregroundStyle(MetricTheme.sensorTempColor(temp, category: "Battery"))
+                                .accessibilityValue("\(String(format: "%.1f", temp)) degrees, \(MetricTheme.sensorTempSeverityWord(temp, category: "Battery"))")
                         }
                     }
                     if let voltage = engine.batteryVoltage {
@@ -1020,6 +1029,7 @@ struct ThermalDetailView: View {
                     }
                     HStack(spacing: 8) {
                         Circle().fill(engine.thermalState.color).frame(width: 10, height: 10)
+                            .accessibilityHidden(true)
                         Text(engine.thermalState.label)
                             .font(.system(size: 18, weight: .semibold, design: .rounded))
                             .foregroundStyle(engine.thermalState.color)
@@ -1045,21 +1055,21 @@ struct ThermalDetailView: View {
                         SensorCategoryRow(
                             icon: "cpu", iconColor: MetricTheme.cpu, label: "CPU", avgCelsius: avg,
                             sensors: cpuSensors.map { ($0.label, $0.celsius) },
-                            colorFn: { MetricTheme.sensorTempColor($0, category: "CPU") }
+                            category: "CPU"
                         )
                     }
                     if let avg = engine.gpuTemperatureC {
                         SensorCategoryRow(
                             icon: "cube.transparent", iconColor: .cyan, label: "GPU", avgCelsius: avg,
                             sensors: gpuSensors.map { ($0.label, $0.celsius) },
-                            colorFn: { MetricTheme.sensorTempColor($0, category: "GPU") }
+                            category: "GPU"
                         )
                     }
                     if let bat = engine.batteryTemperatureC {
                         SensorCategoryRow(
                             icon: "battery.75percent", iconColor: MetricTheme.battery, label: "Battery",
                             avgCelsius: bat, sensors: [],
-                            colorFn: { MetricTheme.sensorTempColor($0, category: "Battery") }
+                            category: "Battery"
                         )
                     }
 
@@ -1070,7 +1080,7 @@ struct ThermalDetailView: View {
                         SensorCategoryRow(
                             icon: "internaldrive", iconColor: .indigo, label: "Storage", avgCelsius: avg,
                             sensors: storageSensors.map { ($0.label, $0.celsius) },
-                            colorFn: { MetricTheme.sensorTempColor($0, category: "Storage") }
+                            category: "Storage"
                         )
                     }
 
@@ -1093,7 +1103,7 @@ struct ThermalDetailView: View {
                         SensorCategoryRow(
                             icon: "thermometer", iconColor: .orange, label: "System", avgCelsius: avg,
                             sensors: systemDisplaySensors,
-                            colorFn: { MetricTheme.sensorTempColor($0, category: "System") },
+                            category: "System",
                             initiallyExpanded: true
                         )
                     }
@@ -1105,7 +1115,7 @@ struct ThermalDetailView: View {
                         SensorCategoryRow(
                             icon: "memorychip", iconColor: MetricTheme.memory, label: "Memory", avgCelsius: avg,
                             sensors: memorySensors.map { ($0.label, $0.celsius) },
-                            colorFn: { MetricTheme.sensorTempColor($0, category: "Memory") }
+                            category: "Memory"
                         )
                     }
 
@@ -1170,21 +1180,24 @@ private struct SensorCategoryRow: View {
     let label: String
     let avgCelsius: Double
     let sensors: [(label: String, celsius: Double)]
-    let colorFn: (Double) -> Color
+    let category: String
 
     @State private var expanded: Bool
 
     init(icon: String, iconColor: Color, label: String, avgCelsius: Double,
-         sensors: [(label: String, celsius: Double)], colorFn: @escaping (Double) -> Color,
+         sensors: [(label: String, celsius: Double)], category: String,
          initiallyExpanded: Bool = false) {
         self.icon = icon
         self.iconColor = iconColor
         self.label = label
         self.avgCelsius = avgCelsius
         self.sensors = sensors
-        self.colorFn = colorFn
+        self.category = category
         _expanded = State(initialValue: initiallyExpanded)
     }
+
+    private func colorFn(_ celsius: Double) -> Color { MetricTheme.sensorTempColor(celsius, category: category) }
+    private func severityWord(_ celsius: Double) -> String { MetricTheme.sensorTempSeverityWord(celsius, category: category) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -1210,6 +1223,7 @@ private struct SensorCategoryRow: View {
                     Text(String(format: "%.1f°C", avgCelsius))
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(colorFn(avgCelsius))
+                        .accessibilityValue("\(String(format: "%.1f", avgCelsius)) degrees, \(severityWord(avgCelsius))")
                     Image(systemName: "chevron.right")
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundStyle(.tertiary)
@@ -1231,6 +1245,7 @@ private struct SensorCategoryRow: View {
                             Text(String(format: "%.1f°C", sensor.celsius))
                                 .font(.caption2.monospacedDigit())
                                 .foregroundStyle(colorFn(sensor.celsius))
+                                .accessibilityValue("\(String(format: "%.1f", sensor.celsius)) degrees, \(severityWord(sensor.celsius))")
                         }
                         .padding(.leading, 30)
                     }
@@ -1250,7 +1265,9 @@ struct BluetoothDeviceRow: View {
                 .font(.system(size: 13))
                 .foregroundStyle(device.isConnected ? .blue : .secondary)
                 .frame(width: 18)
+                .accessibilityHidden(true)
             Text(device.name).font(.caption).lineLimit(1)
+                .accessibilityValue(device.isConnected ? "connected" : "not connected")
             Spacer()
             if device.batteryLeft != nil || device.batteryRight != nil || device.batteryCase != nil {
                 HStack(spacing: 4) {
@@ -1264,9 +1281,13 @@ struct BluetoothDeviceRow: View {
                     Text("\(pct)%").font(.caption.monospacedDigit())
                 }
                 .foregroundStyle(pct < 20 ? .red : .secondary)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Battery")
+                .accessibilityValue(pct < 20 ? "\(pct) percent, low" : "\(pct) percent")
             }
             if !device.isConnected {
                 Circle().fill(Color.secondary.opacity(0.3)).frame(width: 7, height: 7)
+                    .accessibilityHidden(true)
             }
         }
     }
@@ -1294,7 +1315,8 @@ struct WiFiSignalBars: View {
 
     var body: some View {
         HStack(spacing: 10) {
-            // 4 bars of increasing height
+            // 4 bars of increasing height — decorative; the text alongside already
+            // states the signal quality in words plus the raw dBm value.
             HStack(alignment: .bottom, spacing: 3) {
                 ForEach(1...4, id: \.self) { i in
                     RoundedRectangle(cornerRadius: 2)
@@ -1302,6 +1324,7 @@ struct WiFiSignalBars: View {
                         .frame(width: 7, height: CGFloat(i) * 5 + 4)
                 }
             }
+            .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
                 Text(label)
                     .font(.caption.weight(.semibold))
@@ -1311,6 +1334,9 @@ struct WiFiSignalBars: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Wi-Fi signal")
+        .accessibilityValue("\(label), \(rssi) dBm")
     }
 }
 
