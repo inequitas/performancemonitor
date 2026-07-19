@@ -1,6 +1,7 @@
 import SwiftUI
 import Foundation
 import AppKit
+import PerformanceAppCore
 
 extension NSApplication {
     // NSApp.windows always includes internal plumbing windows (NSStatusBarWindow
@@ -49,13 +50,11 @@ enum MetricTheme {
 
     // Temperature colour thresholds vary by sensor category (CPU runs hotter than battery).
     static func sensorTempColor(_ celsius: Double, category: String) -> Color {
-        switch category {
-        case "CPU", "GPU":
-            return celsius < 60 ? .green : celsius < 75 ? .yellow : celsius < 90 ? .orange : .red
-        case "Battery":
-            return celsius < 35 ? .green : celsius < 45 ? .yellow : celsius < 55 ? .orange : .red
-        default:
-            return celsius < 40 ? .green : celsius < 55 ? .yellow : celsius < 70 ? .orange : .red
+        switch TempSeverityMapper.severity(celsius: celsius, category: category) {
+        case .normal:   return .green
+        case .warning:  return .yellow
+        case .elevated: return .orange
+        case .critical: return .red
         }
     }
 }

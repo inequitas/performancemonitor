@@ -8,6 +8,7 @@
 
 import Foundation
 import IOKit
+import PerformanceAppCore
 
 // MARK: - Public types
 
@@ -283,16 +284,10 @@ final class SMCReader: @unchecked Sendable {
     }
 
     private func encode(_ key: String) -> UInt32 {
-        key.utf8.prefix(4).reduce(0) { $0 << 8 | UInt32($1) }
+        FourCC.encode(key)
     }
 
     private func fourCC(_ code: UInt32) -> String {
-        let b: [UInt8] = [
-            UInt8((code >> 24) & 0xFF),
-            UInt8((code >> 16) & 0xFF),
-            UInt8((code >>  8) & 0xFF),
-            UInt8( code        & 0xFF)
-        ]
-        return String(bytes: b, encoding: .utf8) ?? "????"
+        FourCC.decode(code)
     }
 }

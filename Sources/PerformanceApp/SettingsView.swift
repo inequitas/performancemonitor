@@ -1,5 +1,6 @@
 import SwiftUI
 import ServiceManagement
+import PerformanceAppCore
 
 struct SettingsView: View {
     // Plain let — no @ObservedObject. Each child tab observes engine directly,

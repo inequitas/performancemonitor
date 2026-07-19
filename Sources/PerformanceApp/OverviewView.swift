@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 import Charts
+import PerformanceAppCore
 
 struct OverviewView: View {
     @ObservedObject var engine: MetricsEngine

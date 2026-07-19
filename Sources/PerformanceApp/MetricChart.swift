@@ -1,15 +1,14 @@
 import SwiftUI
 import Charts
+import PerformanceAppCore
 
 // 95th-percentile max — prevents rare big spikes from collapsing all smaller bars.
 func p95Max(_ a: [Double], _ b: [Double]) -> Double {
-    let all = (a + b).filter { $0 > 0 }.sorted()
-    guard !all.isEmpty else { return 1 }
-    return max(all[Int(Double(all.count) * 0.95)], 1)
+    ChartMath.p95Max(a, b)
 }
 
 func absoluteMax(_ a: [Double], _ b: [Double]) -> Double {
-    max(a.max() ?? 0, b.max() ?? 0, 1)
+    ChartMath.absoluteMax(a, b)
 }
 
 enum ChartDisplayStyle: String, CaseIterable, Identifiable {

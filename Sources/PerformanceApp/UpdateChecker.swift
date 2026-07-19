@@ -2,6 +2,7 @@ import Foundation
 import AppKit
 import UserNotifications
 import CryptoKit
+import PerformanceAppCore
 
 @MainActor
 final class UpdateChecker: NSObject, ObservableObject {
@@ -333,14 +334,7 @@ final class UpdateChecker: NSObject, ObservableObject {
     }
 
     private func isNewer(_ a: String, than b: String) -> Bool {
-        let parts = { (s: String) -> [Int] in s.split(separator: ".").compactMap { Int($0) } }
-        let va = parts(a), vb = parts(b)
-        for i in 0..<max(va.count, vb.count) {
-            let ai = i < va.count ? va[i] : 0
-            let bi = i < vb.count ? vb[i] : 0
-            if ai != bi { return ai > bi }
-        }
-        return false
+        VersionComparison.isNewer(a, than: b)
     }
 }
 

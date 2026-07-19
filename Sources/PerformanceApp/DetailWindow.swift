@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 import Charts
+import PerformanceAppCore
 
 struct DetailWindow: View {
     let kind: MetricsEngine.Panel
@@ -1279,21 +1280,9 @@ struct BluetoothDeviceRow: View {
 struct WiFiSignalBars: View {
     let rssi: Int   // dBm, e.g. -55
 
-    private var bars: Int {
-        if rssi >= -50 { return 4 }
-        if rssi >= -65 { return 3 }
-        if rssi >= -75 { return 2 }
-        return 1
-    }
+    private var bars: Int { WiFiSignal.bars(forRSSI: rssi) }
 
-    private var label: String {
-        switch bars {
-        case 4: return "Excellent"
-        case 3: return "Good"
-        case 2: return "Fair"
-        default: return "Weak"
-        }
-    }
+    private var label: String { WiFiSignal.label(forBars: bars) }
 
     private var color: Color {
         switch bars {
