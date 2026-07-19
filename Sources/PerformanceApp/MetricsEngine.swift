@@ -54,7 +54,6 @@ final class MetricsEngine: ObservableObject {
     @Published var topCPUProcesses: [ProcessUsage] = []
     @Published var topMemoryProcesses: [ProcessUsage] = []
     @Published var topNetworkProcesses: [ProcessUsage] = []
-    @Published var topDiskProcesses: [ProcessUsage] = []
 
     @Published var localInterfaces: [LocalInterface] = []
     @Published var dnsServers: [String] = []

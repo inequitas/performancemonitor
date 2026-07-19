@@ -146,6 +146,16 @@ private struct GeneralTab: View {
                         .padding(.horizontal, 8).padding(.vertical, 3)
                         .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
                 }
+                Divider().padding(.vertical, 4)
+                SettingsRow(label: "Crash Reports") {
+                    Button("Open Crash Reports Folder") {
+                        let dir = CrashReporter.reportsDirectory
+                        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+                        NSWorkspace.shared.open(dir)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                }
             }
 
             SettingsSection(icon: "list.number", title: "Processes", color: .blue) {

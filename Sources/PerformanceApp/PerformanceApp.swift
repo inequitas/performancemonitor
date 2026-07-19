@@ -14,6 +14,12 @@ struct PerformanceApp: App {
         return img
     }()
 
+    init() {
+        // On-device only: writes crash diagnostics to disk locally, never
+        // transmits anything. See CrashReporter.swift.
+        CrashReporter.shared.start()
+    }
+
     var body: some Scene {
         MenuBarExtra {
             EmptyView()
