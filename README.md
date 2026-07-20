@@ -4,6 +4,18 @@ A lightweight macOS menu bar app that gives you real-time system metrics at a gl
 
 [![CI](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml/badge.svg)](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml) ![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.0.0-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green) [![Sponsor](https://img.shields.io/badge/%E2%9D%A4-Sponsor-ea4aaa)](https://github.com/sponsors/inequitas)
 
+<p align="center">
+  <img src="screenshots/Main_Screen.png" width="420" alt="Performance Monitor overview popover showing CPU, memory, disk, thermal, GPU, battery, network and Bluetooth cards">
+</p>
+
+<p align="center">
+  <img src="screenshots/cpu_screen.png" width="260" alt="CPU detail window with per-core usage">
+  <img src="screenshots/network_screen.png" width="260" alt="Network detail window with latency and throughput charts">
+  <img src="screenshots/Thermal_Screen.png" width="260" alt="Thermal detail window with per-sensor temperatures">
+</p>
+
+<p align="center"><sub>More screenshots (all detail views and settings) in <a href="screenshots/">screenshots/</a>.</sub></p>
+
 ---
 
 ## Requirements
