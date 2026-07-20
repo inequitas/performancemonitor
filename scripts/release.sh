@@ -180,6 +180,8 @@ fi
 # --- (e) tag -------------------------------------------------------------
 echo "==> Tagging ${TAG}..."
 git tag "$TAG"
+# gh release create refuses local-only tags — push it first.
+git push origin "$TAG"
 
 # --- (f) publish -----------------------------------------------------------
 for ASSET in "${ASSETS[@]}"; do
