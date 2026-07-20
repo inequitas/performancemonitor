@@ -48,6 +48,7 @@ struct OnboardingView: View {
                 Text(String(localized: "This app lives in your menu bar, not the Dock. Look for its icon — CPU, memory, and more — next to the clock at the top of your screen."))
                     .font(.callout)
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             VStack(alignment: .leading, spacing: 10) {
@@ -67,6 +68,7 @@ struct OnboardingView: View {
                 Text(String(localized: "Performance Monitor will ask for Bluetooth access to show your paired devices and their battery levels, and for notification access to deliver the alerts above. Both are optional — the rest of the app works fully without them."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -113,6 +115,7 @@ struct OnboardingView: View {
                 Image(systemName: icon).font(.system(size: 11, weight: .semibold)).foregroundStyle(color)
             }
             Text(text).font(.caption).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

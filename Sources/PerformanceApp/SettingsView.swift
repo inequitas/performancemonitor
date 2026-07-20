@@ -35,7 +35,7 @@ struct SettingsView: View {
             UpdatesTab(updater: updater)
                 .tabItem { Label(String(localized: "Updates"), systemImage: "arrow.down.circle.fill") }
         }
-        .frame(width: 420)
+        .frame(width: 500)
         .background(.regularMaterial)
         .modifier(SettingsWindowModifier(settings: engine.settings))
         .transaction { $0.animation = nil }
@@ -608,6 +608,7 @@ private struct PanelsTab: View {
         VStack(alignment: .leading, spacing: 12) {
             Text(String(localized: "Drag cards to reorder. Tap the eye to show or hide."))
                 .font(.caption).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.horizontal, 2)
 
             PanelGridPreview(
