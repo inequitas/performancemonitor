@@ -88,6 +88,9 @@
 "Beta updates arrive sooner but are tested less." = "测试版更新发布更早，但测试较少。";
 "Beta versions may contain bugs or unfinished features." = "测试版可能包含错误或未完成的功能。";
 "Report a problem" = "报告问题";
+"You're currently on a beta version (%@). You can switch back to the latest stable release now." = "你目前使用的是测试版 (%@)。现在可以切换回最新的稳定版本。";
+"Switch to Stable Now" = "立即切换到稳定版";
+"Your settings will be kept." = "你的设置将会保留。";
 "Checking for updates…" = "正在检查更新…";
 "You're up to date" = "已是最新版本";
 "Checked %@" = "已于 %@ 检查";

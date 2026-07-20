@@ -89,6 +89,9 @@
 "Beta updates arrive sooner but are tested less." = "ベータ版の更新は早く届きますが、テストは十分ではありません。";
 "Beta versions may contain bugs or unfinished features." = "ベータ版には不具合や未完成の機能が含まれる場合があります。";
 "Report a problem" = "問題を報告";
+"You're currently on a beta version (%@). You can switch back to the latest stable release now." = "現在ベータ版 (%@) をご利用中です。今すぐ最新の安定版に切り替えられます。";
+"Switch to Stable Now" = "今すぐ安定版に切り替え";
+"Your settings will be kept." = "設定はそのまま保持されます。";
 "Checking for updates…" = "アップデートを確認中…";
 "You're up to date" = "最新の状態です";
 "Checked %@" = "確認日時: %@";

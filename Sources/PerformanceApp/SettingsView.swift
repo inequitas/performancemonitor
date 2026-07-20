@@ -468,6 +468,7 @@ private struct UpdatesTab: View {
                     Text(String(localized: "Beta updates arrive sooner but are tested less."))
                         .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
                         .fixedSize(horizontal: false, vertical: true)
+                    switchToStableBlock
                 }
                 // Shown whenever this run is effectively on the beta channel
                 // — an actual beta build, or a stable build with the opt-in
@@ -500,6 +501,62 @@ private struct UpdatesTab: View {
             .font(.caption2)
         }
         .padding(.top, 2)
+    }
+
+    /// Shown right under the opt-in toggle whenever it's off (whether the
+    /// user just switched it off, or it was already off when the tab opened
+    /// — e.g. after a restart) while the running version is a pre-release on
+    /// an otherwise-stable build. Offers one click back onto stable using the
+    /// same download/verify/install chain as a normal update.
+    @ViewBuilder private var switchToStableBlock: some View {
+        if updater.canSwitchToLatestStable && !settings.betaUpdatesOptIn {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "arrow.uturn.backward.circle")
+                        .foregroundStyle(.blue)
+                    Text(String(format: String(localized: "You're currently on a beta version (%@). You can switch back to the latest stable release now."), updater.currentVersion))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                switch updater.state {
+                case .downloading:
+                    HStack(spacing: 8) {
+                        ProgressView().controlSize(.small)
+                        Text(String(localized: "Downloading…")).font(.caption2).foregroundStyle(.secondary)
+                        Spacer()
+                    }
+                case .installing:
+                    HStack(spacing: 8) {
+                        ProgressView().controlSize(.small)
+                        Text(String(localized: "Installing — app will restart shortly…")).font(.caption2).foregroundStyle(.secondary)
+                        Spacer()
+                    }
+                case .error(let message):
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(message).font(.caption2).foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                        HStack {
+                            Spacer()
+                            Button(String(localized: "Switch to Stable Now")) { updater.switchToLatestStable() }
+                                .buttonStyle(.bordered).controlSize(.small)
+                        }
+                    }
+                default:
+                    HStack {
+                        Spacer()
+                        Button(String(localized: "Switch to Stable Now")) { updater.switchToLatestStable() }
+                            .buttonStyle(.borderedProminent).controlSize(.small)
+                    }
+                }
+                Text(String(localized: "Your settings will be kept."))
+                    .font(.caption2).foregroundStyle(.tertiary)
+            }
+            .padding(10)
+            .background(.blue.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.blue.opacity(0.2), lineWidth: 1))
+            .padding(.top, 2)
+        }
     }
 
     @ViewBuilder private var statusContent: some View {

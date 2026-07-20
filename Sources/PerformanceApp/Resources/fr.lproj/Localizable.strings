@@ -89,6 +89,9 @@
 "Beta updates arrive sooner but are tested less." = "Les mises à jour bêta arrivent plus tôt, mais sont moins testées.";
 "Beta versions may contain bugs or unfinished features." = "Les versions bêta peuvent contenir des bugs ou des fonctionnalités inachevées.";
 "Report a problem" = "Signaler un problème";
+"You're currently on a beta version (%@). You can switch back to the latest stable release now." = "Vous utilisez actuellement une version bêta (%@). Vous pouvez maintenant revenir à la dernière version stable.";
+"Switch to Stable Now" = "Revenir à la version stable";
+"Your settings will be kept." = "Vos réglages seront conservés.";
 "Checking for updates…" = "Recherche de mises à jour…";
 "You're up to date" = "Vous êtes à jour";
 "Checked %@" = "Vérifié %@";

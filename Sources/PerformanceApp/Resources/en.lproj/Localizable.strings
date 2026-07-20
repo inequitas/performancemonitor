@@ -89,6 +89,9 @@
 "Beta updates arrive sooner but are tested less." = "Beta updates arrive sooner but are tested less.";
 "Beta versions may contain bugs or unfinished features." = "Beta versions may contain bugs or unfinished features.";
 "Report a problem" = "Report a problem";
+"You're currently on a beta version (%@). You can switch back to the latest stable release now." = "You're currently on a beta version (%@). You can switch back to the latest stable release now.";
+"Switch to Stable Now" = "Switch to Stable Now";
+"Your settings will be kept." = "Your settings will be kept.";
 "Checking for updates…" = "Checking for updates…";
 "You're up to date" = "You're up to date";
 "Checked %@" = "Checked %@";

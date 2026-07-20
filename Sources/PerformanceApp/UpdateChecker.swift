@@ -54,6 +54,17 @@ final class UpdateChecker: NSObject, ObservableObject {
     /// actual beta build and for a stable build with the opt-in enabled.
     var isBetaChannel: Bool { effectiveChannel == .beta }
 
+    /// True when this run can offer a one-click path back onto the stable
+    /// channel: the build's OWN channel (Info.plist `PMUpdateChannel`, not
+    /// the opt-in-derived `effectiveChannel`) is stable, yet the running
+    /// version string is a pre-release. That combination only happens to a
+    /// nominally-stable build — never to the dedicated Beta app, which is
+    /// always built with `PMUpdateChannel=beta` and so is deliberately
+    /// excluded from this path.
+    var canSwitchToLatestStable: Bool {
+        channel == .stable && VersionComparison.isPrerelease(currentVersion)
+    }
+
     /// Shared with SettingsStore.betaUpdatesOptIn, which owns the persisted
     /// value; kept as one literal here to avoid a typo'd duplicate key.
     static let betaOptInKey = "betaUpdatesOptIn"
@@ -147,6 +158,18 @@ final class UpdateChecker: NSObject, ObservableObject {
         Task { await performInstall(from: downloadURL) }
     }
 
+    /// User-initiated downgrade back onto the stable channel. Only does
+    /// anything when `canSwitchToLatestStable` is true. Fetches GitHub's
+    /// "latest" endpoint (which never returns a pre-release) and installs it
+    /// through the exact same download → verify → unzip → install chain as
+    /// a normal update — deliberately WITHOUT the `isNewer` gate that
+    /// `performCheck` applies, since the whole point here is to install a
+    /// release that is older (by version string) than the current beta.
+    func switchToLatestStable() {
+        guard canSwitchToLatestStable else { return }
+        Task { await performSwitchToLatestStable() }
+    }
+
     // MARK: - Private
 
     private func performCheck() async {
@@ -168,6 +191,34 @@ final class UpdateChecker: NSObject, ObservableObject {
             } else {
                 state = .upToDate
             }
+        } catch {
+            state = .error(String(format: String(localized: "Network error: %@"), error.localizedDescription))
+        }
+    }
+
+    /// Backs `switchToLatestStable()`. Always queries the stable "latest"
+    /// endpoint and restricts asset selection to `.stable` (i.e. exactly
+    /// "PerformanceApp.zip", no beta fallback) regardless of this run's
+    /// `effectiveChannel` — a switch back to stable must never hand back a
+    /// beta asset. Reuses `performInstall`, so the found release is
+    /// installed even though it is not newer than `currentVersion`.
+    private func performSwitchToLatestStable() async {
+        state = .checking
+        do {
+            var req = URLRequest(url: stableAPIURL)
+            req.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
+            req.timeoutInterval = 10
+            let (data, _) = try await URLSession.shared.data(for: req)
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let (_, downloadURL) = Self.candidate(from: json, channel: .stable) else {
+                state = .error(String(localized: "Could not read release info from GitHub."))
+                return
+            }
+            guard Self.isAllowedDownloadURL(downloadURL) else {
+                state = .error(String(localized: "Update refused — download is not served from a trusted GitHub host."))
+                return
+            }
+            await performInstall(from: downloadURL)
         } catch {
             state = .error(String(format: String(localized: "Network error: %@"), error.localizedDescription))
         }
