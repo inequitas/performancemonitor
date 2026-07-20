@@ -50,12 +50,12 @@
 
 /* MARK: - SettingsView: etiquetas de pestañas */
 "General" = "General";
-"Menu Bar" = "Barra de menús";
+"Menu Bar" = "Barra menús";
 "Metrics" = "Métricas";
 "Alerts" = "Alertas";
 "Panels" = "Paneles";
 "History" = "Historial";
-"Updates" = "Actualizaciones";
+"Updates" = "Actualización";
 
 /* MARK: - SettingsView: pestaña General */
 "Refresh interval" = "Intervalo de actualización";

@@ -50,7 +50,7 @@
 
 /* MARK: - SettingsView : libellés des onglets */
 "General" = "Général";
-"Menu Bar" = "Barre des menus";
+"Menu Bar" = "Barre menus";
 "Metrics" = "Mesures";
 "Alerts" = "Alertes";
 "Panels" = "Panneaux";

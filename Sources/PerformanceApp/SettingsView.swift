@@ -247,6 +247,7 @@ private struct MenuBarTab: View {
             Text(String(localized: "Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
             SettingsRow(label: String(localized: "Colour when above alert threshold")) {
                 Toggle("", isOn: $settings.menuBarThresholdColor).labelsHidden()
@@ -419,15 +420,20 @@ private struct UpdatesTab: View {
     var body: some View {
         VStack(spacing: 16) {
             if !updater.notificationsEnabled {
-                HStack(spacing: 8) {
-                    Image(systemName: "bell.slash.fill").foregroundStyle(.orange)
-                    Text(String(localized: "Update notifications are disabled. Enable them in System Settings → Notifications → Performance Monitor."))
-                        .font(.caption).foregroundStyle(.secondary)
-                    Spacer()
-                    Button(String(localized: "Open Settings")) {
-                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.notifications")!)
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "bell.slash.fill").foregroundStyle(.orange)
+                        Text(String(localized: "Update notifications are disabled. Enable them in System Settings → Notifications → Performance Monitor."))
+                            .font(.caption).foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .buttonStyle(.bordered).controlSize(.small)
+                    HStack {
+                        Spacer()
+                        Button(String(localized: "Open Settings")) {
+                            NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.notifications")!)
+                        }
+                        .buttonStyle(.bordered).controlSize(.small)
+                    }
                 }
                 .padding(10)
                 .background(.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
@@ -461,6 +467,7 @@ private struct UpdatesTab: View {
                     }
                     Text(String(localized: "Beta updates arrive sooner but are tested less."))
                         .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 // Shown whenever this run is effectively on the beta channel
                 // — an actual beta build, or a stable build with the opt-in
@@ -484,6 +491,7 @@ private struct UpdatesTab: View {
                 Text(String(localized: "Beta versions may contain bugs or unfinished features."))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Button(String(localized: "Report a problem")) {
                 NSWorkspace.shared.open(URL(string: "https://github.com/inequitas/performancemonitor/issues")!)
@@ -529,6 +537,7 @@ private struct UpdatesTab: View {
                     Text(String(format: String(localized: "v%@ is available"), version)).font(.callout)
                     Text(String(localized: "The app will quit and relaunch after installing."))
                         .font(.caption2).foregroundStyle(.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer()
                 Button(String(localized: "Update Now")) { updater.downloadAndInstall(from: url) }
@@ -549,6 +558,7 @@ private struct UpdatesTab: View {
             HStack(spacing: 8) {
                 ProgressView().controlSize(.small)
                 Text(String(localized: "Installing — app will restart shortly…")).font(.callout).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
                 Spacer()
             }.padding(.vertical, 3)
 
@@ -557,6 +567,7 @@ private struct UpdatesTab: View {
                 Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(message).font(.callout).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                     Button(String(localized: "Try Again")) { updater.checkForUpdates() }
                         .buttonStyle(.bordered).controlSize(.small)
                 }
@@ -606,6 +617,7 @@ private struct MetricsTab: View {
                 if settings.publicIPEnabled {
                     Text(String(localized: "Fetches from api.ipify.org over HTTPS every 5 min."))
                         .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 Divider().padding(.vertical, 4)
                 SettingsRow(label: String(localized: "Ping server")) {
@@ -674,6 +686,7 @@ private struct AlertsTab: View {
                     }
                     Text(String(localized: "Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min."))
                         .font(.caption2).foregroundStyle(.secondary).padding(.top, 4)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
@@ -891,6 +904,7 @@ private struct SettingsRow<Control: View>: View {
     var body: some View {
         HStack {
             Text(label).font(.callout)
+                .fixedSize(horizontal: false, vertical: true)
             Spacer()
             control()
         }
@@ -916,6 +930,7 @@ private struct AlertMetricRow: View {
                     .foregroundStyle(color)
                     .frame(width: 16)
                 Text(label).font(.callout)
+                    .fixedSize(horizontal: false, vertical: true)
                 Spacer()
                 Toggle("", isOn: $enabled).labelsHidden()
             }
