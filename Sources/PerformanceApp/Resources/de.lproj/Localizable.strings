@@ -1,0 +1,335 @@
+/*
+  Localizable.strings (de)
+  Performance Monitor
+
+  Schlüsselkonvention: Der englische Ausgangstext ist selbst der
+  Suchschlüssel. Format-Strings behalten ihre printf-Spezifizierer
+  (%.0f, %@, ...) unverändert im Schlüssel bei.
+*/
+
+/* MARK: - Theme (ProcessInfo.ThermalState label) */
+"Nominal" = "Normal";
+"Fair" = "Mäßig";
+"Serious" = "Ernst";
+"Critical" = "Kritisch";
+"Unknown" = "Unbekannt";
+
+/* MARK: - AlertService */
+"High CPU usage" = "Hohe CPU-Auslastung";
+"CPU is at %.0f%%" = "CPU liegt bei %.0f%%";
+"High memory usage" = "Hohe Speicherauslastung";
+"%.1f / %.0f GB used (%.0f%%)" = "%.1f / %.0f GB belegt (%.0f%%)";
+"Low disk space" = "Wenig Speicherplatz";
+"Only %.1f GB free" = "Nur noch %.1f GB frei";
+"High GPU usage" = "Hohe GPU-Auslastung";
+"GPU is at %.0f%%" = "GPU liegt bei %.0f%%";
+"System running hot" = "System läuft heiß";
+"Thermal pressure: %@" = "Thermischer Druck: %@";
+
+/* MARK: - MenuBarModels (Anzeigenamen; rawValue bleibt für die Speicherung fix) */
+"CPU" = "CPU";
+"Memory" = "Speicher";
+"Network" = "Netzwerk";
+"Disk" = "Speicherplatz";
+"GPU" = "GPU";
+"Sparkline" = "Sparkline";
+"Text only" = "Nur Text";
+"System" = "System";
+"Light" = "Hell";
+"Dark" = "Dunkel";
+
+/* MARK: - MetricsEngine (Panel- / PingServer-Anzeigenamen) */
+"Thermal" = "Temperatur";
+"GPU & Displays" = "GPU & Bildschirme";
+"Battery" = "Akku";
+"Bluetooth" = "Bluetooth";
+"Apple (default)" = "Apple (Standard)";
+"Cloudflare (1.1.1.1)" = "Cloudflare (1.1.1.1)";
+"Google (8.8.8.8)" = "Google (8.8.8.8)";
+"Quad9 (9.9.9.9)" = "Quad9 (9.9.9.9)";
+
+/* MARK: - SettingsView: Tab-Beschriftungen */
+"General" = "Allgemein";
+"Menu Bar" = "Menüleiste";
+"Metrics" = "Messwerte";
+"Alerts" = "Benachrichtigungen";
+"Panels" = "Panels";
+"History" = "Verlauf";
+"Updates" = "Updates";
+
+/* MARK: - SettingsView: Tab Allgemein */
+"Refresh interval" = "Aktualisierungsintervall";
+"Appearance" = "Erscheinungsbild";
+"Show in Dock" = "Im Dock anzeigen";
+"Launch at login" = "Bei Anmeldung starten";
+"Open / close popover" = "Popover öffnen/schließen";
+"Crash Reports" = "Absturzberichte";
+"Open Crash Reports Folder" = "Ordner mit Absturzberichten öffnen";
+"Processes" = "Prozesse";
+"Top processes shown" = "Anzahl angezeigter Top-Prozesse";
+
+/* MARK: - SettingsView: Tab Menüleiste */
+"Menu Bar Icons" = "Menüleisten-Symbole";
+"Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar." = "Ziehe den Griff, um die Reihenfolge zu ändern. Das oberste aktivierte Symbol erscheint ganz rechts in der Menüleiste.";
+"Colour when above alert threshold" = "Farbe bei Überschreiten des Schwellenwerts";
+"IO" = "IO";
+"Space" = "Speicherplatz";
+"Text" = "Text";
+"Graph" = "Grafik";
+
+/* MARK: - SettingsView: Tab Updates */
+"Update notifications are disabled. Enable them in System Settings → Notifications → Performance Monitor." = "Update-Benachrichtigungen sind deaktiviert. Aktiviere sie unter Systemeinstellungen → Mitteilungen → Performance Monitor.";
+"Open Settings" = "Einstellungen öffnen";
+"Current version" = "Aktuelle Version";
+"Beta channel" = "Beta-Kanal";
+"Checking for updates…" = "Suche nach Updates…";
+"You're up to date" = "Du bist auf dem neuesten Stand";
+"Checked %@" = "Geprüft %@";
+"v%@ is available" = "v%@ ist verfügbar";
+"The app will quit and relaunch after installing." = "Die App wird nach der Installation beendet und neu gestartet.";
+"Update Now" = "Jetzt aktualisieren";
+"Downloading…" = "Wird heruntergeladen…";
+"Installing — app will restart shortly…" = "Wird installiert — App startet gleich neu…";
+"Try Again" = "Erneut versuchen";
+"Check Now" = "Jetzt prüfen";
+"Remind me later after" = "Später erinnern nach";
+"1 day" = "1 Tag";
+"3 days" = "3 Tagen";
+"7 days" = "7 Tagen";
+"14 days" = "14 Tagen";
+
+/* MARK: - SettingsView: Tab Messwerte */
+"Show removable volumes" = "Wechseldatenträger anzeigen";
+"Fetches from api.ipify.org over HTTPS every 5 min." = "Ruft alle 5 Min. über HTTPS bei api.ipify.org ab.";
+"Show public IP" = "Öffentliche IP anzeigen";
+"Ping server" = "Ping-Server";
+
+/* MARK: - SettingsView: Tab Benachrichtigungen */
+"Enable notifications" = "Benachrichtigungen aktivieren";
+"CPU above" = "CPU über";
+"Memory above" = "Speicher über";
+"Disk free below" = "Freier Speicherplatz unter";
+"GPU above" = "GPU über";
+"Thermal pressure" = "Thermischer Druck";
+"Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min." = "Temperaturbenachrichtigungen erfolgen bei Ernst oder Kritisch. Alle Benachrichtigungen sind auf einmal pro 5 Min. begrenzt.";
+
+/* MARK: - SettingsView: Tab Panels */
+"Drag cards to reorder. Tap the eye to show or hide." = "Ziehe Karten, um die Reihenfolge zu ändern. Tippe auf das Auge, um sie ein- oder auszublenden.";
+
+/* MARK: - SettingsView: Tab Verlauf */
+"Save history to disk" = "Verlauf auf Festplatte speichern";
+"Export" = "Exportieren";
+"Export CSV…" = "CSV exportieren…";
+
+/* MARK: - OnboardingView */
+"Welcome to Performance Monitor" = "Willkommen bei Performance Monitor";
+"This app lives in your menu bar, not the Dock. Look for its icon — CPU, memory, and more — next to the clock at the top of your screen." = "Diese App befindet sich in deiner Menüleiste, nicht im Dock. Achte auf ihr Symbol — CPU, Speicher und mehr — neben der Uhr oben auf deinem Bildschirm.";
+"Click the menu bar icon for a quick overview of CPU, memory, network, disk, and more" = "Klicke auf das Menüleisten-Symbol für einen schnellen Überblick über CPU, Speicher, Netzwerk, Speicherplatz und mehr";
+"Open any card for a detailed window with history charts and process breakdowns" = "Öffne eine beliebige Karte für ein detailliertes Fenster mit Verlaufsdiagrammen und Prozessaufschlüsselungen";
+"Choose which metrics show in the menu bar, and whether as text or a live graph" = "Wähle, welche Messwerte in der Menüleiste erscheinen und ob als Text oder als Live-Grafik";
+"Get notified when CPU, memory, disk space, or temperature cross a threshold you set" = "Erhalte eine Benachrichtigung, wenn CPU, Speicher, Speicherplatz oder Temperatur einen von dir festgelegten Schwellenwert überschreiten";
+"About permissions" = "Über Berechtigungen";
+"Performance Monitor will ask for Bluetooth access to show your paired devices and their battery levels, and for notification access to deliver the alerts above. Both are optional — the rest of the app works fully without them." = "Performance Monitor fragt nach Bluetooth-Zugriff, um deine gekoppelten Geräte und deren Akkustand anzuzeigen, sowie nach Zugriff auf Mitteilungen, um die oben genannten Benachrichtigungen zuzustellen. Beides ist optional — der Rest der App funktioniert auch ohne vollständig.";
+"Get Started" = "Los geht's";
+
+/* MARK: - OverviewView */
+"System Overview" = "Systemübersicht";
+"Settings" = "Einstellungen";
+"Quit" = "Beenden";
+"%@ history" = "%@-Verlauf";
+"Area" = "Fläche";
+"Gauge" = "Anzeige";
+"Bat" = "Bat";
+"normal" = "normal";
+"warm" = "warm";
+"hot" = "heiß";
+"critical" = "kritisch";
+"%ld°C, %@" = "%ld°C, %@";
+"free of %ld GB" = "frei von %ld GB";
+"%ld percent, charging" = "%ld Prozent, lädt";
+"%ld percent, low battery" = "%ld Prozent, Akku fast leer";
+"%ld percent" = "%ld Prozent";
+"%.0fW charging" = "%.0fW Ladeleistung";
+"%ldh %ldm to full" = "%ldh %ldm bis voll";
+"%ldm to full" = "%ldm bis voll";
+"%ldh %ldm remaining" = "noch %ldh %ldm";
+"%ldm remaining" = "noch %ldm";
+"Charging" = "Lädt";
+"On Battery" = "Im Akkubetrieb";
+"Chart" = "Diagramm";
+"Info" = "Info";
+"No display info" = "Keine Bildschirminfo";
+"main" = "Haupt";
+"VPN active, FortiClient" = "VPN aktiv, FortiClient";
+"VPN active" = "VPN aktiv";
+"VPN inactive" = "VPN inaktiv";
+"Connected" = "Verbunden";
+"%@, primary connection" = "%@, primäre Verbindung";
+"Disconnected" = "Nicht verbunden";
+"Local IP" = "Lokale IP";
+"Public IP" = "Öffentliche IP";
+"Looking up…" = "Wird gesucht…";
+"%ld connected" = "%ld verbunden";
+"No devices connected" = "Keine Geräte verbunden";
+"%ld percent, low" = "%ld Prozent, niedrig";
+
+/* MARK: - DetailShared */
+"Case" = "Hülle";
+"%ld percent, low battery" = "%ld Prozent, Akku fast leer";
+"Resume live updates" = "Live-Updates fortsetzen";
+"Pause list" = "Liste pausieren";
+"No data captured." = "Keine Daten erfasst.";
+"Quit %@" = "%@ beenden";
+"Quit %@?" = "%@ beenden?";
+"process" = "Prozess";
+"Cancel" = "Abbrechen";
+"This sends a quit signal to the process (PID %ld). Unsaved work may be lost." = "Dies sendet ein Beenden-Signal an den Prozess (PID %ld). Ungespeicherte Arbeit kann verloren gehen.";
+"Wi-Fi signal" = "WLAN-Signal";
+"%@, %ld dBm" = "%@, %ld dBm";
+
+/* MARK: - MemoryDetailView */
+"%@ GB / %@ GB" = "%@ GB / %@ GB";
+"Memory usage history" = "Speicherauslastungsverlauf";
+"App %.1fGB" = "App %.1fGB";
+"Wired %.1fGB" = "Wired %.1fGB";
+"Cmp %.1fGB" = "Cmp %.1fGB";
+"App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM." = "App: Aktive + inaktive Seiten — Speicher, der aktuell oder kürzlich von Apps verwendet wird.\n\nWired: Vom Kernel und den Treibern fest im RAM verankert. Kann nicht auf die Festplatte ausgelagert werden.\n\nKomprimiert: Seiten, die das macOS-Speicherdrucksystem komprimiert, um physisches RAM freizugeben. Hoher komprimierter Speicher ist normal; er wird zu Swap, sobald Komprimierung nicht mehr ausreicht.\n\nSwap: Daten, die wegen vollem RAM auf die Festplatte geschrieben wurden. Dauerhaft hohe Swap-Nutzung bedeutet, dass du mehr RAM benötigst.";
+"Swap used: %@ GB" = "Swap belegt: %@ GB";
+"Top Memory" = "Top-Speicher";
+
+/* MARK: - Theme (sensorTempSeverityWord — Zusatzfälle; "normal"/"critical" gemeinsam mit OverviewView) */
+"warning" = "Warnung";
+"elevated" = "erhöht";
+
+/* MARK: - BatteryDetailView */
+"Source" = "Quelle";
+"State" = "Status";
+"Charging" = "Lädt";
+"Discharging" = "Entlädt";
+"Time to full" = "Zeit bis voll";
+"Time remaining" = "Verbleibende Zeit";
+"%ldh %ldm" = "%ldh %ldm";
+"Health" = "Zustand";
+"Capacity %: NominalChargeCapacity ÷ DesignCapacity × 100. This shows how much of the original battery capacity remains.\n\nCycle count: Each full charge/discharge cycle counts as one. Apple considers batteries at peak performance for 1000 cycles (MacBook Pro/Air M-series). After that, capacity may be below 80%.\n\nCondition 'Normal' means the battery is performing within expected parameters. 'Service Recommended' means capacity has dropped significantly and Apple recommends a replacement." = "Kapazität %: NominalChargeCapacity ÷ DesignCapacity × 100. Zeigt, wie viel von der ursprünglichen Akkukapazität noch vorhanden ist.\n\nZyklenanzahl: Jeder vollständige Lade-/Entladezyklus zählt als einer. Apple stuft Akkus bis zu 1000 Zyklen (MacBook Pro/Air M-Serie) als auf Spitzenniveau ein. Danach kann die Kapazität unter 80 % sinken.\n\nZustand 'Normal' bedeutet, dass der Akku innerhalb der erwarteten Parameter arbeitet. 'Service empfohlen' bedeutet, dass die Kapazität deutlich gesunken ist und Apple einen Austausch empfiehlt.";
+"Capacity vs. design" = "Kapazität ggü. Werkszustand";
+"Condition" = "Zustand";
+"Cycle count" = "Zyklenanzahl";
+"Electrical" = "Elektrisch";
+"Temperature: Read from AppleSmartBattery IORegistry — no special privileges needed. This is the battery cell temperature, not the CPU temperature.\n\nVoltage: Current battery terminal voltage in volts.\n\nCurrent: Positive = charging (current flowing in). Negative = discharging (current flowing out). Values are in milliamps (mA).\n\nAll values come from the AppleSmartBattery driver which is always accessible without entitlements." = "Temperatur: Ausgelesen aus der AppleSmartBattery-IORegistry — keine besonderen Rechte erforderlich. Dies ist die Temperatur der Akkuzelle, nicht der CPU.\n\nSpannung: Aktuelle Akku-Klemmenspannung in Volt.\n\nStrom: Positiv = Laden (Strom fließt hinein). Negativ = Entladen (Strom fließt heraus). Werte in Milliampere (mA).\n\nAlle Werte stammen vom AppleSmartBattery-Treiber, der stets ohne Entitlements zugänglich ist.";
+"Input power" = "Eingangsleistung";
+"Draw" = "Verbrauch";
+"Temperature" = "Temperatur";
+"%@ degrees, %@" = "%@ Grad, %@";
+"Voltage" = "Spannung";
+"Current" = "Strom";
+"%ld mA" = "%ld mA";
+
+/* MARK: - CPUDetailView */
+"CPU usage history" = "CPU-Auslastungsverlauf";
+"User %.0f%%" = "Benutzer %.0f%%";
+"Sys %.0f%%" = "System %.0f%%";
+"Idle %.0f%%" = "Leerlauf %.0f%%";
+"Load avg: %.2f  %.2f  %.2f  (1 / 5 / 15 min)" = "Load avg: %.2f  %.2f  %.2f  (1 / 5 / 15 Min.)";
+"Per-core" = "Pro Kern";
+"P = Performance cores (faster, higher power). E = Efficiency cores (slower, lower power). macOS assigns which core handles each workload automatically. On Intel Macs all cores are equivalent and show as Core N." = "P = Performance-Kerne (schneller, höherer Verbrauch). E = Efficiency-Kerne (langsamer, geringerer Verbrauch). macOS weist automatisch zu, welcher Kern eine Aufgabe übernimmt. Bei Intel-Macs sind alle Kerne gleichwertig und werden als Core N angezeigt.";
+"Core %ld" = "Kern %ld";
+"Thermal Pressure" = "Thermischer Druck";
+"This is the macOS thermal throttling signal — not an exact temperature reading.\n\n• Nominal: No throttling. System running normally.\n• Fair: Slight throttling may be occurring.\n• Serious: Active throttling. Performance is being reduced to cool the system.\n• Critical: Severe throttling. Immediate action recommended (close apps, remove from enclosed spaces).\n\nExact die temperatures (CPU/GPU) are not readable on Apple Silicon without a privileged kernel extension. macOS blocks SMC access for user-space apps." = "Dies ist das macOS-Signal für thermisches Throttling — keine exakte Temperaturmessung.\n\n• Normal: Kein Throttling. System läuft normal.\n• Mäßig: Leichtes Throttling kann auftreten.\n• Ernst: Aktives Throttling. Die Leistung wird reduziert, um das System zu kühlen.\n• Kritisch: Starkes Throttling. Sofortiges Handeln empfohlen (Apps schließen, aus geschlossenen Räumen entfernen).\n\nExakte Chip-Temperaturen (CPU/GPU) sind auf Apple Silicon ohne privilegierte Kernel-Extension nicht auslesbar. macOS blockiert SMC-Zugriff für Apps im Benutzerbereich.";
+"Top CPU" = "Top-CPU";
+
+/* MARK: - DiskDetailView */
+"Read" = "Lesen";
+"Write" = "Schreiben";
+"Disk read speed history" = "Verlauf der Lesegeschwindigkeit";
+"Disk write speed history" = "Verlauf der Schreibgeschwindigkeit";
+"Storage" = "Speicher";
+"SMART OK" = "SMART OK";
+"Removable" = "Wechseldatenträger";
+"%.1f GB used" = "%.1f GB belegt";
+"%.1f GB free" = "%.1f GB frei";
+"%ld%% wear" = "%ld%% Verschleiß";
+"%.1f TB written" = "%.1f TB geschrieben";
+"%ld h on" = "%ld Std. an";
+
+/* MARK: - GPUDetailView */
+"GPU utilization percentage is not available through any public macOS API on Apple Silicon. Apple's IOKit SMC interface blocks access to GPU load counters for user-space processes.\n\nThird-party tools that show GPU % use private, entitled APIs or kernel extensions that require special signing. The Metal information shown here (working set size, power mode) is the maximum available through the public API." = "Der GPU-Auslastungsprozentsatz ist auf Apple Silicon über keine öffentliche macOS-API verfügbar. Apples IOKit-SMC-Schnittstelle blockiert den Zugriff auf GPU-Lastzähler für Prozesse im Benutzerbereich.\n\nTools von Drittanbietern, die GPU % anzeigen, nutzen private, entitlement-basierte APIs oder Kernel-Extensions, die eine spezielle Signierung erfordern. Die hier gezeigten Metal-Informationen (Working-Set-Größe, Energiemodus) sind das Maximum, das über die öffentliche API verfügbar ist.";
+"Location" = "Standort";
+"Max working set" = "Max. Working Set";
+"Power mode" = "Energiemodus";
+"Low power" = "Niedriger Verbrauch";
+"High performance" = "Hohe Leistung";
+"Displays" = "Bildschirme";
+"Arrange…" = "Anordnen…";
+"No display info available" = "Keine Bildschirminfo verfügbar";
+"Main" = "Haupt";
+
+/* MARK: - NetworkDetailView */
+"Throughput" = "Durchsatz";
+"Download speed history" = "Verlauf der Downloadgeschwindigkeit";
+"Upload speed history" = "Verlauf der Uploadgeschwindigkeit";
+"Connected — %@" = "Verbunden — %@";
+"No connection" = "Keine Verbindung";
+"VPN" = "VPN";
+"Local IPs are read from the system network interfaces.\n\nVPN is detected by the presence of utun, ppp, or ipsec interfaces.\n\nPublic IP is fetched from api.ipify.org over HTTPS. Only your outbound request is sent — no other data. Refreshed every 5 minutes.\n\nConnectivity check is an HTTPS HEAD request to Apple's captive portal endpoint (captive.apple.com). This respects your system proxy settings. True ICMP ping requires root on macOS, so this is used instead." = "Lokale IP-Adressen werden aus den Netzwerkschnittstellen des Systems ausgelesen.\n\nVPN wird anhand vorhandener utun-, ppp- oder ipsec-Schnittstellen erkannt.\n\nDie öffentliche IP wird über HTTPS von api.ipify.org abgerufen. Nur deine ausgehende Anfrage wird gesendet — keine weiteren Daten. Alle 5 Minuten aktualisiert.\n\nDie Verbindungsprüfung ist eine HTTPS-HEAD-Anfrage an Apples Captive-Portal-Endpunkt (captive.apple.com). Dies berücksichtigt deine System-Proxyeinstellungen. Echtes ICMP-Ping erfordert unter macOS Root-Rechte, daher wird stattdessen dies verwendet.";
+"Wi-Fi" = "WLAN";
+"Signal strength is measured in dBm (decibel-milliwatts) — a negative number where closer to zero is stronger.\n\n• Excellent (−50 dBm or better): Ideal. Full speed, no drops.\n• Good (−50 to −65 dBm): Reliable for video calls and large transfers.\n• Fair (−65 to −75 dBm): Usable but may slow down. Consider moving closer to your router.\n• Weak (below −75 dBm): Prone to disconnects and slow speeds.\n\nRead from CoreWLAN — same source as the macOS menu bar WiFi indicator." = "Die Signalstärke wird in dBm (Dezibel-Milliwatt) gemessen — eine negative Zahl, wobei näher an null stärker ist.\n\n• Ausgezeichnet (−50 dBm oder besser): Ideal. Volle Geschwindigkeit, keine Aussetzer.\n• Gut (−50 bis −65 dBm): Zuverlässig für Videoanrufe und große Übertragungen.\n• Mäßig (−65 bis −75 dBm): Nutzbar, kann aber langsamer werden. Näher an den Router rücken.\n• Schwach (unter −75 dBm): Anfällig für Verbindungsabbrüche und niedrige Geschwindigkeiten.\n\nAusgelesen über CoreWLAN — dieselbe Quelle wie die WLAN-Anzeige in der macOS-Menüleiste.";
+"Connectivity Check" = "Verbindungsprüfung";
+"%ld milliseconds, %@" = "%ld Millisekunden, %@";
+"good" = "gut";
+"fair" = "mäßig";
+"poor" = "schlecht";
+"Timeout" = "Zeitüberschreitung";
+"Ping latency history" = "Ping-Latenzverlauf";
+"Top Network Usage" = "Top-Netzwerknutzung";
+"Measuring…" = "Wird gemessen…";
+"primary connection" = "primäre Verbindung";
+"Subnet" = "Subnetz";
+"Gateway" = "Gateway";
+
+/* MARK: - BluetoothDetailView */
+"Paired devices are read from the IOBluetooth framework — all devices you have ever paired, whether connected or not.\n\nBattery percentage is read from the IOHIDDevice registry for devices that expose it (Apple peripherals: AirPods, Magic Mouse, Magic Keyboard, etc.). Third-party peripherals may not expose battery data." = "Gekoppelte Geräte werden aus dem IOBluetooth-Framework ausgelesen — alle Geräte, die du jemals gekoppelt hast, verbunden oder nicht.\n\nDer Akkustand wird aus dem IOHIDDevice-Register für Geräte ausgelesen, die diesen bereitstellen (Apple-Zubehör: AirPods, Magic Mouse, Magic Keyboard usw.). Zubehör von Drittanbietern liefert möglicherweise keine Akkudaten.";
+"Bluetooth Access Required" = "Bluetooth-Zugriff erforderlich";
+"Access was denied. Go to System Settings → Privacy & Security → Bluetooth to enable it." = "Der Zugriff wurde verweigert. Gehe zu Systemeinstellungen → Datenschutz & Sicherheit → Bluetooth, um ihn zu aktivieren.";
+"Allow Performance Monitor to read your paired Bluetooth devices." = "Erlaube Performance Monitor, deine gekoppelten Bluetooth-Geräte auszulesen.";
+"Open Privacy Settings" = "Datenschutzeinstellungen öffnen";
+"Grant Bluetooth Access" = "Bluetooth-Zugriff gewähren";
+"No paired devices found." = "Keine gekoppelten Geräte gefunden.";
+"Not connected" = "Nicht verbunden";
+"connected" = "verbunden";
+"not connected" = "nicht verbunden";
+
+/* Added during localization completion pass */
+"Airflow" = "Luftstrom";
+"App bundle not found inside downloaded archive." = "App-Bundle im heruntergeladenen Archiv nicht gefunden.";
+"Could not read release info from GitHub." = "Release-Informationen konnten nicht von GitHub gelesen werden.";
+"Download failed — server returned an error." = "Download fehlgeschlagen — der Server hat einen Fehler zurückgegeben.";
+"Failed to unzip the downloaded archive." = "Entpacken des heruntergeladenen Archivs fehlgeschlagen.";
+"Fan speed is read from the SMC via IOKit.\n\nActual: current measured RPM.\nMin/Max: hardware-defined speed range for this fan.\nAirflow: intake air temperature sensor near each fan." = "Die Lüftergeschwindigkeit wird über IOKit aus der SMC ausgelesen.\n\nAktuell: aktuell gemessene Drehzahl (RPM).\nMin/Max: hardwareseitig definierter Geschwindigkeitsbereich dieses Lüfters.\nLuftstrom: Ansauglufttemperatursensor in der Nähe jedes Lüfters.";
+"Fans" = "Lüfter";
+"GPU usage history" = "GPU-Auslastungsverlauf";
+"Install failed: %@" = "Installation fehlgeschlagen: %@";
+"Loading…" = "Wird geladen…";
+"Network error: %@" = "Netzwerkfehler: %@";
+"No temperature sensors found for this Mac model." = "Keine Temperatursensoren für dieses Mac-Modell gefunden.";
+"Performance Monitor Update" = "Performance Monitor-Update";
+"Range" = "Bereich";
+"Read from the System Management Controller (SMC) via IOKit.\n\nCPU and GPU values shown are averages across all cluster sensors. Tap a row to expand individual readings.\n\nBattery temperature is read from the AppleSmartBattery IORegistry entry." = "Ausgelesen aus dem System Management Controller (SMC) über IOKit.\n\nDie angezeigten CPU- und GPU-Werte sind Durchschnittswerte aller Cluster-Sensoren. Tippe auf eine Zeile, um einzelne Messwerte auszuklappen.\n\nDie Akkutemperatur wird aus dem AppleSmartBattery-IORegistry-Eintrag gelesen.";
+"Remind Me Later" = "Später erinnern";
+"Skip This Version" = "Diese Version überspringen";
+"Speed" = "Geschwindigkeit";
+"Temperatures" = "Temperaturen";
+"Thermal & Fans" = "Temperatur & Lüfter";
+"Trackpad" = "Trackpad";
+"True Tone" = "True Tone";
+"Update aborted — could not download the signature file." = "Update abgebrochen — die Signaturdatei konnte nicht heruntergeladen werden.";
+"Update aborted — could not locate the signature file." = "Update abgebrochen — die Signaturdatei konnte nicht gefunden werden.";
+"Update aborted — internal verification key is invalid." = "Update abgebrochen — der interne Verifizierungsschlüssel ist ungültig.";
+"Update aborted — signature is missing or unreadable. This release cannot be verified." = "Update abgebrochen — Signatur fehlt oder ist unlesbar. Diese Version kann nicht verifiziert werden.";
+"Update aborted — the download failed signature verification and may have been tampered with." = "Update abgebrochen — der Download hat die Signaturprüfung nicht bestanden und wurde möglicherweise manipuliert.";
+"Update refused — download is not served from a trusted GitHub host." = "Update abgelehnt — der Download stammt nicht von einem vertrauenswürdigen GitHub-Host.";
+"Version %@ is available — you're on %@." = "Version %@ ist verfügbar — du nutzt %@.";
+"above alert threshold" = "über dem Meldungsschwellenwert";
+"below alert threshold" = "unter dem Meldungsschwellenwert";
+"well above alert threshold" = "deutlich über dem Meldungsschwellenwert";
+"well below alert threshold" = "deutlich unter dem Meldungsschwellenwert";
+"macOS reports four thermal pressure levels:\n\n• Nominal — system operating normally.\n• Fair — some power reduction to prevent overheating.\n• Serious — significant throttling in effect.\n• Critical — aggressive throttling; performance severely impacted.\n\nThis is read from ProcessInfo.thermalState — the same value macOS uses internally to throttle workloads." = "macOS meldet vier Stufen thermischen Drucks:\n\n• Nominal — System arbeitet normal.\n• Fair — leichte Leistungsreduzierung zur Vermeidung von Überhitzung.\n• Serious — spürbares Throttling aktiv.\n• Critical — aggressives Throttling; Leistung stark beeinträchtigt.\n\nDies wird aus ProcessInfo.thermalState gelesen — demselben Wert, den macOS intern zum Drosseln von Arbeitslasten verwendet.";

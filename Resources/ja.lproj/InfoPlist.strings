@@ -1,0 +1,11 @@
+/*
+  InfoPlist.strings (ja)
+  Performance Monitor
+
+  Info.plist向けのローカライズされたシステム向け文字列（権限プロンプトなど）。
+  build_app.sh によって Contents/Resources/ja.lproj にコピーされます —
+  アプリ内UI文字列に使うSwiftPMリソースバンドルとは別の、
+  標準的なmacOS Info.plistローカライゼーションです。
+*/
+
+"NSBluetoothAlwaysUsageDescription" = "Performance Monitorは、ペアリング済みのBluetoothデバイスとその接続状態を一覧表示します。";

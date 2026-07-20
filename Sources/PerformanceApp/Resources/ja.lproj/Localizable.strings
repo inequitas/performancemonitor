@@ -1,0 +1,335 @@
+/*
+  Localizable.strings (ja)
+  Performance Monitor
+
+  キー規約: 英語の原文そのものが検索キーとして使われます。
+  フォーマット文字列は printf 形式の指定子 (%.0f, %@ など) を
+  キー内でそのまま保持します。
+*/
+
+/* MARK: - Theme (ProcessInfo.ThermalState label) */
+"Nominal" = "標準";
+"Fair" = "軽度";
+"Serious" = "重度";
+"Critical" = "深刻";
+"Unknown" = "不明";
+
+/* MARK: - AlertService */
+"High CPU usage" = "CPU使用率が高い";
+"CPU is at %.0f%%" = "CPUが%.0f%%です";
+"High memory usage" = "メモリ使用率が高い";
+"%.1f / %.0f GB used (%.0f%%)" = "%.1f / %.0f GB使用中 (%.0f%%)";
+"Low disk space" = "ディスク空き容量が少ない";
+"Only %.1f GB free" = "残り%.1f GBのみ";
+"High GPU usage" = "GPU使用率が高い";
+"GPU is at %.0f%%" = "GPUが%.0f%%です";
+"System running hot" = "システムが高温です";
+"Thermal pressure: %@" = "サーマルプレッシャー: %@";
+
+/* MARK: - MenuBarModels (enum display names; rawValue stays fixed for storage) */
+"CPU" = "CPU";
+"Memory" = "メモリ";
+"Network" = "ネットワーク";
+"Disk" = "ディスク";
+"GPU" = "GPU";
+"Sparkline" = "スパークライン";
+"Text only" = "テキストのみ";
+"System" = "システム";
+"Light" = "ライト";
+"Dark" = "ダーク";
+
+/* MARK: - MetricsEngine (Panel / PingServer display names) */
+"Thermal" = "サーマル";
+"GPU & Displays" = "GPUとディスプレイ";
+"Battery" = "バッテリー";
+"Bluetooth" = "Bluetooth";
+"Apple (default)" = "Apple (デフォルト)";
+"Cloudflare (1.1.1.1)" = "Cloudflare (1.1.1.1)";
+"Google (8.8.8.8)" = "Google (8.8.8.8)";
+"Quad9 (9.9.9.9)" = "Quad9 (9.9.9.9)";
+
+/* MARK: - SettingsView: tab labels */
+"General" = "一般";
+"Menu Bar" = "メニューバー";
+"Metrics" = "測定項目";
+"Alerts" = "アラート";
+"Panels" = "パネル";
+"History" = "履歴";
+"Updates" = "アップデート";
+
+/* MARK: - SettingsView: General tab */
+"Refresh interval" = "更新間隔";
+"Appearance" = "外観";
+"Show in Dock" = "Dockに表示";
+"Launch at login" = "ログイン時に起動";
+"Open / close popover" = "ポップオーバーを開く/閉じる";
+"Crash Reports" = "クラッシュレポート";
+"Open Crash Reports Folder" = "クラッシュレポートフォルダを開く";
+"Processes" = "プロセス";
+"Top processes shown" = "表示する上位プロセス数";
+
+/* MARK: - SettingsView: Menu Bar tab */
+"Menu Bar Icons" = "メニューバーアイコン";
+"Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar." = "ハンドルをドラッグして順序を変更します。一番上の有効なアイコンがメニューバーの一番右に表示されます。";
+"Colour when above alert threshold" = "アラートしきい値を超えたときの色";
+"IO" = "IO";
+"Space" = "空き容量";
+"Text" = "テキスト";
+"Graph" = "グラフ";
+
+/* MARK: - SettingsView: Updates tab */
+"Update notifications are disabled. Enable them in System Settings → Notifications → Performance Monitor." = "アップデート通知はオフになっています。システム設定 → 通知 → Performance Monitor でオンにしてください。";
+"Open Settings" = "設定を開く";
+"Current version" = "現在のバージョン";
+"Beta channel" = "ベータチャンネル";
+"Checking for updates…" = "アップデートを確認中…";
+"You're up to date" = "最新の状態です";
+"Checked %@" = "確認日時: %@";
+"v%@ is available" = "v%@ が利用可能です";
+"The app will quit and relaunch after installing." = "インストール後、アプリは終了して再起動します。";
+"Update Now" = "今すぐアップデート";
+"Downloading…" = "ダウンロード中…";
+"Installing — app will restart shortly…" = "インストール中 — まもなくアプリが再起動します…";
+"Try Again" = "再試行";
+"Check Now" = "今すぐ確認";
+"Remind me later after" = "次の期間が経過したら再通知";
+"1 day" = "1日";
+"3 days" = "3日";
+"7 days" = "7日";
+"14 days" = "14日";
+
+/* MARK: - SettingsView: Metrics tab */
+"Show removable volumes" = "リムーバブルボリュームを表示";
+"Fetches from api.ipify.org over HTTPS every 5 min." = "5分ごとにHTTPS経由でapi.ipify.orgから取得します。";
+"Show public IP" = "パブリックIPを表示";
+"Ping server" = "Pingサーバー";
+
+/* MARK: - SettingsView: Alerts tab */
+"Enable notifications" = "通知を有効にする";
+"CPU above" = "CPUが次を超えたら";
+"Memory above" = "メモリが次を超えたら";
+"Disk free below" = "空きディスク容量が次を下回ったら";
+"GPU above" = "GPUが次を超えたら";
+"Thermal pressure" = "サーマルプレッシャー";
+"Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min." = "サーマルアラートは「重度」または「深刻」で発生します。すべてのアラートは5分に1回に制限されます。";
+
+/* MARK: - SettingsView: Panels tab */
+"Drag cards to reorder. Tap the eye to show or hide." = "カードをドラッグして順序を変更します。目のアイコンをタップして表示・非表示を切り替えます。";
+
+/* MARK: - SettingsView: History tab */
+"Save history to disk" = "履歴をディスクに保存";
+"Export" = "書き出す";
+"Export CSV…" = "CSVを書き出す…";
+
+/* MARK: - OnboardingView */
+"Welcome to Performance Monitor" = "Performance Monitorへようこそ";
+"This app lives in your menu bar, not the Dock. Look for its icon — CPU, memory, and more — next to the clock at the top of your screen." = "このアプリはDockではなくメニューバーに常駐します。画面上部の時計の隣にあるアイコン（CPU、メモリなど）を探してください。";
+"Click the menu bar icon for a quick overview of CPU, memory, network, disk, and more" = "メニューバーのアイコンをクリックすると、CPU、メモリ、ネットワーク、ディスクなどの概要をすぐに確認できます";
+"Open any card for a detailed window with history charts and process breakdowns" = "カードを開くと、履歴グラフとプロセスの内訳を含む詳細ウィンドウが表示されます";
+"Choose which metrics show in the menu bar, and whether as text or a live graph" = "メニューバーに表示する項目や、テキスト表示かライブグラフ表示かを選択できます";
+"Get notified when CPU, memory, disk space, or temperature cross a threshold you set" = "CPU、メモリ、ディスク容量、温度が設定したしきい値を超えたときに通知を受け取れます";
+"About permissions" = "権限について";
+"Performance Monitor will ask for Bluetooth access to show your paired devices and their battery levels, and for notification access to deliver the alerts above. Both are optional — the rest of the app works fully without them." = "Performance Monitorは、ペアリング済みデバイスとそのバッテリー残量を表示するためにBluetoothへのアクセスを、上記のアラートを届けるために通知へのアクセスを求めます。どちらも任意です — これらがなくてもアプリの他の機能はすべて動作します。";
+"Get Started" = "始める";
+
+/* MARK: - OverviewView */
+"System Overview" = "システム概要";
+"Settings" = "設定";
+"Quit" = "終了";
+"%@ history" = "%@の履歴";
+"Area" = "エリア";
+"Gauge" = "ゲージ";
+"Bat" = "Bat";
+"normal" = "通常";
+"warm" = "温かい";
+"hot" = "高温";
+"critical" = "危険";
+"%ld°C, %@" = "%ld°C、%@";
+"free of %ld GB" = "%ld GB中の空き容量";
+"%ld percent, charging" = "%ld パーセント、充電中";
+"%ld percent, low battery" = "%ld パーセント、バッテリー残量わずか";
+"%ld percent" = "%ld パーセント";
+"%.0fW charging" = "%.0fWで充電中";
+"%ldh %ldm to full" = "満充電まで%ld時間%ld分";
+"%ldm to full" = "満充電まで%ld分";
+"%ldh %ldm remaining" = "残り%ld時間%ld分";
+"%ldm remaining" = "残り%ld分";
+"Charging" = "充電中";
+"On Battery" = "バッテリー使用中";
+"Chart" = "グラフ";
+"Info" = "情報";
+"No display info" = "ディスプレイ情報なし";
+"main" = "メイン";
+"VPN active, FortiClient" = "VPN有効、FortiClient";
+"VPN active" = "VPN有効";
+"VPN inactive" = "VPN無効";
+"Connected" = "接続済み";
+"%@, primary connection" = "%@、メイン接続";
+"Disconnected" = "未接続";
+"Local IP" = "ローカルIP";
+"Public IP" = "パブリックIP";
+"Looking up…" = "検索中…";
+"%ld connected" = "%ld台接続済み";
+"No devices connected" = "接続中のデバイスなし";
+"%ld percent, low" = "%ld パーセント、低下";
+
+/* MARK: - DetailShared */
+"Case" = "ケース";
+"%ld percent, low battery" = "%ld パーセント、バッテリー残量わずか";
+"Resume live updates" = "ライブ更新を再開";
+"Pause list" = "リストを一時停止";
+"No data captured." = "データが記録されていません。";
+"Quit %@" = "%@を終了";
+"Quit %@?" = "%@を終了しますか？";
+"process" = "プロセス";
+"Cancel" = "キャンセル";
+"This sends a quit signal to the process (PID %ld). Unsaved work may be lost." = "プロセス（PID %ld）に終了シグナルを送信します。保存されていない作業内容が失われる可能性があります。";
+"Wi-Fi signal" = "Wi-Fi信号";
+"%@, %ld dBm" = "%@、%ld dBm";
+
+/* MARK: - MemoryDetailView */
+"%@ GB / %@ GB" = "%@ GB / %@ GB";
+"Memory usage history" = "メモリ使用率の履歴";
+"App %.1fGB" = "App %.1fGB";
+"Wired %.1fGB" = "Wired %.1fGB";
+"Cmp %.1fGB" = "Cmp %.1fGB";
+"App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM." = "App: アクティブ + 非アクティブページ — 現在または最近アプリが使用しているメモリ。\n\nWired: カーネルとドライバによってRAMに固定されています。ディスクにページアウトできません。\n\n圧縮: 物理RAMを解放するためmacOSのメモリ管理システムが圧縮したページ。圧縮メモリが多いのは正常な状態で、圧縮だけでは足りなくなるとswapになります。\n\nSwap: RAMが満杯になったためディスクに書き込まれたデータ。swapの使用量が高い状態が続く場合は、RAMの増設が必要であることを示します。";
+"Swap used: %@ GB" = "Swap使用量: %@ GB";
+"Top Memory" = "メモリ使用量トップ";
+
+/* MARK: - Theme (sensorTempSeverityWord — extra cases; "normal"/"critical" shared with OverviewView) */
+"warning" = "注意";
+"elevated" = "上昇気味";
+
+/* MARK: - BatteryDetailView */
+"Source" = "電源";
+"State" = "状態";
+"Charging" = "充電中";
+"Discharging" = "放電中";
+"Time to full" = "満充電までの時間";
+"Time remaining" = "残り時間";
+"%ldh %ldm" = "%ld時間%ld分";
+"Health" = "バッテリーの状態";
+"Capacity %: NominalChargeCapacity ÷ DesignCapacity × 100. This shows how much of the original battery capacity remains.\n\nCycle count: Each full charge/discharge cycle counts as one. Apple considers batteries at peak performance for 1000 cycles (MacBook Pro/Air M-series). After that, capacity may be below 80%.\n\nCondition 'Normal' means the battery is performing within expected parameters. 'Service Recommended' means capacity has dropped significantly and Apple recommends a replacement." = "容量 %: NominalChargeCapacity ÷ DesignCapacity × 100。元のバッテリー容量がどれだけ残っているかを示します。\n\nサイクルカウント: 満充電・放電を1回行うごとに1カウントされます。Appleは1000サイクルまでバッテリーが最高性能を発揮するとしています（MacBook Pro/Air Mシリーズ）。それ以降は容量が80%を下回ることがあります。\n\n状態が「良好」の場合、バッテリーは想定どおりに機能しています。「要サービス」の場合、容量が大幅に低下しており、Appleは交換を推奨しています。";
+"Capacity vs. design" = "設計容量に対する割合";
+"Condition" = "状態";
+"Cycle count" = "サイクルカウント";
+"Electrical" = "電気系統";
+"Temperature: Read from AppleSmartBattery IORegistry — no special privileges needed. This is the battery cell temperature, not the CPU temperature.\n\nVoltage: Current battery terminal voltage in volts.\n\nCurrent: Positive = charging (current flowing in). Negative = discharging (current flowing out). Values are in milliamps (mA).\n\nAll values come from the AppleSmartBattery driver which is always accessible without entitlements." = "温度: AppleSmartBattery IORegistryから読み取ります — 特別な権限は不要です。これはCPUの温度ではなく、バッテリーセルの温度です。\n\n電圧: 現在のバッテリー端子電圧（ボルト）。\n\n電流: プラス値は充電中（電流が流入）、マイナス値は放電中（電流が流出）を示します。単位はミリアンペア（mA）です。\n\nすべての値はAppleSmartBatteryドライバから取得され、entitlementなしで常にアクセス可能です。";
+"Input power" = "入力電力";
+"Draw" = "消費電力";
+"Temperature" = "温度";
+"%@ degrees, %@" = "%@度、%@";
+"Voltage" = "電圧";
+"Current" = "電流";
+"%ld mA" = "%ld mA";
+
+/* MARK: - CPUDetailView */
+"CPU usage history" = "CPU使用率の履歴";
+"User %.0f%%" = "ユーザー %.0f%%";
+"Sys %.0f%%" = "システム %.0f%%";
+"Idle %.0f%%" = "アイドル %.0f%%";
+"Load avg: %.2f  %.2f  %.2f  (1 / 5 / 15 min)" = "Load avg: %.2f  %.2f  %.2f  (1 / 5 / 15 min)";
+"Per-core" = "コアごと";
+"P = Performance cores (faster, higher power). E = Efficiency cores (slower, lower power). macOS assigns which core handles each workload automatically. On Intel Macs all cores are equivalent and show as Core N." = "P = Performanceコア（高速・高消費電力）。E = Efficiencyコア（低速・低消費電力）。どのコアが各処理を担当するかはmacOSが自動的に割り当てます。IntelのMacではすべてのコアが同等で、Core Nと表示されます。";
+"Core %ld" = "コア %ld";
+"Thermal Pressure" = "サーマルプレッシャー";
+"This is the macOS thermal throttling signal — not an exact temperature reading.\n\n• Nominal: No throttling. System running normally.\n• Fair: Slight throttling may be occurring.\n• Serious: Active throttling. Performance is being reduced to cool the system.\n• Critical: Severe throttling. Immediate action recommended (close apps, remove from enclosed spaces).\n\nExact die temperatures (CPU/GPU) are not readable on Apple Silicon without a privileged kernel extension. macOS blocks SMC access for user-space apps." = "これはmacOSのサーマルスロットリング信号であり、正確な温度測定値ではありません。\n\n• 標準: スロットリングなし。システムは正常に動作しています。\n• 軽度: 軽度のスロットリングが発生している可能性があります。\n• 重度: スロットリングが有効です。システムを冷却するためパフォーマンスが低下しています。\n• 深刻: 深刻なスロットリングです。すぐに対処してください（アプリを閉じる、密閉空間から取り出すなど）。\n\n正確なダイ温度（CPU/GPU）は、特権を持つカーネル拡張なしではApple Siliconで読み取れません。macOSはユーザー空間のアプリに対してSMCアクセスをブロックしています。";
+"Top CPU" = "CPU使用量トップ";
+
+/* MARK: - DiskDetailView */
+"Read" = "読み込み";
+"Write" = "書き込み";
+"Disk read speed history" = "ディスク読み込み速度の履歴";
+"Disk write speed history" = "ディスク書き込み速度の履歴";
+"Storage" = "ストレージ";
+"SMART OK" = "SMART OK";
+"Removable" = "リムーバブル";
+"%.1f GB used" = "%.1f GB使用中";
+"%.1f GB free" = "%.1f GB空き";
+"%ld%% wear" = "摩耗度 %ld%%";
+"%.1f TB written" = "%.1f TB書き込み済み";
+"%ld h on" = "稼働 %ld時間";
+
+/* MARK: - GPUDetailView */
+"GPU utilization percentage is not available through any public macOS API on Apple Silicon. Apple's IOKit SMC interface blocks access to GPU load counters for user-space processes.\n\nThird-party tools that show GPU % use private, entitled APIs or kernel extensions that require special signing. The Metal information shown here (working set size, power mode) is the maximum available through the public API." = "Apple SiliconではGPU使用率はどの公開macOS APIからも取得できません。AppleのIOKit SMCインターフェースは、ユーザー空間のプロセスによるGPU負荷カウンタへのアクセスをブロックしています。\n\nGPU使用率を表示するサードパーティ製ツールは、非公開のentitled APIや特別な署名が必要なカーネル拡張を使用しています。ここに表示されているMetal情報（ワーキングセットサイズ、電力モード）は、公開APIから取得できる最大限の情報です。";
+"Location" = "場所";
+"Max working set" = "最大ワーキングセット";
+"Power mode" = "電力モード";
+"Low power" = "低電力";
+"High performance" = "高パフォーマンス";
+"Displays" = "ディスプレイ";
+"Arrange…" = "配置…";
+"No display info available" = "ディスプレイ情報がありません";
+"Main" = "メイン";
+
+/* MARK: - NetworkDetailView */
+"Throughput" = "スループット";
+"Download speed history" = "ダウンロード速度の履歴";
+"Upload speed history" = "アップロード速度の履歴";
+"Connected — %@" = "接続済み — %@";
+"No connection" = "接続なし";
+"VPN" = "VPN";
+"Local IPs are read from the system network interfaces.\n\nVPN is detected by the presence of utun, ppp, or ipsec interfaces.\n\nPublic IP is fetched from api.ipify.org over HTTPS. Only your outbound request is sent — no other data. Refreshed every 5 minutes.\n\nConnectivity check is an HTTPS HEAD request to Apple's captive portal endpoint (captive.apple.com). This respects your system proxy settings. True ICMP ping requires root on macOS, so this is used instead." = "ローカルIPはシステムのネットワークインターフェースから読み取ります。\n\nVPNはutun、ppp、ipsecインターフェースの有無によって検出されます。\n\nパブリックIPはHTTPS経由でapi.ipify.orgから取得します。送信されるのは発信リクエストのみで、他のデータは送信されません。5分ごとに更新されます。\n\n接続確認は、Appleのキャプティブポータルのエンドポイント（captive.apple.com）へのHTTPS HEADリクエストです。システムのプロキシ設定に従います。macOSで本来のICMP pingを行うにはroot権限が必要なため、代わりにこの方法を使用しています。";
+"Wi-Fi" = "Wi-Fi";
+"Signal strength is measured in dBm (decibel-milliwatts) — a negative number where closer to zero is stronger.\n\n• Excellent (−50 dBm or better): Ideal. Full speed, no drops.\n• Good (−50 to −65 dBm): Reliable for video calls and large transfers.\n• Fair (−65 to −75 dBm): Usable but may slow down. Consider moving closer to your router.\n• Weak (below −75 dBm): Prone to disconnects and slow speeds.\n\nRead from CoreWLAN — same source as the macOS menu bar WiFi indicator." = "信号強度はdBm（デシベルミリワット）で測定されます — 負の数値で、ゼロに近いほど強い信号です。\n\n• 優秀（−50 dBm以上）: 理想的。フル速度で切断もありません。\n• 良好（−50〜−65 dBm）: ビデオ通話や大容量転送も安定して行えます。\n• 普通（−65〜−75 dBm）: 使用は可能ですが速度が低下することがあります。ルーターに近づくことを検討してください。\n• 弱い（−75 dBm未満）: 切断や速度低下が起きやすくなります。\n\nCoreWLANから読み取ります — macOSメニューバーのWi-Fiアイコンと同じ情報源です。";
+"Connectivity Check" = "接続確認";
+"%ld milliseconds, %@" = "%ldミリ秒、%@";
+"good" = "良好";
+"fair" = "普通";
+"poor" = "不良";
+"Timeout" = "タイムアウト";
+"Ping latency history" = "Ping遅延の履歴";
+"Top Network Usage" = "ネットワーク使用量トップ";
+"Measuring…" = "測定中…";
+"primary connection" = "メイン接続";
+"Subnet" = "サブネット";
+"Gateway" = "ゲートウェイ";
+
+/* MARK: - BluetoothDetailView */
+"Paired devices are read from the IOBluetooth framework — all devices you have ever paired, whether connected or not.\n\nBattery percentage is read from the IOHIDDevice registry for devices that expose it (Apple peripherals: AirPods, Magic Mouse, Magic Keyboard, etc.). Third-party peripherals may not expose battery data." = "ペアリング済みデバイスはIOBluetoothフレームワークから読み取ります — 接続の有無にかかわらず、これまでにペアリングしたすべてのデバイスが対象です。\n\nバッテリー残量は、対応しているデバイス（AirPods、Magic Mouse、Magic KeyboardなどのApple製周辺機器）についてIOHIDDeviceレジストリから読み取ります。サードパーティ製の周辺機器はバッテリーデータを提供していない場合があります。";
+"Bluetooth Access Required" = "Bluetoothアクセスが必要です";
+"Access was denied. Go to System Settings → Privacy & Security → Bluetooth to enable it." = "アクセスが拒否されました。システム設定 → プライバシーとセキュリティ → Bluetoothで有効にしてください。";
+"Allow Performance Monitor to read your paired Bluetooth devices." = "Performance Monitorにペアリング済みのBluetoothデバイスの読み取りを許可してください。";
+"Open Privacy Settings" = "プライバシー設定を開く";
+"Grant Bluetooth Access" = "Bluetoothアクセスを許可";
+"No paired devices found." = "ペアリング済みのデバイスが見つかりません。";
+"Not connected" = "未接続";
+"connected" = "接続済み";
+"not connected" = "未接続";
+
+/* Added during localization completion pass */
+"Airflow" = "エアフロー";
+"App bundle not found inside downloaded archive." = "ダウンロードしたアーカイブ内にアプリバンドルが見つかりません。";
+"Could not read release info from GitHub." = "GitHubからリリース情報を読み取れませんでした。";
+"Download failed — server returned an error." = "ダウンロードに失敗しました — サーバーがエラーを返しました。";
+"Failed to unzip the downloaded archive." = "ダウンロードしたアーカイブの展開に失敗しました。";
+"Fan speed is read from the SMC via IOKit.\n\nActual: current measured RPM.\nMin/Max: hardware-defined speed range for this fan.\nAirflow: intake air temperature sensor near each fan." = "ファン速度はIOKit経由でSMCから読み取ります。\n\n実測値: 現在測定されている回転数（RPM）。\n最小/最大: このファンのハードウェアで定義された速度範囲。\nエアフロー: 各ファン付近の吸気温度センサー。";
+"Fans" = "ファン";
+"GPU usage history" = "GPU使用率の履歴";
+"Install failed: %@" = "インストールに失敗しました: %@";
+"Loading…" = "読み込み中…";
+"Network error: %@" = "ネットワークエラー: %@";
+"No temperature sensors found for this Mac model." = "このMacモデルの温度センサーが見つかりません。";
+"Performance Monitor Update" = "Performance Monitorのアップデート";
+"Range" = "範囲";
+"Read from the System Management Controller (SMC) via IOKit.\n\nCPU and GPU values shown are averages across all cluster sensors. Tap a row to expand individual readings.\n\nBattery temperature is read from the AppleSmartBattery IORegistry entry." = "System Management Controller（SMC）からIOKit経由で読み取ります。\n\n表示されているCPUとGPUの値は、すべてのクラスターセンサーの平均値です。行をタップすると個別の測定値が展開されます。\n\nバッテリー温度はAppleSmartBatteryのIORegistryエントリから読み取ります。";
+"Remind Me Later" = "後で通知";
+"Skip This Version" = "このバージョンをスキップ";
+"Speed" = "速度";
+"Temperatures" = "温度";
+"Thermal & Fans" = "サーマルとファン";
+"Trackpad" = "トラックパッド";
+"True Tone" = "True Tone";
+"Update aborted — could not download the signature file." = "アップデートを中止しました — 署名ファイルをダウンロードできませんでした。";
+"Update aborted — could not locate the signature file." = "アップデートを中止しました — 署名ファイルが見つかりませんでした。";
+"Update aborted — internal verification key is invalid." = "アップデートを中止しました — 内部検証キーが無効です。";
+"Update aborted — signature is missing or unreadable. This release cannot be verified." = "アップデートを中止しました — 署名がないか読み取れません。このリリースは検証できません。";
+"Update aborted — the download failed signature verification and may have been tampered with." = "アップデートを中止しました — ダウンロードした内容が署名検証に失敗しました。改ざんされている可能性があります。";
+"Update refused — download is not served from a trusted GitHub host." = "アップデートを拒否しました — ダウンロード元が信頼できるGitHubホストではありません。";
+"Version %@ is available — you're on %@." = "バージョン%@が利用可能です — 現在お使いのバージョンは%@です。";
+"above alert threshold" = "アラートしきい値を超えています";
+"below alert threshold" = "アラートしきい値を下回っています";
+"well above alert threshold" = "アラートしきい値を大幅に超えています";
+"well below alert threshold" = "アラートしきい値を大幅に下回っています";
+"macOS reports four thermal pressure levels:\n\n• Nominal — system operating normally.\n• Fair — some power reduction to prevent overheating.\n• Serious — significant throttling in effect.\n• Critical — aggressive throttling; performance severely impacted.\n\nThis is read from ProcessInfo.thermalState — the same value macOS uses internally to throttle workloads." = "macOSは4段階のサーマルプレッシャーレベルを報告します。\n\n• 標準 — システムは正常に動作しています。\n• 軽度 — 過熱を防ぐため電力がやや抑えられています。\n• 重度 — 大幅なスロットリングが有効です。\n• 深刻 — 積極的なスロットリングにより、パフォーマンスが大幅に低下しています。\n\nこれはProcessInfo.thermalStateから読み取られる値で、macOSが内部的にワークロードをスロットリングする際に使用する値と同じです。";
