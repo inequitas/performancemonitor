@@ -2,7 +2,7 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.0.0-lightgrey)
+![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.0.0-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green) [![Sponsor](https://img.shields.io/badge/%E2%9D%A4-Sponsor-ea4aaa)](https://github.com/sponsors/inequitas)
 
 ---
 
@@ -116,6 +116,17 @@ The build script compiles a release binary, assembles the `.app` bundle (under t
 | Bluetooth | Read paired device names and battery levels |
 
 No data is collected or transmitted. Everything runs locally.
+
+---
+
+## Support
+
+Performance Monitor is free and will stay free — no paywalled features, ever.
+If it saves you the price of a paid alternative, consider [sponsoring on GitHub](https://github.com/sponsors/inequitas); it helps cover Apple's Developer Program fee so the app can be notarised. A ⭐ on the repo helps too. Supporters are listed in [SUPPORTERS.md](SUPPORTERS.md).
+
+## License
+
+[MIT](LICENSE)
 
 ---
 
