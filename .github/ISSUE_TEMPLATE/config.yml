@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question or idea to discuss?
+    url: https://github.com/inequitas/performancemonitor/discussions
+    about: For questions and open-ended ideas, Discussions is the right place.

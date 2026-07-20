@@ -1,0 +1,38 @@
+name: Bug report
+description: Something isn't working right
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Settings → Updates → Current version (mention if you're on the beta channel)
+      placeholder: "1.1.0"
+    validations:
+      required: true
+  - type: input
+    id: hardware
+    attributes:
+      label: Mac and macOS version
+      placeholder: "MacBook Pro M2, macOS 15.2"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the Network detail window
+        2. …
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Screenshots help a lot. Crash reports live in ~/Library/Application Support/PerformanceApp/CrashReports/ (Settings → General → Open Crash Reports Folder).
