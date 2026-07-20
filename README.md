@@ -144,7 +144,7 @@ No data is collected or transmitted. Everything runs locally.
 ## Support
 
 Performance Monitor is free and will stay free — no paywalled features, ever.
-If it saves you the price of a paid alternative, consider [sponsoring on GitHub](https://github.com/sponsors/inequitas); it helps cover Apple's Developer Program fee so the app can be notarised. A ⭐ on the repo helps too. Supporters are listed in [SUPPORTERS.md](SUPPORTERS.md).
+If it saves you the price of a paid alternative, consider [sponsoring on GitHub](https://github.com/sponsors/inequitas) or [buying a coffee on Ko-fi](https://ko-fi.com/inequitas); it helps cover Apple's Developer Program fee so the app can be notarised. A ⭐ on the repo helps too. Supporters are listed in [SUPPORTERS.md](SUPPORTERS.md).
 
 ## License
 
