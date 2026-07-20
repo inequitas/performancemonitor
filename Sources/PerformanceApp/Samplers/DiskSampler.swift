@@ -31,6 +31,10 @@ protocol DiskSampling: AnyObject {
     /// Runs `diskutil info /dev/disk0` off the main thread and parses the SMART
     /// status. Returns `nil` when the tool could not be launched.
     func fetchSMART() async -> String?
+    /// Reads NVMe wear-level data (percentage used, TBW, power-on hours) off
+    /// the main thread via IOKit. Returns `nil` when unavailable (external/
+    /// older drives without a matching IOKit class).
+    func fetchWear() async -> NVMeWearInfo?
     /// Enumerates mounted volumes (drives the mount/unmount-driven refresh).
     func volumes() -> [VolumeInfo]
 }
@@ -55,6 +59,7 @@ final class DiskSampler: DiskSampling {
     private var previousTimestamp: Date?
     private var smartFetchTick = 0
     private var inFlight = false
+    private let wearReader = NVMeSMARTReader()
 
     func sample() async -> DiskSnapshot? {
         guard !inFlight else { return nil }
@@ -143,6 +148,13 @@ final class DiskSampler: DiskSampling {
             proc.waitUntilExit()
             let out = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
             return SMARTParser.parse(out)
+        }.value
+    }
+
+    func fetchWear() async -> NVMeWearInfo? {
+        let reader = wearReader  // capture before leaving @MainActor; class is @unchecked Sendable
+        return await Task.detached(priority: .background) {
+            reader.read()
         }.value
     }
 

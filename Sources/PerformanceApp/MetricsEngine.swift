@@ -46,6 +46,7 @@ final class MetricsEngine: ObservableObject {
     @Published var diskWriteHistory: [Double] = []
     @Published var diskFreeHistory: [Double] = []
     @Published var diskSmartStatus: String? = nil   // e.g. "Verified", "Not Supported", nil while loading
+    @Published var diskWearInfo: NVMeWearInfo? = nil   // nil while loading or unavailable (external/older drives)
     @Published var gpuMetricsAvailable: Bool = false
     @Published var volumes: [VolumeInfo] = []
 
@@ -571,6 +572,7 @@ final class MetricsEngine: ObservableObject {
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.diskSmartStatus = await self.diskSampler.fetchSMART()
+                self.diskWearInfo = await self.diskSampler.fetchWear()
             }
         }
         appendCapped(diskReadKBps, to: &diskReadHistory)

@@ -82,6 +82,9 @@ struct DiskDetailView: View {
                                 .foregroundStyle(ok ? .green : .red)
                         }
                     }
+                    if let wear = engine.diskWearInfo {
+                        NVMeWearRow(wear: wear)
+                    }
                     let visibleVolumes = engine.volumes.filter { engine.settings.showRemovableVolumes || !$0.isRemovable }
                     ForEach(visibleVolumes) { volume in
                         VStack(alignment: .leading, spacing: 6) {
@@ -112,6 +115,29 @@ struct DiskDetailView: View {
             }
 
             Spacer()
+        }
+    }
+}
+
+// MARK: - NVMe wear level
+
+/// Shows wear %, total bytes written, and power-on hours for the internal
+/// SSD, read via IOKit's `IONVMeSMARTInterface` (no root required). Only
+/// rendered when `engine.diskWearInfo` is non-nil — external/older drives
+/// without a matching IOKit class simply don't show this row.
+private struct NVMeWearRow: View {
+    let wear: NVMeWearInfo
+
+    var body: some View {
+        HStack {
+            Label("\(wear.percentageUsed)% wear", systemImage: "battery.75percent")
+                .font(.caption2).foregroundStyle(.secondary)
+            Spacer()
+            Text(String(format: "%.1f TB written", wear.totalBytesWrittenTB))
+                .font(.caption2).foregroundStyle(.secondary)
+            Spacer()
+            Text("\(wear.powerOnHours) h on")
+                .font(.caption2).foregroundStyle(.secondary)
         }
     }
 }
