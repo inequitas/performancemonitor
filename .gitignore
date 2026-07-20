@@ -19,3 +19,5 @@ xcuserdata/
 
 # Update-signing private key — NEVER commit this
 scripts/private_key.txt
+# Local planning doc (not published)
+ROADMAP.md
