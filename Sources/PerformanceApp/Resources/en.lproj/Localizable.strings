@@ -60,6 +60,9 @@
 /* MARK: - SettingsView: General tab */
 "Refresh interval" = "Refresh interval";
 "Appearance" = "Appearance";
+"Language" = "Language";
+"Takes effect after relaunch" = "Takes effect after relaunch";
+"Relaunch Now" = "Relaunch Now";
 "Show in Dock" = "Show in Dock";
 "Launch at login" = "Launch at login";
 "Open / close popover" = "Open / close popover";
@@ -82,6 +85,10 @@
 "Open Settings" = "Open Settings";
 "Current version" = "Current version";
 "Beta channel" = "Beta channel";
+"Also receive beta updates" = "Also receive beta updates";
+"Beta updates arrive sooner but are tested less." = "Beta updates arrive sooner but are tested less.";
+"Beta versions may contain bugs or unfinished features." = "Beta versions may contain bugs or unfinished features.";
+"Report a problem" = "Report a problem";
 "Checking for updates…" = "Checking for updates…";
 "You're up to date" = "You're up to date";
 "Checked %@" = "Checked %@";

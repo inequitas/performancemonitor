@@ -59,6 +59,9 @@
 /* MARK: - SettingsView：通用标签页 */
 "Refresh interval" = "刷新间隔";
 "Appearance" = "外观";
+"Language" = "语言";
+"Takes effect after relaunch" = "重新启动后生效";
+"Relaunch Now" = "立即重新启动";
 "Show in Dock" = "在程序坞中显示";
 "Launch at login" = "登录时启动";
 "Open / close popover" = "打开/关闭弹出窗口";
@@ -81,6 +84,10 @@
 "Open Settings" = "打开系统设置";
 "Current version" = "当前版本";
 "Beta channel" = "测试版通道";
+"Also receive beta updates" = "同时接收测试版更新";
+"Beta updates arrive sooner but are tested less." = "测试版更新发布更早，但测试较少。";
+"Beta versions may contain bugs or unfinished features." = "测试版可能包含错误或未完成的功能。";
+"Report a problem" = "报告问题";
 "Checking for updates…" = "正在检查更新…";
 "You're up to date" = "已是最新版本";
 "Checked %@" = "已于 %@ 检查";

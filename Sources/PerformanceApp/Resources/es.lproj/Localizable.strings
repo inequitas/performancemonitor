@@ -60,6 +60,9 @@
 /* MARK: - SettingsView: pestaña General */
 "Refresh interval" = "Intervalo de actualización";
 "Appearance" = "Aspecto";
+"Language" = "Idioma";
+"Takes effect after relaunch" = "Se aplica tras reiniciar";
+"Relaunch Now" = "Reiniciar ahora";
 "Show in Dock" = "Mostrar en el Dock";
 "Launch at login" = "Abrir al iniciar sesión";
 "Open / close popover" = "Abrir/cerrar ventana emergente";
@@ -82,6 +85,10 @@
 "Open Settings" = "Abrir Ajustes";
 "Current version" = "Versión actual";
 "Beta channel" = "Canal beta";
+"Also receive beta updates" = "Recibir también actualizaciones beta";
+"Beta updates arrive sooner but are tested less." = "Las actualizaciones beta llegan antes, pero están menos probadas.";
+"Beta versions may contain bugs or unfinished features." = "Las versiones beta pueden contener errores o funciones inacabadas.";
+"Report a problem" = "Informar de un problema";
 "Checking for updates…" = "Buscando actualizaciones…";
 "You're up to date" = "Tienes la versión más reciente";
 "Checked %@" = "Comprobado %@";

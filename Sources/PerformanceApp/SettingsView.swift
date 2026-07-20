@@ -32,7 +32,7 @@ struct SettingsView: View {
             HistoryTab(engine: engine, settings: engine.settings)
                 .tabItem { Label(String(localized: "History"), systemImage: "clock.arrow.circlepath") }
 
-            UpdatesTab(updater: updater)
+            UpdatesTab(updater: updater, settings: engine.settings)
                 .tabItem { Label(String(localized: "Updates"), systemImage: "arrow.down.circle.fill") }
         }
         .frame(width: 500)
@@ -97,6 +97,10 @@ private struct WindowFocuser: NSViewRepresentable {
 private struct GeneralTab: View {
     @ObservedObject var settings: SettingsStore
     @Binding var launchAtLogin: Bool
+    // Captured on first appearance so the relaunch banner shows only after
+    // the user actually changes the language during this Settings visit —
+    // not merely because a non-system language was already active.
+    @State private var initialAppLanguage: AppLanguage?
 
     var body: some View {
         VStack(spacing: 16) {
@@ -120,6 +124,29 @@ private struct GeneralTab: View {
                     .labelsHidden()
                     .pickerStyle(.segmented)
                     .frame(width: 160)
+                }
+                Divider().padding(.vertical, 4)
+                SettingsRow(label: String(localized: "Language")) {
+                    Picker("", selection: $settings.appLanguage) {
+                        ForEach(AppLanguage.allCases) { lang in
+                            Text(lang.displayName).tag(lang)
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                    .frame(width: 160)
+                }
+                if let initial = initialAppLanguage, settings.appLanguage != initial {
+                    HStack(spacing: 8) {
+                        Text(String(localized: "Takes effect after relaunch"))
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Button(String(localized: "Relaunch Now")) { relaunchApp() }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                    }
+                    .padding(.top, 2)
                 }
                 Divider().padding(.vertical, 4)
                 SettingsRow(label: String(localized: "Show in Dock")) {
@@ -169,6 +196,24 @@ private struct GeneralTab: View {
         }
         .padding(16)
         .transaction { $0.animation = nil }
+        .onAppear {
+            if initialAppLanguage == nil { initialAppLanguage = settings.appLanguage }
+        }
+    }
+
+    /// Relaunches the app so a language change (which macOS only picks up
+    /// from AppleLanguages at process start) takes effect. Launches a fresh
+    /// instance of the same bundle, then quits this one — NSWorkspace's
+    /// openApplication is the modern, sandbox-safe replacement for spawning
+    /// the executable directly via Process/NSTask.
+    private func relaunchApp() {
+        let bundleURL = Bundle.main.bundleURL
+        let configuration = NSWorkspace.OpenConfiguration()
+        configuration.createsNewApplicationInstance = true
+        NSWorkspace.shared.openApplication(at: bundleURL, configuration: configuration) { _, _ in }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            NSApp.terminate(nil)
+        }
     }
 }
 
@@ -363,6 +408,7 @@ private struct MenuBarMetricRow: View {
 
 private struct UpdatesTab: View {
     @ObservedObject var updater: UpdateChecker
+    @ObservedObject var settings: SettingsStore
 
     private static let relativeFormatter: RelativeDateTimeFormatter = {
         let f = RelativeDateTimeFormatter()
@@ -405,10 +451,47 @@ private struct UpdatesTab: View {
                 }
                 Divider().padding(.vertical, 4)
                 statusContent
+                // The opt-in only makes sense on a stable build — an actual
+                // beta build is already on the beta channel via its
+                // Info.plist and shows the "Beta channel" badge above instead.
+                if updater.channel != .beta {
+                    Divider().padding(.vertical, 4)
+                    SettingsRow(label: String(localized: "Also receive beta updates")) {
+                        Toggle("", isOn: $settings.betaUpdatesOptIn).labelsHidden()
+                    }
+                    Text(String(localized: "Beta updates arrive sooner but are tested less."))
+                        .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
+                }
+                // Shown whenever this run is effectively on the beta channel
+                // — an actual beta build, or a stable build with the opt-in
+                // above enabled — since beta users are exactly the ones who
+                // need an easy way to report problems.
+                if updater.isBetaChannel {
+                    betaWarning
+                }
             }
         }
         .padding(16)
         .task { await updater.refreshNotificationStatus() }
+    }
+
+    private var betaWarning: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 6) {
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Text(String(localized: "Beta versions may contain bugs or unfinished features."))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            Button(String(localized: "Report a problem")) {
+                NSWorkspace.shared.open(URL(string: "https://github.com/inequitas/performancemonitor/issues")!)
+            }
+            .buttonStyle(.link)
+            .font(.caption2)
+        }
+        .padding(.top, 2)
     }
 
     @ViewBuilder private var statusContent: some View {

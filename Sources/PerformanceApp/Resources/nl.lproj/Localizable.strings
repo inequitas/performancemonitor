@@ -60,6 +60,9 @@
 /* MARK: - SettingsView: tabblad Algemeen */
 "Refresh interval" = "Verversingsinterval";
 "Appearance" = "Weergave";
+"Language" = "Taal";
+"Takes effect after relaunch" = "Wordt van kracht na herstart";
+"Relaunch Now" = "Nu herstarten";
 "Show in Dock" = "Tonen in Dock";
 "Launch at login" = "Starten bij inloggen";
 "Open / close popover" = "Popover openen/sluiten";
@@ -82,6 +85,10 @@
 "Open Settings" = "Instellingen openen";
 "Current version" = "Huidige versie";
 "Beta channel" = "Bètakanaal";
+"Also receive beta updates" = "Ook bèta-updates ontvangen";
+"Beta updates arrive sooner but are tested less." = "Bèta-updates verschijnen eerder, maar zijn minder grondig getest.";
+"Beta versions may contain bugs or unfinished features." = "Bètaversies kunnen bugs of onafgemaakte functies bevatten.";
+"Report a problem" = "Een probleem melden";
 "Checking for updates…" = "Controleren op updates…";
 "You're up to date" = "Je hebt de nieuwste versie";
 "Checked %@" = "Gecontroleerd %@";

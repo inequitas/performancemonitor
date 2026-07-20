@@ -60,6 +60,9 @@
 /* MARK: - SettingsView: General tab */
 "Refresh interval" = "更新間隔";
 "Appearance" = "外観";
+"Language" = "言語";
+"Takes effect after relaunch" = "再起動後に反映されます";
+"Relaunch Now" = "今すぐ再起動";
 "Show in Dock" = "Dockに表示";
 "Launch at login" = "ログイン時に起動";
 "Open / close popover" = "ポップオーバーを開く/閉じる";
@@ -82,6 +85,10 @@
 "Open Settings" = "設定を開く";
 "Current version" = "現在のバージョン";
 "Beta channel" = "ベータチャンネル";
+"Also receive beta updates" = "ベータ版の更新も受け取る";
+"Beta updates arrive sooner but are tested less." = "ベータ版の更新は早く届きますが、テストは十分ではありません。";
+"Beta versions may contain bugs or unfinished features." = "ベータ版には不具合や未完成の機能が含まれる場合があります。";
+"Report a problem" = "問題を報告";
 "Checking for updates…" = "アップデートを確認中…";
 "You're up to date" = "最新の状態です";
 "Checked %@" = "確認日時: %@";

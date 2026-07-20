@@ -40,7 +40,23 @@ final class UpdateChecker: NSObject, ObservableObject {
         return Channel(rawValue: raw) ?? .stable
     }()
 
-    var isBetaChannel: Bool { channel == .beta }
+    /// The channel this run actually checks/downloads from: beta if the
+    /// build itself is a beta build (Info.plist PMUpdateChannel), OR if the
+    /// user opted in to beta updates from a stable build via Settings →
+    /// Updates. Read fresh from UserDefaults each time (rather than cached)
+    /// so toggling the opt-in takes effect on the very next check.
+    var effectiveChannel: Channel {
+        if channel == .beta { return .beta }
+        return UserDefaults.standard.bool(forKey: Self.betaOptInKey) ? .beta : .stable
+    }
+
+    /// Drives the "Beta channel" badge in the Updates tab — true both for an
+    /// actual beta build and for a stable build with the opt-in enabled.
+    var isBetaChannel: Bool { effectiveChannel == .beta }
+
+    /// Shared with SettingsStore.betaUpdatesOptIn, which owns the persisted
+    /// value; kept as one literal here to avoid a typo'd duplicate key.
+    static let betaOptInKey = "betaUpdatesOptIn"
 
     // Stable: GitHub's "latest" endpoint, which never returns pre-releases.
     private let stableAPIURL = URL(string: "https://api.github.com/repos/inequitas/performancemonitor/releases/latest")!
@@ -163,7 +179,12 @@ final class UpdateChecker: NSObject, ObservableObject {
     /// version by `VersionComparison` — which orders pre-releases too — so a
     /// beta install is offered both newer betas and the eventual stable release.
     private func fetchCandidateRelease() async throws -> (tag: String, downloadURL: URL)? {
-        switch channel {
+        // Effective channel (build channel OR the beta opt-in) decides both
+        // which GitHub endpoint we query AND, within a release's asset list,
+        // which zip we're allowed to download — see AssetSelector.
+        let assetChannel: PerformanceAppCore.UpdateChannel = effectiveChannel == .beta ? .beta : .stable
+
+        switch effectiveChannel {
         case .stable:
             var req = URLRequest(url: stableAPIURL)
             req.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
@@ -172,7 +193,7 @@ final class UpdateChecker: NSObject, ObservableObject {
             guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
                 return nil
             }
-            return Self.candidate(from: json)
+            return Self.candidate(from: json, channel: assetChannel)
 
         case .beta:
             var req = URLRequest(url: releasesListAPIURL)
@@ -184,7 +205,7 @@ final class UpdateChecker: NSObject, ObservableObject {
             }
             let candidates = releases
                 .filter { ($0["draft"] as? Bool) != true }
-                .compactMap { Self.candidate(from: $0) }
+                .compactMap { Self.candidate(from: $0, channel: assetChannel) }
             return candidates.max { lhs, rhs in
                 let lv = lhs.tag.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
                 let rv = rhs.tag.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
@@ -193,11 +214,18 @@ final class UpdateChecker: NSObject, ObservableObject {
         }
     }
 
-    private static func candidate(from json: [String: Any]) -> (tag: String, downloadURL: URL)? {
+    /// Picks the release's asset by exact name for `channel` (via
+    /// AssetSelector — never "the first .zip"), so a stable client can never
+    /// be handed a beta build's asset or vice versa.
+    private static func candidate(from json: [String: Any], channel: PerformanceAppCore.UpdateChannel) -> (tag: String, downloadURL: URL)? {
         guard
             let tag = json["tag_name"] as? String,
-            let assets = json["assets"] as? [[String: Any]],
-            let zipAsset = assets.first(where: { ($0["name"] as? String)?.hasSuffix(".zip") == true }),
+            let assets = json["assets"] as? [[String: Any]]
+        else { return nil }
+        let names = assets.compactMap { $0["name"] as? String }
+        guard
+            let selectedName = AssetSelector.selectAssetName(from: names, channel: channel),
+            let zipAsset = assets.first(where: { ($0["name"] as? String) == selectedName }),
             let urlStr = zipAsset["browser_download_url"] as? String,
             let downloadURL = URL(string: urlStr)
         else { return nil }
