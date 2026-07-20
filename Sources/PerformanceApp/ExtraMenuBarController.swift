@@ -2,6 +2,7 @@ import AppKit
 import SwiftUI
 import Combine
 import Carbon
+import PerformanceAppCore
 
 /// Owns the single NSStatusItem that shows all enabled metrics side-by-side.
 /// Subscribes to the engine's raw metric publishers and renders images itself,
@@ -64,6 +65,7 @@ final class ExtraMenuBarController: NSObject {
         // only one draw pass.
         engine.objectWillChange
             .merge(with: settings.objectWillChange)
+            .merge(with: engine.alerts.objectWillChange)
             .debounce(for: .milliseconds(32), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 self?.render()
@@ -143,15 +145,45 @@ final class ExtraMenuBarController: NSObject {
     // (already debounced), so it always reflects what's currently on screen.
     private func accessibilityLabel(for metrics: [MenuBarMetric], engine: MetricsEngine) -> String {
         guard !metrics.isEmpty else { return "Performance Monitor" }
-        let parts = metrics.map { engine.textOnlyLabel(for: $0) }
+        let parts = metrics.map { metric -> String in
+            let base = engine.textOnlyLabel(for: metric)
+            // Colour is never the only channel conveying threshold status —
+            // fold it into the spoken label too, e.g. "CPU 92%, above alert threshold".
+            guard settings.menuBarThresholdColor,
+                  let suffix = engine.thresholdStatus(for: metric).label else { return base }
+            return "\(base), \(suffix)"
+        }
         return "Performance Monitor: " + parts.joined(separator: ", ")
+    }
+
+    // MARK: - Threshold colouring
+
+    private func thresholdColor(for severity: ThresholdSeverity) -> NSColor {
+        switch severity {
+        case .normal:   return .white
+        case .warning:  return .systemOrange
+        case .critical: return .systemRed
+        }
+    }
+
+    /// Text attributes for a metric's slot. Reuses the shared, pre-measured
+    /// `Self.attrs` whenever no colouring applies (the common case), so the
+    /// fast path allocates nothing extra.
+    private func textAttrs(for severity: ThresholdSeverity) -> [NSAttributedString.Key: Any] {
+        guard settings.menuBarThresholdColor, severity != .normal else { return Self.attrs }
+        return [
+            .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium),
+            .foregroundColor: thresholdColor(for: severity)
+        ]
     }
 
     private func makeImage(for metric: MenuBarMetric,
                            style: MenuBarStyle,
                            engine: MetricsEngine) -> NSImage {
         let h: CGFloat = 16
-        let attrs = Self.attrs
+        let severity = settings.menuBarThresholdColor ? engine.thresholdStatus(for: metric).severity : .normal
+        let attrs = textAttrs(for: severity)
+        let sparkColor = thresholdColor(for: severity)
 
         // Disk in Space mode is always rendered as text — no sparkline applies.
         let effectiveStyle: MenuBarStyle =
@@ -194,7 +226,7 @@ final class ExtraMenuBarController: NSObject {
                     path.move(to: pt(0))
                     for i in 1..<history.count { path.addLine(to: pt(i)) }
                     ctx.addPath(path)
-                    ctx.setStrokeColor(NSColor.white.withAlphaComponent(0.85).cgColor)
+                    ctx.setStrokeColor(sparkColor.withAlphaComponent(0.85).cgColor)
                     ctx.setLineWidth(1.5)
                     ctx.setLineCap(.round); ctx.setLineJoin(.round)
                     ctx.strokePath()
@@ -202,7 +234,7 @@ final class ExtraMenuBarController: NSObject {
                     ctx.addLine(to: CGPoint(x: CGFloat(history.count - 1) * step, y: 0))
                     ctx.addLine(to: CGPoint(x: 0, y: 0))
                     ctx.closePath()
-                    ctx.setFillColor(NSColor.white.withAlphaComponent(0.15).cgColor)
+                    ctx.setFillColor(sparkColor.withAlphaComponent(0.15).cgColor)
                     ctx.fillPath()
                 }
                 (text as NSString).draw(at: NSPoint(x: textX, y: textY), withAttributes: attrs)

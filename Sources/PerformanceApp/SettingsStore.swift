@@ -107,6 +107,14 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(diskSparklineWrite, forKey: "diskSparklineWrite") }
     }
 
+    /// When on, the menu-bar value/sparkline for a metric is colored orange
+    /// or red once its current value crosses that metric's alert threshold
+    /// (see AlertService). Off by default so the menu bar stays unchanged
+    /// for existing users.
+    @Published var menuBarThresholdColor: Bool = false {
+        didSet { UserDefaults.standard.set(menuBarThresholdColor, forKey: "menuBarThresholdColor") }
+    }
+
     @Published var panelOrder: [MetricsEngine.Panel] = MetricsEngine.Panel.allCases {
         didSet { UserDefaults.standard.set(panelOrder.map(\.rawValue), forKey: Pref.panelOrder) }
     }
@@ -199,6 +207,7 @@ final class SettingsStore: ObservableObject {
         }
         networkSparklineUpload = ud.bool(forKey: "networkSparklineUpload")
         diskSparklineWrite     = ud.bool(forKey: "diskSparklineWrite")
+        menuBarThresholdColor  = ud.bool(forKey: "menuBarThresholdColor")
 
         if let raw = ud.stringArray(forKey: Pref.panelOrder) {
             let loaded = raw.compactMap { MetricsEngine.Panel(rawValue: $0) }

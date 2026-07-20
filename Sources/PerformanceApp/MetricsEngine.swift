@@ -307,6 +307,48 @@ final class MetricsEngine: ObservableObject {
         }
     }
 
+    /// Alert-threshold severity for a menu-bar metric, plus a short
+    /// human-readable suffix for VoiceOver (nil when normal). Reuses the
+    /// same threshold values as AlertService, so it stays in sync with the
+    /// Alerts settings tab. A metric's threshold only counts as "applicable"
+    /// when its alert type is enabled — if the user turned CPU alerting off,
+    /// the CPU menu-bar item no longer treats its (still-stored) threshold
+    /// as active. CPU/GPU/memory are usage-style (bad above the threshold);
+    /// disk free space is headroom-style (bad below it), and only applies
+    /// while the menu bar is showing free space rather than I/O throughput.
+    /// Network has no configured alert threshold, so it is always `.normal`.
+    func thresholdStatus(for metric: MenuBarMetric) -> (severity: ThresholdSeverity, label: String?) {
+        func status(_ severity: ThresholdSeverity, _ direction: ThresholdSeverityMapper.Direction) -> (ThresholdSeverity, String?) {
+            switch severity {
+            case .normal:   return (.normal, nil)
+            case .warning:  return (.warning, direction == .lowIsBad ? "below alert threshold" : "above alert threshold")
+            case .critical: return (.critical, direction == .lowIsBad ? "well below alert threshold" : "well above alert threshold")
+            }
+        }
+        switch metric {
+        case .cpu:
+            let threshold = alerts.cpuEnabled ? alerts.cpuThreshold : nil
+            let severity = ThresholdSeverityMapper.severity(value: cpuUsagePercent, threshold: threshold, direction: .highIsBad)
+            return status(severity, .highIsBad)
+        case .gpu:
+            let threshold = alerts.gpuEnabled ? alerts.gpuThreshold : nil
+            let severity = ThresholdSeverityMapper.severity(value: gpuUsagePercent, threshold: threshold, direction: .highIsBad)
+            return status(severity, .highIsBad)
+        case .memory:
+            let pct = memoryTotalGB > 0 ? (memoryUsedGB / memoryTotalGB) * 100 : 0
+            let threshold = (alerts.memoryEnabled && memoryTotalGB > 0) ? alerts.memoryThresholdPercent : nil
+            let severity = ThresholdSeverityMapper.severity(value: pct, threshold: threshold, direction: .highIsBad)
+            return status(severity, .highIsBad)
+        case .disk:
+            guard settings.diskDisplayMode == .space else { return (.normal, nil) }
+            let threshold = alerts.diskEnabled ? alerts.diskFreeThresholdGB : nil
+            let severity = ThresholdSeverityMapper.severity(value: diskFreeGB, threshold: threshold, direction: .lowIsBad)
+            return status(severity, .lowIsBad)
+        case .network:
+            return (.normal, nil)
+        }
+    }
+
     init() {
         thermalState = ProcessInfo.processInfo.thermalState
         thermalObserver = NotificationCenter.default.addObserver(

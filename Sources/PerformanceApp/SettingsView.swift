@@ -203,6 +203,10 @@ private struct MenuBarTab: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
+            SettingsRow(label: "Colour when above alert threshold") {
+                Toggle("", isOn: $settings.menuBarThresholdColor).labelsHidden()
+            }
+
             ZStack(alignment: .topLeading) {
                 RoundedRectangle(cornerRadius: 14).fill(.ultraThinMaterial)
                 ForEach(Array(settings.menuBarOrder.enumerated()), id: \.element) { i, metric in
