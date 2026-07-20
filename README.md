@@ -1,6 +1,6 @@
 # Performance Monitor
 
-A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
+**[perfmon.knhome.nl](https://perfmon.knhome.nl)** — A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
 [![CI](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml/badge.svg)](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml) ![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.0.0-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green) [![Sponsor](https://img.shields.io/badge/%E2%9D%A4-Sponsor-ea4aaa)](https://github.com/sponsors/inequitas)
 
