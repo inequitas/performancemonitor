@@ -62,6 +62,27 @@ if [ -f "${ICON_SRC}" ]; then
     cp "${ICON_SRC}" "${APP_DIR}/Contents/Resources/AppIcon.icns"
 fi
 
+# Localization: In-app UI strings (String(localized:), no explicit bundle)
+# resolve against Bundle.main, which CFBundle maps to Contents/Resources/
+# <lang>.lproj at runtime — the standard mechanism, verified to correctly
+# honor the user's language preference. We deliberately do NOT use SwiftPM's
+# generated Bundle.module accessor here: its resource_bundle_accessor.swift
+# looks for the resource bundle via `Bundle.main.bundleURL.appendingPathComponent(...)`,
+# i.e. at the TOP LEVEL of the .app (sibling of Contents/) — but codesign
+# rejects that layout ("unsealed contents present in the bundle root"). Bundle.module
+# remains available for `swift build`/`swift test` during development (it
+# falls back to the raw .build path there), but the shipped .app copies the
+# same source-of-truth .lproj files straight into Contents/Resources instead.
+#
+# Two source trees feed Contents/Resources/<lang>.lproj:
+#   - Sources/PerformanceApp/Resources/<lang>.lproj  (Localizable.strings — UI strings)
+#   - Resources/<lang>.lproj                          (InfoPlist.strings — system prompts)
+for LANG_DIR in Sources/PerformanceApp/Resources/*.lproj Resources/*.lproj; do
+    LPROJ_NAME="$(basename "${LANG_DIR}")"
+    mkdir -p "${APP_DIR}/Contents/Resources/${LPROJ_NAME}"
+    cp "${LANG_DIR}/"*.strings "${APP_DIR}/Contents/Resources/${LPROJ_NAME}/"
+done
+
 cat > "${APP_DIR}/Contents/Info.plist" << PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

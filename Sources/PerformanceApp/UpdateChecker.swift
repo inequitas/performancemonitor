@@ -88,9 +88,9 @@ final class UpdateChecker: NSObject, ObservableObject {
         let center = UNUserNotificationCenter.current()
         center.delegate = self
 
-        let updateAction = UNNotificationAction(identifier: "UPDATE_NOW",    title: "Update Now",          options: .foreground)
-        let remindAction = UNNotificationAction(identifier: "REMIND_LATER",  title: "Remind Me Later",     options: [])
-        let neverAction  = UNNotificationAction(identifier: "NEVER",         title: "Skip This Version",   options: .destructive)
+        let updateAction = UNNotificationAction(identifier: "UPDATE_NOW",    title: String(localized: "Update Now"),          options: .foreground)
+        let remindAction = UNNotificationAction(identifier: "REMIND_LATER",  title: String(localized: "Remind Me Later"),     options: [])
+        let neverAction  = UNNotificationAction(identifier: "NEVER",         title: String(localized: "Skip This Version"),   options: .destructive)
         let category = UNNotificationCategory(identifier: Self.categoryID,
                                               actions: [updateAction, remindAction, neverAction],
                                               intentIdentifiers: [], options: [])
@@ -137,11 +137,11 @@ final class UpdateChecker: NSObject, ObservableObject {
         state = .checking
         do {
             guard let (tag, downloadURL) = try await fetchCandidateRelease() else {
-                state = .error("Could not read release info from GitHub.")
+                state = .error(String(localized: "Could not read release info from GitHub."))
                 return
             }
             guard Self.isAllowedDownloadURL(downloadURL) else {
-                state = .error("Update refused — download is not served from a trusted GitHub host.")
+                state = .error(String(localized: "Update refused — download is not served from a trusted GitHub host."))
                 return
             }
             lastChecked = Date()
@@ -153,7 +153,7 @@ final class UpdateChecker: NSObject, ObservableObject {
                 state = .upToDate
             }
         } catch {
-            state = .error("Network error: \(error.localizedDescription)")
+            state = .error(String(format: String(localized: "Network error: %@"), error.localizedDescription))
         }
     }
 
@@ -219,8 +219,8 @@ final class UpdateChecker: NSObject, ObservableObject {
         guard authStatus == .authorized else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = "Performance Monitor Update"
-        content.body  = "Version \(version) is available — you're on \(currentVersion)."
+        content.title = String(localized: "Performance Monitor Update")
+        content.body  = String(format: String(localized: "Version %@ is available — you're on %@."), version, currentVersion)
         content.sound = .default
         content.categoryIdentifier = Self.categoryID
         content.userInfo = ["version": version, "downloadURL": downloadURL.absoluteString]
@@ -245,7 +245,7 @@ final class UpdateChecker: NSObject, ObservableObject {
             // Reject anything not served from the trusted GitHub hosts, even if a
             // manipulated release pointed the download elsewhere.
             guard Self.isAllowedDownloadURL(downloadURL) else {
-                state = .error("Update refused — download is not served from a trusted GitHub host.")
+                state = .error(String(localized: "Update refused — download is not served from a trusted GitHub host."))
                 return
             }
 
@@ -254,7 +254,7 @@ final class UpdateChecker: NSObject, ObservableObject {
 
             let (data, response) = try await URLSession.shared.data(from: downloadURL)
             guard (response as? HTTPURLResponse)?.statusCode == 200 else {
-                state = .error("Download failed — server returned an error.")
+                state = .error(String(localized: "Download failed — server returned an error."))
                 return
             }
             try data.write(to: zipPath)
@@ -267,13 +267,13 @@ final class UpdateChecker: NSObject, ObservableObject {
             // with a missing or invalid signature is refused outright (fail-closed).
             guard let verifyingKey = try? Curve25519.Signing.PublicKey(
                     rawRepresentation: Data(base64Encoded: Self.publicKeyBase64) ?? Data()) else {
-                state = .error("Update aborted — internal verification key is invalid.")
+                state = .error(String(localized: "Update aborted — internal verification key is invalid."))
                 return
             }
 
             guard let sigURL = URL(string: downloadURL.absoluteString + ".sig"),
                   Self.isAllowedDownloadURL(sigURL) else {
-                state = .error("Update aborted — could not locate the signature file.")
+                state = .error(String(localized: "Update aborted — could not locate the signature file."))
                 return
             }
 
@@ -284,17 +284,17 @@ final class UpdateChecker: NSObject, ObservableObject {
                       let sigB64 = String(data: sigData, encoding: .utf8)?
                           .trimmingCharacters(in: .whitespacesAndNewlines),
                       let decoded = Data(base64Encoded: sigB64) else {
-                    state = .error("Update aborted — signature is missing or unreadable. This release cannot be verified.")
+                    state = .error(String(localized: "Update aborted — signature is missing or unreadable. This release cannot be verified."))
                     return
                 }
                 signature = decoded
             } catch {
-                state = .error("Update aborted — could not download the signature file.")
+                state = .error(String(localized: "Update aborted — could not download the signature file."))
                 return
             }
 
             guard verifyingKey.isValidSignature(signature, for: data) else {
-                state = .error("Update aborted — the download failed signature verification and may have been tampered with.")
+                state = .error(String(localized: "Update aborted — the download failed signature verification and may have been tampered with."))
                 return
             }
             // --- Verification passed: the zip bytes are authentic ---
@@ -309,13 +309,13 @@ final class UpdateChecker: NSObject, ObservableObject {
             try unzip.run()
             unzip.waitUntilExit()
             guard unzip.terminationStatus == 0 else {
-                state = .error("Failed to unzip the downloaded archive.")
+                state = .error(String(localized: "Failed to unzip the downloaded archive."))
                 return
             }
 
             guard let newAppURL = try FileManager.default.contentsOfDirectory(at: tmp, includingPropertiesForKeys: nil)
                     .first(where: { $0.pathExtension == "app" }) else {
-                state = .error("App bundle not found inside downloaded archive.")
+                state = .error(String(localized: "App bundle not found inside downloaded archive."))
                 return
             }
 
@@ -363,7 +363,7 @@ final class UpdateChecker: NSObject, ObservableObject {
             NSApp.setActivationPolicy(.accessory)
             NSApp.terminate(nil)
         } catch {
-            state = .error("Install failed: \(error.localizedDescription)")
+            state = .error(String(format: String(localized: "Install failed: %@"), error.localizedDescription))
         }
     }
 

@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "PerformanceApp",
+    defaultLocalization: "en",
     platforms: [.macOS(.v14)],
     targets: [
         .target(
@@ -17,6 +18,9 @@ let package = Package(
             name: "PerformanceApp",
             dependencies: ["PerformanceAppCore", "CNVMeSMART"],
             path: "Sources/PerformanceApp",
+            resources: [
+                .process("Resources")
+            ],
             linkerSettings: [
                 .linkedFramework("IOBluetooth"),
                 .linkedFramework("CoreWLAN"),

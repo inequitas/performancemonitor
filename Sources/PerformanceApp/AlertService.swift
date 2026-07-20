@@ -58,23 +58,27 @@ final class AlertService: ObservableObject {
                diskFree: Double, gpu: Double, thermal: ProcessInfo.ThermalState) {
         guard alertsEnabled else { return }
         if cpuEnabled, cpu >= cpuThreshold {
-            fire("cpu", "High CPU usage", String(format: "CPU is at %.0f%%", cpu))
+            fire("cpu", String(localized: "High CPU usage"),
+                 String(format: String(localized: "CPU is at %.0f%%"), cpu))
         }
         if memoryEnabled, memTotal > 0 {
             let pct = (memUsed / memTotal) * 100
             if pct >= memoryThresholdPercent {
-                fire("memory", "High memory usage",
-                     String(format: "%.1f / %.0f GB used (%.0f%%)", memUsed, memTotal, pct))
+                fire("memory", String(localized: "High memory usage"),
+                     String(format: String(localized: "%.1f / %.0f GB used (%.0f%%)"), memUsed, memTotal, pct))
             }
         }
         if diskEnabled, diskFree > 0, diskFree <= diskFreeThresholdGB {
-            fire("disk", "Low disk space", String(format: "Only %.1f GB free", diskFree))
+            fire("disk", String(localized: "Low disk space"),
+                 String(format: String(localized: "Only %.1f GB free"), diskFree))
         }
         if gpuEnabled, gpu >= gpuThreshold {
-            fire("gpu", "High GPU usage", String(format: "GPU is at %.0f%%", gpu))
+            fire("gpu", String(localized: "High GPU usage"),
+                 String(format: String(localized: "GPU is at %.0f%%"), gpu))
         }
         if thermalEnabled, thermal == .serious || thermal == .critical {
-            fire("thermal", "System running hot", "Thermal pressure: \(thermal.label)")
+            fire("thermal", String(localized: "System running hot"),
+                 String(format: String(localized: "Thermal pressure: %@"), thermal.label))
         }
     }
 

@@ -1,0 +1,11 @@
+/*
+  InfoPlist.strings (en)
+  Performance Monitor
+
+  Localized overrides for Info.plist system-facing strings (permission
+  prompts, etc.). Copied into Contents/Resources/en.lproj by build_app.sh —
+  this is standard macOS Info.plist localization, separate from the
+  SwiftPM resource bundle used for in-app UI strings.
+*/
+
+"NSBluetoothAlwaysUsageDescription" = "Performance Monitor lists your paired Bluetooth devices and their connection status.";

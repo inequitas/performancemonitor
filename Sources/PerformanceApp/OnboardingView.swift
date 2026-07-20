@@ -43,28 +43,28 @@ struct OnboardingView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("Welcome to Performance Monitor")
+                Text(String(localized: "Welcome to Performance Monitor"))
                     .font(.title2.weight(.semibold))
-                Text("This app lives in your menu bar, not the Dock. Look for its icon — CPU, memory, and more — next to the clock at the top of your screen.")
+                Text(String(localized: "This app lives in your menu bar, not the Dock. Look for its icon — CPU, memory, and more — next to the clock at the top of your screen."))
                     .font(.callout)
                     .foregroundStyle(.secondary)
             }
 
             VStack(alignment: .leading, spacing: 10) {
                 featureRow(icon: "rectangle.stack.fill", color: .blue,
-                           text: "Click the menu bar icon for a quick overview of CPU, memory, network, disk, and more")
+                           text: String(localized: "Click the menu bar icon for a quick overview of CPU, memory, network, disk, and more"))
                 featureRow(icon: "macwindow", color: .indigo,
-                           text: "Open any card for a detailed window with history charts and process breakdowns")
+                           text: String(localized: "Open any card for a detailed window with history charts and process breakdowns"))
                 featureRow(icon: "menubar.rectangle", color: .purple,
-                           text: "Choose which metrics show in the menu bar, and whether as text or a live graph")
+                           text: String(localized: "Choose which metrics show in the menu bar, and whether as text or a live graph"))
                 featureRow(icon: "bell.badge.fill", color: .orange,
-                           text: "Get notified when CPU, memory, disk space, or temperature cross a threshold you set")
+                           text: String(localized: "Get notified when CPU, memory, disk space, or temperature cross a threshold you set"))
             }
 
             VStack(alignment: .leading, spacing: 6) {
-                Label("About permissions", systemImage: "hand.raised.fill")
+                Label(String(localized: "About permissions"), systemImage: "hand.raised.fill")
                     .font(.subheadline.weight(.semibold))
-                Text("Performance Monitor will ask for Bluetooth access to show your paired devices and their battery levels, and for notification access to deliver the alerts above. Both are optional — the rest of the app works fully without them.")
+                Text(String(localized: "Performance Monitor will ask for Bluetooth access to show your paired devices and their battery levels, and for notification access to deliver the alerts above. Both are optional — the rest of the app works fully without them."))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -73,7 +73,7 @@ struct OnboardingView: View {
             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
 
             HStack {
-                Label("Launch at login", systemImage: "power")
+                Label(String(localized: "Launch at login"), systemImage: "power")
                     .font(.callout)
                 Spacer()
                 Toggle("", isOn: $launchAtLogin)
@@ -91,7 +91,7 @@ struct OnboardingView: View {
 
             HStack {
                 Spacer()
-                Button("Get Started") {
+                Button(String(localized: "Get Started")) {
                     OnboardingGate.markCompleted()
                     dismissWindow()
                 }

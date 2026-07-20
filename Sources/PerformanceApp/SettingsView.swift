@@ -15,25 +15,25 @@ struct SettingsView: View {
     var body: some View {
         TabView {
             GeneralTab(settings: engine.settings, launchAtLogin: $launchAtLogin)
-                .tabItem { Label("General", systemImage: "gearshape.fill") }
+                .tabItem { Label(String(localized: "General"), systemImage: "gearshape.fill") }
 
             MenuBarTab(settings: engine.settings)
-                .tabItem { Label("Menu Bar", systemImage: "menubar.rectangle") }
+                .tabItem { Label(String(localized: "Menu Bar"), systemImage: "menubar.rectangle") }
 
             MetricsTab(settings: engine.settings)
-                .tabItem { Label("Metrics", systemImage: "chart.bar.fill") }
+                .tabItem { Label(String(localized: "Metrics"), systemImage: "chart.bar.fill") }
 
             AlertsTab(alerts: engine.alerts)
-                .tabItem { Label("Alerts", systemImage: "bell.badge.fill") }
+                .tabItem { Label(String(localized: "Alerts"), systemImage: "bell.badge.fill") }
 
             PanelsTab(settings: engine.settings)
-                .tabItem { Label("Panels", systemImage: "square.grid.2x2") }
+                .tabItem { Label(String(localized: "Panels"), systemImage: "square.grid.2x2") }
 
             HistoryTab(engine: engine, settings: engine.settings)
-                .tabItem { Label("History", systemImage: "clock.arrow.circlepath") }
+                .tabItem { Label(String(localized: "History"), systemImage: "clock.arrow.circlepath") }
 
             UpdatesTab(updater: updater)
-                .tabItem { Label("Updates", systemImage: "arrow.down.circle.fill") }
+                .tabItem { Label(String(localized: "Updates"), systemImage: "arrow.down.circle.fill") }
         }
         .frame(width: 420)
         .background(.regularMaterial)
@@ -100,8 +100,8 @@ private struct GeneralTab: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            SettingsSection(icon: "gearshape.fill", title: "General", color: .gray) {
-                SettingsRow(label: "Refresh interval") {
+            SettingsSection(icon: "gearshape.fill", title: String(localized: "General"), color: .gray) {
+                SettingsRow(label: String(localized: "Refresh interval")) {
                     HStack(spacing: 8) {
                         Slider(value: $settings.refreshInterval, in: 0.5...5.0, step: 0.5)
                         Text(String(format: "%.1fs", settings.refreshInterval))
@@ -111,10 +111,10 @@ private struct GeneralTab: View {
                     }
                 }
                 Divider().padding(.vertical, 4)
-                SettingsRow(label: "Appearance") {
+                SettingsRow(label: String(localized: "Appearance")) {
                     Picker("", selection: $settings.appAppearance) {
                         ForEach(AppAppearance.allCases) { a in
-                            Text(a.rawValue).tag(a)
+                            Text(a.displayName).tag(a)
                         }
                     }
                     .labelsHidden()
@@ -122,11 +122,11 @@ private struct GeneralTab: View {
                     .frame(width: 160)
                 }
                 Divider().padding(.vertical, 4)
-                SettingsRow(label: "Show in Dock") {
+                SettingsRow(label: String(localized: "Show in Dock")) {
                     Toggle("", isOn: $settings.showInDock).labelsHidden()
                 }
                 Divider().padding(.vertical, 4)
-                SettingsRow(label: "Launch at login") {
+                SettingsRow(label: String(localized: "Launch at login")) {
                     Toggle("", isOn: $launchAtLogin)
                         .labelsHidden()
                         .onChange(of: launchAtLogin) { _, newValue in
@@ -139,7 +139,7 @@ private struct GeneralTab: View {
                         }
                 }
                 Divider().padding(.vertical, 4)
-                SettingsRow(label: "Open / close popover") {
+                SettingsRow(label: String(localized: "Open / close popover")) {
                     Text(ExtraMenuBarController.shortcutDisplay)
                         .font(.system(.callout, design: .monospaced))
                         .foregroundStyle(.secondary)
@@ -147,8 +147,8 @@ private struct GeneralTab: View {
                         .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
                 }
                 Divider().padding(.vertical, 4)
-                SettingsRow(label: "Crash Reports") {
-                    Button("Open Crash Reports Folder") {
+                SettingsRow(label: String(localized: "Crash Reports")) {
+                    Button(String(localized: "Open Crash Reports Folder")) {
                         let dir = CrashReporter.reportsDirectory
                         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
                         NSWorkspace.shared.open(dir)
@@ -158,8 +158,8 @@ private struct GeneralTab: View {
                 }
             }
 
-            SettingsSection(icon: "list.number", title: "Processes", color: .blue) {
-                SettingsRow(label: "Top processes shown") {
+            SettingsSection(icon: "list.number", title: String(localized: "Processes"), color: .blue) {
+                SettingsRow(label: String(localized: "Top processes shown")) {
                     Stepper(value: $settings.topProcessCount, in: 3...15) {
                         Text("\(settings.topProcessCount)")
                             .font(.system(.body, design: .rounded).weight(.semibold))
@@ -196,14 +196,14 @@ private struct MenuBarTab: View {
                         .foregroundStyle(.indigo)
                 }
                 .transaction { $0.animation = nil }
-                Text("Menu Bar Icons").font(.headline)
+                Text(String(localized: "Menu Bar Icons")).font(.headline)
             }
 
-            Text("Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar.")
+            Text(String(localized: "Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar."))
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            SettingsRow(label: "Colour when above alert threshold") {
+            SettingsRow(label: String(localized: "Colour when above alert threshold")) {
                 Toggle("", isOn: $settings.menuBarThresholdColor).labelsHidden()
             }
 
@@ -316,14 +316,14 @@ private struct MenuBarMetricRow: View {
                     .symbolEffectsRemoved()
             }
             .transaction { $0.animation = nil }
-            Text(metric.rawValue).font(.callout)
+            Text(metric.displayName).font(.callout)
             Spacer()
             if enabled.wrappedValue {
                 // Disk: IO vs Space toggle
                 if metric == .disk {
                     Picker("", selection: $settings.diskDisplayMode) {
-                        Text("IO").tag(MetricsEngine.DiskDisplayMode.io)
-                        Text("Space").tag(MetricsEngine.DiskDisplayMode.space)
+                        Text(String(localized: "IO")).tag(MetricsEngine.DiskDisplayMode.io)
+                        Text(String(localized: "Space")).tag(MetricsEngine.DiskDisplayMode.space)
                     }
                     .labelsHidden().pickerStyle(.segmented).frame(width: 80)
                 }
@@ -348,8 +348,8 @@ private struct MenuBarMetricRow: View {
                 // Style picker — hidden for disk+space (always text)
                 if !(metric == .disk && settings.diskDisplayMode == .space) {
                     Picker("", selection: style) {
-                        Text("Text").tag(MenuBarStyle.text)
-                        Text("Graph").tag(MenuBarStyle.sparkline)
+                        Text(String(localized: "Text")).tag(MenuBarStyle.text)
+                        Text(String(localized: "Graph")).tag(MenuBarStyle.sparkline)
                     }
                     .labelsHidden().pickerStyle(.segmented).frame(width: 100)
                 }
@@ -375,10 +375,10 @@ private struct UpdatesTab: View {
             if !updater.notificationsEnabled {
                 HStack(spacing: 8) {
                     Image(systemName: "bell.slash.fill").foregroundStyle(.orange)
-                    Text("Update notifications are disabled. Enable them in System Settings → Notifications → Performance Monitor.")
+                    Text(String(localized: "Update notifications are disabled. Enable them in System Settings → Notifications → Performance Monitor."))
                         .font(.caption).foregroundStyle(.secondary)
                     Spacer()
-                    Button("Open Settings") {
+                    Button(String(localized: "Open Settings")) {
                         NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.notifications")!)
                     }
                     .buttonStyle(.bordered).controlSize(.small)
@@ -388,14 +388,14 @@ private struct UpdatesTab: View {
                 .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(.orange.opacity(0.2), lineWidth: 1))
             }
 
-            SettingsSection(icon: "arrow.down.circle.fill", title: "Updates", color: .blue) {
-                SettingsRow(label: "Current version") {
+            SettingsSection(icon: "arrow.down.circle.fill", title: String(localized: "Updates"), color: .blue) {
+                SettingsRow(label: String(localized: "Current version")) {
                     HStack(spacing: 6) {
                         Text(updater.currentVersion)
                             .font(.callout.monospacedDigit())
                             .foregroundStyle(.secondary)
                         if updater.isBetaChannel {
-                            Text("Beta channel")
+                            Text(String(localized: "Beta channel"))
                                 .font(.caption2.weight(.semibold))
                                 .padding(.horizontal, 6).padding(.vertical, 2)
                                 .background(.orange.opacity(0.15), in: Capsule())
@@ -419,7 +419,7 @@ private struct UpdatesTab: View {
         case .checking:
             HStack(spacing: 8) {
                 ProgressView().controlSize(.small)
-                Text("Checking for updates…").font(.callout).foregroundStyle(.secondary)
+                Text(String(localized: "Checking for updates…")).font(.callout).foregroundStyle(.secondary)
                 Spacer()
             }.padding(.vertical, 3)
 
@@ -427,9 +427,9 @@ private struct UpdatesTab: View {
             HStack(spacing: 8) {
                 Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("You're up to date").font(.callout)
+                    Text(String(localized: "You're up to date")).font(.callout)
                     if let date = updater.lastChecked {
-                        Text("Checked \(Self.relativeFormatter.localizedString(for: date, relativeTo: Date()))")
+                        Text(String(format: String(localized: "Checked %@"), Self.relativeFormatter.localizedString(for: date, relativeTo: Date())))
                             .font(.caption2).foregroundStyle(.tertiary)
                     }
                 }
@@ -443,12 +443,12 @@ private struct UpdatesTab: View {
             HStack(spacing: 8) {
                 Image(systemName: "arrow.down.circle.fill").foregroundStyle(.blue)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("v\(version) is available").font(.callout)
-                    Text("The app will quit and relaunch after installing.")
+                    Text(String(format: String(localized: "v%@ is available"), version)).font(.callout)
+                    Text(String(localized: "The app will quit and relaunch after installing."))
                         .font(.caption2).foregroundStyle(.tertiary)
                 }
                 Spacer()
-                Button("Update Now") { updater.downloadAndInstall(from: url) }
+                Button(String(localized: "Update Now")) { updater.downloadAndInstall(from: url) }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
             }.padding(.vertical, 3)
@@ -458,14 +458,14 @@ private struct UpdatesTab: View {
         case .downloading:
             HStack(spacing: 8) {
                 ProgressView().controlSize(.small)
-                Text("Downloading…").font(.callout).foregroundStyle(.secondary)
+                Text(String(localized: "Downloading…")).font(.callout).foregroundStyle(.secondary)
                 Spacer()
             }.padding(.vertical, 3)
 
         case .installing:
             HStack(spacing: 8) {
                 ProgressView().controlSize(.small)
-                Text("Installing — app will restart shortly…").font(.callout).foregroundStyle(.secondary)
+                Text(String(localized: "Installing — app will restart shortly…")).font(.callout).foregroundStyle(.secondary)
                 Spacer()
             }.padding(.vertical, 3)
 
@@ -474,7 +474,7 @@ private struct UpdatesTab: View {
                 Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(message).font(.callout).foregroundStyle(.secondary)
-                    Button("Try Again") { updater.checkForUpdates() }
+                    Button(String(localized: "Try Again")) { updater.checkForUpdates() }
                         .buttonStyle(.bordered).controlSize(.small)
                 }
                 Spacer()
@@ -483,18 +483,18 @@ private struct UpdatesTab: View {
     }
 
     private var checkNowButton: some View {
-        Button("Check Now") { updater.checkForUpdates() }
+        Button(String(localized: "Check Now")) { updater.checkForUpdates() }
             .buttonStyle(.bordered)
             .controlSize(.small)
     }
 
     private var snoozePicker: some View {
-        SettingsRow(label: "Remind me later after") {
+        SettingsRow(label: String(localized: "Remind me later after")) {
             Picker("", selection: $updater.snoozeDays) {
-                Text("1 day").tag(1)
-                Text("3 days").tag(3)
-                Text("7 days").tag(7)
-                Text("14 days").tag(14)
+                Text(String(localized: "1 day")).tag(1)
+                Text(String(localized: "3 days")).tag(3)
+                Text(String(localized: "7 days")).tag(7)
+                Text(String(localized: "14 days")).tag(14)
             }
             .labelsHidden()
             .pickerStyle(.menu)
@@ -510,22 +510,22 @@ private struct MetricsTab: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            SettingsSection(icon: "internaldrive", title: "Disk", color: .indigo) {
-                SettingsRow(label: "Show removable volumes") {
+            SettingsSection(icon: "internaldrive", title: String(localized: "Disk"), color: .indigo) {
+                SettingsRow(label: String(localized: "Show removable volumes")) {
                     Toggle("", isOn: $settings.showRemovableVolumes).labelsHidden()
                 }
             }
 
-            SettingsSection(icon: "network", title: "Network", color: .green) {
-                SettingsRow(label: "Show public IP") {
+            SettingsSection(icon: "network", title: String(localized: "Network"), color: .green) {
+                SettingsRow(label: String(localized: "Show public IP")) {
                     Toggle("", isOn: $settings.publicIPEnabled).labelsHidden()
                 }
                 if settings.publicIPEnabled {
-                    Text("Fetches from api.ipify.org over HTTPS every 5 min.")
+                    Text(String(localized: "Fetches from api.ipify.org over HTTPS every 5 min."))
                         .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
                 }
                 Divider().padding(.vertical, 4)
-                SettingsRow(label: "Ping server") {
+                SettingsRow(label: String(localized: "Ping server")) {
                     Picker("", selection: $settings.pingServer) {
                         ForEach(MetricsEngine.PingServer.allCases) { server in
                             Text(server.displayName).tag(server)
@@ -548,14 +548,14 @@ private struct AlertsTab: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            SettingsSection(icon: "bell.badge.fill", title: "Alerts", color: .orange) {
-                SettingsRow(label: "Enable notifications") {
+            SettingsSection(icon: "bell.badge.fill", title: String(localized: "Alerts"), color: .orange) {
+                SettingsRow(label: String(localized: "Enable notifications")) {
                     Toggle("", isOn: $alerts.alertsEnabled).labelsHidden()
                 }
                 if alerts.alertsEnabled {
                     Divider().padding(.vertical, 4)
                     AlertMetricRow(
-                        icon: "cpu", label: "CPU above",
+                        icon: "cpu", label: String(localized: "CPU above"),
                         color: MetricTheme.cpu,
                         enabled: $alerts.cpuEnabled,
                         value: $alerts.cpuThreshold,
@@ -563,7 +563,7 @@ private struct AlertsTab: View {
                     )
                     Divider().padding(.vertical, 4)
                     AlertMetricRow(
-                        icon: "memorychip", label: "Memory above",
+                        icon: "memorychip", label: String(localized: "Memory above"),
                         color: MetricTheme.memory,
                         enabled: $alerts.memoryEnabled,
                         value: $alerts.memoryThresholdPercent,
@@ -571,7 +571,7 @@ private struct AlertsTab: View {
                     )
                     Divider().padding(.vertical, 4)
                     AlertMetricRow(
-                        icon: "internaldrive", label: "Disk free below",
+                        icon: "internaldrive", label: String(localized: "Disk free below"),
                         color: MetricTheme.disk,
                         enabled: $alerts.diskEnabled,
                         value: $alerts.diskFreeThresholdGB,
@@ -579,17 +579,17 @@ private struct AlertsTab: View {
                     )
                     Divider().padding(.vertical, 4)
                     AlertMetricRow(
-                        icon: "cube.transparent", label: "GPU above",
+                        icon: "cube.transparent", label: String(localized: "GPU above"),
                         color: .cyan,
                         enabled: $alerts.gpuEnabled,
                         value: $alerts.gpuThreshold,
                         range: 50...100, step: 5, format: "%.0f%%"
                     )
                     Divider().padding(.vertical, 4)
-                    SettingsRow(label: "Thermal pressure") {
+                    SettingsRow(label: String(localized: "Thermal pressure")) {
                         Toggle("", isOn: $alerts.thermalEnabled).labelsHidden()
                     }
-                    Text("Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min.")
+                    Text(String(localized: "Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min."))
                         .font(.caption2).foregroundStyle(.secondary).padding(.top, 4)
                 }
             }
@@ -606,7 +606,7 @@ private struct PanelsTab: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Drag cards to reorder. Tap the eye to show or hide.")
+            Text(String(localized: "Drag cards to reorder. Tap the eye to show or hide."))
                 .font(.caption).foregroundStyle(.secondary)
                 .padding(.horizontal, 2)
 
@@ -690,7 +690,7 @@ private struct PanelMiniCard: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(hidden ? .secondary : panel.color)
                     .symbolEffectsRemoved()
-                Text(panel.rawValue)
+                Text(panel.title)
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(hidden ? .tertiary : .secondary)
                     .lineLimit(1)
@@ -743,14 +743,14 @@ private struct HistoryTab: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            SettingsSection(icon: "clock.arrow.circlepath", title: "History", color: .purple) {
-                SettingsRow(label: "Save history to disk") {
+            SettingsSection(icon: "clock.arrow.circlepath", title: String(localized: "History"), color: .purple) {
+                SettingsRow(label: String(localized: "Save history to disk")) {
                     Toggle("", isOn: $settings.persistHistoryEnabled).labelsHidden()
                 }
                 if settings.persistHistoryEnabled {
                     Divider().padding(.vertical, 4)
-                    SettingsRow(label: "Export") {
-                        Button("Export CSV…") { engine.exportHistoryCSV() }
+                    SettingsRow(label: String(localized: "Export")) {
+                        Button(String(localized: "Export CSV…")) { engine.exportHistoryCSV() }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
                     }

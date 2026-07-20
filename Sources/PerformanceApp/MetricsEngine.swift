@@ -150,8 +150,14 @@ final class MetricsEngine: ObservableObject {
 
         var title: String {
             switch self {
-            case .gpu: return "GPU & Displays"
-            default:   return rawValue
+            case .cpu:       return String(localized: "CPU")
+            case .memory:    return String(localized: "Memory")
+            case .disk:      return String(localized: "Disk")
+            case .thermal:   return String(localized: "Thermal")
+            case .gpu:       return String(localized: "GPU & Displays")
+            case .battery:   return String(localized: "Battery")
+            case .network:   return String(localized: "Network")
+            case .bluetooth: return String(localized: "Bluetooth")
             }
         }
 
@@ -202,10 +208,10 @@ final class MetricsEngine: ObservableObject {
 
         var displayName: String {
             switch self {
-            case .apple:      return "Apple (default)"
-            case .cloudflare: return "Cloudflare (1.1.1.1)"
-            case .google:     return "Google (8.8.8.8)"
-            case .quad9:      return "Quad9 (9.9.9.9)"
+            case .apple:      return String(localized: "Apple (default)")
+            case .cloudflare: return String(localized: "Cloudflare (1.1.1.1)")
+            case .google:     return String(localized: "Google (8.8.8.8)")
+            case .quad9:      return String(localized: "Quad9 (9.9.9.9)")
             }
         }
 
@@ -322,8 +328,8 @@ final class MetricsEngine: ObservableObject {
         func status(_ severity: ThresholdSeverity, _ direction: ThresholdSeverityMapper.Direction) -> (ThresholdSeverity, String?) {
             switch severity {
             case .normal:   return (.normal, nil)
-            case .warning:  return (.warning, direction == .lowIsBad ? "below alert threshold" : "above alert threshold")
-            case .critical: return (.critical, direction == .lowIsBad ? "well below alert threshold" : "well above alert threshold")
+            case .warning:  return (.warning, direction == .lowIsBad ? String(localized: "below alert threshold") : String(localized: "above alert threshold"))
+            case .critical: return (.critical, direction == .lowIsBad ? String(localized: "well below alert threshold") : String(localized: "well above alert threshold"))
             }
         }
         switch metric {

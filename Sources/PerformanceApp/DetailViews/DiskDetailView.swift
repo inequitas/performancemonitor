@@ -19,9 +19,9 @@ private struct DiskButterflyChart: View {
                 Label(formatSpeed(readSpeed), systemImage: "arrow.down")
                     .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.indigo)
-                Text("Read").font(.caption).foregroundStyle(.secondary)
+                Text(String(localized: "Read")).font(.caption).foregroundStyle(.secondary)
                 Spacer()
-                Text("Write").font(.caption).foregroundStyle(.secondary)
+                Text(String(localized: "Write")).font(.caption).foregroundStyle(.secondary)
                 Label(formatSpeed(writeSpeed), systemImage: "arrow.up")
                     .font(.system(size: 18, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.purple)
@@ -48,10 +48,10 @@ private struct DiskButterflyChart: View {
                 }
                 .frame(width: 56)
                 VStack(spacing: 0) {
-                    MetricChart(values: readHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: .indigo, style: .area, accessibilityDescription: "Disk read speed history") { formatSpeed($0) }
+                    MetricChart(values: readHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: .indigo, style: .area, accessibilityDescription: String(localized: "Disk read speed history")) { formatSpeed($0) }
                         .frame(height: 90)
                     Color.primary.opacity(0.25).frame(height: 1).frame(height: 14)
-                    MetricChart(values: writeHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: .purple, style: .area, accessibilityDescription: "Disk write speed history") { formatSpeed($0) }
+                    MetricChart(values: writeHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: .purple, style: .area, accessibilityDescription: String(localized: "Disk write speed history")) { formatSpeed($0) }
                         .frame(height: 90)
                         .scaleEffect(y: -1)
                 }
@@ -66,18 +66,18 @@ struct DiskDetailView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Label("Disk", systemImage: MetricsEngine.Panel.disk.icon)
+            Label(String(localized: "Disk"), systemImage: MetricsEngine.Panel.disk.icon)
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(MetricTheme.disk)
 
             SectionCard {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("Storage").font(.subheadline.weight(.semibold))
+                        Text(String(localized: "Storage")).font(.subheadline.weight(.semibold))
                         Spacer()
                         if let smart = engine.diskSmartStatus {
                             let ok = smart == "Verified"
-                            Label(ok ? "SMART OK" : smart, systemImage: ok ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
+                            Label(ok ? String(localized: "SMART OK") : smart, systemImage: ok ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(ok ? .green : .red)
                         }
@@ -90,14 +90,14 @@ struct DiskDetailView: View {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 Text(volume.name).font(.caption).lineLimit(1)
-                                if volume.isRemovable { Text("Removable").font(.caption2).foregroundStyle(.secondary) }
+                                if volume.isRemovable { Text(String(localized: "Removable")).font(.caption2).foregroundStyle(.secondary) }
                             }
                             DiskUsageBar(used: volume.totalGB - volume.freeGB, total: volume.totalGB)
                             HStack {
-                                Text(String(format: "%.1f GB used", volume.totalGB - volume.freeGB))
+                                Text(String(format: String(localized: "%.1f GB used"), volume.totalGB - volume.freeGB))
                                     .font(.caption2).foregroundStyle(.secondary)
                                 Spacer()
-                                Text(String(format: "%.1f GB free", volume.freeGB))
+                                Text(String(format: String(localized: "%.1f GB free"), volume.freeGB))
                                     .font(.caption2).foregroundStyle(.secondary)
                             }
                         }
@@ -130,13 +130,13 @@ private struct NVMeWearRow: View {
 
     var body: some View {
         HStack {
-            Label("\(wear.percentageUsed)% wear", systemImage: "battery.75percent")
+            Label(String(format: String(localized: "%ld%% wear"), wear.percentageUsed), systemImage: "battery.75percent")
                 .font(.caption2).foregroundStyle(.secondary)
             Spacer()
-            Text(String(format: "%.1f TB written", wear.totalBytesWrittenTB))
+            Text(String(format: String(localized: "%.1f TB written"), wear.totalBytesWrittenTB))
                 .font(.caption2).foregroundStyle(.secondary)
             Spacer()
-            Text("\(wear.powerOnHours) h on")
+            Text(String(format: String(localized: "%ld h on"), wear.powerOnHours))
                 .font(.caption2).foregroundStyle(.secondary)
         }
     }
