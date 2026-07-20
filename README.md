@@ -2,7 +2,7 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.0.0-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green) [![Sponsor](https://img.shields.io/badge/%E2%9D%A4-Sponsor-ea4aaa)](https://github.com/sponsors/inequitas)
+[![CI](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml/badge.svg)](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml) ![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.0.0-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green) [![Sponsor](https://img.shields.io/badge/%E2%9D%A4-Sponsor-ea4aaa)](https://github.com/sponsors/inequitas)
 
 ---
 
@@ -74,6 +74,16 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 ---
 
 ## Installation
+
+### Homebrew
+
+```bash
+brew install --cask inequitas/tap/performance-monitor
+```
+
+> **Gatekeeper note:** The app is ad-hoc signed (no Apple Developer ID). On first launch, right-click the app → **Open** to bypass the unidentified developer warning.
+
+### Manual
 
 1. Download the latest `Performance Monitor.app` from [Releases](https://github.com/inequitas/performancemonitor/releases)
 2. Unzip and drag to `/Applications`

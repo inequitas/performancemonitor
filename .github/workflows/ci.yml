@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [main, beta]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build (release, arm64)
+        run: swift build -c release --arch arm64
+
+      - name: Test
+        run: swift test

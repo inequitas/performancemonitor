@@ -31,6 +31,9 @@ cd "$(dirname "$0")/.."
 #   e) [--publish only] git tag vVERSION
 #   f) [--publish only] gh release create vVERSION <zip> <zip>.sig
 #      --title <title> --notes-file <notes> [--prerelease for beta]
+#   g) [--publish, stable only] best-effort scripts/update_tap.sh bump of the
+#      Homebrew cask in inequitas/homebrew-tap — a failure here warns but
+#      never fails the release, which has already succeeded by this point.
 
 PUBLISH=false
 BETA=false
@@ -183,3 +186,13 @@ else
 fi
 
 echo "==> Released ${TAG}."
+
+# --- (g) best-effort Homebrew tap bump (stable only) ------------------------
+if [ "$BETA" = false ]; then
+    echo "==> Updating Homebrew tap..."
+    if ! bash scripts/update_tap.sh "$VERSION" "$ZIP_PATH"; then
+        echo "WARNING: failed to update inequitas/homebrew-tap for ${TAG}." >&2
+        echo "         The GitHub release itself succeeded — update the cask manually:" >&2
+        echo "         scripts/update_tap.sh ${VERSION} ${ZIP_PATH}" >&2
+    fi
+fi
