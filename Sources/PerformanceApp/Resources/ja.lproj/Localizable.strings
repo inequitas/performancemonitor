@@ -70,6 +70,8 @@
 "Open Crash Reports Folder" = "クラッシュレポートフォルダを開く";
 "Processes" = "プロセス";
 "Top processes shown" = "表示する上位プロセス数";
+"Support this project ♥" = "このプロジェクトを支援 ♥";
+"Performance Monitor is free and always will be." = "Performance Monitor は無料で、これからもずっと無料です。";
 
 /* MARK: - SettingsView: Menu Bar tab */
 "Menu Bar Icons" = "メニューバーアイコン";

@@ -70,6 +70,8 @@
 "Open Crash Reports Folder" = "Ouvrir le dossier des rapports de plantage";
 "Processes" = "Processus";
 "Top processes shown" = "Nombre de processus principaux affichés";
+"Support this project ♥" = "Soutenir ce projet ♥";
+"Performance Monitor is free and always will be." = "Performance Monitor est gratuit et le restera toujours.";
 
 /* MARK: - SettingsView : onglet Barre des menus */
 "Menu Bar Icons" = "Icônes de la barre des menus";

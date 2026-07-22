@@ -193,12 +193,32 @@ private struct GeneralTab: View {
                     }
                 }
             }
+
+            supportBlock
         }
         .padding(16)
         .transaction { $0.animation = nil }
         .onAppear {
             if initialAppLanguage == nil { initialAppLanguage = settings.appLanguage }
         }
+    }
+
+    /// Small, deliberately unobtrusive donation link — no banner, no popup.
+    /// Ko-fi is the current outlet; a GitHub Sponsors link may be added
+    /// alongside or in place of this once that application has been approved.
+    private var supportBlock: some View {
+        VStack(spacing: 2) {
+            Button(String(localized: "Support this project ♥")) {
+                NSWorkspace.shared.open(URL(string: "https://ko-fi.com/inequitas")!)
+            }
+            .buttonStyle(.link)
+            .font(.caption2)
+            Text(String(localized: "Performance Monitor is free and always will be."))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 2)
     }
 
     /// Relaunches the app so a language change (which macOS only picks up
