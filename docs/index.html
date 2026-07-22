@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Performance Monitor — free, open-source macOS system monitor</title>
+<meta name="description" content="A lightweight, open-source macOS menu bar system monitor. CPU, memory, network, disk, GPU, temperatures, battery. No telemetry, free forever.">
+<meta property="og:title" content="Performance Monitor for macOS">
+<meta property="og:description" content="Lightweight, open-source menu bar system monitor. No telemetry, no subscription, signed updates.">
+<meta property="og:image" content="https://perfmon.knhome.nl/social_preview.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<style>
+  :root { --bg:#0e0e13; --card:#17171f; --text:#e8e8ee; --dim:#9a9aa8; --accent:#6b9eff; --green:#4cd274; }
+  * { margin:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.6; }
+  .wrap { max-width:980px; margin:0 auto; padding:0 24px; }
+  header { padding:72px 0 40px; text-align:center; }
+  h1 { font-size:2.6rem; letter-spacing:-.02em; }
+  .tagline { font-size:1.25rem; color:var(--dim); margin:12px auto 24px; max-width:640px; }
+  .pillars { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:32px; }
+  .pill { background:var(--card); border:1px solid #26262f; border-radius:999px; padding:6px 16px; font-size:.9rem; color:var(--accent); }
+  .cta { display:inline-block; background:var(--accent); color:#0b0b10; font-weight:600; padding:12px 28px; border-radius:10px; text-decoration:none; margin:4px; }
+  .cta.alt { background:var(--card); color:var(--text); border:1px solid #2c2c38; }
+  .hero { display:block; margin:48px auto 0; width:min(420px,90%); border-radius:14px; box-shadow:0 24px 80px rgba(0,0,0,.55); }
+  section { padding:48px 0; }
+  h2 { font-size:1.5rem; margin-bottom:16px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid #22222b; border-radius:14px; padding:20px; }
+  .card h3 { font-size:1.05rem; margin-bottom:6px; }
+  .card p { color:var(--dim); font-size:.95rem; }
+  code, pre { font-family:ui-monospace,"SF Mono",Menlo,monospace; }
+  pre { background:#0a0a0f; border:1px solid #22222b; border-radius:10px; padding:14px 18px; overflow-x:auto; font-size:.95rem; }
+  .note { color:var(--dim); font-size:.85rem; margin-top:10px; }
+  a { color:var(--accent); }
+  footer { padding:40px 0 60px; text-align:center; color:var(--dim); font-size:.9rem; border-top:1px solid #1c1c24; }
+  .heart { color:#ea4aaa; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Performance Monitor</h1>
+  <p class="tagline">A lightweight, open-source system monitor for your Mac's menu bar — CPU, memory, network, disk, GPU, temperatures, and battery at a glance.</p>
+  <div class="pillars">
+    <span class="pill">Free forever</span>
+    <span class="pill">No telemetry</span>
+    <span class="pill">Signed updates</span>
+    <span class="pill">Apple Silicon native</span>
+    <span class="pill">7 languages</span>
+  </div>
+  <a class="cta" href="https://github.com/inequitas/performancemonitor/releases/latest">Download</a>
+  <a class="cta alt" href="https://github.com/inequitas/performancemonitor">View on GitHub</a>
+  <img class="hero" src="Main_Screen.png" alt="Performance Monitor overview popover showing CPU, memory, disk, thermal, GPU, battery, network and Bluetooth">
+</header>
+
+<section>
+  <h2>Why this one?</h2>
+  <div class="grid">
+    <div class="card"><h3>🔒 Private by design</h3><p>No telemetry, no analytics, no accounts. Nothing ever leaves your Mac — and because the source is public, you don't have to take our word for it.</p></div>
+    <div class="card"><h3>🪶 Genuinely lightweight</h3><p>A monitor that hogs the system it monitors is a bad joke. Sampling pauses when nothing is on screen, and heavy work stays off the main thread.</p></div>
+    <div class="card"><h3>🆓 Free, and staying free</h3><p>No paywalled features, no subscription, no nag screens. Updates are Ed25519-signed and verified before they install.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Install</h2>
+  <pre>brew install --cask inequitas/tap/performance-monitor</pre>
+  <p class="note">Or <a href="https://github.com/inequitas/performancemonitor/releases/latest">download the zip</a> and drag to Applications. The app is not notarised (no paid Apple Developer ID — it's a free app): on first launch, right-click → Open. Requires an Apple Silicon Mac (M1 or later) on macOS 14+.</p>
+</section>
+
+<section>
+  <h2>Everything at a glance</h2>
+  <div class="grid">
+    <div class="card"><h3>Deep detail windows</h3><p>Per-core CPU, process breakdowns, latency and throughput charts, per-sensor temperatures, fan speeds, SSD wear level, and battery health.</p></div>
+    <div class="card"><h3>Your menu bar, your rules</h3><p>Pick which metrics live in the menu bar — as text or live sparklines — with optional threshold colouring when things run hot.</p></div>
+    <div class="card"><h3>Alerts &amp; history</h3><p>Native notifications when CPU, memory, disk or temperature cross your thresholds. Optional CSV history for your own analysis.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Support the project <span class="heart">♥</span></h2>
+  <p>Performance Monitor is free and will stay that way. If it saves you the price of a paid alternative, consider <a href="https://github.com/sponsors/inequitas">sponsoring on GitHub</a> or <a href="https://ko-fi.com/inequitas">buying a coffee on Ko-fi</a> — it goes toward Apple's Developer Program fee so the app can be notarised. A ⭐ on the repo helps too.</p>
+</section>
+
+<footer>
+  <a href="https://github.com/inequitas/performancemonitor">GitHub</a> ·
+  <a href="https://github.com/inequitas/performancemonitor/releases">Releases</a> ·
+  <a href="https://github.com/inequitas/performancemonitor/issues">Report a problem</a> ·
+  <a href="https://github.com/sponsors/inequitas">Sponsor</a><br><br>
+  MIT licensed. Made in the Netherlands.
+</footer>
+
+</div>
+</body>
+</html>
