@@ -1,6 +1,7 @@
 import Foundation
 import IOBluetooth
 import CoreBluetooth
+import PerformanceAppCore
 
 /// Owns Bluetooth authorisation, the paired-device read throttle, and the
 /// battery caches (system_profiler parse + BLE GATT read). Publishes results
@@ -8,8 +9,6 @@ import CoreBluetooth
 ///
 /// Extracted verbatim from `MetricsEngine`'s Bluetooth section in the Part-B
 /// decomposition; `BluetoothAuthDelegate` and `BLEBatteryReader` moved with it.
-import PerformanceAppCore
-
 @MainActor
 final class BluetoothSampler {
     /// Called with a fresh paired-device list whenever one is read.
@@ -113,7 +112,7 @@ final class BluetoothSampler {
             guard (try? proc.run()) != nil else { return }
             proc.waitUntilExit()
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            let captured = BTDeviceParser.parse(data) ?? [:]
+            guard let captured = BTDeviceParser.parse(data) else { return }
             await MainActor.run { [weak self] in self?.btBatteryCache = captured }
         }
     }
