@@ -1,0 +1,32 @@
+name: PR target check
+
+# Friendly nudge when a pull request is opened against `main`: development
+# happens on `beta`, and `main` only receives release merges.
+#
+# Uses `pull_request_target` so the token can comment on PRs from forks.
+# This job deliberately does NOT check out the PR's code — it only posts a
+# comment — so running in the base-repo context stays safe.
+
+on:
+  pull_request_target:
+    types: [opened]
+    branches: [main]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Suggest retargeting to beta
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh pr comment "$PR" --repo "$REPO" --body "Thanks for the contribution! 👋
+
+          Heads-up: active development happens on the \`beta\` branch — \`main\` only receives release merges. Could you retarget this PR to \`beta\`? You can change the base branch with the **Edit** button at the top of this PR; no need to redo any work.
+
+          (If you'd rather not, no problem — just say so and I'll retarget it for you.)"
