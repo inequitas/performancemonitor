@@ -40,7 +40,34 @@ final class UpdateChecker: NSObject, ObservableObject {
         return Channel(rawValue: raw) ?? .stable
     }()
 
-    var isBetaChannel: Bool { channel == .beta }
+    /// The channel this run actually checks/downloads from: beta if the
+    /// build itself is a beta build (Info.plist PMUpdateChannel), OR if the
+    /// user opted in to beta updates from a stable build via Settings →
+    /// Updates. Read fresh from UserDefaults each time (rather than cached)
+    /// so toggling the opt-in takes effect on the very next check.
+    var effectiveChannel: Channel {
+        if channel == .beta { return .beta }
+        return UserDefaults.standard.bool(forKey: Self.betaOptInKey) ? .beta : .stable
+    }
+
+    /// Drives the "Beta channel" badge in the Updates tab — true both for an
+    /// actual beta build and for a stable build with the opt-in enabled.
+    var isBetaChannel: Bool { effectiveChannel == .beta }
+
+    /// True when this run can offer a one-click path back onto the stable
+    /// channel: the build's OWN channel (Info.plist `PMUpdateChannel`, not
+    /// the opt-in-derived `effectiveChannel`) is stable, yet the running
+    /// version string is a pre-release. That combination only happens to a
+    /// nominally-stable build — never to the dedicated Beta app, which is
+    /// always built with `PMUpdateChannel=beta` and so is deliberately
+    /// excluded from this path.
+    var canSwitchToLatestStable: Bool {
+        channel == .stable && VersionComparison.isPrerelease(currentVersion)
+    }
+
+    /// Shared with SettingsStore.betaUpdatesOptIn, which owns the persisted
+    /// value; kept as one literal here to avoid a typo'd duplicate key.
+    static let betaOptInKey = "betaUpdatesOptIn"
 
     // Stable: GitHub's "latest" endpoint, which never returns pre-releases.
     private let stableAPIURL = URL(string: "https://api.github.com/repos/inequitas/performancemonitor/releases/latest")!
@@ -88,9 +115,9 @@ final class UpdateChecker: NSObject, ObservableObject {
         let center = UNUserNotificationCenter.current()
         center.delegate = self
 
-        let updateAction = UNNotificationAction(identifier: "UPDATE_NOW",    title: "Update Now",          options: .foreground)
-        let remindAction = UNNotificationAction(identifier: "REMIND_LATER",  title: "Remind Me Later",     options: [])
-        let neverAction  = UNNotificationAction(identifier: "NEVER",         title: "Skip This Version",   options: .destructive)
+        let updateAction = UNNotificationAction(identifier: "UPDATE_NOW",    title: String(localized: "Update Now"),          options: .foreground)
+        let remindAction = UNNotificationAction(identifier: "REMIND_LATER",  title: String(localized: "Remind Me Later"),     options: [])
+        let neverAction  = UNNotificationAction(identifier: "NEVER",         title: String(localized: "Skip This Version"),   options: .destructive)
         let category = UNNotificationCategory(identifier: Self.categoryID,
                                               actions: [updateAction, remindAction, neverAction],
                                               intentIdentifiers: [], options: [])
@@ -131,17 +158,29 @@ final class UpdateChecker: NSObject, ObservableObject {
         Task { await performInstall(from: downloadURL) }
     }
 
+    /// User-initiated downgrade back onto the stable channel. Only does
+    /// anything when `canSwitchToLatestStable` is true. Fetches GitHub's
+    /// "latest" endpoint (which never returns a pre-release) and installs it
+    /// through the exact same download → verify → unzip → install chain as
+    /// a normal update — deliberately WITHOUT the `isNewer` gate that
+    /// `performCheck` applies, since the whole point here is to install a
+    /// release that is older (by version string) than the current beta.
+    func switchToLatestStable() {
+        guard canSwitchToLatestStable else { return }
+        Task { await performSwitchToLatestStable() }
+    }
+
     // MARK: - Private
 
     private func performCheck() async {
         state = .checking
         do {
             guard let (tag, downloadURL) = try await fetchCandidateRelease() else {
-                state = .error("Could not read release info from GitHub.")
+                state = .error(String(localized: "Could not read release info from GitHub."))
                 return
             }
             guard Self.isAllowedDownloadURL(downloadURL) else {
-                state = .error("Update refused — download is not served from a trusted GitHub host.")
+                state = .error(String(localized: "Update refused — download is not served from a trusted GitHub host."))
                 return
             }
             lastChecked = Date()
@@ -153,7 +192,35 @@ final class UpdateChecker: NSObject, ObservableObject {
                 state = .upToDate
             }
         } catch {
-            state = .error("Network error: \(error.localizedDescription)")
+            state = .error(String(format: String(localized: "Network error: %@"), error.localizedDescription))
+        }
+    }
+
+    /// Backs `switchToLatestStable()`. Always queries the stable "latest"
+    /// endpoint and restricts asset selection to `.stable` (i.e. exactly
+    /// "PerformanceApp.zip", no beta fallback) regardless of this run's
+    /// `effectiveChannel` — a switch back to stable must never hand back a
+    /// beta asset. Reuses `performInstall`, so the found release is
+    /// installed even though it is not newer than `currentVersion`.
+    private func performSwitchToLatestStable() async {
+        state = .checking
+        do {
+            var req = URLRequest(url: stableAPIURL)
+            req.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
+            req.timeoutInterval = 10
+            let (data, _) = try await URLSession.shared.data(for: req)
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let (_, downloadURL) = Self.candidate(from: json, channel: .stable) else {
+                state = .error(String(localized: "Could not read release info from GitHub."))
+                return
+            }
+            guard Self.isAllowedDownloadURL(downloadURL) else {
+                state = .error(String(localized: "Update refused — download is not served from a trusted GitHub host."))
+                return
+            }
+            await performInstall(from: downloadURL)
+        } catch {
+            state = .error(String(format: String(localized: "Network error: %@"), error.localizedDescription))
         }
     }
 
@@ -163,7 +230,12 @@ final class UpdateChecker: NSObject, ObservableObject {
     /// version by `VersionComparison` — which orders pre-releases too — so a
     /// beta install is offered both newer betas and the eventual stable release.
     private func fetchCandidateRelease() async throws -> (tag: String, downloadURL: URL)? {
-        switch channel {
+        // Effective channel (build channel OR the beta opt-in) decides both
+        // which GitHub endpoint we query AND, within a release's asset list,
+        // which zip we're allowed to download — see AssetSelector.
+        let assetChannel: PerformanceAppCore.UpdateChannel = effectiveChannel == .beta ? .beta : .stable
+
+        switch effectiveChannel {
         case .stable:
             var req = URLRequest(url: stableAPIURL)
             req.setValue("application/vnd.github.v3+json", forHTTPHeaderField: "Accept")
@@ -172,7 +244,7 @@ final class UpdateChecker: NSObject, ObservableObject {
             guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
                 return nil
             }
-            return Self.candidate(from: json)
+            return Self.candidate(from: json, channel: assetChannel)
 
         case .beta:
             var req = URLRequest(url: releasesListAPIURL)
@@ -184,7 +256,7 @@ final class UpdateChecker: NSObject, ObservableObject {
             }
             let candidates = releases
                 .filter { ($0["draft"] as? Bool) != true }
-                .compactMap { Self.candidate(from: $0) }
+                .compactMap { Self.candidate(from: $0, channel: assetChannel) }
             return candidates.max { lhs, rhs in
                 let lv = lhs.tag.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
                 let rv = rhs.tag.trimmingCharacters(in: CharacterSet(charactersIn: "vV"))
@@ -193,11 +265,18 @@ final class UpdateChecker: NSObject, ObservableObject {
         }
     }
 
-    private static func candidate(from json: [String: Any]) -> (tag: String, downloadURL: URL)? {
+    /// Picks the release's asset by exact name for `channel` (via
+    /// AssetSelector — never "the first .zip"), so a stable client can never
+    /// be handed a beta build's asset or vice versa.
+    private static func candidate(from json: [String: Any], channel: PerformanceAppCore.UpdateChannel) -> (tag: String, downloadURL: URL)? {
         guard
             let tag = json["tag_name"] as? String,
-            let assets = json["assets"] as? [[String: Any]],
-            let zipAsset = assets.first(where: { ($0["name"] as? String)?.hasSuffix(".zip") == true }),
+            let assets = json["assets"] as? [[String: Any]]
+        else { return nil }
+        let names = assets.compactMap { $0["name"] as? String }
+        guard
+            let selectedName = AssetSelector.selectAssetName(from: names, channel: channel),
+            let zipAsset = assets.first(where: { ($0["name"] as? String) == selectedName }),
             let urlStr = zipAsset["browser_download_url"] as? String,
             let downloadURL = URL(string: urlStr)
         else { return nil }
@@ -219,8 +298,8 @@ final class UpdateChecker: NSObject, ObservableObject {
         guard authStatus == .authorized else { return }
 
         let content = UNMutableNotificationContent()
-        content.title = "Performance Monitor Update"
-        content.body  = "Version \(version) is available — you're on \(currentVersion)."
+        content.title = String(localized: "Performance Monitor Update")
+        content.body  = String(format: String(localized: "Version %@ is available — you're on %@."), version, currentVersion)
         content.sound = .default
         content.categoryIdentifier = Self.categoryID
         content.userInfo = ["version": version, "downloadURL": downloadURL.absoluteString]
@@ -245,7 +324,7 @@ final class UpdateChecker: NSObject, ObservableObject {
             // Reject anything not served from the trusted GitHub hosts, even if a
             // manipulated release pointed the download elsewhere.
             guard Self.isAllowedDownloadURL(downloadURL) else {
-                state = .error("Update refused — download is not served from a trusted GitHub host.")
+                state = .error(String(localized: "Update refused — download is not served from a trusted GitHub host."))
                 return
             }
 
@@ -254,7 +333,7 @@ final class UpdateChecker: NSObject, ObservableObject {
 
             let (data, response) = try await URLSession.shared.data(from: downloadURL)
             guard (response as? HTTPURLResponse)?.statusCode == 200 else {
-                state = .error("Download failed — server returned an error.")
+                state = .error(String(localized: "Download failed — server returned an error."))
                 return
             }
             try data.write(to: zipPath)
@@ -267,13 +346,13 @@ final class UpdateChecker: NSObject, ObservableObject {
             // with a missing or invalid signature is refused outright (fail-closed).
             guard let verifyingKey = try? Curve25519.Signing.PublicKey(
                     rawRepresentation: Data(base64Encoded: Self.publicKeyBase64) ?? Data()) else {
-                state = .error("Update aborted — internal verification key is invalid.")
+                state = .error(String(localized: "Update aborted — internal verification key is invalid."))
                 return
             }
 
             guard let sigURL = URL(string: downloadURL.absoluteString + ".sig"),
                   Self.isAllowedDownloadURL(sigURL) else {
-                state = .error("Update aborted — could not locate the signature file.")
+                state = .error(String(localized: "Update aborted — could not locate the signature file."))
                 return
             }
 
@@ -284,17 +363,17 @@ final class UpdateChecker: NSObject, ObservableObject {
                       let sigB64 = String(data: sigData, encoding: .utf8)?
                           .trimmingCharacters(in: .whitespacesAndNewlines),
                       let decoded = Data(base64Encoded: sigB64) else {
-                    state = .error("Update aborted — signature is missing or unreadable. This release cannot be verified.")
+                    state = .error(String(localized: "Update aborted — signature is missing or unreadable. This release cannot be verified."))
                     return
                 }
                 signature = decoded
             } catch {
-                state = .error("Update aborted — could not download the signature file.")
+                state = .error(String(localized: "Update aborted — could not download the signature file."))
                 return
             }
 
             guard verifyingKey.isValidSignature(signature, for: data) else {
-                state = .error("Update aborted — the download failed signature verification and may have been tampered with.")
+                state = .error(String(localized: "Update aborted — the download failed signature verification and may have been tampered with."))
                 return
             }
             // --- Verification passed: the zip bytes are authentic ---
@@ -309,13 +388,13 @@ final class UpdateChecker: NSObject, ObservableObject {
             try unzip.run()
             unzip.waitUntilExit()
             guard unzip.terminationStatus == 0 else {
-                state = .error("Failed to unzip the downloaded archive.")
+                state = .error(String(localized: "Failed to unzip the downloaded archive."))
                 return
             }
 
             guard let newAppURL = try FileManager.default.contentsOfDirectory(at: tmp, includingPropertiesForKeys: nil)
                     .first(where: { $0.pathExtension == "app" }) else {
-                state = .error("App bundle not found inside downloaded archive.")
+                state = .error(String(localized: "App bundle not found inside downloaded archive."))
                 return
             }
 
@@ -363,7 +442,7 @@ final class UpdateChecker: NSObject, ObservableObject {
             NSApp.setActivationPolicy(.accessory)
             NSApp.terminate(nil)
         } catch {
-            state = .error("Install failed: \(error.localizedDescription)")
+            state = .error(String(format: String(localized: "Install failed: %@"), error.localizedDescription))
         }
     }
 

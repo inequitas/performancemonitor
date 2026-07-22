@@ -99,4 +99,18 @@ struct VersionComparisonTests {
         #expect(!VersionComparison.isNewer("1.1.9", than: "1.2.0"))
         #expect(VersionComparison.isNewer("2.0.0", than: "1.99.99"))
     }
+
+    // MARK: - isPrerelease
+
+    @Test func isPrereleaseTrueForBetaSuffix() {
+        #expect(VersionComparison.isPrerelease("1.1.0-beta.1"))
+        #expect(VersionComparison.isPrerelease("1.1.0-beta"))
+        #expect(VersionComparison.isPrerelease("1.0.0-alpha.2"))
+    }
+
+    @Test func isPrereleaseFalseForPlainRelease() {
+        #expect(!VersionComparison.isPrerelease("1.1.0"))
+        #expect(!VersionComparison.isPrerelease("1.0"))
+        #expect(!VersionComparison.isPrerelease(""))
+    }
 }

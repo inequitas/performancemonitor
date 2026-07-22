@@ -1,5 +1,6 @@
 import Foundation
 import UserNotifications
+import PerformanceAppCore
 
 @MainActor
 final class AlertService: ObservableObject {
@@ -35,9 +36,18 @@ final class AlertService: ObservableObject {
     @Published var thermalEnabled: Bool = true {
         didSet { ud.set(thermalEnabled, forKey: "thermalAlertEnabled") }
     }
+    /// How long (seconds) CPU/GPU/memory must stay continuously over their
+    /// threshold before an alert fires. `0` fires on the very next tick,
+    /// matching pre-dwell behaviour. Disk and thermal are intentionally not
+    /// subject to this — disk free space is level-stable and thermal state
+    /// is already debounced by macOS.
+    @Published var alertSustainSeconds: Double = 30 {
+        didSet { ud.set(alertSustainSeconds, forKey: "alertSustainSeconds") }
+    }
 
     private var lastFired: [String: Date] = [:]
     private let cooldown: TimeInterval = 300
+    private var dwellTracker = AlertDwellTracker()
 
     func loadPreferences() {
         func bool(_ k: String) -> Bool?   { ud.object(forKey: k) != nil ? ud.bool(forKey: k) : nil }
@@ -52,34 +62,39 @@ final class AlertService: ObservableObject {
         if let v = dbl("memoryAlertThresholdPct")    { memoryThresholdPercent = v }
         if let v = dbl("diskFreeAlertThresholdGB")   { diskFreeThresholdGB    = v }
         if let v = dbl("gpuAlertThreshold")          { gpuThreshold           = v }
+        if let v = dbl("alertSustainSeconds")        { alertSustainSeconds    = v }
     }
 
     func check(cpu: Double, memUsed: Double, memTotal: Double,
                diskFree: Double, gpu: Double, thermal: ProcessInfo.ThermalState) {
         guard alertsEnabled else { return }
-        if cpuEnabled, cpu >= cpuThreshold {
-            fire("cpu", "High CPU usage", String(format: "CPU is at %.0f%%", cpu))
+        let now = Date()
+        if cpuEnabled, dwellTracker.shouldFire(key: "cpu", isOver: cpu >= cpuThreshold, now: now, dwell: alertSustainSeconds) {
+            fire("cpu", String(localized: "High CPU usage"),
+                 String(format: String(localized: "CPU is at %.0f%%"), cpu), now: now)
         }
         if memoryEnabled, memTotal > 0 {
             let pct = (memUsed / memTotal) * 100
-            if pct >= memoryThresholdPercent {
-                fire("memory", "High memory usage",
-                     String(format: "%.1f / %.0f GB used (%.0f%%)", memUsed, memTotal, pct))
+            if dwellTracker.shouldFire(key: "memory", isOver: pct >= memoryThresholdPercent, now: now, dwell: alertSustainSeconds) {
+                fire("memory", String(localized: "High memory usage"),
+                     String(format: String(localized: "%.1f / %.0f GB used (%.0f%%)"), memUsed, memTotal, pct), now: now)
             }
         }
         if diskEnabled, diskFree > 0, diskFree <= diskFreeThresholdGB {
-            fire("disk", "Low disk space", String(format: "Only %.1f GB free", diskFree))
+            fire("disk", String(localized: "Low disk space"),
+                 String(format: String(localized: "Only %.1f GB free"), diskFree), now: now)
         }
-        if gpuEnabled, gpu >= gpuThreshold {
-            fire("gpu", "High GPU usage", String(format: "GPU is at %.0f%%", gpu))
+        if gpuEnabled, dwellTracker.shouldFire(key: "gpu", isOver: gpu >= gpuThreshold, now: now, dwell: alertSustainSeconds) {
+            fire("gpu", String(localized: "High GPU usage"),
+                 String(format: String(localized: "GPU is at %.0f%%"), gpu), now: now)
         }
         if thermalEnabled, thermal == .serious || thermal == .critical {
-            fire("thermal", "System running hot", "Thermal pressure: \(thermal.label)")
+            fire("thermal", String(localized: "System running hot"),
+                 String(format: String(localized: "Thermal pressure: %@"), thermal.label), now: now)
         }
     }
 
-    private func fire(_ key: String, _ title: String, _ body: String) {
-        let now = Date()
+    private func fire(_ key: String, _ title: String, _ body: String, now: Date) {
         if let last = lastFired[key], now.timeIntervalSince(last) < cooldown { return }
         lastFired[key] = now
         let content = UNMutableNotificationContent()

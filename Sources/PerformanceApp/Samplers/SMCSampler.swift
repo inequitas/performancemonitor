@@ -8,6 +8,7 @@ struct SMCSnapshot {
     let fans: [FanInfo]
     let extendedTemperatures: [TempReading]
     let unknownSMCTemperatures: [TempReading]
+    let systemPowerWatts: Double?
 }
 
 protocol SMCSampling: AnyObject {
@@ -35,6 +36,7 @@ final class SMCSampler: SMCSampling {
             let cpuT     = reader.cpuTemperature()
             let gpuT     = reader.gpuTemperature()
             let f        = reader.fans()
+            let power    = reader.systemPowerWatts()
             let allTemps = reader.readAllTemperatures()
             var known: [TempReading] = []
             var unknown: [TempReading] = []
@@ -62,7 +64,8 @@ final class SMCSampler: SMCSampling {
                                gpuTemperatureC: finalGpuT,
                                fans: f,
                                extendedTemperatures: known,
-                               unknownSMCTemperatures: unknown)
+                               unknownSMCTemperatures: unknown,
+                               systemPowerWatts: power)
         }.value
     }
 }

@@ -46,6 +46,7 @@ final class MetricsEngine: ObservableObject {
     @Published var diskWriteHistory: [Double] = []
     @Published var diskFreeHistory: [Double] = []
     @Published var diskSmartStatus: String? = nil   // e.g. "Verified", "Not Supported", nil while loading
+    @Published var diskWearInfo: NVMeWearInfo? = nil   // nil while loading or unavailable (external/older drives)
     @Published var gpuMetricsAvailable: Bool = false
     @Published var volumes: [VolumeInfo] = []
 
@@ -61,13 +62,18 @@ final class MetricsEngine: ObservableObject {
     @Published var vpnIsFortiClient: Bool = false
     @Published var isConnected: Bool = false
     @Published var connectionType: String = "Unknown"  // primary interface
+    @Published var isLikelyHotspot: Bool = false
     @Published var isWifiAvailable: Bool = false
     @Published var isEthernetAvailable: Bool = false
     @Published var wifiSSID: String? = nil
     @Published var wifiRSSI: Int? = nil      // dBm, nil when not on WiFi
 
     @Published var publicIP: String?
-    private var lastPublicIPFetch: Date?
+    private var lastPublicIPFetchSuccess: Date?
+    private var lastPublicIPFetchFailure: Date?
+    private var publicIPFetchInFlight = false
+    private var lastPathSignature: String?
+    private var networkChangeDebounceTask: Task<Void, Never>?
     private var pathMonitor: NWPathMonitor?
     private var wifiMonitor: NWPathMonitor?
     private var ethernetMonitor: NWPathMonitor?
@@ -99,6 +105,7 @@ final class MetricsEngine: ObservableObject {
     @Published var fans: [FanInfo] = []
     @Published var extendedTemperatures: [TempReading] = []
     @Published var unknownSMCTemperatures: [TempReading] = []
+    @Published var systemPowerWatts: Double?
 
     @Published var performanceCoreCount: Int = 0
     @Published var efficiencyCoreCount: Int = 0
@@ -117,6 +124,14 @@ final class MetricsEngine: ObservableObject {
     let settings = SettingsStore()
     /// On-disk history CSV persistence + export.
     let history = HistoryStore()
+    /// On-disk daily network data-usage persistence (roadmap 1.2b).
+    let dataUsage = DataUsageStore()
+    /// Tiered SQLite history store (roadmap 1.3a, part 1 — recording only;
+    /// the history-window UI that reads it lands separately). Lives
+    /// alongside `history`; both are gated by the same
+    /// `persistHistoryEnabled` preference.
+    let historyDB = HistoryDatabase()
+    private var historyCompactionTask: Task<Void, Never>?
 
     // MARK: - Per-domain samplers
     //
@@ -149,8 +164,14 @@ final class MetricsEngine: ObservableObject {
 
         var title: String {
             switch self {
-            case .gpu: return "GPU & Displays"
-            default:   return rawValue
+            case .cpu:       return String(localized: "CPU")
+            case .memory:    return String(localized: "Memory")
+            case .disk:      return String(localized: "Disk")
+            case .thermal:   return String(localized: "Thermal")
+            case .gpu:       return String(localized: "GPU & Displays")
+            case .battery:   return String(localized: "Battery")
+            case .network:   return String(localized: "Network")
+            case .bluetooth: return String(localized: "Bluetooth")
             }
         }
 
@@ -201,10 +222,10 @@ final class MetricsEngine: ObservableObject {
 
         var displayName: String {
             switch self {
-            case .apple:      return "Apple (default)"
-            case .cloudflare: return "Cloudflare (1.1.1.1)"
-            case .google:     return "Google (8.8.8.8)"
-            case .quad9:      return "Quad9 (9.9.9.9)"
+            case .apple:      return String(localized: "Apple (default)")
+            case .cloudflare: return String(localized: "Cloudflare (1.1.1.1)")
+            case .google:     return String(localized: "Google (8.8.8.8)")
+            case .quad9:      return String(localized: "Quad9 (9.9.9.9)")
             }
         }
 
@@ -307,6 +328,48 @@ final class MetricsEngine: ObservableObject {
         }
     }
 
+    /// Alert-threshold severity for a menu-bar metric, plus a short
+    /// human-readable suffix for VoiceOver (nil when normal). Reuses the
+    /// same threshold values as AlertService, so it stays in sync with the
+    /// Alerts settings tab. A metric's threshold only counts as "applicable"
+    /// when its alert type is enabled — if the user turned CPU alerting off,
+    /// the CPU menu-bar item no longer treats its (still-stored) threshold
+    /// as active. CPU/GPU/memory are usage-style (bad above the threshold);
+    /// disk free space is headroom-style (bad below it), and only applies
+    /// while the menu bar is showing free space rather than I/O throughput.
+    /// Network has no configured alert threshold, so it is always `.normal`.
+    func thresholdStatus(for metric: MenuBarMetric) -> (severity: ThresholdSeverity, label: String?) {
+        func status(_ severity: ThresholdSeverity, _ direction: ThresholdSeverityMapper.Direction) -> (ThresholdSeverity, String?) {
+            switch severity {
+            case .normal:   return (.normal, nil)
+            case .warning:  return (.warning, direction == .lowIsBad ? String(localized: "below alert threshold") : String(localized: "above alert threshold"))
+            case .critical: return (.critical, direction == .lowIsBad ? String(localized: "well below alert threshold") : String(localized: "well above alert threshold"))
+            }
+        }
+        switch metric {
+        case .cpu:
+            let threshold = alerts.cpuEnabled ? alerts.cpuThreshold : nil
+            let severity = ThresholdSeverityMapper.severity(value: cpuUsagePercent, threshold: threshold, direction: .highIsBad)
+            return status(severity, .highIsBad)
+        case .gpu:
+            let threshold = alerts.gpuEnabled ? alerts.gpuThreshold : nil
+            let severity = ThresholdSeverityMapper.severity(value: gpuUsagePercent, threshold: threshold, direction: .highIsBad)
+            return status(severity, .highIsBad)
+        case .memory:
+            let pct = memoryTotalGB > 0 ? (memoryUsedGB / memoryTotalGB) * 100 : 0
+            let threshold = (alerts.memoryEnabled && memoryTotalGB > 0) ? alerts.memoryThresholdPercent : nil
+            let severity = ThresholdSeverityMapper.severity(value: pct, threshold: threshold, direction: .highIsBad)
+            return status(severity, .highIsBad)
+        case .disk:
+            guard settings.diskDisplayMode == .space else { return (.normal, nil) }
+            let threshold = alerts.diskEnabled ? alerts.diskFreeThresholdGB : nil
+            let severity = ThresholdSeverityMapper.severity(value: diskFreeGB, threshold: threshold, direction: .lowIsBad)
+            return status(severity, .lowIsBad)
+        case .network:
+            return (.normal, nil)
+        }
+    }
+
     init() {
         thermalState = ProcessInfo.processInfo.thermalState
         thermalObserver = NotificationCenter.default.addObserver(
@@ -356,6 +419,20 @@ final class MetricsEngine: ObservableObject {
         refresh()
         restartTimer()
         extraBarController = ExtraMenuBarController(engine: self, settings: settings)
+        startHistoryCompactionLoop()
+    }
+
+    /// Runs `HistoryDatabase.compact()` about once a minute for the lifetime
+    /// of the app. The `Task.detached` body hops onto `historyDB`'s own
+    /// actor for the actual work, so compaction never runs on the main
+    /// thread even though the loop is kicked off from here.
+    private func startHistoryCompactionLoop() {
+        historyCompactionTask = Task.detached(priority: .utility) { [historyDB] in
+            while !Task.isCancelled {
+                await historyDB.compact()
+                try? await Task.sleep(nanoseconds: 60_000_000_000)
+            }
+        }
     }
 
     private func startPingTimer() {
@@ -392,6 +469,11 @@ final class MetricsEngine: ObservableObject {
     private func startPathMonitor() {
         let monitor = NWPathMonitor()
         monitor.pathUpdateHandler = { [weak self] path in
+            // NWPathMonitor callbacks fire on `queue` below, not the main
+            // thread — the signature comparison happens here (off-main) so
+            // it captures every transient change, then the actual engine
+            // updates hop to @MainActor.
+            let signature = "\(path.status)|\(path.availableInterfaces.map(\.type).map(String.init(describing:)).sorted())"
             Task { @MainActor in
                 guard let self else { return }
                 self.isConnected = path.status == .satisfied
@@ -399,6 +481,29 @@ final class MetricsEngine: ObservableObject {
                     : path.usesInterfaceType(.wiredEthernet) ? "Ethernet"
                     : path.usesInterfaceType(.cellular) ? "Cellular"
                     : path.status == .satisfied ? "Other" : "Offline"
+                self.isLikelyHotspot = NetworkClassification.isLikelyHotspot(
+                    isExpensive: path.isExpensive,
+                    usesWifi: path.usesInterfaceType(.wifi),
+                    satisfied: path.status == .satisfied
+                )
+
+                let changed = self.lastPathSignature != nil && self.lastPathSignature != signature
+                self.lastPathSignature = signature
+                if changed, self.settings.publicIPEnabled {
+                    // The old public IP belongs to the previous network path
+                    // and is no longer trustworthy — clear it immediately.
+                    // The actual fetch is debounced so a burst of transient
+                    // updates during a handoff (Wi-Fi -> hotspot etc.)
+                    // coalesces into a single request instead of one per
+                    // intermediate path state.
+                    self.publicIP = nil
+                    self.networkChangeDebounceTask?.cancel()
+                    self.networkChangeDebounceTask = Task { @MainActor [weak self] in
+                        try? await Task.sleep(nanoseconds: 800_000_000)
+                        guard !Task.isCancelled else { return }
+                        self?.fetchPublicIP(networkChanged: true)
+                    }
+                }
             }
         }
         monitor.start(queue: DispatchQueue(label: "NetworkPathMonitor"))
@@ -471,8 +576,14 @@ final class MetricsEngine: ObservableObject {
                        download: downloadSpeedKBps,
                        upload: uploadSpeedKBps,
                        diskFree: diskFreeGB)
+        recordHistorySample()
 
-        if settings.publicIPEnabled, lastPublicIPFetch.map({ Date().timeIntervalSince($0) > 300 }) ?? true {
+        if settings.publicIPEnabled,
+           PublicIPFetch.shouldFetch(lastSuccess: lastPublicIPFetchSuccess,
+                                      lastFailure: lastPublicIPFetchFailure,
+                                      now: Date(),
+                                      networkChanged: false,
+                                      inFlight: publicIPFetchInFlight) {
             fetchPublicIP()
         }
     }
@@ -514,6 +625,7 @@ final class MetricsEngine: ObservableObject {
         vpnIsFortiClient = s.vpnIsFortiClient
         appendCapped(downloadSpeedKBps, to: &downloadHistory)
         appendCapped(uploadSpeedKBps, to: &uploadHistory)
+        dataUsage.record(physicalBytesReceived: s.physicalBytesReceived, physicalBytesSent: s.physicalBytesSent)
     }
 
     // MARK: - Disk
@@ -529,6 +641,7 @@ final class MetricsEngine: ObservableObject {
             Task { @MainActor [weak self] in
                 guard let self else { return }
                 self.diskSmartStatus = await self.diskSampler.fetchSMART()
+                self.diskWearInfo = await self.diskSampler.fetchWear()
             }
         }
         appendCapped(diskReadKBps, to: &diskReadHistory)
@@ -581,6 +694,28 @@ final class MetricsEngine: ObservableObject {
                      diskFree: diskFreeGB, gpu: gpuUsagePercent, thermal: thermalState)
     }
 
+    // MARK: - Tiered SQLite history (roadmap 1.3a)
+
+    /// Feeds the current tick's readings into `historyDB`, gated by the same
+    /// `persistHistoryEnabled` preference as the CSV store. `HistoryDatabase`
+    /// itself throttles to ~1 sample/second internally, so calling this every
+    /// tick is safe even at a faster refresh interval.
+    private func recordHistorySample() {
+        guard settings.persistHistoryEnabled else { return }
+        let memoryUsedPercent = memoryTotalGB > 0 ? (memoryUsedGB / memoryTotalGB) * 100 : 0
+        let values: [HistoryMetric: Double] = [
+            .cpuUsagePercent: cpuUsagePercent,
+            .memoryUsedPercent: memoryUsedPercent,
+            .gpuUsagePercent: gpuUsagePercent,
+            .downloadSpeedKBps: downloadSpeedKBps,
+            .uploadSpeedKBps: uploadSpeedKBps,
+            .diskReadKBps: diskReadKBps,
+            .diskWriteKBps: diskWriteKBps,
+        ]
+        let now = Date()
+        Task { [historyDB] in await historyDB.record(values, at: now) }
+    }
+
     // MARK: - History export
 
     /// Thin wrapper delegating to HistoryStore with the engine's in-memory
@@ -628,13 +763,30 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - Public IP (opt-in, calls a third-party service)
 
-    private func fetchPublicIP() {
-        lastPublicIPFetch = Date()
+    /// - Parameter networkChanged: pass `true` when this fetch was triggered
+    ///   by a detected network-path change, so the caller's own throttle
+    ///   check can be skipped here too — the guard below still prevents a
+    ///   second concurrent request via `publicIPFetchInFlight`.
+    private func fetchPublicIP(networkChanged: Bool = false) {
+        guard !publicIPFetchInFlight else { return }
         guard let url = URL(string: "https://api.ipify.org?format=text") else { return }
-        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
-            guard let data, let ip = String(data: data, encoding: .utf8) else { return }
+        publicIPFetchInFlight = true
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             Task { @MainActor in
-                self?.publicIP = ip.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard let self else { return }
+                self.publicIPFetchInFlight = false
+
+                let httpStatus = (response as? HTTPURLResponse)?.statusCode
+                guard error == nil, httpStatus == 200,
+                      let data, let raw = String(data: data, encoding: .utf8),
+                      PublicIPFetch.isPlausibleIPAddress(raw)
+                else {
+                    self.lastPublicIPFetchFailure = Date()
+                    return
+                }
+                self.lastPublicIPFetchSuccess = Date()
+                self.lastPublicIPFetchFailure = nil
+                self.publicIP = raw.trimmingCharacters(in: .whitespacesAndNewlines)
             }
         }.resume()
     }
@@ -691,6 +843,7 @@ final class MetricsEngine: ObservableObject {
             self.fans                   = s.fans
             self.extendedTemperatures   = s.extendedTemperatures
             self.unknownSMCTemperatures = s.unknownSMCTemperatures
+            self.systemPowerWatts       = s.systemPowerWatts
         }
     }
 

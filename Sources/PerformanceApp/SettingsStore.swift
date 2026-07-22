@@ -83,6 +83,29 @@ final class SettingsStore: ObservableObject {
         }
     }
 
+    /// UI language override. Writes directly to the system `AppleLanguages`
+    /// key (rather than a private pref key) since that's the mechanism that
+    /// actually controls which .lproj macOS resolves at next launch — takes
+    /// effect on relaunch only, never live.
+    @Published var appLanguage: AppLanguage = .system {
+        didSet {
+            guard !isLoadingPreferences else { return }
+            if appLanguage == .system {
+                UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+            } else {
+                UserDefaults.standard.set([appLanguage.rawValue], forKey: "AppleLanguages")
+            }
+        }
+    }
+
+    /// Opt-in to receiving beta updates while running a stable build. Off by
+    /// default so existing stable installs keep their current behaviour
+    /// unchanged. Has no effect on an actual beta build, which is already on
+    /// the beta channel via its Info.plist (see UpdateChecker.effectiveChannel).
+    @Published var betaUpdatesOptIn: Bool = false {
+        didSet { UserDefaults.standard.set(betaUpdatesOptIn, forKey: "betaUpdatesOptIn") }
+    }
+
     // Single source of truth for all per-metric menu bar config.
     // CPU on/sparkline by default; all others off.
     @Published var menuBarConfig: [MenuBarMetric: MenuBarConfig] = {
@@ -105,6 +128,14 @@ final class SettingsStore: ObservableObject {
 
     @Published var diskSparklineWrite: Bool = false {
         didSet { UserDefaults.standard.set(diskSparklineWrite, forKey: "diskSparklineWrite") }
+    }
+
+    /// When on, the menu-bar value/sparkline for a metric is colored orange
+    /// or red once its current value crosses that metric's alert threshold
+    /// (see AlertService). Off by default so the menu bar stays unchanged
+    /// for existing users.
+    @Published var menuBarThresholdColor: Bool = false {
+        didSet { UserDefaults.standard.set(menuBarThresholdColor, forKey: "menuBarThresholdColor") }
     }
 
     @Published var panelOrder: [MetricsEngine.Panel] = MetricsEngine.Panel.allCases {
@@ -197,8 +228,18 @@ final class SettingsStore: ObservableObject {
         if let a = AppAppearance(rawValue: ud.string(forKey: "appAppearance") ?? "") {
             appAppearance = a
         }
+        // Derived from the existing AppleLanguages value (if any), not a
+        // dedicated pref key — mirrors whatever is currently in effect.
+        if let code = ud.stringArray(forKey: "AppleLanguages")?.first,
+           let lang = AppLanguage(rawValue: code) {
+            appLanguage = lang
+        } else {
+            appLanguage = .system
+        }
         networkSparklineUpload = ud.bool(forKey: "networkSparklineUpload")
         diskSparklineWrite     = ud.bool(forKey: "diskSparklineWrite")
+        menuBarThresholdColor  = ud.bool(forKey: "menuBarThresholdColor")
+        betaUpdatesOptIn       = ud.bool(forKey: "betaUpdatesOptIn")
 
         if let raw = ud.stringArray(forKey: Pref.panelOrder) {
             let loaded = raw.compactMap { MetricsEngine.Panel(rawValue: $0) }

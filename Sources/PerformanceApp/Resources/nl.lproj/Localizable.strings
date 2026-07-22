@@ -1,0 +1,388 @@
+/*
+  Localizable.strings (nl)
+  Performance Monitor
+
+  Sleutelconventie: de Engelse brontekst is zelf de opzoeksleutel.
+  Format-strings behouden hun printf-specificaties (%.0f, %@, ...)
+  ongewijzigd in de sleutel.
+*/
+
+/* MARK: - Theme (ProcessInfo.ThermalState label) */
+"Nominal" = "Normaal";
+"Fair" = "Redelijk";
+"Serious" = "Ernstig";
+"Critical" = "Kritiek";
+"Unknown" = "Onbekend";
+
+/* MARK: - AlertService */
+"High CPU usage" = "Hoog CPU-gebruik";
+"CPU is at %.0f%%" = "CPU staat op %.0f%%";
+"High memory usage" = "Hoog geheugengebruik";
+"%.1f / %.0f GB used (%.0f%%)" = "%.1f / %.0f GB gebruikt (%.0f%%)";
+"Low disk space" = "Weinig schijfruimte";
+"Only %.1f GB free" = "Nog maar %.1f GB vrij";
+"High GPU usage" = "Hoog GPU-gebruik";
+"GPU is at %.0f%%" = "GPU staat op %.0f%%";
+"System running hot" = "Systeem draait heet";
+"Thermal pressure: %@" = "Thermische druk: %@";
+
+/* MARK: - MenuBarModels (weergavenamen; rawValue blijft vast voor opslag) */
+"CPU" = "CPU";
+"Memory" = "Geheugen";
+"Network" = "Netwerk";
+"Disk" = "Schijf";
+"GPU" = "GPU";
+"Sparkline" = "Sparkline";
+"Text only" = "Alleen tekst";
+"System" = "Systeem";
+"Light" = "Licht";
+"Dark" = "Donker";
+
+/* MARK: - MetricsEngine (Panel / PingServer weergavenamen) */
+"Thermal" = "Temperatuur";
+"GPU & Displays" = "GPU en beeldschermen";
+"Battery" = "Batterij";
+"Bluetooth" = "Bluetooth";
+"Apple (default)" = "Apple (standaard)";
+"Cloudflare (1.1.1.1)" = "Cloudflare (1.1.1.1)";
+"Google (8.8.8.8)" = "Google (8.8.8.8)";
+"Quad9 (9.9.9.9)" = "Quad9 (9.9.9.9)";
+
+/* MARK: - SettingsView: tabbladen */
+"General" = "Algemeen";
+"Menu Bar" = "Menubalk";
+"Metrics" = "Metingen";
+"Alerts" = "Meldingen";
+"Panels" = "Panelen";
+"History" = "Historie";
+"Updates" = "Updates";
+
+/* MARK: - SettingsView: tabblad Algemeen */
+"Refresh interval" = "Verversingsinterval";
+"Appearance" = "Weergave";
+"Language" = "Taal";
+"Takes effect after relaunch" = "Wordt van kracht na herstart";
+"Relaunch Now" = "Nu herstarten";
+"Show in Dock" = "Tonen in Dock";
+"Launch at login" = "Starten bij inloggen";
+"Open / close popover" = "Popover openen/sluiten";
+"Crash Reports" = "Crashrapporten";
+"Open Crash Reports Folder" = "Map met crashrapporten openen";
+"Processes" = "Processen";
+"Top processes shown" = "Aantal getoonde topprocessen";
+"Support this project ♥" = "Steun dit project ♥";
+"Performance Monitor is free and always will be." = "Performance Monitor is gratis en zal dat altijd blijven.";
+
+/* MARK: - SettingsView: tabblad Menubalk */
+"Menu Bar Icons" = "Menubalkpictogrammen";
+"Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar." = "Sleep de handgreep om de volgorde te wijzigen. Het bovenste ingeschakelde pictogram verschijnt uiterst rechts in de menubalk.";
+"Colour when above alert threshold" = "Kleur bij overschrijden van drempel";
+"IO" = "IO";
+"Space" = "Ruimte";
+"Text" = "Tekst";
+"Graph" = "Grafiek";
+
+/* MARK: - SettingsView: tabblad Updates */
+"Update notifications are disabled. Enable them in System Settings → Notifications → Performance Monitor." = "Updatemeldingen staan uit. Schakel ze in via Systeeminstellingen → Meldingen → Performance Monitor.";
+"Open Settings" = "Instellingen openen";
+"Current version" = "Huidige versie";
+"Beta channel" = "Bètakanaal";
+"Also receive beta updates" = "Ook bèta-updates ontvangen";
+"Beta updates arrive sooner but are tested less." = "Bèta-updates verschijnen eerder, maar zijn minder grondig getest.";
+"Beta versions may contain bugs or unfinished features." = "Bètaversies kunnen bugs of onafgemaakte functies bevatten.";
+"Report a problem" = "Een probleem melden";
+"You're currently on a beta version (%@). You can switch back to the latest stable release now." = "Je gebruikt momenteel een bètaversie (%@). Je kunt nu terugschakelen naar de nieuwste stabiele release.";
+"Switch to Stable Now" = "Nu naar stabiel schakelen";
+"Your settings will be kept." = "Je instellingen blijven behouden.";
+"Checking for updates…" = "Controleren op updates…";
+"You're up to date" = "Je hebt de nieuwste versie";
+"Checked %@" = "Gecontroleerd %@";
+"v%@ is available" = "v%@ is beschikbaar";
+"The app will quit and relaunch after installing." = "De app sluit af en start opnieuw na installatie.";
+"Update Now" = "Nu updaten";
+"Downloading…" = "Downloaden…";
+"Installing — app will restart shortly…" = "Installeren — app herstart zo…";
+"Try Again" = "Opnieuw proberen";
+"Check Now" = "Nu controleren";
+"Remind me later after" = "Herinner me later na";
+"1 day" = "1 dag";
+"3 days" = "3 dagen";
+"7 days" = "7 dagen";
+"14 days" = "14 dagen";
+
+/* MARK: - SettingsView: tabblad Metingen */
+"Show removable volumes" = "Verwisselbare volumes tonen";
+"Fetches from api.ipify.org over HTTPS every 5 min." = "Haalt elke 5 min op via HTTPS bij api.ipify.org.";
+"Show public IP" = "Publiek IP-adres tonen";
+"Ping server" = "Pingserver";
+
+/* MARK: - SettingsView: tabblad Meldingen */
+"Enable notifications" = "Meldingen inschakelen";
+"CPU above" = "CPU boven";
+"Memory above" = "Geheugen boven";
+"Disk free below" = "Vrije schijfruimte onder";
+"GPU above" = "GPU boven";
+"Thermal pressure" = "Thermische druk";
+"Alert after exceeded for" = "Waarschuwen na overschrijding van";
+"Off" = "Uit";
+"1 min" = "1 min";
+"2 min" = "2 min";
+"Applies to CPU, GPU and memory. Disk space and thermal alerts always fire immediately." = "Geldt voor CPU, GPU en geheugen. Meldingen voor schijfruimte en temperatuur gaan altijd direct af.";
+"Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min." = "Temperatuurmeldingen gaan af bij Ernstig of Kritiek. Alle meldingen zijn beperkt tot één keer per 5 min.";
+
+/* MARK: - SettingsView: tabblad Panelen */
+"Drag cards to reorder. Tap the eye to show or hide." = "Sleep kaarten om de volgorde te wijzigen. Tik op het oog om te tonen of verbergen.";
+
+/* MARK: - SettingsView: tabblad Geschiedenis */
+"Save history to disk" = "Geschiedenis opslaan op schijf";
+"Open History Window" = "Historievenster openen";
+"Export" = "Exporteren";
+"Export CSV…" = "CSV exporteren…";
+
+/* MARK: - OnboardingView */
+"Welcome to Performance Monitor" = "Welkom bij Performance Monitor";
+"This app lives in your menu bar, not the Dock. Look for its icon — CPU, memory, and more — next to the clock at the top of your screen." = "Deze app leeft in je menubalk, niet in het Dock. Zoek het pictogram — CPU, geheugen en meer — naast de klok bovenaan je scherm.";
+"Click the menu bar icon for a quick overview of CPU, memory, network, disk, and more" = "Klik op het menubalkpictogram voor een snel overzicht van CPU, geheugen, netwerk, schijf en meer";
+"Open any card for a detailed window with history charts and process breakdowns" = "Open een kaart voor een gedetailleerd venster met historiekgrafieken en procesoverzichten";
+"Choose which metrics show in the menu bar, and whether as text or a live graph" = "Kies welke metingen in de menubalk verschijnen, als tekst of als live grafiek";
+"Get notified when CPU, memory, disk space, or temperature cross a threshold you set" = "Ontvang een melding wanneer CPU, geheugen, schijfruimte of temperatuur een door jou ingestelde drempel overschrijden";
+"About permissions" = "Over machtigingen";
+"Performance Monitor will ask for Bluetooth access to show your paired devices and their battery levels, and for notification access to deliver the alerts above. Both are optional — the rest of the app works fully without them." = "Performance Monitor vraagt toegang tot Bluetooth om je gekoppelde apparaten en hun batterijniveau te tonen, en toegang tot meldingen om bovenstaande waarschuwingen te kunnen sturen. Beide zijn optioneel — de rest van de app werkt volledig zonder.";
+"Get Started" = "Aan de slag";
+
+/* MARK: - OverviewView */
+"System Overview" = "Systeemoverzicht";
+"Settings" = "Instellingen";
+"Quit" = "Afsluiten";
+"%@ history" = "%@-geschiedenis";
+"Area" = "Vlak";
+"Gauge" = "Meter";
+"Bat" = "Bat";
+"normal" = "normaal";
+"warm" = "warm";
+"hot" = "heet";
+"critical" = "kritiek";
+"%ld°C, %@" = "%ld°C, %@";
+"free of %ld GB" = "vrij van %ld GB";
+"%ld percent, charging" = "%ld procent, aan het opladen";
+"%ld percent, low battery" = "%ld procent, batterij bijna leeg";
+"%ld percent" = "%ld procent";
+"%.0fW charging" = "%.0fW aan het opladen";
+"%ldh %ldm to full" = "%ldu %ldm tot vol";
+"%ldm to full" = "%ldm tot vol";
+"%ldh %ldm remaining" = "nog %ldu %ldm";
+"%ldm remaining" = "nog %ldm";
+"Charging" = "Opladen";
+"On Battery" = "Op batterij";
+"Chart" = "Grafiek";
+"Info" = "Info";
+"No display info" = "Geen scherminfo";
+"main" = "hoofd";
+"VPN active, FortiClient" = "VPN actief, FortiClient";
+"VPN active" = "VPN actief";
+"VPN inactive" = "VPN inactief";
+"Connected" = "Verbonden";
+"%@, primary connection" = "%@, primaire verbinding";
+"Disconnected" = "Niet verbonden";
+"Local IP" = "Lokaal IP";
+"Public IP" = "Publiek IP";
+"Looking up…" = "Opzoeken…";
+"%ld connected" = "%ld verbonden";
+"No devices connected" = "Geen apparaten verbonden";
+"%ld percent, low" = "%ld procent, laag";
+
+/* MARK: - DetailShared */
+"Case" = "Hoesje";
+"%ld percent, low battery" = "%ld procent, batterij bijna leeg";
+"Resume live updates" = "Live updates hervatten";
+"Pause list" = "Lijst pauzeren";
+"No data captured." = "Geen data vastgelegd.";
+"Quit %@" = "%@ afsluiten";
+"Quit %@?" = "%@ afsluiten?";
+"process" = "proces";
+"Cancel" = "Annuleren";
+"This sends a quit signal to the process (PID %ld). Unsaved work may be lost." = "Dit stuurt een afsluitsignaal naar het proces (PID %ld). Niet-opgeslagen werk kan verloren gaan.";
+"Wi-Fi signal" = "Wifi-signaal";
+"%@, %ld dBm" = "%@, %ld dBm";
+
+/* MARK: - MemoryDetailView */
+"%@ GB / %@ GB" = "%@ GB / %@ GB";
+"Memory usage history" = "Geheugengebruik-geschiedenis";
+"App %.1fGB" = "App %.1fGB";
+"Wired %.1fGB" = "Vast %.1fGB";
+"Cmp %.1fGB" = "Cmp %.1fGB";
+"App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM." = "App: Actieve + inactieve pagina's — geheugen dat op dit moment of recent door apps wordt gebruikt.\n\nVast (wired): Vastgezet in RAM door de kernel en drivers. Kan niet naar schijf worden uitgeplaatst.\n\nGecomprimeerd: Pagina's die macOS comprimeert om fysiek RAM vrij te maken bij geheugendruk. Hoog gecomprimeerd geheugen is normaal; het wordt swap zodra comprimeren niet meer volstaat.\n\nSwap: Data die naar schijf is geschreven omdat het RAM vol was. Aanhoudend hoog swapgebruik betekent dat je meer RAM nodig hebt.";
+"Swap used: %@ GB" = "Swap gebruikt: %@ GB";
+"Top Memory" = "Topgeheugen";
+
+/* MARK: - Theme (sensorTempSeverityWord — extra gevallen; "normal"/"critical" gedeeld met OverviewView) */
+"warning" = "waarschuwing";
+"elevated" = "verhoogd";
+
+/* MARK: - BatteryDetailView */
+"Source" = "Bron";
+"State" = "Status";
+"Charging" = "Opladen";
+"Discharging" = "Ontladen";
+"Time to full" = "Tijd tot vol";
+"Time remaining" = "Resterende tijd";
+"%ldh %ldm" = "%ldu %ldm";
+"Health" = "Gezondheid";
+"Capacity %: NominalChargeCapacity ÷ DesignCapacity × 100. This shows how much of the original battery capacity remains.\n\nCycle count: Each full charge/discharge cycle counts as one. Apple considers batteries at peak performance for 1000 cycles (MacBook Pro/Air M-series). After that, capacity may be below 80%.\n\nCondition 'Normal' means the battery is performing within expected parameters. 'Service Recommended' means capacity has dropped significantly and Apple recommends a replacement." = "Capaciteit %: NominalChargeCapacity ÷ DesignCapacity × 100. Dit toont hoeveel van de oorspronkelijke batterijcapaciteit nog over is.\n\nCyclustelling: Elke volledige laad-/ontlaadcyclus telt als één. Apple beschouwt batterijen als op piekniveau tot 1000 cycli (MacBook Pro/Air M-serie). Daarna kan de capaciteit onder 80% zakken.\n\nConditie 'Normaal' betekent dat de batterij binnen de verwachte parameters presteert. 'Onderhoud aanbevolen' betekent dat de capaciteit aanzienlijk is gedaald en Apple vervanging aanraadt.";
+"Capacity vs. design" = "Capaciteit t.o.v. ontwerp";
+"Condition" = "Conditie";
+"Cycle count" = "Cyclustelling";
+"Electrical" = "Elektrisch";
+"Temperature: Read from AppleSmartBattery IORegistry — no special privileges needed. This is the battery cell temperature, not the CPU temperature.\n\nVoltage: Current battery terminal voltage in volts.\n\nCurrent: Positive = charging (current flowing in). Negative = discharging (current flowing out). Values are in milliamps (mA).\n\nAll values come from the AppleSmartBattery driver which is always accessible without entitlements." = "Temperatuur: Uitgelezen uit AppleSmartBattery IORegistry — geen speciale rechten nodig. Dit is de temperatuur van de batterijcel, niet van de CPU.\n\nSpanning: Huidige batterijspanning in volt.\n\nStroom: Positief = opladen (stroom stroomt in). Negatief = ontladen (stroom stroomt uit). Waarden in milliampère (mA).\n\nAlle waarden komen van de AppleSmartBattery-driver, altijd toegankelijk zonder entitlements.";
+"Input power" = "Ingangsvermogen";
+"Draw" = "Verbruik";
+"Temperature" = "Temperatuur";
+"%@ degrees, %@" = "%@ graden, %@";
+"Voltage" = "Spanning";
+"Current" = "Stroom";
+"%ld mA" = "%ld mA";
+
+/* MARK: - CPUDetailView */
+"CPU usage history" = "CPU-gebruiksgeschiedenis";
+"User %.0f%%" = "Gebruiker %.0f%%";
+"Sys %.0f%%" = "Systeem %.0f%%";
+"Idle %.0f%%" = "Inactief %.0f%%";
+"Load avg: %.2f  %.2f  %.2f  (1 / 5 / 15 min)" = "Load avg: %.2f  %.2f  %.2f  (1 / 5 / 15 min)";
+"Per-core" = "Per kern";
+"P = Performance cores (faster, higher power). E = Efficiency cores (slower, lower power). macOS assigns which core handles each workload automatically. On Intel Macs all cores are equivalent and show as Core N." = "P = Performance-kernen (sneller, meer vermogen). E = Efficiency-kernen (langzamer, minder vermogen). macOS wijst automatisch toe welke kern een taak uitvoert. Op Intel-Macs zijn alle kernen gelijk en worden ze getoond als Core N.";
+"Core %ld" = "Kern %ld";
+"Thermal Pressure" = "Thermische druk";
+"This is the macOS thermal throttling signal — not an exact temperature reading.\n\n• Nominal: No throttling. System running normally.\n• Fair: Slight throttling may be occurring.\n• Serious: Active throttling. Performance is being reduced to cool the system.\n• Critical: Severe throttling. Immediate action recommended (close apps, remove from enclosed spaces).\n\nExact die temperatures (CPU/GPU) are not readable on Apple Silicon without a privileged kernel extension. macOS blocks SMC access for user-space apps." = "Dit is het macOS-signaal voor thermisch throttlen — geen exacte temperatuurmeting.\n\n• Normaal: Geen throttling. Systeem draait normaal.\n• Redelijk: Er kan lichte throttling optreden.\n• Ernstig: Actieve throttling. Prestaties worden verlaagd om het systeem te koelen.\n• Kritiek: Zware throttling. Onmiddellijke actie aanbevolen (sluit apps, haal uit afgesloten ruimtes).\n\nExacte chiptemperaturen (CPU/GPU) zijn op Apple Silicon niet uit te lezen zonder bevoorrechte kernelextensie. macOS blokkeert SMC-toegang voor apps in de gebruikersruimte.";
+"Top CPU" = "Top CPU";
+
+/* MARK: - DiskDetailView */
+"Read" = "Lezen";
+"Write" = "Schrijven";
+"Disk read speed history" = "Schijf-leessnelheid-geschiedenis";
+"Disk write speed history" = "Schijf-schrijfsnelheid-geschiedenis";
+"Storage" = "Opslag";
+"SMART OK" = "SMART OK";
+"Removable" = "Verwisselbaar";
+"%.1f GB used" = "%.1f GB gebruikt";
+"%.1f GB free" = "%.1f GB vrij";
+"%ld%% wear" = "%ld%% slijtage";
+"%.1f TB written" = "%.1f TB geschreven";
+"%ld h on" = "%ld u aan";
+
+/* MARK: - GPUDetailView */
+"GPU utilization percentage is not available through any public macOS API on Apple Silicon. Apple's IOKit SMC interface blocks access to GPU load counters for user-space processes.\n\nThird-party tools that show GPU % use private, entitled APIs or kernel extensions that require special signing. The Metal information shown here (working set size, power mode) is the maximum available through the public API." = "Het GPU-gebruikspercentage is op Apple Silicon niet beschikbaar via een publieke macOS-API. Apple's IOKit SMC-interface blokkeert toegang tot GPU-belastingtellers voor apps in de gebruikersruimte.\n\nTools van derden die GPU % tonen, gebruiken private, entitled API's of kernelextensies die speciale signing vereisen. De Metal-informatie die hier wordt getoond (working set-grootte, energiemodus) is het maximum dat via de publieke API beschikbaar is.";
+"Location" = "Locatie";
+"Max working set" = "Max. working set";
+"Power mode" = "Energiemodus";
+"Low power" = "Laag verbruik";
+"High performance" = "Hoge prestaties";
+"Displays" = "Beeldschermen";
+"Arrange…" = "Rangschikken…";
+"No display info available" = "Geen scherminfo beschikbaar";
+"Main" = "Hoofd";
+
+/* MARK: - NetworkDetailView */
+"Throughput" = "Doorvoer";
+"Download speed history" = "Downloadsnelheid-geschiedenis";
+"Upload speed history" = "Uploadsnelheid-geschiedenis";
+"Connected — %@" = "Verbonden — %@";
+"No connection" = "Geen verbinding";
+"VPN" = "VPN";
+"Local IPs are read from the system network interfaces.\n\nVPN is detected by the presence of utun, ppp, or ipsec interfaces.\n\nPublic IP is fetched from api.ipify.org over HTTPS. Only your outbound request is sent — no other data. Refreshed every 5 minutes.\n\nConnectivity check is an HTTPS HEAD request to Apple's captive portal endpoint (captive.apple.com). This respects your system proxy settings. True ICMP ping requires root on macOS, so this is used instead." = "Lokale IP-adressen worden uitgelezen uit de netwerkinterfaces van het systeem.\n\nVPN wordt gedetecteerd aan de hand van utun-, ppp- of ipsec-interfaces.\n\nHet publieke IP-adres wordt via HTTPS opgehaald bij api.ipify.org. Alleen je uitgaande verzoek wordt verstuurd — verder geen data. Elke 5 minuten ververst.\n\nDe verbindingscontrole is een HTTPS HEAD-verzoek naar Apple's captive-portal-eindpunt (captive.apple.com). Dit respecteert je systeem-proxyinstellingen. Echte ICMP-ping vereist root op macOS, vandaar dit alternatief.";
+"Wi-Fi" = "Wifi";
+"Personal Hotspot" = "Persoonlijke hotspot";
+"Signal strength is measured in dBm (decibel-milliwatts) — a negative number where closer to zero is stronger.\n\n• Excellent (−50 dBm or better): Ideal. Full speed, no drops.\n• Good (−50 to −65 dBm): Reliable for video calls and large transfers.\n• Fair (−65 to −75 dBm): Usable but may slow down. Consider moving closer to your router.\n• Weak (below −75 dBm): Prone to disconnects and slow speeds.\n\nRead from CoreWLAN — same source as the macOS menu bar WiFi indicator." = "Signaalsterkte wordt gemeten in dBm (decibel-milliwatt) — een negatief getal waarbij dichter bij nul sterker is.\n\n• Uitstekend (−50 dBm of beter): Ideaal. Volle snelheid, geen uitval.\n• Goed (−50 tot −65 dBm): Betrouwbaar voor videobellen en grote overdrachten.\n• Redelijk (−65 tot −75 dBm): Bruikbaar maar kan vertragen. Overweeg dichter bij je router te gaan zitten.\n• Zwak (onder −75 dBm): Gevoelig voor verbindingsverlies en lage snelheden.\n\nUitgelezen via CoreWLAN — dezelfde bron als de wifi-indicator in de macOS-menubalk.";
+"Connectivity Check" = "Verbindingscontrole";
+"%ld milliseconds, %@" = "%ld milliseconden, %@";
+"good" = "goed";
+"fair" = "redelijk";
+"poor" = "slecht";
+"Timeout" = "Time-out";
+"Ping latency history" = "Ping-latentiegeschiedenis";
+"Top Network Usage" = "Topnetwerkgebruik";
+"Measuring…" = "Meten…";
+"primary connection" = "primaire verbinding";
+"Subnet" = "Subnet";
+"Gateway" = "Gateway";
+
+/* MARK: - BluetoothDetailView */
+"Paired devices are read from the IOBluetooth framework — all devices you have ever paired, whether connected or not.\n\nBattery percentage is read from the IOHIDDevice registry for devices that expose it (Apple peripherals: AirPods, Magic Mouse, Magic Keyboard, etc.). Third-party peripherals may not expose battery data." = "Gekoppelde apparaten worden uitgelezen uit het IOBluetooth-framework — alle apparaten die je ooit hebt gekoppeld, verbonden of niet.\n\nBatterijpercentage wordt uitgelezen uit het IOHIDDevice-register voor apparaten die dit ondersteunen (Apple-randapparatuur: AirPods, Magic Mouse, Magic Keyboard, enz.). Randapparatuur van derden geeft mogelijk geen batterijdata door.";
+"Bluetooth Access Required" = "Bluetooth-toegang vereist";
+"Access was denied. Go to System Settings → Privacy & Security → Bluetooth to enable it." = "Toegang is geweigerd. Ga naar Systeeminstellingen → Privacy en beveiliging → Bluetooth om dit in te schakelen.";
+"Allow Performance Monitor to read your paired Bluetooth devices." = "Sta Performance Monitor toe je gekoppelde Bluetooth-apparaten uit te lezen.";
+"Open Privacy Settings" = "Privacy-instellingen openen";
+"Grant Bluetooth Access" = "Bluetooth-toegang verlenen";
+"No paired devices found." = "Geen gekoppelde apparaten gevonden.";
+"Not connected" = "Niet verbonden";
+"connected" = "verbonden";
+"not connected" = "niet verbonden";
+
+/* Added during localization completion pass */
+"Airflow" = "Luchtstroom";
+"App bundle not found inside downloaded archive." = "App-bundle niet gevonden in het gedownloade archief.";
+"Could not read release info from GitHub." = "Kon release-informatie niet van GitHub lezen.";
+"Download failed — server returned an error." = "Download mislukt — de server gaf een fout terug.";
+"Failed to unzip the downloaded archive." = "Uitpakken van het gedownloade archief is mislukt.";
+"Fan speed is read from the SMC via IOKit.\n\nActual: current measured RPM.\nMin/Max: hardware-defined speed range for this fan.\nAirflow: intake air temperature sensor near each fan." = "Ventilatorsnelheid wordt via IOKit uit de SMC gelezen.\n\nActueel: huidig gemeten toerental.\nMin/Max: door de hardware gedefinieerd snelheidsbereik van deze ventilator.\nLuchtstroom: sensor voor de aanzuiglucht bij elke ventilator.";
+"Fans" = "Ventilatoren";
+"GPU usage history" = "GPU-gebruiksgeschiedenis";
+"Install failed: %@" = "Installatie mislukt: %@";
+"Loading…" = "Laden…";
+"Network error: %@" = "Netwerkfout: %@";
+"No temperature sensors found for this Mac model." = "Geen temperatuursensoren gevonden voor dit Mac-model.";
+"Performance Monitor Update" = "Performance Monitor-update";
+"Range" = "Bereik";
+"Read from the System Management Controller (SMC) via IOKit.\n\nCPU and GPU values shown are averages across all cluster sensors. Tap a row to expand individual readings.\n\nBattery temperature is read from the AppleSmartBattery IORegistry entry." = "Uitgelezen uit de System Management Controller (SMC) via IOKit.\n\nDe getoonde CPU- en GPU-waarden zijn gemiddelden over alle clustersensoren. Tik op een rij om individuele metingen uit te klappen.\n\nDe batterijtemperatuur wordt gelezen uit de AppleSmartBattery-IORegistry.";
+"Remind Me Later" = "Herinner me later";
+"Skip This Version" = "Deze versie overslaan";
+"Speed" = "Snelheid";
+"Temperatures" = "Temperaturen";
+"Thermal & Fans" = "Warmte & ventilatoren";
+"Trackpad" = "Trackpad";
+"True Tone" = "True Tone";
+"Update aborted — could not download the signature file." = "Update afgebroken — kon het handtekeningbestand niet downloaden.";
+"Update aborted — could not locate the signature file." = "Update afgebroken — kon het handtekeningbestand niet vinden.";
+"Update aborted — internal verification key is invalid." = "Update afgebroken — interne verificatiesleutel is ongeldig.";
+"Update aborted — signature is missing or unreadable. This release cannot be verified." = "Update afgebroken — handtekening ontbreekt of is onleesbaar. Deze release kan niet worden geverifieerd.";
+"Update aborted — the download failed signature verification and may have been tampered with." = "Update afgebroken — de download doorstond de handtekeningverificatie niet en is mogelijk gemanipuleerd.";
+"Update refused — download is not served from a trusted GitHub host." = "Update geweigerd — de download komt niet van een vertrouwde GitHub-host.";
+"Version %@ is available — you're on %@." = "Versie %@ is beschikbaar — je gebruikt %@.";
+"above alert threshold" = "boven de meldingsdrempel";
+"below alert threshold" = "onder de meldingsdrempel";
+"well above alert threshold" = "ver boven de meldingsdrempel";
+"well below alert threshold" = "ver onder de meldingsdrempel";
+"macOS reports four thermal pressure levels:\n\n• Nominal — system operating normally.\n• Fair — some power reduction to prevent overheating.\n• Serious — significant throttling in effect.\n• Critical — aggressive throttling; performance severely impacted.\n\nThis is read from ProcessInfo.thermalState — the same value macOS uses internally to throttle workloads." = "macOS kent vier niveaus van thermische druk:\n\n• Nominal — systeem werkt normaal.\n• Fair — enige vermogensreductie om oververhitting te voorkomen.\n• Serious — aanzienlijke throttling actief.\n• Critical — agressieve throttling; prestaties sterk beperkt.\n\nDit wordt gelezen uit ProcessInfo.thermalState — dezelfde waarde die macOS intern gebruikt om werklasten te throttlen.";
+
+/* MARK: - ThermalDetailView power (roadmap 1.2a) */
+"Power" = "Vermogen";
+"System Power" = "Systeemvermogen";
+"Total system power draw, read from the System Management Controller (SMC).\n\nCovers the whole machine — CPU, GPU, display, and everything else on the same power rail — not just one component." = "Totaal stroomverbruik van het systeem, gelezen uit de System Management Controller (SMC).\n\nOmvat de hele machine — CPU, GPU, beeldscherm en al het andere op dezelfde voedingslijn — niet slechts één onderdeel.";
+
+/* MARK: - NetworkDetailView data usage (roadmap 1.2b) */
+"Data Usage" = "Datagebruik";
+"Tracks bytes transferred over physical Wi-Fi/Ethernet interfaces only — VPN and other virtual interfaces are excluded so their tunneled traffic isn't counted twice.\n\nMeasurement starts the moment this feature first ran on this Mac; there is no data from before that." = "Houdt alleen het aantal bytes bij dat via fysieke Wi-Fi/Ethernet-interfaces is verstuurd — VPN en andere virtuele interfaces worden uitgesloten, zodat getunneld verkeer niet dubbel wordt geteld.\n\nDe meting begint op het moment dat deze functie voor het eerst actief werd op deze Mac; data van daarvoor is niet beschikbaar.";
+"Reset Statistics" = "Statistieken resetten";
+"Today" = "Vandaag";
+"This Week" = "Deze week";
+"This Month" = "Deze maand";
+"Tracking since %@" = "Bijgehouden sinds %@";
+"Reset data usage statistics?" = "Datagebruikstatistieken resetten?";
+"Reset" = "Resetten";
+"This clears all recorded download and upload totals. This cannot be undone." = "Hiermee worden alle geregistreerde download- en uploadtotalen gewist. Dit kan niet ongedaan worden gemaakt.";
+
+/* MARK: - HistoryWindow (roadmap 1.3a part 2) */
+"1 Hour" = "1 uur";
+"24 Hours" = "24 uur";
+"7 Days" = "7 dagen";
+"30 Days" = "30 dagen";
+"Period" = "Periode";
+"Refresh" = "Vernieuwen";
+"Download" = "Download";
+"Upload" = "Upload";
+"Disk Read" = "Schijf lezen";
+"Disk Write" = "Schijf schrijven";
+"Go to Settings" = "Naar instellingen";
+"Enable \"%@\" in Settings to record history." = "Schakel \"%@\" in bij Instellingen om geschiedenis vast te leggen.";
+
+/* MARK: - HistoryWindow weekly summary (roadmap 1.3b) */
+"%@ — avg %@, peak %@ (%@)" = "%@ — gem. %@, piek %@ (%@)";

@@ -10,7 +10,7 @@ struct ThermalDetailView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Label("Thermal & Fans", systemImage: "thermometer.medium")
+            Label(String(localized: "Thermal & Fans"), systemImage: "thermometer.medium")
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(engine.thermalState.color)
 
@@ -18,9 +18,9 @@ struct ThermalDetailView: View {
             SectionCard {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("Thermal Pressure").font(.subheadline.weight(.semibold))
+                        Text(String(localized: "Thermal Pressure")).font(.subheadline.weight(.semibold))
                         Spacer()
-                        InfoButton(text: "macOS reports four thermal pressure levels:\n\n• Nominal — system operating normally.\n• Fair — some power reduction to prevent overheating.\n• Serious — significant throttling in effect.\n• Critical — aggressive throttling; performance severely impacted.\n\nThis is read from ProcessInfo.thermalState — the same value macOS uses internally to throttle workloads.")
+                        InfoButton(text: String(localized: "macOS reports four thermal pressure levels:\n\n• Nominal — system operating normally.\n• Fair — some power reduction to prevent overheating.\n• Serious — significant throttling in effect.\n• Critical — aggressive throttling; performance severely impacted.\n\nThis is read from ProcessInfo.thermalState — the same value macOS uses internally to throttle workloads."))
                     }
                     HStack(spacing: 8) {
                         Circle().fill(engine.thermalState.color).frame(width: 10, height: 10)
@@ -32,13 +32,27 @@ struct ThermalDetailView: View {
                 }
             }
 
+            // System power draw — read from the SMC PSTR key (see SMCPowerCatalog)
+            if let watts = engine.systemPowerWatts {
+                SectionCard {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text(String(localized: "Power")).font(.subheadline.weight(.semibold))
+                            Spacer()
+                            InfoButton(text: String(localized: "Total system power draw, read from the System Management Controller (SMC).\n\nCovers the whole machine — CPU, GPU, display, and everything else on the same power rail — not just one component."))
+                        }
+                        detailRow(String(localized: "System Power"), String(format: "%.1f W", watts))
+                    }
+                }
+            }
+
             // Temperatures — each category expandable to individual sensors
             SectionCard {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Text("Temperatures").font(.subheadline.weight(.semibold))
                         Spacer()
-                        InfoButton(text: "Read from the System Management Controller (SMC) via IOKit.\n\nCPU and GPU values shown are averages across all cluster sensors. Tap a row to expand individual readings.\n\nBattery temperature is read from the AppleSmartBattery IORegistry entry.")
+                        InfoButton(text: String(localized: "Read from the System Management Controller (SMC) via IOKit.\n\nCPU and GPU values shown are averages across all cluster sensors. Tap a row to expand individual readings.\n\nBattery temperature is read from the AppleSmartBattery IORegistry entry."))
                     }
 
                     let groups = Dictionary(grouping: engine.extendedTemperatures, by: \.category)
@@ -48,21 +62,21 @@ struct ThermalDetailView: View {
 
                     if let avg = engine.cpuTemperatureC {
                         SensorCategoryRow(
-                            icon: "cpu", iconColor: MetricTheme.cpu, label: "CPU", avgCelsius: avg,
+                            icon: "cpu", iconColor: MetricTheme.cpu, label: String(localized: "CPU"), avgCelsius: avg,
                             sensors: cpuSensors.map { ($0.label, $0.celsius) },
                             category: "CPU"
                         )
                     }
                     if let avg = engine.gpuTemperatureC {
                         SensorCategoryRow(
-                            icon: "cube.transparent", iconColor: .cyan, label: "GPU", avgCelsius: avg,
+                            icon: "cube.transparent", iconColor: .cyan, label: String(localized: "GPU"), avgCelsius: avg,
                             sensors: gpuSensors.map { ($0.label, $0.celsius) },
                             category: "GPU"
                         )
                     }
                     if let bat = engine.batteryTemperatureC {
                         SensorCategoryRow(
-                            icon: "battery.75percent", iconColor: MetricTheme.battery, label: "Battery",
+                            icon: "battery.75percent", iconColor: MetricTheme.battery, label: String(localized: "Battery"),
                             avgCelsius: bat, sensors: [],
                             category: "Battery"
                         )
@@ -73,7 +87,7 @@ struct ThermalDetailView: View {
                     if !storageSensors.isEmpty {
                         let avg = storageSensors.map(\.celsius).reduce(0, +) / Double(storageSensors.count)
                         SensorCategoryRow(
-                            icon: "internaldrive", iconColor: .indigo, label: "Storage", avgCelsius: avg,
+                            icon: "internaldrive", iconColor: .indigo, label: String(localized: "Storage"), avgCelsius: avg,
                             sensors: storageSensors.map { ($0.label, $0.celsius) },
                             category: "Storage"
                         )
@@ -87,7 +101,7 @@ struct ThermalDetailView: View {
                                 result += trackpadSensors.map { ($0.label, $0.celsius) }
                             } else {
                                 let avg = trackpadSensors.map(\.celsius).reduce(0, +) / Double(trackpadSensors.count)
-                                result.append(("Trackpad", avg))
+                                result.append((String(localized: "Trackpad"), avg))
                             }
                         }
                         result += (groups["System"] ?? []).sorted { $0.label < $1.label }.map { ($0.label, $0.celsius) }
@@ -96,7 +110,7 @@ struct ThermalDetailView: View {
                     if !systemDisplaySensors.isEmpty {
                         let avg = systemDisplaySensors.map(\.celsius).reduce(0, +) / Double(systemDisplaySensors.count)
                         SensorCategoryRow(
-                            icon: "thermometer", iconColor: .orange, label: "System", avgCelsius: avg,
+                            icon: "thermometer", iconColor: .orange, label: String(localized: "System"), avgCelsius: avg,
                             sensors: systemDisplaySensors,
                             category: "System",
                             initiallyExpanded: true
@@ -108,7 +122,7 @@ struct ThermalDetailView: View {
                     if !memorySensors.isEmpty {
                         let avg = memorySensors.map(\.celsius).reduce(0, +) / Double(memorySensors.count)
                         SensorCategoryRow(
-                            icon: "memorychip", iconColor: MetricTheme.memory, label: "Memory", avgCelsius: avg,
+                            icon: "memorychip", iconColor: MetricTheme.memory, label: String(localized: "Memory"), avgCelsius: avg,
                             sensors: memorySensors.map { ($0.label, $0.celsius) },
                             category: "Memory"
                         )
@@ -128,7 +142,7 @@ struct ThermalDetailView: View {
                         HStack {
                             Text("Fans").font(.subheadline.weight(.semibold))
                             Spacer()
-                            InfoButton(text: "Fan speed is read from the SMC via IOKit.\n\nActual: current measured RPM.\nMin/Max: hardware-defined speed range for this fan.\nAirflow: intake air temperature sensor near each fan.")
+                            InfoButton(text: String(localized: "Fan speed is read from the SMC via IOKit.\n\nActual: current measured RPM.\nMin/Max: hardware-defined speed range for this fan.\nAirflow: intake air temperature sensor near each fan."))
                         }
                         let airflow = engine.extendedTemperatures.filter { $0.category == "Airflow" }
                         ForEach(engine.fans) { fan in
@@ -138,8 +152,8 @@ struct ThermalDetailView: View {
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(.secondary)
                                 }
-                                detailRow("Speed", "\(fan.actual) RPM")
-                                detailRow("Range", "\(fan.min) – \(fan.max) RPM")
+                                detailRow(String(localized: "Speed"), "\(fan.actual) RPM")
+                                detailRow(String(localized: "Range"), "\(fan.min) – \(fan.max) RPM")
                                 if fan.max > fan.min {
                                     let progress = Double(fan.actual - fan.min) / Double(fan.max - fan.min)
                                     GeometryReader { geo in
@@ -154,7 +168,7 @@ struct ThermalDetailView: View {
                                 }
                                 // Airflow sensor matched to this fan by label (Left/Right)
                                 if let a = airflow.first(where: { $0.label.lowercased().contains(fan.label.lowercased()) }) {
-                                    detailRow("Airflow", String(format: "%.1f°C", a.celsius))
+                                    detailRow(String(localized: "Airflow"), String(format: "%.1f°C", a.celsius))
                                 }
                             }
                             if fan.id < engine.fans.count - 1 { Divider() }
@@ -218,7 +232,7 @@ private struct SensorCategoryRow: View {
                     Text(String(format: "%.1f°C", avgCelsius))
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(colorFn(avgCelsius))
-                        .accessibilityValue("\(String(format: "%.1f", avgCelsius)) degrees, \(severityWord(avgCelsius))")
+                        .accessibilityValue(String(format: String(localized: "%@ degrees, %@"), String(format: "%.1f", avgCelsius), severityWord(avgCelsius)))
                     Image(systemName: "chevron.right")
                         .font(.system(size: 9, weight: .semibold))
                         .foregroundStyle(.tertiary)
@@ -240,7 +254,7 @@ private struct SensorCategoryRow: View {
                             Text(String(format: "%.1f°C", sensor.celsius))
                                 .font(.caption2.monospacedDigit())
                                 .foregroundStyle(colorFn(sensor.celsius))
-                                .accessibilityValue("\(String(format: "%.1f", sensor.celsius)) degrees, \(severityWord(sensor.celsius))")
+                                .accessibilityValue(String(format: String(localized: "%@ degrees, %@"), String(format: "%.1f", sensor.celsius), severityWord(sensor.celsius)))
                         }
                         .padding(.leading, 30)
                     }

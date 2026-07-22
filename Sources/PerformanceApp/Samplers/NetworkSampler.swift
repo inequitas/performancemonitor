@@ -13,6 +13,12 @@ struct NetworkSnapshot {
     let dnsServers: [String]
     let isVPNActive: Bool
     let vpnIsFortiClient: Bool
+    /// Cumulative bytes received/sent across physical interfaces only (see
+    /// `NetworkInterfaceFilter`) since boot/link-up — i.e. the raw
+    /// `if_data` counters, not a delta. Feeds `DataUsageStore`, which turns
+    /// consecutive readings into daily totals.
+    let physicalBytesReceived: UInt64
+    let physicalBytesSent: UInt64
 }
 
 protocol NetworkSampling: AnyObject {
@@ -37,6 +43,8 @@ final class NetworkSampler: NetworkSampling {
 
         var totalReceived: UInt64 = 0
         var totalSent: UInt64 = 0
+        var physicalReceived: UInt64 = 0
+        var physicalSent: UInt64 = 0
         var interfaces: [LocalInterface] = []
         var vpnDetected = false
         let wifiIfaceName = CWWiFiClient.shared().interface()?.interfaceName
@@ -50,6 +58,10 @@ final class NetworkSampler: NetworkSampling {
                     let networkData = data.withMemoryRebound(to: if_data.self, capacity: 1) { $0.pointee }
                     totalReceived += UInt64(networkData.ifi_ibytes)
                     totalSent += UInt64(networkData.ifi_obytes)
+                    if NetworkInterfaceFilter.isPhysical(name) {
+                        physicalReceived += UInt64(networkData.ifi_ibytes)
+                        physicalSent += UInt64(networkData.ifi_obytes)
+                    }
                 }
             }
             if let sa = ifa.ifa_addr, sa.pointee.sa_family == UInt8(AF_INET), !name.hasPrefix("lo") {
@@ -151,6 +163,8 @@ final class NetworkSampler: NetworkSampling {
                                interfaces: sortedInterfaces,
                                dnsServers: dnsServers,
                                isVPNActive: vpnDetected,
-                               vpnIsFortiClient: vpnIsFortiClient)
+                               vpnIsFortiClient: vpnIsFortiClient,
+                               physicalBytesReceived: physicalReceived,
+                               physicalBytesSent: physicalSent)
     }
 }

@@ -13,7 +13,7 @@ struct NetworkButterflyChart: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Throughput", systemImage: "arrow.up.arrow.down")
+            Label(String(localized: "Throughput"), systemImage: "arrow.up.arrow.down")
                 .font(.subheadline.weight(.semibold))
             HStack {
                 Label(formatSpeed(downloadSpeed), systemImage: "arrow.down")
@@ -46,10 +46,10 @@ struct NetworkButterflyChart: View {
                 }
                 .frame(width: 56)
                 VStack(spacing: 0) {
-                    MetricChart(values: downloadHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkDown, style: .area, accessibilityDescription: "Download speed history") { formatSpeed($0) }
+                    MetricChart(values: downloadHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkDown, style: .area, accessibilityDescription: String(localized: "Download speed history")) { formatSpeed($0) }
                         .frame(height: 90)
                     Color.primary.opacity(0.25).frame(height: 1).frame(height: 14)
-                    MetricChart(values: uploadHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkUp, style: .area, accessibilityDescription: "Upload speed history") { formatSpeed($0) }
+                    MetricChart(values: uploadHistory, fixedMax: sharedMax, showAxes: false, showGridLines: true, fillFrame: true, color: MetricTheme.networkUp, style: .area, accessibilityDescription: String(localized: "Upload speed history")) { formatSpeed($0) }
                         .frame(height: 90)
                         .scaleEffect(y: -1)
                 }
@@ -63,11 +63,18 @@ struct NetworkButterflyChart: View {
 
 struct NetworkDetailView: View {
     @ObservedObject var engine: MetricsEngine
+    @ObservedObject private var dataUsage: DataUsageStore
     @State private var expandedInterfaces: Set<String> = []
+    @State private var showResetUsageConfirm = false
+
+    init(engine: MetricsEngine) {
+        self.engine = engine
+        self.dataUsage = engine.dataUsage
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Label("Network", systemImage: MetricsEngine.Panel.network.icon)
+            Label(String(localized: "Network"), systemImage: MetricsEngine.Panel.network.icon)
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(MetricTheme.networkDown)
 
@@ -76,21 +83,21 @@ struct NetworkDetailView: View {
                     HStack(spacing: 8) {
                         Circle().fill(engine.isConnected ? Color.green : Color.red).frame(width: 9, height: 9)
                             .accessibilityHidden(true)
-                        Text(engine.isConnected ? "Connected — \(engine.connectionType)" : "No connection")
+                        Text(engine.isConnected ? String(format: String(localized: "Connected — %@"), engine.connectionType) : String(localized: "No connection"))
                             .font(.system(size: 16, weight: .semibold, design: .rounded))
                         if engine.isVPNActive {
-                            Label("VPN", systemImage: "lock.shield.fill")
+                            Label(String(localized: "VPN"), systemImage: "lock.shield.fill")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(.green)
                         }
                         Spacer()
-                        InfoButton(text: "Local IPs are read from the system network interfaces.\n\nVPN is detected by the presence of utun, ppp, or ipsec interfaces.\n\nPublic IP is fetched from api.ipify.org over HTTPS. Only your outbound request is sent — no other data. Refreshed every 5 minutes.\n\nConnectivity check is an HTTPS HEAD request to Apple's captive portal endpoint (captive.apple.com). This respects your system proxy settings. True ICMP ping requires root on macOS, so this is used instead.")
+                        InfoButton(text: String(localized: "Local IPs are read from the system network interfaces.\n\nVPN is detected by the presence of utun, ppp, or ipsec interfaces.\n\nPublic IP is fetched from api.ipify.org over HTTPS. Only your outbound request is sent — no other data. Refreshed every 5 minutes.\n\nConnectivity check is an HTTPS HEAD request to Apple's captive portal endpoint (captive.apple.com). This respects your system proxy settings. True ICMP ping requires root on macOS, so this is used instead."))
                     }
                     ForEach(engine.localInterfaces) { iface in
                         interfaceRow(iface)
                     }
                     Divider()
-                    CopyableIPRow(icon: "globe", label: "Public IP", value: engine.publicIP ?? "Looking up…")
+                    CopyableIPRow(icon: "globe", label: String(localized: "Public IP"), value: engine.publicIP ?? String(localized: "Looking up…"))
                 }
             }
 
@@ -98,10 +105,10 @@ struct NetworkDetailView: View {
                 SectionCard {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            Label(engine.wifiSSID ?? "Wi-Fi", systemImage: "wifi")
+                            Label(engine.wifiSSID ?? String(localized: "Wi-Fi"), systemImage: engine.isLikelyHotspot ? "personalhotspot" : "wifi")
                                 .font(.subheadline.weight(.semibold))
                             Spacer()
-                            InfoButton(text: "Signal strength is measured in dBm (decibel-milliwatts) — a negative number where closer to zero is stronger.\n\n• Excellent (−50 dBm or better): Ideal. Full speed, no drops.\n• Good (−50 to −65 dBm): Reliable for video calls and large transfers.\n• Fair (−65 to −75 dBm): Usable but may slow down. Consider moving closer to your router.\n• Weak (below −75 dBm): Prone to disconnects and slow speeds.\n\nRead from CoreWLAN — same source as the macOS menu bar WiFi indicator.")
+                            InfoButton(text: String(localized: "Signal strength is measured in dBm (decibel-milliwatts) — a negative number where closer to zero is stronger.\n\n• Excellent (−50 dBm or better): Ideal. Full speed, no drops.\n• Good (−50 to −65 dBm): Reliable for video calls and large transfers.\n• Fair (−65 to −75 dBm): Usable but may slow down. Consider moving closer to your router.\n• Weak (below −75 dBm): Prone to disconnects and slow speeds.\n\nRead from CoreWLAN — same source as the macOS menu bar WiFi indicator."))
                         }
                         WiFiSignalBars(rssi: rssi)
                     }
@@ -111,19 +118,19 @@ struct NetworkDetailView: View {
             SectionCard {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Label("Connectivity Check", systemImage: "waveform.path.ecg")
+                        Label(String(localized: "Connectivity Check"), systemImage: "waveform.path.ecg")
                             .font(.subheadline.weight(.semibold))
                         Spacer()
                         if let ms = engine.pingLatencyMs {
                             Text(String(format: "%.0f ms", ms))
                                 .font(.system(size: 16, weight: .bold, design: .rounded))
                                 .foregroundStyle(ms < 100 ? .green : ms < 300 ? .orange : .red)
-                                .accessibilityValue("\(Int(ms.rounded())) milliseconds, \(ms < 100 ? "good" : ms < 300 ? "fair" : "poor")")
+                                .accessibilityValue(String(format: String(localized: "%ld milliseconds, %@"), Int(ms.rounded()), ms < 100 ? String(localized: "good") : ms < 300 ? String(localized: "fair") : String(localized: "poor")))
                         } else {
-                            Text("Timeout").font(.caption).foregroundStyle(.red)
+                            Text(String(localized: "Timeout")).font(.caption).foregroundStyle(.red)
                         }
                     }
-                    MetricChart(values: engine.pingHistory, unit: "ms", showAxes: true, color: .teal, accessibilityDescription: "Ping latency history") { String(format: "%.0fms", $0) }
+                    MetricChart(values: engine.pingHistory, unit: "ms", showAxes: true, color: .teal, accessibilityDescription: String(localized: "Ping latency history")) { String(format: "%.0fms", $0) }
                         .frame(height: 60)
                 }
             }
@@ -139,11 +146,11 @@ struct NetworkDetailView: View {
 
             SectionCard {
                 VStack(alignment: .leading, spacing: 6) {
-                    Label("Top Network Usage", systemImage: "network")
+                    Label(String(localized: "Top Network Usage"), systemImage: "network")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(MetricTheme.networkDown)
                     if engine.topNetworkProcesses.isEmpty {
-                        Text("Measuring…").font(.caption).foregroundStyle(.secondary)
+                        Text(String(localized: "Measuring…")).font(.caption).foregroundStyle(.secondary)
                     } else {
                         ForEach(engine.topNetworkProcesses) { proc in
                             HStack {
@@ -155,7 +162,59 @@ struct NetworkDetailView: View {
                     }
                 }
             }
+            SectionCard {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Label(String(localized: "Data Usage"), systemImage: "chart.bar.doc.horizontal")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(MetricTheme.networkDown)
+                        Spacer()
+                        InfoButton(text: String(localized: "Tracks bytes transferred over physical Wi-Fi/Ethernet interfaces only — VPN and other virtual interfaces are excluded so their tunneled traffic isn't counted twice.\n\nMeasurement starts the moment this feature first ran on this Mac; there is no data from before that."))
+                        Button {
+                            showResetUsageConfirm = true
+                        } label: {
+                            Text(String(localized: "Reset Statistics")).font(.caption)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
+                    }
+                    dataUsageRow(String(localized: "Today"), totals: DataUsageAggregation.today(dataUsage.dailyUsage, now: Date()))
+                    dataUsageRow(String(localized: "This Week"), totals: DataUsageAggregation.thisWeek(dataUsage.dailyUsage, now: Date()))
+                    dataUsageRow(String(localized: "This Month"), totals: DataUsageAggregation.thisMonth(dataUsage.dailyUsage, now: Date()))
+                    if let start = dataUsage.trackingStartDate {
+                        Text(String(format: String(localized: "Tracking since %@"), start.formatted(date: .abbreviated, time: .omitted)))
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+            }
+            .confirmationDialog(String(localized: "Reset data usage statistics?"),
+                                 isPresented: $showResetUsageConfirm,
+                                 titleVisibility: .visible) {
+                Button(String(localized: "Reset"), role: .destructive) { dataUsage.reset() }
+                Button(String(localized: "Cancel"), role: .cancel) {}
+            } message: {
+                Text(String(localized: "This clears all recorded download and upload totals. This cannot be undone."))
+            }
+
             Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private func dataUsageRow(_ label: String, totals: DataUsageTotals) -> some View {
+        HStack {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(width: 76, alignment: .leading)
+            Spacer()
+            Label(NetworkFormatting.formatDataUsage(bytes: totals.downloadBytes), systemImage: "arrow.down")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(MetricTheme.networkDown)
+            Label(NetworkFormatting.formatDataUsage(bytes: totals.uploadBytes), systemImage: "arrow.up")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(MetricTheme.networkUp)
         }
     }
 
@@ -180,7 +239,7 @@ struct NetworkDetailView: View {
                     Text(iface.displayName)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                        .accessibilityValue(iface.isPrimary ? "primary connection" : "")
+                        .accessibilityValue(iface.isPrimary ? String(localized: "primary connection") : "")
                     Spacer()
                     if !isExpanded {
                         Text(iface.address + suffix)
@@ -199,10 +258,10 @@ struct NetworkDetailView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     CopyableIPRow(label: "IP", value: iface.address)
                     if let mask = iface.subnetMask {
-                        CopyableIPRow(label: "Subnet", value: mask)
+                        CopyableIPRow(label: String(localized: "Subnet"), value: mask)
                     }
                     if let gw = iface.gateway {
-                        CopyableIPRow(label: "Gateway", value: gw)
+                        CopyableIPRow(label: String(localized: "Gateway"), value: gw)
                     }
                     ForEach(engine.dnsServers, id: \.self) { dns in
                         CopyableIPRow(icon: "server.rack", label: "DNS", value: dns)

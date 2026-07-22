@@ -65,11 +65,11 @@ struct EarbudBatteryPill: View {
     var body: some View {
         HStack(spacing: 2) {
             Text(label).font(.caption2).foregroundStyle(.tertiary)
-            Text("\(pct)%").font(.caption2.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
+            Text(String(format: "%ld%%", pct)).font(.caption2.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
-        .accessibilityValue(pct < 20 ? "\(pct) percent, low battery" : "\(pct) percent")
+        .accessibilityValue(pct < 20 ? String(format: String(localized: "%ld percent, low battery"), pct) : String(format: String(localized: "%ld percent"), pct))
     }
 }
 
@@ -154,11 +154,11 @@ struct ProcessListView: View {
                         .foregroundStyle(paused ? color : .secondary)
                 }
                 .buttonStyle(.plain)
-                .help(paused ? "Resume live updates" : "Pause list")
+                .help(paused ? String(localized: "Resume live updates") : String(localized: "Pause list"))
             }
 
             if displayed.isEmpty {
-                Text(paused ? "No data captured." : "Loading…")
+                Text(paused ? String(localized: "No data captured.") : String(localized: "Loading…"))
                     .font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(displayed.prefix(engine.settings.topProcessCount)) { proc in
@@ -177,30 +177,30 @@ struct ProcessListView: View {
                                     .foregroundStyle(.secondary)
                             }
                             .buttonStyle(.plain)
-                            .help("Quit \(proc.name)")
+                            .help(String(format: String(localized: "Quit %@"), proc.name))
                         }
                     }
                     .contentShape(Rectangle())
                     .contextMenu {
                         if proc.pid > 0 {
-                            Button("Quit \(proc.name)", role: .destructive) { pendingKill = proc }
+                            Button(String(format: String(localized: "Quit %@"), proc.name), role: .destructive) { pendingKill = proc }
                         }
                     }
                 }
             }
         }
         .alert(
-            "Quit \(pendingKill?.name ?? "process")?",
+            String(format: String(localized: "Quit %@?"), pendingKill?.name ?? String(localized: "process")),
             isPresented: Binding(get: { pendingKill != nil }, set: { _ in pendingKill = nil }),
             presenting: pendingKill
         ) { proc in
-            Button("Cancel", role: .cancel) { }
-            Button("Quit", role: .destructive) {
+            Button(String(localized: "Cancel"), role: .cancel) { }
+            Button(String(localized: "Quit"), role: .destructive) {
                 engine.terminateProcess(pid: proc.pid)
                 paused = false
             }
         } message: { proc in
-            Text("This sends a quit signal to the process (PID \(proc.pid)). Unsaved work may be lost.")
+            Text(String(format: String(localized: "This sends a quit signal to the process (PID %ld). Unsaved work may be lost."), Int(proc.pid)))
         }
     }
 }
@@ -246,8 +246,8 @@ struct WiFiSignalBars: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Wi-Fi signal")
-        .accessibilityValue("\(label), \(rssi) dBm")
+        .accessibilityLabel(String(localized: "Wi-Fi signal"))
+        .accessibilityValue(String(format: String(localized: "%@, %ld dBm"), label, rssi))
     }
 }
 

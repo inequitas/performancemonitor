@@ -1,0 +1,387 @@
+/*
+  Localizable.strings (zh-Hans)
+  Performance Monitor
+
+  键约定：英文源字符串本身即为查找键（不使用人为的点号标识符）。
+  格式字符串中的 printf 风格占位符（%.0f、%@ 等）在键中保持原样。
+*/
+
+/* MARK: - Theme (ProcessInfo.ThermalState label) */
+"Nominal" = "标称";
+"Fair" = "一般";
+"Serious" = "严重";
+"Critical" = "危急";
+"Unknown" = "未知";
+
+/* MARK: - AlertService */
+"High CPU usage" = "CPU 使用率过高";
+"CPU is at %.0f%%" = "CPU 为 %.0f%%";
+"High memory usage" = "内存使用率过高";
+"%.1f / %.0f GB used (%.0f%%)" = "已用 %.1f / %.0f GB（%.0f%%）";
+"Low disk space" = "磁盘空间不足";
+"Only %.1f GB free" = "仅剩 %.1f GB 可用空间";
+"High GPU usage" = "GPU 使用率过高";
+"GPU is at %.0f%%" = "GPU 为 %.0f%%";
+"System running hot" = "系统温度过高";
+"Thermal pressure: %@" = "热压力：%@";
+
+/* MARK: - MenuBarModels（显示名称；rawValue 保持固定用于存储）*/
+"CPU" = "CPU";
+"Memory" = "内存";
+"Network" = "网络";
+"Disk" = "磁盘";
+"GPU" = "GPU";
+"Sparkline" = "迷你图";
+"Text only" = "仅文本";
+"System" = "系统";
+"Light" = "浅色";
+"Dark" = "深色";
+
+/* MARK: - MetricsEngine（Panel / PingServer 显示名称）*/
+"Thermal" = "温度";
+"GPU & Displays" = "GPU 与显示器";
+"Battery" = "电池";
+"Bluetooth" = "蓝牙";
+"Apple (default)" = "Apple（默认）";
+"Cloudflare (1.1.1.1)" = "Cloudflare (1.1.1.1)";
+"Google (8.8.8.8)" = "Google (8.8.8.8)";
+"Quad9 (9.9.9.9)" = "Quad9 (9.9.9.9)";
+
+/* MARK: - SettingsView：标签页 */
+"General" = "通用";
+"Menu Bar" = "菜单栏";
+"Metrics" = "指标";
+"Alerts" = "提醒";
+"Panels" = "面板";
+"History" = "历史记录";
+"Updates" = "更新";
+
+/* MARK: - SettingsView：通用标签页 */
+"Refresh interval" = "刷新间隔";
+"Appearance" = "外观";
+"Language" = "语言";
+"Takes effect after relaunch" = "重新启动后生效";
+"Relaunch Now" = "立即重新启动";
+"Show in Dock" = "在程序坞中显示";
+"Launch at login" = "登录时启动";
+"Open / close popover" = "打开/关闭弹出窗口";
+"Crash Reports" = "崩溃报告";
+"Open Crash Reports Folder" = "打开崩溃报告文件夹";
+"Processes" = "进程";
+"Top processes shown" = "显示的进程数量";
+"Support this project ♥" = "支持本项目 ♥";
+"Performance Monitor is free and always will be." = "Performance Monitor 免费,并将永远免费。";
+
+/* MARK: - SettingsView：菜单栏标签页 */
+"Menu Bar Icons" = "菜单栏图标";
+"Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar." = "拖动手柄以调整顺序。列表中最上方已启用的图标会显示在菜单栏最右侧。";
+"Colour when above alert threshold" = "超过提醒阈值时变色";
+"IO" = "IO";
+"Space" = "空间";
+"Text" = "文本";
+"Graph" = "图表";
+
+/* MARK: - SettingsView：更新标签页 */
+"Update notifications are disabled. Enable them in System Settings → Notifications → Performance Monitor." = "更新通知已关闭。请前往「系统设置」→「通知」→「Performance Monitor」中开启。";
+"Open Settings" = "打开系统设置";
+"Current version" = "当前版本";
+"Beta channel" = "测试版通道";
+"Also receive beta updates" = "同时接收测试版更新";
+"Beta updates arrive sooner but are tested less." = "测试版更新发布更早，但测试较少。";
+"Beta versions may contain bugs or unfinished features." = "测试版可能包含错误或未完成的功能。";
+"Report a problem" = "报告问题";
+"You're currently on a beta version (%@). You can switch back to the latest stable release now." = "你目前使用的是测试版 (%@)。现在可以切换回最新的稳定版本。";
+"Switch to Stable Now" = "立即切换到稳定版";
+"Your settings will be kept." = "你的设置将会保留。";
+"Checking for updates…" = "正在检查更新…";
+"You're up to date" = "已是最新版本";
+"Checked %@" = "已于 %@ 检查";
+"v%@ is available" = "v%@ 可用";
+"The app will quit and relaunch after installing." = "安装后应用将退出并重新启动。";
+"Update Now" = "立即更新";
+"Downloading…" = "正在下载…";
+"Installing — app will restart shortly…" = "正在安装 — 应用即将重新启动…";
+"Try Again" = "重试";
+"Check Now" = "立即检查";
+"Remind me later after" = "稍后提醒我，间隔";
+"1 day" = "1 天";
+"3 days" = "3 天";
+"7 days" = "7 天";
+"14 days" = "14 天";
+
+/* MARK: - SettingsView：指标标签页 */
+"Show removable volumes" = "显示可移动卷";
+"Fetches from api.ipify.org over HTTPS every 5 min." = "每 5 分钟通过 HTTPS 从 api.ipify.org 获取一次。";
+"Show public IP" = "显示公网 IP";
+"Ping server" = "Ping 服务器";
+
+/* MARK: - SettingsView：提醒标签页 */
+"Enable notifications" = "启用通知";
+"CPU above" = "CPU 超过";
+"Memory above" = "内存超过";
+"Disk free below" = "可用磁盘空间低于";
+"GPU above" = "GPU 超过";
+"Thermal pressure" = "热压力";
+"Alert after exceeded for" = "超过阈值持续以下时长后提醒";
+"Off" = "关闭";
+"1 min" = "1 分钟";
+"2 min" = "2 分钟";
+"Applies to CPU, GPU and memory. Disk space and thermal alerts always fire immediately." = "适用于 CPU、GPU 和内存。磁盘空间和温度提醒始终立即触发。";
+"Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min." = "温度提醒在「严重」或「危急」级别时触发。所有提醒每 5 分钟最多触发一次。";
+
+/* MARK: - SettingsView：面板标签页 */
+"Drag cards to reorder. Tap the eye to show or hide." = "拖动卡片以调整顺序。点按眼睛图标以显示或隐藏。";
+
+/* MARK: - SettingsView：历史记录标签页 */
+"Save history to disk" = "将历史记录保存到磁盘";
+"Open History Window" = "打开历史记录窗口";
+"Export" = "导出";
+"Export CSV…" = "导出 CSV…";
+
+/* MARK: - OnboardingView */
+"Welcome to Performance Monitor" = "欢迎使用 Performance Monitor";
+"This app lives in your menu bar, not the Dock. Look for its icon — CPU, memory, and more — next to the clock at the top of your screen." = "本应用位于菜单栏，而非程序坞。请在屏幕顶部时钟旁查找它的图标 —— 显示 CPU、内存等信息。";
+"Click the menu bar icon for a quick overview of CPU, memory, network, disk, and more" = "点按菜单栏图标，快速概览 CPU、内存、网络、磁盘等信息";
+"Open any card for a detailed window with history charts and process breakdowns" = "打开任意卡片，查看包含历史图表和进程明细的详情窗口";
+"Choose which metrics show in the menu bar, and whether as text or a live graph" = "选择菜单栏中显示哪些指标，以及以文本还是实时图表形式显示";
+"Get notified when CPU, memory, disk space, or temperature cross a threshold you set" = "当 CPU、内存、磁盘空间或温度超过你设定的阈值时收到通知";
+"About permissions" = "关于权限";
+"Performance Monitor will ask for Bluetooth access to show your paired devices and their battery levels, and for notification access to deliver the alerts above. Both are optional — the rest of the app works fully without them." = "Performance Monitor 会请求蓝牙访问权限，以显示你已配对的设备及其电量；还会请求通知权限，以发送上述提醒。两者均为可选 —— 即使不授权，应用的其余功能也能正常使用。";
+"Get Started" = "开始使用";
+
+/* MARK: - OverviewView */
+"System Overview" = "系统概览";
+"Settings" = "设置";
+"Quit" = "退出";
+"%@ history" = "%@历史记录";
+"Area" = "面积图";
+"Gauge" = "仪表盘";
+"Bat" = "Bat";
+"normal" = "正常";
+"warm" = "温热";
+"hot" = "炎热";
+"critical" = "危急";
+"%ld°C, %@" = "%ld°C，%@";
+"free of %ld GB" = "可用，共 %ld GB";
+"%ld percent, charging" = "%ld%%，正在充电";
+"%ld percent, low battery" = "%ld%%，电量不足";
+"%ld percent" = "%ld%%";
+"%.0fW charging" = "%.0fW 充电中";
+"%ldh %ldm to full" = "%ld 小时 %ld 分钟后充满";
+"%ldm to full" = "%ld 分钟后充满";
+"%ldh %ldm remaining" = "剩余 %ld 小时 %ld 分钟";
+"%ldm remaining" = "剩余 %ld 分钟";
+"Charging" = "充电中";
+"On Battery" = "使用电池";
+"Chart" = "图表";
+"Info" = "信息";
+"No display info" = "无显示器信息";
+"main" = "主";
+"VPN active, FortiClient" = "VPN 已启用，FortiClient";
+"VPN active" = "VPN 已启用";
+"VPN inactive" = "VPN 未启用";
+"Connected" = "已连接";
+"%@, primary connection" = "%@，主连接";
+"Disconnected" = "已断开";
+"Local IP" = "本地 IP";
+"Public IP" = "公网 IP";
+"Looking up…" = "正在查询…";
+"%ld connected" = "已连接 %ld 个";
+"No devices connected" = "没有已连接的设备";
+"%ld percent, low" = "%ld%%，电量低";
+
+/* MARK: - DetailShared */
+"Case" = "充电盒";
+"%ld percent, low battery" = "%ld%%，电量不足";
+"Resume live updates" = "恢复实时更新";
+"Pause list" = "暂停列表";
+"No data captured." = "未采集到数据。";
+"Quit %@" = "退出 %@";
+"Quit %@?" = "要退出 %@ 吗？";
+"process" = "进程";
+"Cancel" = "取消";
+"This sends a quit signal to the process (PID %ld). Unsaved work may be lost." = "这会向该进程（PID %ld）发送退出信号。未保存的工作可能会丢失。";
+"Wi-Fi signal" = "Wi-Fi 信号";
+"%@, %ld dBm" = "%@，%ld dBm";
+
+/* MARK: - MemoryDetailView */
+"%@ GB / %@ GB" = "%@ GB / %@ GB";
+"Memory usage history" = "内存使用历史记录";
+"App %.1fGB" = "App %.1fGB";
+"Wired %.1fGB" = "已连线 %.1fGB";
+"Cmp %.1fGB" = "压缩 %.1fGB";
+"App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM." = "App：活跃页 + 非活跃页 —— 应用当前正在使用或最近使用过的内存。\n\n已连线：由内核和驱动程序锁定在 RAM 中，无法调出到磁盘。\n\n已压缩：macOS 内存压力系统压缩的页面，用于释放物理 RAM。较高的压缩内存量属于正常现象；当压缩已不足以缓解压力时，会转为交换空间。\n\n交换空间：因 RAM 已满而写入磁盘的数据。持续偏高的交换空间使用量说明你需要更多 RAM。";
+"Swap used: %@ GB" = "已用交换空间：%@ GB";
+"Top Memory" = "内存占用最高";
+
+/* MARK: - Theme（sensorTempSeverityWord —— 额外情况；"normal"/"critical" 与 OverviewView 共用）*/
+"warning" = "警告";
+"elevated" = "偏高";
+
+/* MARK: - BatteryDetailView */
+"Source" = "来源";
+"State" = "状态";
+"Charging" = "充电中";
+"Discharging" = "放电中";
+"Time to full" = "充满所需时间";
+"Time remaining" = "剩余时间";
+"%ldh %ldm" = "%ld 小时 %ld 分钟";
+"Health" = "健康状况";
+"Capacity %: NominalChargeCapacity ÷ DesignCapacity × 100. This shows how much of the original battery capacity remains.\n\nCycle count: Each full charge/discharge cycle counts as one. Apple considers batteries at peak performance for 1000 cycles (MacBook Pro/Air M-series). After that, capacity may be below 80%.\n\nCondition 'Normal' means the battery is performing within expected parameters. 'Service Recommended' means capacity has dropped significantly and Apple recommends a replacement." = "容量百分比：NominalChargeCapacity ÷ DesignCapacity × 100。表示原始电池容量还剩下多少。\n\n循环次数：每完成一次完整的充放电循环计为一次。Apple 认为电池在 1000 次循环内（MacBook Pro/Air M 系列）都能保持最佳性能。此后容量可能降至 80% 以下。\n\n状况「正常」表示电池性能在预期范围内。「建议维修」表示容量已明显下降，Apple 建议更换电池。";
+"Capacity vs. design" = "容量与设计容量对比";
+"Condition" = "状况";
+"Cycle count" = "循环次数";
+"Electrical" = "电气";
+"Temperature: Read from AppleSmartBattery IORegistry — no special privileges needed. This is the battery cell temperature, not the CPU temperature.\n\nVoltage: Current battery terminal voltage in volts.\n\nCurrent: Positive = charging (current flowing in). Negative = discharging (current flowing out). Values are in milliamps (mA).\n\nAll values come from the AppleSmartBattery driver which is always accessible without entitlements." = "温度：从 AppleSmartBattery IORegistry 读取 —— 无需特殊权限。这是电池芯温度，而非 CPU 温度。\n\n电压：电池端子当前电压，单位为伏特。\n\n电流：正值 = 充电（电流流入）。负值 = 放电（电流流出）。单位为毫安（mA）。\n\n所有数值均来自 AppleSmartBattery 驱动，无需 entitlements 即可始终访问。";
+"Input power" = "输入功率";
+"Draw" = "功耗";
+"Temperature" = "温度";
+"%@ degrees, %@" = "%@ 度，%@";
+"Voltage" = "电压";
+"Current" = "电流";
+"%ld mA" = "%ld mA";
+
+/* MARK: - CPUDetailView */
+"CPU usage history" = "CPU 使用历史记录";
+"User %.0f%%" = "用户 %.0f%%";
+"Sys %.0f%%" = "系统 %.0f%%";
+"Idle %.0f%%" = "空闲 %.0f%%";
+"Load avg: %.2f  %.2f  %.2f  (1 / 5 / 15 min)" = "平均负载：%.2f  %.2f  %.2f （1 / 5 / 15 分钟）";
+"Per-core" = "各核心";
+"P = Performance cores (faster, higher power). E = Efficiency cores (slower, lower power). macOS assigns which core handles each workload automatically. On Intel Macs all cores are equivalent and show as Core N." = "P = 性能核心（速度更快，功耗更高）。E = 能效核心（速度较慢，功耗更低）。macOS 会自动分配由哪个核心处理各项任务。在 Intel Mac 上，所有核心都是等效的，统一显示为 Core N。";
+"Core %ld" = "核心 %ld";
+"Thermal Pressure" = "热压力";
+"This is the macOS thermal throttling signal — not an exact temperature reading.\n\n• Nominal: No throttling. System running normally.\n• Fair: Slight throttling may be occurring.\n• Serious: Active throttling. Performance is being reduced to cool the system.\n• Critical: Severe throttling. Immediate action recommended (close apps, remove from enclosed spaces).\n\nExact die temperatures (CPU/GPU) are not readable on Apple Silicon without a privileged kernel extension. macOS blocks SMC access for user-space apps." = "这是 macOS 的热节流信号 —— 并非精确的温度读数。\n\n• 标称：无节流。系统运行正常。\n• 一般：可能出现轻微节流。\n• 严重：正在主动节流。性能正被降低以为系统降温。\n• 危急：严重节流。建议立即采取措施（关闭应用、移出封闭空间）。\n\n在 Apple Silicon 上，若无特权内核扩展则无法读取精确的芯片温度（CPU/GPU）。macOS 会阻止用户空间应用访问 SMC。";
+"Top CPU" = "CPU 占用最高";
+
+/* MARK: - DiskDetailView */
+"Read" = "读取";
+"Write" = "写入";
+"Disk read speed history" = "磁盘读取速度历史记录";
+"Disk write speed history" = "磁盘写入速度历史记录";
+"Storage" = "存储空间";
+"SMART OK" = "SMART 正常";
+"Removable" = "可移动";
+"%.1f GB used" = "已用 %.1f GB";
+"%.1f GB free" = "可用 %.1f GB";
+"%ld%% wear" = "磨损 %ld%%";
+"%.1f TB written" = "已写入 %.1f TB";
+"%ld h on" = "已通电 %ld 小时";
+
+/* MARK: - GPUDetailView */
+"GPU utilization percentage is not available through any public macOS API on Apple Silicon. Apple's IOKit SMC interface blocks access to GPU load counters for user-space processes.\n\nThird-party tools that show GPU % use private, entitled APIs or kernel extensions that require special signing. The Metal information shown here (working set size, power mode) is the maximum available through the public API." = "在 Apple Silicon 上，GPU 使用率无法通过任何公开的 macOS API 获取。Apple 的 IOKit SMC 接口会阻止用户空间进程访问 GPU 负载计数器。\n\n能够显示 GPU 使用率的第三方工具，使用的是私有的、需要 entitlement 的 API，或需要特殊签名的内核扩展。此处显示的 Metal 信息（工作集大小、电源模式）是通过公开 API 所能获取的最大信息量。";
+"Location" = "位置";
+"Max working set" = "最大工作集";
+"Power mode" = "电源模式";
+"Low power" = "低功耗";
+"High performance" = "高性能";
+"Displays" = "显示器";
+"Arrange…" = "排列…";
+"No display info available" = "无可用显示器信息";
+"Main" = "主显示器";
+
+/* MARK: - NetworkDetailView */
+"Throughput" = "吞吐量";
+"Download speed history" = "下载速度历史记录";
+"Upload speed history" = "上传速度历史记录";
+"Connected — %@" = "已连接 — %@";
+"No connection" = "无连接";
+"VPN" = "VPN";
+"Local IPs are read from the system network interfaces.\n\nVPN is detected by the presence of utun, ppp, or ipsec interfaces.\n\nPublic IP is fetched from api.ipify.org over HTTPS. Only your outbound request is sent — no other data. Refreshed every 5 minutes.\n\nConnectivity check is an HTTPS HEAD request to Apple's captive portal endpoint (captive.apple.com). This respects your system proxy settings. True ICMP ping requires root on macOS, so this is used instead." = "本地 IP 从系统网络接口读取。\n\nVPN 通过检测是否存在 utun、ppp 或 ipsec 接口来判断。\n\n公网 IP 通过 HTTPS 从 api.ipify.org 获取。仅发送你的出站请求 —— 不包含其他数据。每 5 分钟刷新一次。\n\n连通性检测是向 Apple 的强制门户入口（captive.apple.com）发送的 HTTPS HEAD 请求，遵循你的系统代理设置。真正的 ICMP ping 在 macOS 上需要 root 权限，因此改用此方式。";
+"Wi-Fi" = "Wi-Fi";
+"Personal Hotspot" = "个人热点";
+"Signal strength is measured in dBm (decibel-milliwatts) — a negative number where closer to zero is stronger.\n\n• Excellent (−50 dBm or better): Ideal. Full speed, no drops.\n• Good (−50 to −65 dBm): Reliable for video calls and large transfers.\n• Fair (−65 to −75 dBm): Usable but may slow down. Consider moving closer to your router.\n• Weak (below −75 dBm): Prone to disconnects and slow speeds.\n\nRead from CoreWLAN — same source as the macOS menu bar WiFi indicator." = "信号强度以 dBm（分贝毫瓦）为单位 —— 数值为负，越接近零表示信号越强。\n\n• 极佳（−50 dBm 或更强）：理想状态。全速运行，不掉线。\n• 良好（−50 至 −65 dBm）：适合视频通话和大文件传输。\n• 一般（−65 至 −75 dBm）：可用，但可能变慢。建议靠近路由器。\n• 弱（低于 −75 dBm）：容易掉线，速度较慢。\n\n从 CoreWLAN 读取 —— 与 macOS 菜单栏 Wi-Fi 指示图标使用相同的数据来源。";
+"Connectivity Check" = "连通性检测";
+"%ld milliseconds, %@" = "%ld 毫秒，%@";
+"good" = "良好";
+"fair" = "一般";
+"poor" = "较差";
+"Timeout" = "超时";
+"Ping latency history" = "Ping 延迟历史记录";
+"Top Network Usage" = "网络占用最高";
+"Measuring…" = "正在测量…";
+"primary connection" = "主连接";
+"Subnet" = "子网";
+"Gateway" = "网关";
+
+/* MARK: - BluetoothDetailView */
+"Paired devices are read from the IOBluetooth framework — all devices you have ever paired, whether connected or not.\n\nBattery percentage is read from the IOHIDDevice registry for devices that expose it (Apple peripherals: AirPods, Magic Mouse, Magic Keyboard, etc.). Third-party peripherals may not expose battery data." = "已配对设备从 IOBluetooth 框架读取 —— 包含你曾经配对过的所有设备，无论当前是否已连接。\n\n电量百分比从 IOHIDDevice 注册表中读取，仅适用于提供此信息的设备（Apple 外设：AirPods、妙控鼠标、妙控键盘等）。第三方外设可能不会提供电量数据。";
+"Bluetooth Access Required" = "需要蓝牙访问权限";
+"Access was denied. Go to System Settings → Privacy & Security → Bluetooth to enable it." = "访问权限已被拒绝。请前往「系统设置」→「隐私与安全性」→「蓝牙」中开启。";
+"Allow Performance Monitor to read your paired Bluetooth devices." = "允许 Performance Monitor 读取你已配对的蓝牙设备。";
+"Open Privacy Settings" = "打开隐私设置";
+"Grant Bluetooth Access" = "授予蓝牙访问权限";
+"No paired devices found." = "未找到已配对的设备。";
+"Not connected" = "未连接";
+"connected" = "已连接";
+"not connected" = "未连接";
+
+/* Added during localization completion pass */
+"Airflow" = "气流";
+"App bundle not found inside downloaded archive." = "在下载的压缩包中未找到 App 包。";
+"Could not read release info from GitHub." = "无法从 GitHub 读取发行版信息。";
+"Download failed — server returned an error." = "下载失败 —— 服务器返回了错误。";
+"Failed to unzip the downloaded archive." = "解压下载的压缩包失败。";
+"Fan speed is read from the SMC via IOKit.\n\nActual: current measured RPM.\nMin/Max: hardware-defined speed range for this fan.\nAirflow: intake air temperature sensor near each fan." = "风扇转速通过 IOKit 从 SMC 读取。\n\n实际：当前测得的转速（RPM）。\n最小/最大：该风扇由硬件定义的转速范围。\n气流：每个风扇附近的进气温度传感器。";
+"Fans" = "风扇";
+"GPU usage history" = "GPU 使用历史记录";
+"Install failed: %@" = "安装失败：%@";
+"Loading…" = "正在加载…";
+"Network error: %@" = "网络错误：%@";
+"No temperature sensors found for this Mac model." = "此 Mac 型号未找到温度传感器。";
+"Performance Monitor Update" = "Performance Monitor 更新";
+"Range" = "范围";
+"Read from the System Management Controller (SMC) via IOKit.\n\nCPU and GPU values shown are averages across all cluster sensors. Tap a row to expand individual readings.\n\nBattery temperature is read from the AppleSmartBattery IORegistry entry." = "通过 IOKit 从系统管理控制器（SMC）读取。\n\n显示的 CPU 和 GPU 数值是所有簇传感器的平均值。点按一行可展开各个读数。\n\n电池温度从 AppleSmartBattery IORegistry 条目中读取。";
+"Remind Me Later" = "稍后提醒我";
+"Skip This Version" = "跳过此版本";
+"Speed" = "转速";
+"Temperatures" = "温度";
+"Thermal & Fans" = "温度与风扇";
+"Trackpad" = "触控板";
+"True Tone" = "原彩显示";
+"Update aborted — could not download the signature file." = "更新已中止 —— 无法下载签名文件。";
+"Update aborted — could not locate the signature file." = "更新已中止 —— 找不到签名文件。";
+"Update aborted — internal verification key is invalid." = "更新已中止 —— 内部验证密钥无效。";
+"Update aborted — signature is missing or unreadable. This release cannot be verified." = "更新已中止 —— 签名缺失或无法读取。此版本无法通过验证。";
+"Update aborted — the download failed signature verification and may have been tampered with." = "更新已中止 —— 下载内容未通过签名验证，可能已被篡改。";
+"Update refused — download is not served from a trusted GitHub host." = "更新已拒绝 —— 下载内容并非来自受信任的 GitHub 主机。";
+"Version %@ is available — you're on %@." = "版本 %@ 现已可用 —— 你当前使用的是 %@。";
+"above alert threshold" = "高于提醒阈值";
+"below alert threshold" = "低于提醒阈值";
+"well above alert threshold" = "远高于提醒阈值";
+"well below alert threshold" = "远低于提醒阈值";
+"macOS reports four thermal pressure levels:\n\n• Nominal — system operating normally.\n• Fair — some power reduction to prevent overheating.\n• Serious — significant throttling in effect.\n• Critical — aggressive throttling; performance severely impacted.\n\nThis is read from ProcessInfo.thermalState — the same value macOS uses internally to throttle workloads." = "macOS 会报告四种热压力级别：\n\n• 标称 —— 系统运行正常。\n• 一般 —— 略微降低功耗以防止过热。\n• 严重 —— 正在进行明显节流。\n• 危急 —— 强力节流；性能受到严重影响。\n\n此数据读取自 ProcessInfo.thermalState —— 与 macOS 内部用于对工作负载进行节流的数值相同。";
+
+/* MARK: - ThermalDetailView power (roadmap 1.2a) */
+"Power" = "功耗";
+"System Power" = "系统功耗";
+"Total system power draw, read from the System Management Controller (SMC).\n\nCovers the whole machine — CPU, GPU, display, and everything else on the same power rail — not just one component." = "整机系统总功耗，读取自系统管理控制器（SMC）。\n\n涵盖整台设备——CPU、GPU、显示屏以及同一供电线路上的其他一切部件，而不仅仅是单个组件。";
+
+/* MARK: - NetworkDetailView data usage (roadmap 1.2b) */
+"Data Usage" = "数据用量";
+"Tracks bytes transferred over physical Wi-Fi/Ethernet interfaces only — VPN and other virtual interfaces are excluded so their tunneled traffic isn't counted twice.\n\nMeasurement starts the moment this feature first ran on this Mac; there is no data from before that." = "仅统计通过物理 Wi-Fi/以太网接口传输的字节数——VPN 及其他虚拟接口会被排除，以避免隧道流量被重复计算。\n\n统计从此功能在本 Mac 上首次运行时开始；此前没有数据。";
+"Reset Statistics" = "重置统计";
+"Today" = "今天";
+"This Week" = "本周";
+"This Month" = "本月";
+"Tracking since %@" = "自 %@ 起统计";
+"Reset data usage statistics?" = "重置数据用量统计？";
+"Reset" = "重置";
+"This clears all recorded download and upload totals. This cannot be undone." = "这将清除所有已记录的下载和上传总量。此操作无法撤销。";
+
+/* MARK: - HistoryWindow (roadmap 1.3a part 2) */
+"1 Hour" = "1 小时";
+"24 Hours" = "24 小时";
+"7 Days" = "7 天";
+"30 Days" = "30 天";
+"Period" = "时间段";
+"Refresh" = "刷新";
+"Download" = "下载";
+"Upload" = "上传";
+"Disk Read" = "磁盘读取";
+"Disk Write" = "磁盘写入";
+"Go to Settings" = "前往设置";
+"Enable \"%@\" in Settings to record history." = "在设置中启用“%@”以记录历史记录。";
+
+/* MARK: - HistoryWindow weekly summary (roadmap 1.3b) */
+"%@ — avg %@, peak %@ (%@)" = "%@ — 平均 %@，峰值 %@（%@）";

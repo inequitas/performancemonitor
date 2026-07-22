@@ -3,19 +3,29 @@ import PackageDescription
 
 let package = Package(
     name: "PerformanceApp",
+    defaultLocalization: "en",
     platforms: [.macOS(.v14)],
     targets: [
         .target(
             name: "PerformanceAppCore",
             path: "Sources/PerformanceAppCore"
         ),
+        .target(
+            name: "CNVMeSMART",
+            path: "Sources/CNVMeSMART"
+        ),
         .executableTarget(
             name: "PerformanceApp",
-            dependencies: ["PerformanceAppCore"],
+            dependencies: ["PerformanceAppCore", "CNVMeSMART"],
             path: "Sources/PerformanceApp",
+            resources: [
+                .process("Resources")
+            ],
             linkerSettings: [
                 .linkedFramework("IOBluetooth"),
-                .linkedFramework("CoreWLAN")
+                .linkedFramework("CoreWLAN"),
+                .linkedFramework("IOKit"),
+                .linkedLibrary("sqlite3")
             ]
         ),
         .testTarget(

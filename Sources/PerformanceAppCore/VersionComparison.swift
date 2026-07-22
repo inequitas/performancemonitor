@@ -37,6 +37,13 @@ public enum VersionComparison {
         compare(a, b) == .orderedDescending
     }
 
+    /// Returns true if `version` carries a `-`-introduced pre-release part
+    /// (e.g. "1.1.0-beta.1"). Used to detect a build that's running a beta
+    /// version string regardless of which update channel it currently checks.
+    public static func isPrerelease(_ version: String) -> Bool {
+        parse(version).prerelease != nil
+    }
+
     private static func compare(_ a: String, _ b: String) -> ComparisonResult {
         let pa = parse(a), pb = parse(b)
 

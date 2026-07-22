@@ -40,6 +40,11 @@ struct PerformanceApp: App {
         }
         .windowResizability(.contentSize)
 
+        Window(String(localized: "History"), id: "history") {
+            HistoryWindow(engine: engine)
+        }
+        .windowResizability(.contentMinSize)
+
         Settings {
             SettingsView(engine: engine, updater: updater)
         }

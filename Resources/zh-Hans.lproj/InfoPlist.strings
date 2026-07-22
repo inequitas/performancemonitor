@@ -1,0 +1,10 @@
+/*
+  InfoPlist.strings (zh-Hans)
+  Performance Monitor
+
+  Info.plist 系统提示字符串的本地化（权限提示等）。由 build_app.sh
+  复制到 Contents/Resources/zh-Hans.lproj —— 这是标准的 macOS
+  Info.plist 本地化方式，与用于应用内 UI 字符串的 SwiftPM 资源包无关。
+*/
+
+"NSBluetoothAlwaysUsageDescription" = "Performance Monitor 会列出你已配对的蓝牙设备及其连接状态。";

@@ -18,7 +18,7 @@ struct OverviewView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("System Overview")
+            Text(String(localized: "System Overview"))
                 .font(.title3.weight(.semibold))
                 .padding(.top, 12)
                 .padding(.horizontal, 14)
@@ -48,12 +48,12 @@ struct OverviewView: View {
                     // Activation policy resets to .accessory in SettingsView's
                     // WindowFocuser when the window actually closes, not on a timer.
                 } label: {
-                    Label("Settings", systemImage: "gearshape")
+                    Label(String(localized: "Settings"), systemImage: "gearshape")
                 }
                 .buttonStyle(.plain)
                 Spacer()
                 Button { NSApplication.shared.terminate(nil) } label: {
-                    Label("Quit", systemImage: "power")
+                    Label(String(localized: "Quit"), systemImage: "power")
                 }
                 .buttonStyle(.plain)
             }
@@ -70,7 +70,7 @@ struct OverviewView: View {
         switch panel {
         case .cpu:
             OverviewCard(
-                title: "CPU", icon: MetricsEngine.Panel.cpu.icon, color: MetricTheme.cpu,
+                title: String(localized: "CPU"), icon: MetricsEngine.Panel.cpu.icon, color: MetricTheme.cpu,
                 valueText: String(format: "%.0f%%", engine.cpuUsagePercent),
                 history: engine.cpuHistory, unit: "%", fixedMax: 100,
                 percentValue: engine.cpuUsagePercent,
@@ -78,7 +78,7 @@ struct OverviewView: View {
             ) { openDetail(.cpu) }
         case .memory:
             OverviewCard(
-                title: "Memory", icon: MetricsEngine.Panel.memory.icon, color: MetricTheme.memory,
+                title: String(localized: "Memory"), icon: MetricsEngine.Panel.memory.icon, color: MetricTheme.memory,
                 valueText: String(format: "%.1f / %.0f GB", engine.memoryUsedGB, engine.memoryTotalGB),
                 history: engine.memoryHistory, unit: "GB", fixedMax: max(engine.memoryTotalGB, 1),
                 percentValue: engine.memoryTotalGB > 0 ? (engine.memoryUsedGB / engine.memoryTotalGB) * 100 : 0,
@@ -136,7 +136,12 @@ private func formatSpeedCompact(_ kbps: Double) -> String {
 enum CardChartStyle: String, CaseIterable, Identifiable {
     case area, gauge
     var id: String { rawValue }
-    var label: String { rawValue.capitalized }
+    var label: String {
+        switch self {
+        case .area:  return String(localized: "Area")
+        case .gauge: return String(localized: "Gauge")
+        }
+    }
     var systemImage: String {
         switch self {
         case .area:  return "chart.bar.fill"
@@ -202,7 +207,7 @@ private struct OverviewCard: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                         .frame(maxWidth: .infinity, alignment: .center)
-                    MetricChart(values: history, unit: unit, fixedMax: fixedMax, showAxes: false, color: color, style: .area, accessibilityDescription: "\(title) history", valueFormatter: valueFormatter)
+                    MetricChart(values: history, unit: unit, fixedMax: fixedMax, showAxes: false, color: color, style: .area, accessibilityDescription: String(format: String(localized: "%@ history"), title), valueFormatter: valueFormatter)
                         .frame(height: 46)
                 }
             }
@@ -230,17 +235,17 @@ private struct ThermalCard: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 6) {
                     cardIcon("thermometer.medium", color: state.color)
-                    Text("Thermal").font(.caption).foregroundStyle(.secondary)
+                    Text(String(localized: "Thermal")).font(.caption).foregroundStyle(.secondary)
                 }
                 VStack(alignment: .center, spacing: 4) {
                     if let t = cpuTemp {
-                        tempRow("cpu", "CPU", t)
+                        tempRow("cpu", String(localized: "CPU"), t)
                     }
                     if let t = gpuTemp {
-                        tempRow("cube.transparent", "GPU", t)
+                        tempRow("cube.transparent", String(localized: "GPU"), t)
                     }
                     if let t = batteryTemp {
-                        tempRow("battery.75percent", "Bat", t)
+                        tempRow("battery.75percent", String(localized: "Bat"), t)
                     }
                     HStack(spacing: 4) {
                         Circle().fill(state.color).frame(width: 7, height: 7).accessibilityHidden(true)
@@ -271,10 +276,10 @@ private struct ThermalCard: View {
     // colour alone is also available to VoiceOver / colour-blind users.
     private func tempSeverityWord(_ celsius: Double) -> String {
         switch celsius {
-        case ..<60:  return "normal"
-        case ..<80:  return "warm"
-        case ..<95:  return "hot"
-        default:     return "critical"
+        case ..<60:  return String(localized: "normal")
+        case ..<80:  return String(localized: "warm")
+        case ..<95:  return String(localized: "hot")
+        default:     return String(localized: "critical")
         }
     }
 
@@ -295,7 +300,7 @@ private struct ThermalCard: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(label)
-        .accessibilityValue("\(Int(celsius.rounded()))°C, \(tempSeverityWord(celsius))")
+        .accessibilityValue(String(format: String(localized: "%ld°C, %@"), Int(celsius.rounded()), tempSeverityWord(celsius)))
     }
 }
 
@@ -317,7 +322,7 @@ private struct DiskCard: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
                 cardIcon(MetricsEngine.Panel.disk.icon, color: readColor)
-                Text("Disk").font(.caption).foregroundStyle(.secondary)
+                Text(String(localized: "Disk")).font(.caption).foregroundStyle(.secondary)
                 Spacer()
                 Menu {
                     ForEach(CardChartStyle.allCases) { s in
@@ -337,7 +342,7 @@ private struct DiskCard: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(String(format: "%.0f GB", engine.diskFreeGB))
                                 .font(.system(.body, design: .rounded)).fontWeight(.semibold)
-                            Text("free of \(Int(engine.diskTotalGB)) GB")
+                            Text(String(format: String(localized: "free of %ld GB"), Int(engine.diskTotalGB)))
                                 .font(.caption2).foregroundStyle(.secondary)
                         }
                         Spacer()
@@ -385,9 +390,9 @@ private struct DiskButterflyChart: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            MetricChart(values: readHistory, fixedMax: sharedMax, showAxes: false, fillFrame: true, color: readColor, style: .area, accessibilityDescription: "Disk read speed history", valueFormatter: formatSpeedCompact)
+            MetricChart(values: readHistory, fixedMax: sharedMax, showAxes: false, fillFrame: true, color: readColor, style: .area, accessibilityDescription: String(localized: "Disk read speed history"), valueFormatter: formatSpeedCompact)
             Color.primary.opacity(0.25).frame(height: 1)
-            MetricChart(values: writeHistory, fixedMax: sharedMax, showAxes: false, fillFrame: true, color: writeColor, style: .area, accessibilityDescription: "Disk write speed history", valueFormatter: formatSpeedCompact)
+            MetricChart(values: writeHistory, fixedMax: sharedMax, showAxes: false, fillFrame: true, color: writeColor, style: .area, accessibilityDescription: String(localized: "Disk write speed history"), valueFormatter: formatSpeedCompact)
                 .scaleEffect(y: -1)
         }
     }
@@ -412,19 +417,21 @@ private struct BatteryCard: View {
 
     // Only the number's colour flags a low battery today — say it in words too.
     private var batteryAccessibilityValue: String {
-        guard !isCharging else { return "\(percent) percent, charging" }
-        if percent < 20 { return "\(percent) percent, low battery" }
-        return "\(percent) percent"
+        guard !isCharging else { return String(format: String(localized: "%ld percent, charging"), percent) }
+        if percent < 20 { return String(format: String(localized: "%ld percent, low battery"), percent) }
+        return String(format: String(localized: "%ld percent"), percent)
     }
 
     // Time + wattage detail; nil when there's nothing meaningful to show
     private var detailText: String? {
         if isCharging {
             // macOS reports 0 min when nearly full — skip the time in that case
-            let wattStr = watts.map { String(format: "%.0fW charging", $0) }
+            let wattStr = watts.map { String(format: String(localized: "%.0fW charging"), $0) }
             if let m = timeRemainingMinutes, m > 5 {
                 let h = m / 60, mins = m % 60
-                let timeStr = h > 0 ? "\(h)h \(mins)m to full" : "\(mins)m to full"
+                let timeStr = h > 0
+                    ? String(format: String(localized: "%ldh %ldm to full"), h, mins)
+                    : String(format: String(localized: "%ldm to full"), mins)
                 return [timeStr, wattStr].compactMap { $0 }.joined(separator: " · ")
             }
             return wattStr
@@ -432,7 +439,9 @@ private struct BatteryCard: View {
             // On battery — time remaining is what matters; skip the draw wattage
             guard let m = timeRemainingMinutes else { return nil }
             let h = m / 60, mins = m % 60
-            return h > 0 ? "\(h)h \(mins)m remaining" : "\(mins)m remaining"
+            return h > 0
+                ? String(format: String(localized: "%ldh %ldm remaining"), h, mins)
+                : String(format: String(localized: "%ldm remaining"), mins)
         }
     }
 
@@ -441,14 +450,14 @@ private struct BatteryCard: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 6) {
                     cardIcon(isCharging ? "battery.100percent.bolt" : "battery.75percent", color: color)
-                    Text("Battery").font(.caption).foregroundStyle(.secondary)
+                    Text(String(localized: "Battery")).font(.caption).foregroundStyle(.secondary)
                 }
                 VStack(spacing: 2) {
-                    Text("\(percent)%")
+                    Text(String(format: "%ld%%", percent))
                         .font(.system(.body, design: .rounded)).fontWeight(.semibold)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .accessibilityValue(batteryAccessibilityValue)
-                    Text(isCharging ? "Charging" : "On Battery")
+                    Text(isCharging ? String(localized: "Charging") : String(localized: "On Battery"))
                         .font(.caption2).fontWeight(.medium)
                         .foregroundStyle(isCharging ? .green : .secondary)
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -475,9 +484,9 @@ private enum GPUCardStyle: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var label: String {
         switch self {
-        case .area:  return "Chart"
-        case .gauge: return "Gauge"
-        case .info:  return "Info"
+        case .area:  return String(localized: "Chart")
+        case .gauge: return String(localized: "Gauge")
+        case .info:  return String(localized: "Info")
         }
     }
     var systemImage: String {
@@ -502,7 +511,7 @@ private struct GPUCard: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
                 cardIcon("cube.transparent", color: .cyan)
-                Text("GPU & Displays").font(.caption).foregroundStyle(.secondary)
+                Text(String(localized: "GPU & Displays")).font(.caption).foregroundStyle(.secondary)
                 Spacer()
                 Menu {
                     ForEach(GPUCardStyle.allCases) { s in
@@ -522,7 +531,7 @@ private struct GPUCard: View {
                         .frame(maxWidth: .infinity, alignment: .center)
                     MetricChart(values: history, unit: "%", fixedMax: 100,
                                 showAxes: false, color: .cyan, style: .area,
-                                accessibilityDescription: "GPU usage history") { String(format: "%.0f%%", $0) }
+                                accessibilityDescription: String(localized: "GPU usage history")) { String(format: "%.0f%%", $0) }
                         .frame(height: 46)
                 case .gauge:
                     HStack {
@@ -537,7 +546,7 @@ private struct GPUCard: View {
                         .lineLimit(1).minimumScaleFactor(0.7)
                         .frame(maxWidth: .infinity, alignment: .center)
                     if displays.isEmpty {
-                        Text("No display info")
+                        Text(String(localized: "No display info"))
                             .font(.caption2).foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity, alignment: .center)
                     } else {
@@ -548,7 +557,7 @@ private struct GPUCard: View {
                                 Text(d.name)
                                     .font(.caption2).lineLimit(1).foregroundStyle(.secondary)
                                 if d.isMain {
-                                    Text("main").font(.caption2).foregroundStyle(.cyan.opacity(0.7))
+                                    Text(String(localized: "main")).font(.caption2).foregroundStyle(.cyan.opacity(0.7))
                                 }
                             }
                             .frame(maxWidth: .infinity, alignment: .center)
@@ -576,15 +585,15 @@ private struct NetworkOverviewCard: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
                 cardIcon(MetricsEngine.Panel.network.icon, color: MetricTheme.networkDown)
-                Text("Network").font(.caption).foregroundStyle(.secondary)
+                Text(String(localized: "Network")).font(.caption).foregroundStyle(.secondary)
                 Image(systemName: engine.isVPNActive ? "lock.shield.fill" : "lock.shield")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundStyle(engine.isVPNActive
                         ? (engine.vpnIsFortiClient ? Color.blue : Color.green)
                         : Color.secondary)
                     .accessibilityLabel(engine.isVPNActive
-                        ? (engine.vpnIsFortiClient ? "VPN active, FortiClient" : "VPN active")
-                        : "VPN inactive")
+                        ? (engine.vpnIsFortiClient ? String(localized: "VPN active, FortiClient") : String(localized: "VPN active"))
+                        : String(localized: "VPN inactive"))
                 Spacer()
                 HStack(spacing: 5) {
                     let visibleIfaces = engine.localInterfaces.filter { $0.kind != .vpn }
@@ -592,15 +601,17 @@ private struct NetworkOverviewCard: View {
                         Image(systemName: "network")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(.green)
-                            .accessibilityLabel("Connected")
+                            .accessibilityLabel(String(localized: "Connected"))
                     } else {
                         ForEach(visibleIfaces) { iface in
-                            Image(systemName: iface.icon)
+                            let isHotspot = iface.kind == .wifi && engine.isLikelyHotspot
+                            let ifaceLabel = isHotspot ? String(localized: "Personal Hotspot") : iface.displayName
+                            Image(systemName: isHotspot ? "personalhotspot" : iface.icon)
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(iface.isPrimary ? Color.green : Color.primary)
                                 .accessibilityLabel(iface.isPrimary
-                                    ? "\(iface.displayName), primary connection"
-                                    : iface.displayName)
+                                    ? String(format: String(localized: "%@, primary connection"), ifaceLabel)
+                                    : ifaceLabel)
                         }
                     }
                 }
@@ -615,7 +626,7 @@ private struct NetworkOverviewCard: View {
                 Circle()
                     .fill(engine.isConnected ? Color.green : Color.red)
                     .frame(width: 7, height: 7)
-                    .accessibilityLabel(engine.isConnected ? "Connected" : "Disconnected")
+                    .accessibilityLabel(engine.isConnected ? String(localized: "Connected") : String(localized: "Disconnected"))
                 Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
             }
 
@@ -624,14 +635,14 @@ private struct NetworkOverviewCard: View {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
                     if engine.localInterfaces.isEmpty {
-                        CopyableIPRow(icon: "network", label: "Local IP", value: "—")
+                        CopyableIPRow(icon: "network", label: String(localized: "Local IP"), value: "—")
                     } else {
                         ForEach(engine.localInterfaces) { iface in
                             CopyableIPRow(icon: iface.icon, label: iface.displayName, value: iface.address,
                                           iconColor: iface.isPrimary ? .green : .secondary)
                         }
                     }
-                    CopyableIPRow(icon: "globe", label: "Public IP", value: engine.publicIP ?? "Looking up…")
+                    CopyableIPRow(icon: "globe", label: String(localized: "Public IP"), value: engine.publicIP ?? String(localized: "Looking up…"))
                 }
                 if let rssi = engine.wifiRSSI {
                     Spacer()
@@ -660,14 +671,14 @@ struct BluetoothOverviewCard: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 6) {
                 cardIcon("dot.radiowaves.left.and.right", color: .blue)
-                Text("Bluetooth").font(.caption).foregroundStyle(.secondary)
+                Text(String(localized: "Bluetooth")).font(.caption).foregroundStyle(.secondary)
                 Spacer()
-                Text("\(connected.count) connected").font(.caption2).foregroundStyle(.secondary)
+                Text(String(format: String(localized: "%ld connected"), connected.count)).font(.caption2).foregroundStyle(.secondary)
                 Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.tertiary)
             }
 
             if connected.isEmpty {
-                Text("No devices connected").font(.caption).foregroundStyle(.secondary)
+                Text(String(localized: "No devices connected")).font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(connected) { device in
                     HStack(spacing: 8) {
@@ -678,16 +689,16 @@ struct BluetoothOverviewCard: View {
                             HStack(spacing: 4) {
                                 if let l = device.batteryLeft  { EarbudBatteryPill("L", l) }
                                 if let r = device.batteryRight { EarbudBatteryPill("R", r) }
-                                if let c = device.batteryCase  { EarbudBatteryPill("Case", c) }
+                                if let c = device.batteryCase  { EarbudBatteryPill(String(localized: "Case"), c) }
                             }
                         } else if let pct = device.batteryPercent {
                             HStack(spacing: 3) {
                                 Image(systemName: batterySystemImage(pct)).font(.caption2).foregroundStyle(pct < 20 ? .red : pct < 40 ? .orange : .green)
-                                Text("\(pct)%").font(.caption.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
+                                Text(String(format: "%ld%%", pct)).font(.caption.monospacedDigit()).foregroundStyle(pct < 20 ? .red : .secondary)
                             }
                             .accessibilityElement(children: .ignore)
-                            .accessibilityLabel("Battery")
-                            .accessibilityValue(pct < 20 ? "\(pct) percent, low" : "\(pct) percent")
+                            .accessibilityLabel(String(localized: "Battery"))
+                            .accessibilityValue(pct < 20 ? String(format: String(localized: "%ld percent, low"), pct) : String(format: String(localized: "%ld percent"), pct))
                         }
                     }
                 }

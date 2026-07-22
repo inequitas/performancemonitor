@@ -1,0 +1,11 @@
+/*
+  InfoPlist.strings (fr)
+  Performance Monitor
+
+  Chaînes Info.plist localisées (invites système, etc.). Copiées par
+  build_app.sh vers Contents/Resources/fr.lproj — localisation Info.plist
+  standard de macOS, distincte du bundle de ressources SwiftPM utilisé
+  pour les chaînes de l'interface in-app.
+*/
+
+"NSBluetoothAlwaysUsageDescription" = "Performance Monitor affiche vos appareils Bluetooth couplés et leur état de connexion.";

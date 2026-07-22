@@ -18,11 +18,11 @@ struct GPUDetailView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Label("GPU & Displays", systemImage: "cube.transparent")
+                Label(String(localized: "GPU & Displays"), systemImage: "cube.transparent")
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(.cyan)
                 Spacer()
-                InfoButton(text: "GPU utilization percentage is not available through any public macOS API on Apple Silicon. Apple's IOKit SMC interface blocks access to GPU load counters for user-space processes.\n\nThird-party tools that show GPU % use private, entitled APIs or kernel extensions that require special signing. The Metal information shown here (working set size, power mode) is the maximum available through the public API.")
+                InfoButton(text: String(localized: "GPU utilization percentage is not available through any public macOS API on Apple Silicon. Apple's IOKit SMC interface blocks access to GPU load counters for user-space processes.\n\nThird-party tools that show GPU % use private, entitled APIs or kernel extensions that require special signing. The Metal information shown here (working set size, power mode) is the maximum available through the public API."))
             }
 
             SectionCard {
@@ -30,28 +30,28 @@ struct GPUDetailView: View {
                     Text(engine.gpuName)
                         .font(.system(size: 18, weight: .bold, design: .rounded))
                         .foregroundStyle(.cyan)
-                    detailRow("Location", engine.gpuLocation)
-                    detailRow("Max working set", String(format: "%.1f GB", engine.gpuRecommendedMemoryGB))
-                    detailRow("Power mode", engine.gpuIsLowPower ? "Low power" : "High performance")
+                    detailRow(String(localized: "Location"), engine.gpuLocation)
+                    detailRow(String(localized: "Max working set"), String(format: "%.1f GB", engine.gpuRecommendedMemoryGB))
+                    detailRow(String(localized: "Power mode"), engine.gpuIsLowPower ? String(localized: "Low power") : String(localized: "High performance"))
                 }
             }
 
             SectionCard {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("Displays").font(.subheadline.weight(.semibold))
+                        Text(String(localized: "Displays")).font(.subheadline.weight(.semibold))
                         Spacer()
                         Button {
                             NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Displays-Settings.extension")!)
                         } label: {
-                            Label("Arrange…", systemImage: "rectangle.3.group")
+                            Label(String(localized: "Arrange…"), systemImage: "rectangle.3.group")
                                 .font(.caption)
                         }
                         .buttonStyle(.bordered)
                         .controlSize(.mini)
                     }
                     if engine.displays.isEmpty {
-                        Text("No display info available")
+                        Text(String(localized: "No display info available"))
                             .font(.caption).foregroundStyle(.secondary)
                     }
                     ForEach(engine.displays) { info in
@@ -78,7 +78,7 @@ struct GPUDetailView: View {
                                 Spacer()
                                 VStack(alignment: .trailing, spacing: 3) {
                                     if info.isMain {
-                                        Text("Main")
+                                        Text(String(localized: "Main"))
                                             .font(.caption2)
                                             .padding(.horizontal, 6)
                                             .padding(.vertical, 2)

@@ -20,11 +20,11 @@ extension NSApplication {
 extension ProcessInfo.ThermalState {
     var label: String {
         switch self {
-        case .nominal: return "Nominal"
-        case .fair: return "Fair"
-        case .serious: return "Serious"
-        case .critical: return "Critical"
-        @unknown default: return "Unknown"
+        case .nominal: return String(localized: "Nominal")
+        case .fair: return String(localized: "Fair")
+        case .serious: return String(localized: "Serious")
+        case .critical: return String(localized: "Critical")
+        @unknown default: return String(localized: "Unknown")
         }
     }
     var color: Color {
@@ -62,10 +62,10 @@ enum MetricTheme {
     // so VoiceOver / colour-blind users get the same signal as the colour conveys.
     static func sensorTempSeverityWord(_ celsius: Double, category: String) -> String {
         switch TempSeverityMapper.severity(celsius: celsius, category: category) {
-        case .normal:   return "normal"
-        case .warning:  return "warning"
-        case .elevated: return "elevated"
-        case .critical: return "critical"
+        case .normal:   return String(localized: "normal")
+        case .warning:  return String(localized: "warning")
+        case .elevated: return String(localized: "elevated")
+        case .critical: return String(localized: "critical")
         }
     }
 }

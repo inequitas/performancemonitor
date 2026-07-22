@@ -137,11 +137,17 @@ swift test ${PM_SWIFT_TEST_FLAGS:-}
 
 echo "==> Running build_app.sh $([ "$BETA" = true ] && echo '--beta')..."
 if [ "$BETA" = true ]; then
+    # build_app.sh --beta now builds BOTH variants from one compiled binary
+    # (stable -> dist/PerformanceApp.zip, beta -> dist/PerformanceApp-Beta.zip),
+    # so a single beta release ships assets for both update channels — the
+    # app's per-channel AssetSelector then always finds its exact asset by name.
     bash build_app.sh --beta
     ZIP_PATH="dist/PerformanceApp-Beta.zip"
+    ASSETS=("dist/PerformanceApp.zip" "dist/PerformanceApp.zip.sig" "dist/PerformanceApp-Beta.zip" "dist/PerformanceApp-Beta.zip.sig")
 else
     bash build_app.sh
     ZIP_PATH="dist/PerformanceApp.zip"
+    ASSETS=("dist/PerformanceApp.zip" "dist/PerformanceApp.zip.sig")
 fi
 
 if [ "$PUBLISH" != true ]; then
@@ -157,6 +163,14 @@ if [ "$PUBLISH" != true ]; then
     else
         echo "    Signature: MISSING — signed updates need scripts/private_key.txt"
     fi
+    if [ "$BETA" = true ]; then
+        echo "    Also:      dist/PerformanceApp.zip (stable asset, same release)"
+        if [ -f "dist/PerformanceApp.zip.sig" ]; then
+            echo "    Signature: dist/PerformanceApp.zip.sig (present)"
+        else
+            echo "    Signature: MISSING — signed updates need scripts/private_key.txt"
+        fi
+    fi
     echo "    Notes:     ${NOTES_FILE}"
     echo ""
     echo "Re-run with --publish to tag and publish this release."
@@ -166,21 +180,25 @@ fi
 # --- (e) tag -------------------------------------------------------------
 echo "==> Tagging ${TAG}..."
 git tag "$TAG"
+# gh release create refuses local-only tags — push it first.
+git push origin "$TAG"
 
 # --- (f) publish -----------------------------------------------------------
-if [ ! -f "$ZIP_PATH" ] || [ ! -f "${ZIP_PATH}.sig" ]; then
-    echo "ERROR: ${ZIP_PATH}(.sig) missing — cannot publish an unsigned/missing build." >&2
-    exit 1
-fi
+for ASSET in "${ASSETS[@]}"; do
+    if [ ! -f "$ASSET" ]; then
+        echo "ERROR: ${ASSET} missing — cannot publish an unsigned/missing build." >&2
+        exit 1
+    fi
+done
 
 echo "==> Publishing GitHub release ${TAG}..."
 if [ "$BETA" = true ]; then
-    gh release create "$TAG" "$ZIP_PATH" "${ZIP_PATH}.sig" \
+    gh release create "$TAG" "${ASSETS[@]}" \
         --title "${TITLE}" \
         --notes-file "$NOTES_FILE" \
         --prerelease
 else
-    gh release create "$TAG" "$ZIP_PATH" "${ZIP_PATH}.sig" \
+    gh release create "$TAG" "${ASSETS[@]}" \
         --title "${TITLE}" \
         --notes-file "$NOTES_FILE"
 fi
