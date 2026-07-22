@@ -100,6 +100,7 @@ final class MetricsEngine: ObservableObject {
     @Published var fans: [FanInfo] = []
     @Published var extendedTemperatures: [TempReading] = []
     @Published var unknownSMCTemperatures: [TempReading] = []
+    @Published var systemPowerWatts: Double?
 
     @Published var performanceCoreCount: Int = 0
     @Published var efficiencyCoreCount: Int = 0
@@ -741,6 +742,7 @@ final class MetricsEngine: ObservableObject {
             self.fans                   = s.fans
             self.extendedTemperatures   = s.extendedTemperatures
             self.unknownSMCTemperatures = s.unknownSMCTemperatures
+            self.systemPowerWatts       = s.systemPowerWatts
         }
     }
 

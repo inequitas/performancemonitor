@@ -57,9 +57,9 @@ struct BatteryDetailView: View {
                         Spacer()
                         InfoButton(text: String(localized: "Temperature: Read from AppleSmartBattery IORegistry — no special privileges needed. This is the battery cell temperature, not the CPU temperature.\n\nVoltage: Current battery terminal voltage in volts.\n\nCurrent: Positive = charging (current flowing in). Negative = discharging (current flowing out). Values are in milliamps (mA).\n\nAll values come from the AppleSmartBattery driver which is always accessible without entitlements."))
                     }
-                    if let v = engine.batteryVoltage, let a = engine.batteryAmperage {
-                        let watts = v * abs(Double(a)) / 1000
-                        detailRow(engine.batteryIsCharging ? String(localized: "Input power") : String(localized: "Draw"),
+                    if let watts = BatteryPower.watts(voltage: engine.batteryVoltage, amperageMilliamps: engine.batteryAmperage) {
+                        let charging = BatteryPower.direction(amperageMilliamps: engine.batteryAmperage) == .charging
+                        detailRow(charging ? String(localized: "Input power") : String(localized: "Draw"),
                                   String(format: "%.1f W", watts))
                     }
                     if let temp = engine.batteryTemperatureC {

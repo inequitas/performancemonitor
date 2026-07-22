@@ -350,3 +350,8 @@
 "well above alert threshold" = "muy por encima del umbral de alerta";
 "well below alert threshold" = "muy por debajo del umbral de alerta";
 "macOS reports four thermal pressure levels:\n\n• Nominal — system operating normally.\n• Fair — some power reduction to prevent overheating.\n• Serious — significant throttling in effect.\n• Critical — aggressive throttling; performance severely impacted.\n\nThis is read from ProcessInfo.thermalState — the same value macOS uses internally to throttle workloads." = "macOS indica cuatro niveles de presión térmica:\n\n• Nominal — el sistema funciona con normalidad.\n• Fair — cierta reducción de potencia para evitar el sobrecalentamiento.\n• Serious — limitación significativa en curso.\n• Critical — limitación agresiva; rendimiento muy afectado.\n\nEsto se lee de ProcessInfo.thermalState — el mismo valor que macOS usa internamente para limitar las cargas de trabajo.";
+
+/* MARK: - ThermalDetailView power (roadmap 1.2a) */
+"Power" = "Potencia";
+"System Power" = "Potencia del sistema";
+"Total system power draw, read from the System Management Controller (SMC).\n\nCovers the whole machine — CPU, GPU, display, and everything else on the same power rail — not just one component." = "Consumo total de energía del sistema, leído desde el System Management Controller (SMC).\n\nAbarca todo el equipo — CPU, GPU, pantalla y todo lo demás en el mismo riel de alimentación — no solo un componente.";

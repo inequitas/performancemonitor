@@ -32,6 +32,20 @@ struct ThermalDetailView: View {
                 }
             }
 
+            // System power draw — read from the SMC PSTR key (see SMCPowerCatalog)
+            if let watts = engine.systemPowerWatts {
+                SectionCard {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text(String(localized: "Power")).font(.subheadline.weight(.semibold))
+                            Spacer()
+                            InfoButton(text: String(localized: "Total system power draw, read from the System Management Controller (SMC).\n\nCovers the whole machine — CPU, GPU, display, and everything else on the same power rail — not just one component."))
+                        }
+                        detailRow(String(localized: "System Power"), String(format: "%.1f W", watts))
+                    }
+                }
+            }
+
             // Temperatures — each category expandable to individual sensors
             SectionCard {
                 VStack(alignment: .leading, spacing: 8) {

@@ -131,6 +131,27 @@ final class SMCReader: @unchecked Sendable {
         return readings.reduce(0, +) / Double(readings.count)
     }
 
+    // MARK: - Power
+
+    /// Reads a `flt` (32-bit IEEE-754) SMC power value in watts. Power keys
+    /// are always float-encoded, unlike temperature sensors which mix
+    /// `sp78`/`flt`; a type mismatch or an implausible reading (negative, or
+    /// above a generous 500 W ceiling) returns nil rather than garbage.
+    private func readPowerWatts(_ key: String) -> Double? {
+        guard let val = readVal(key), val.dataType == "flt ", val.dataSize >= 4 else { return nil }
+        let bits = UInt32(val.bytes[0]) | UInt32(val.bytes[1]) << 8
+                 | UInt32(val.bytes[2]) << 16 | UInt32(val.bytes[3]) << 24
+        let watts = Double(Float(bitPattern: bits))
+        guard watts.isFinite, watts >= 0, watts < 500 else { return nil }
+        return watts
+    }
+
+    /// Total system power draw in watts, read from the `PSTR` SMC key.
+    /// See `SMCPowerCatalog` for the spike that identified this key.
+    func systemPowerWatts() -> Double? {
+        readPowerWatts(SMCPowerCatalog.systemPowerKey)
+    }
+
     // MARK: - Fans
 
     func fanCount() -> Int {
