@@ -105,7 +105,7 @@ struct NetworkDetailView: View {
                 SectionCard {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            Label(engine.wifiSSID ?? String(localized: "Wi-Fi"), systemImage: "wifi")
+                            Label(engine.wifiSSID ?? String(localized: "Wi-Fi"), systemImage: engine.isLikelyHotspot ? "personalhotspot" : "wifi")
                                 .font(.subheadline.weight(.semibold))
                             Spacer()
                             InfoButton(text: String(localized: "Signal strength is measured in dBm (decibel-milliwatts) — a negative number where closer to zero is stronger.\n\n• Excellent (−50 dBm or better): Ideal. Full speed, no drops.\n• Good (−50 to −65 dBm): Reliable for video calls and large transfers.\n• Fair (−65 to −75 dBm): Usable but may slow down. Consider moving closer to your router.\n• Weak (below −75 dBm): Prone to disconnects and slow speeds.\n\nRead from CoreWLAN — same source as the macOS menu bar WiFi indicator."))

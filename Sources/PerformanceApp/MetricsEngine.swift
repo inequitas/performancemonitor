@@ -62,6 +62,7 @@ final class MetricsEngine: ObservableObject {
     @Published var vpnIsFortiClient: Bool = false
     @Published var isConnected: Bool = false
     @Published var connectionType: String = "Unknown"  // primary interface
+    @Published var isLikelyHotspot: Bool = false
     @Published var isWifiAvailable: Bool = false
     @Published var isEthernetAvailable: Bool = false
     @Published var wifiSSID: String? = nil
@@ -480,6 +481,11 @@ final class MetricsEngine: ObservableObject {
                     : path.usesInterfaceType(.wiredEthernet) ? "Ethernet"
                     : path.usesInterfaceType(.cellular) ? "Cellular"
                     : path.status == .satisfied ? "Other" : "Offline"
+                self.isLikelyHotspot = NetworkClassification.isLikelyHotspot(
+                    isExpensive: path.isExpensive,
+                    usesWifi: path.usesInterfaceType(.wifi),
+                    satisfied: path.status == .satisfied
+                )
 
                 let changed = self.lastPathSignature != nil && self.lastPathSignature != signature
                 self.lastPathSignature = signature

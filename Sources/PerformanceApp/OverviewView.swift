@@ -604,12 +604,14 @@ private struct NetworkOverviewCard: View {
                             .accessibilityLabel(String(localized: "Connected"))
                     } else {
                         ForEach(visibleIfaces) { iface in
-                            Image(systemName: iface.icon)
+                            let isHotspot = iface.kind == .wifi && engine.isLikelyHotspot
+                            let ifaceLabel = isHotspot ? String(localized: "Personal Hotspot") : iface.displayName
+                            Image(systemName: isHotspot ? "personalhotspot" : iface.icon)
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(iface.isPrimary ? Color.green : Color.primary)
                                 .accessibilityLabel(iface.isPrimary
-                                    ? String(format: String(localized: "%@, primary connection"), iface.displayName)
-                                    : iface.displayName)
+                                    ? String(format: String(localized: "%@, primary connection"), ifaceLabel)
+                                    : ifaceLabel)
                         }
                     }
                 }

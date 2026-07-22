@@ -289,6 +289,7 @@
 "VPN" = "VPN";
 "Local IPs are read from the system network interfaces.\n\nVPN is detected by the presence of utun, ppp, or ipsec interfaces.\n\nPublic IP is fetched from api.ipify.org over HTTPS. Only your outbound request is sent — no other data. Refreshed every 5 minutes.\n\nConnectivity check is an HTTPS HEAD request to Apple's captive portal endpoint (captive.apple.com). This respects your system proxy settings. True ICMP ping requires root on macOS, so this is used instead." = "本地 IP 从系统网络接口读取。\n\nVPN 通过检测是否存在 utun、ppp 或 ipsec 接口来判断。\n\n公网 IP 通过 HTTPS 从 api.ipify.org 获取。仅发送你的出站请求 —— 不包含其他数据。每 5 分钟刷新一次。\n\n连通性检测是向 Apple 的强制门户入口（captive.apple.com）发送的 HTTPS HEAD 请求，遵循你的系统代理设置。真正的 ICMP ping 在 macOS 上需要 root 权限，因此改用此方式。";
 "Wi-Fi" = "Wi-Fi";
+"Personal Hotspot" = "个人热点";
 "Signal strength is measured in dBm (decibel-milliwatts) — a negative number where closer to zero is stronger.\n\n• Excellent (−50 dBm or better): Ideal. Full speed, no drops.\n• Good (−50 to −65 dBm): Reliable for video calls and large transfers.\n• Fair (−65 to −75 dBm): Usable but may slow down. Consider moving closer to your router.\n• Weak (below −75 dBm): Prone to disconnects and slow speeds.\n\nRead from CoreWLAN — same source as the macOS menu bar WiFi indicator." = "信号强度以 dBm（分贝毫瓦）为单位 —— 数值为负，越接近零表示信号越强。\n\n• 极佳（−50 dBm 或更强）：理想状态。全速运行，不掉线。\n• 良好（−50 至 −65 dBm）：适合视频通话和大文件传输。\n• 一般（−65 至 −75 dBm）：可用，但可能变慢。建议靠近路由器。\n• 弱（低于 −75 dBm）：容易掉线，速度较慢。\n\n从 CoreWLAN 读取 —— 与 macOS 菜单栏 Wi-Fi 指示图标使用相同的数据来源。";
 "Connectivity Check" = "连通性检测";
 "%ld milliseconds, %@" = "%ld 毫秒，%@";
