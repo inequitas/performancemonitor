@@ -120,6 +120,11 @@
 "Disk free below" = "可用磁盘空间低于";
 "GPU above" = "GPU 超过";
 "Thermal pressure" = "热压力";
+"Alert after exceeded for" = "超过阈值持续以下时长后提醒";
+"Off" = "关闭";
+"1 min" = "1 分钟";
+"2 min" = "2 分钟";
+"Applies to CPU, GPU and memory. Disk space and thermal alerts always fire immediately." = "适用于 CPU、GPU 和内存。磁盘空间和温度提醒始终立即触发。";
 "Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min." = "温度提醒在「严重」或「危急」级别时触发。所有提醒每 5 分钟最多触发一次。";
 
 /* MARK: - SettingsView：面板标签页 */

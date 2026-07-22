@@ -121,6 +121,11 @@
 "Disk free below" = "Disk free below";
 "GPU above" = "GPU above";
 "Thermal pressure" = "Thermal pressure";
+"Alert after exceeded for" = "Alert after exceeded for";
+"Off" = "Off";
+"1 min" = "1 min";
+"2 min" = "2 min";
+"Applies to CPU, GPU and memory. Disk space and thermal alerts always fire immediately." = "Applies to CPU, GPU and memory. Disk space and thermal alerts always fire immediately.";
 "Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min." = "Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min.";
 
 /* MARK: - SettingsView: Panels tab */

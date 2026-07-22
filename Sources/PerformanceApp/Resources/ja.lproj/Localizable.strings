@@ -121,6 +121,11 @@
 "Disk free below" = "空きディスク容量が次を下回ったら";
 "GPU above" = "GPUが次を超えたら";
 "Thermal pressure" = "サーマルプレッシャー";
+"Alert after exceeded for" = "しきい値超過が続いたら通知";
+"Off" = "オフ";
+"1 min" = "1分";
+"2 min" = "2分";
+"Applies to CPU, GPU and memory. Disk space and thermal alerts always fire immediately." = "CPU、GPU、メモリに適用されます。ディスク容量とサーマルの通知は常にすぐに発生します。";
 "Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min." = "サーマルアラートは「重度」または「深刻」で発生します。すべてのアラートは5分に1回に制限されます。";
 
 /* MARK: - SettingsView: Panels tab */

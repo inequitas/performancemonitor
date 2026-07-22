@@ -121,6 +121,11 @@
 "Disk free below" = "Freier Speicherplatz unter";
 "GPU above" = "GPU über";
 "Thermal pressure" = "Thermischer Druck";
+"Alert after exceeded for" = "Warnen nach Überschreitung für";
+"Off" = "Aus";
+"1 min" = "1 Min.";
+"2 min" = "2 Min.";
+"Applies to CPU, GPU and memory. Disk space and thermal alerts always fire immediately." = "Gilt für CPU, GPU und Speicher. Warnungen für Speicherplatz und Temperatur erfolgen immer sofort.";
 "Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min." = "Temperaturbenachrichtigungen erfolgen bei Ernst oder Kritisch. Alle Benachrichtigungen sind auf einmal pro 5 Min. begrenzt.";
 
 /* MARK: - SettingsView: Tab Panels */

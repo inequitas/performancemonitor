@@ -121,6 +121,11 @@
 "Disk free below" = "Vrije schijfruimte onder";
 "GPU above" = "GPU boven";
 "Thermal pressure" = "Thermische druk";
+"Alert after exceeded for" = "Waarschuwen na overschrijding van";
+"Off" = "Uit";
+"1 min" = "1 min";
+"2 min" = "2 min";
+"Applies to CPU, GPU and memory. Disk space and thermal alerts always fire immediately." = "Geldt voor CPU, GPU en geheugen. Meldingen voor schijfruimte en temperatuur gaan altijd direct af.";
 "Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min." = "Temperatuurmeldingen gaan af bij Ernstig of Kritiek. Alle meldingen zijn beperkt tot één keer per 5 min.";
 
 /* MARK: - SettingsView: tabblad Panelen */

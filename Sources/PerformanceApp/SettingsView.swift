@@ -741,6 +741,22 @@ private struct AlertsTab: View {
                     SettingsRow(label: String(localized: "Thermal pressure")) {
                         Toggle("", isOn: $alerts.thermalEnabled).labelsHidden()
                     }
+                    Divider().padding(.vertical, 4)
+                    SettingsRow(label: String(localized: "Alert after exceeded for")) {
+                        Picker("", selection: $alerts.alertSustainSeconds) {
+                            Text(String(localized: "Off")).tag(0.0)
+                            Text("10s").tag(10.0)
+                            Text("30s").tag(30.0)
+                            Text(String(localized: "1 min")).tag(60.0)
+                            Text(String(localized: "2 min")).tag(120.0)
+                        }
+                        .labelsHidden()
+                        .pickerStyle(.menu)
+                        .frame(maxWidth: 100)
+                    }
+                    Text(String(localized: "Applies to CPU, GPU and memory. Disk space and thermal alerts always fire immediately."))
+                        .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
+                        .fixedSize(horizontal: false, vertical: true)
                     Text(String(localized: "Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min."))
                         .font(.caption2).foregroundStyle(.secondary).padding(.top, 4)
                         .fixedSize(horizontal: false, vertical: true)
