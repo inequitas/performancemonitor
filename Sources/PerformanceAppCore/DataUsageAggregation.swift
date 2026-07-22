@@ -45,6 +45,18 @@ public enum DataUsageAggregation {
         sum(days.filter { calendar.isDate($0.day, equalTo: now, toGranularity: .month) })
     }
 
+    /// Rolling window covering `now`'s day and the `count - 1` days before
+    /// it (e.g. `count: 7` → today plus the six prior days) — unlike
+    /// `thisWeek`, which follows the calendar week regardless of where
+    /// `now` falls in it. Used by the "This Week" weekly-overview card,
+    /// which aligns with the history window's own rolling 7-day period.
+    public static func lastNDays(_ days: [DailyDataUsage], count: Int, now: Date, calendar: Calendar = .current) -> DataUsageTotals {
+        guard count > 0 else { return .zero }
+        let startOfToday = calendar.startOfDay(for: now)
+        guard let cutoff = calendar.date(byAdding: .day, value: -(count - 1), to: startOfToday) else { return .zero }
+        return sum(days.filter { $0.day >= cutoff && $0.day <= startOfToday })
+    }
+
     private static func sum(_ days: [DailyDataUsage]) -> DataUsageTotals {
         var down: UInt64 = 0
         var up: UInt64 = 0

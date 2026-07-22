@@ -382,3 +382,6 @@
 "Disk Write" = "Écriture disque";
 "Go to Settings" = "Aller aux Réglages";
 "Enable \"%@\" in Settings to record history." = "Activez « %@ » dans les Réglages pour enregistrer l'historique.";
+
+/* MARK: - HistoryWindow weekly summary (roadmap 1.3b) */
+"%@ — avg %@, peak %@ (%@)" = "%@ — moy. %@, pic %@ (%@)";

@@ -83,4 +83,36 @@ struct DataUsageAggregationTests {
         #expect(DataUsageTotals.zero.downloadBytes == 0)
         #expect(DataUsageTotals.zero.uploadBytes == 0)
     }
+
+    // MARK: - lastNDays
+
+    @Test func lastNDaysOnEmptyHistoryYieldsZero() {
+        #expect(DataUsageAggregation.lastNDays([], count: 7, now: day(2026, 7, 22), calendar: Self.calendar) == .zero)
+    }
+
+    @Test func lastNDaysIsARollingWindowNotACalendarWeek() {
+        // now: Wed 2026-07-22 -> last 7 days = Thu 07-16 .. Wed 07-22,
+        // which straddles two different calendar weeks.
+        let now = day(2026, 7, 22)
+        let rows = [
+            DailyDataUsage(day: day(2026, 7, 16), downloadBytes: 1, uploadBytes: 1), // 7 days ago, in-window (prior cal week)
+            DailyDataUsage(day: day(2026, 7, 22), downloadBytes: 2, uploadBytes: 2), // today, in-window
+            DailyDataUsage(day: day(2026, 7, 15), downloadBytes: 9_999, uploadBytes: 9_999), // 8 days ago, out
+            DailyDataUsage(day: day(2026, 7, 23), downloadBytes: 9_999, uploadBytes: 9_999), // tomorrow, out
+        ]
+        let totals = DataUsageAggregation.lastNDays(rows, count: 7, now: now, calendar: Self.calendar)
+        #expect(totals.downloadBytes == 3)
+        #expect(totals.uploadBytes == 3)
+    }
+
+    @Test func lastNDaysWithCountOneIsJustToday() {
+        let now = day(2026, 7, 22)
+        let rows = [
+            DailyDataUsage(day: day(2026, 7, 22), downloadBytes: 5, uploadBytes: 5),
+            DailyDataUsage(day: day(2026, 7, 21), downloadBytes: 9_999, uploadBytes: 9_999),
+        ]
+        let totals = DataUsageAggregation.lastNDays(rows, count: 1, now: now, calendar: Self.calendar)
+        #expect(totals.downloadBytes == 5)
+        #expect(totals.uploadBytes == 5)
+    }
 }

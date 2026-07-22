@@ -382,3 +382,6 @@
 "Disk Write" = "ディスク書き込み";
 "Go to Settings" = "設定に移動";
 "Enable \"%@\" in Settings to record history." = "履歴を記録するには、設定で「%@」を有効にしてください。";
+
+/* MARK: - HistoryWindow weekly summary (roadmap 1.3b) */
+"%@ — avg %@, peak %@ (%@)" = "%@ — 平均 %@、ピーク %@（%@）";

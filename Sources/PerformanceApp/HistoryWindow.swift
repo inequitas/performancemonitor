@@ -15,6 +15,12 @@ struct HistoryWindow: View {
     @State private var samplesByMetric: [HistoryMetric: [HistorySampleRow]] = [:]
     @State private var isLoading = false
 
+    // "This Week" overview (roadmap 1.3b) — always the trailing 7 days,
+    // independent of the chart period picker above.
+    @State private var weeklyMetricSummaries: [HistoryMetric: WeeklyMetricSummary] = [:]
+    @State private var weeklyDataUsage: DataUsageTotals = .zero
+    private let weeklyWindow: TimeInterval = 7 * 86_400
+
     private struct LoadKey: Equatable { let period: HistoryPeriod; let enabled: Bool }
 
     private var hasAnyData: Bool { samplesByMetric.values.contains { !$0.isEmpty } }
@@ -54,6 +60,7 @@ struct HistoryWindow: View {
         } else {
             ScrollView {
                 VStack(spacing: 12) {
+                    WeeklySummaryCard(metricSummaries: weeklyMetricSummaries, dataUsage: weeklyDataUsage)
                     ForEach(historyMetrics) { info in
                         HistoryChartCard(info: info, period: period, samples: samplesByMetric[info.metric] ?? [])
                     }
@@ -120,7 +127,30 @@ struct HistoryWindow: View {
             result[info.metric] = await engine.historyDB.samples(metric: info.metric, from: from, to: now)
         }
         samplesByMetric = result
+        await loadWeeklySummary(now: now, currentPeriodResult: result)
         isLoading = false
+    }
+
+    /// Always covers the trailing 7 days, regardless of the selected chart
+    /// `period` — reuses this load's own rows when `period` already is
+    /// "7 Days" rather than re-querying.
+    private func loadWeeklySummary(now: Date, currentPeriodResult: [HistoryMetric: [HistorySampleRow]]) async {
+        let from = now.addingTimeInterval(-weeklyWindow)
+        var summaries: [HistoryMetric: WeeklyMetricSummary] = [:]
+        for info in historyMetrics {
+            let rows: [HistorySampleRow]
+            if period == .days7 {
+                rows = currentPeriodResult[info.metric] ?? []
+            } else {
+                rows = await engine.historyDB.samples(metric: info.metric, from: from, to: now)
+            }
+            let aggregates = rows.map { HistoryAggregate(bucketStart: $0.date, min: $0.min, avg: $0.avg, max: $0.max) }
+            if let summary = WeeklySummary.metricSummary(aggregates) {
+                summaries[info.metric] = summary
+            }
+        }
+        weeklyMetricSummaries = summaries
+        weeklyDataUsage = DataUsageAggregation.lastNDays(engine.dataUsage.dailyUsage, count: 7, now: now)
     }
 }
 
@@ -178,6 +208,74 @@ private let historyMetrics: [HistoryMetricInfo] = [
     HistoryMetricInfo(metric: .diskReadKBps, title: String(localized: "Disk Read"), icon: "arrow.down.doc", color: MetricTheme.disk, formatter: formatSpeed),
     HistoryMetricInfo(metric: .diskWriteKBps, title: String(localized: "Disk Write"), icon: "arrow.up.doc", color: .purple, formatter: formatSpeed),
 ]
+
+// MARK: - Weekly summary card (roadmap 1.3b)
+
+/// Compact "This Week" overview: one avg/peak line per history metric plus
+/// the week's total data usage, always covering the trailing 7 days
+/// regardless of the chart period picker above it.
+private struct WeeklySummaryCard: View {
+    let metricSummaries: [HistoryMetric: WeeklyMetricSummary]
+    let dataUsage: DataUsageTotals
+
+    private var hasAnyData: Bool { !metricSummaries.isEmpty || dataUsage != .zero }
+
+    var body: some View {
+        SectionCard {
+            VStack(alignment: .leading, spacing: 8) {
+                Label(String(localized: "7 Days"), systemImage: "calendar")
+                    .font(.subheadline.weight(.semibold))
+                if !hasAnyData {
+                    Text(String(localized: "No data captured."))
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(historyMetrics) { info in
+                        if let summary = metricSummaries[info.metric] {
+                            metricLine(info: info, summary: summary)
+                        }
+                    }
+                    if dataUsage != .zero {
+                        dataUsageLine
+                    }
+                }
+            }
+        }
+    }
+
+    private func metricLine(info: HistoryMetricInfo, summary: WeeklyMetricSummary) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: info.icon)
+                .foregroundStyle(info.color)
+                .frame(width: 16)
+            Text(String(format: String(localized: "%@ — avg %@, peak %@ (%@)"),
+                        info.title,
+                        info.formatter(summary.average),
+                        info.formatter(summary.peak),
+                        summary.peakAt.formatted(.dateTime.weekday(.abbreviated).hour().minute())))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var dataUsageLine: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "chart.bar.doc.horizontal")
+                .foregroundStyle(.secondary)
+                .frame(width: 16)
+            Text(String(localized: "Data Usage"))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Label(NetworkFormatting.formatDataUsage(bytes: dataUsage.downloadBytes), systemImage: "arrow.down")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(MetricTheme.networkDown)
+            Label(NetworkFormatting.formatDataUsage(bytes: dataUsage.uploadBytes), systemImage: "arrow.up")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(MetricTheme.networkUp)
+        }
+    }
+}
 
 // MARK: - Chart card
 

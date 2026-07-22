@@ -381,3 +381,6 @@
 "Disk Write" = "磁盘写入";
 "Go to Settings" = "前往设置";
 "Enable \"%@\" in Settings to record history." = "在设置中启用“%@”以记录历史记录。";
+
+/* MARK: - HistoryWindow weekly summary (roadmap 1.3b) */
+"%@ — avg %@, peak %@ (%@)" = "%@ — 平均 %@，峰值 %@（%@）";

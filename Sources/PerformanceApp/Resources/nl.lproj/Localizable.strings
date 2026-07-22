@@ -382,3 +382,6 @@
 "Disk Write" = "Schijf schrijven";
 "Go to Settings" = "Naar instellingen";
 "Enable \"%@\" in Settings to record history." = "Schakel \"%@\" in bij Instellingen om geschiedenis vast te leggen.";
+
+/* MARK: - HistoryWindow weekly summary (roadmap 1.3b) */
+"%@ — avg %@, peak %@ (%@)" = "%@ — gem. %@, piek %@ (%@)";
