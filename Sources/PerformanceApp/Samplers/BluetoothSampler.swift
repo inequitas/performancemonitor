@@ -1,6 +1,7 @@
 import Foundation
 import IOBluetooth
 import CoreBluetooth
+import PerformanceAppCore
 
 /// Owns Bluetooth authorisation, the paired-device read throttle, and the
 /// battery caches (system_profiler parse + BLE GATT read). Publishes results
@@ -18,18 +19,11 @@ final class BluetoothSampler {
     // Held strongly so the permission dialog can fire and the delegate callback arrives.
     private var btAuthManager: CBCentralManager?
     private var btDelegate: BluetoothAuthDelegate?
-    private var btBatteryCache: [String: BtBatteryInfo] = [:]
+    private var btBatteryCache: [String: BTBatteryInfo] = [:]
     private var btBatteryCacheDate: Date = .distantPast
     private var bleBatteryByName: [String: Int] = [:]
     private var bleBatteryReader: BLEBatteryReader?
     private var btDevicesCacheDate: Date = .distantPast
-
-    private struct BtBatteryInfo {
-        var main: Int?
-        var left: Int?
-        var right: Int?
-        var caseLevel: Int?
-    }
 
     func requestAccess() {
         guard btDelegate == nil else { return }
@@ -118,34 +112,7 @@ final class BluetoothSampler {
             guard (try? proc.run()) != nil else { return }
             proc.waitUntilExit()
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let btArray = json["SPBluetoothDataType"] as? [[String: Any]] else { return }
-
-            func parsePct(_ info: [String: Any], _ key: String) -> Int? {
-                guard let s = info[key] as? String else { return nil }
-                return Int(s.replacingOccurrences(of: "%", with: "").trimmingCharacters(in: .whitespaces))
-            }
-
-            var cache: [String: BtBatteryInfo] = [:]
-            for entry in btArray {
-                for listKey in ["device_connected", "device_not_connected"] {
-                    guard let deviceList = entry[listKey] as? [[String: Any]] else { continue }
-                    for deviceDict in deviceList {
-                        for (_, infoAny) in deviceDict {
-                            guard let info = infoAny as? [String: Any],
-                                  let addr = info["device_address"] as? String else { continue }
-                            let norm = addr.lowercased().replacingOccurrences(of: "-", with: ":")
-                            cache[norm] = BtBatteryInfo(
-                                main:      parsePct(info, "device_batteryLevel"),
-                                left:      parsePct(info, "device_batteryLevelLeft"),
-                                right:     parsePct(info, "device_batteryLevelRight"),
-                                caseLevel: parsePct(info, "device_batteryLevelCase")
-                            )
-                        }
-                    }
-                }
-            }
-            let captured = cache
+            guard let captured = BTDeviceParser.parse(data) else { return }
             await MainActor.run { [weak self] in self?.btBatteryCache = captured }
         }
     }
