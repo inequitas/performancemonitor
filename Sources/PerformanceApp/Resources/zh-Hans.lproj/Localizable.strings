@@ -134,6 +134,7 @@
 
 /* MARK: - SettingsView：历史记录标签页 */
 "Save history to disk" = "将历史记录保存到磁盘";
+"Open History Window" = "打开历史记录窗口";
 "Export" = "导出";
 "Export CSV…" = "导出 CSV…";
 
@@ -366,3 +367,17 @@
 "Reset data usage statistics?" = "重置数据用量统计？";
 "Reset" = "重置";
 "This clears all recorded download and upload totals. This cannot be undone." = "这将清除所有已记录的下载和上传总量。此操作无法撤销。";
+
+/* MARK: - HistoryWindow (roadmap 1.3a part 2) */
+"1 Hour" = "1 小时";
+"24 Hours" = "24 小时";
+"7 Days" = "7 天";
+"30 Days" = "30 天";
+"Period" = "时间段";
+"Refresh" = "刷新";
+"Download" = "下载";
+"Upload" = "上传";
+"Disk Read" = "磁盘读取";
+"Disk Write" = "磁盘写入";
+"Go to Settings" = "前往设置";
+"Enable \"%@\" in Settings to record history." = "在设置中启用“%@”以记录历史记录。";

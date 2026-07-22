@@ -135,6 +135,7 @@
 
 /* MARK: - SettingsView: Tab Verlauf */
 "Save history to disk" = "Verlauf auf Festplatte speichern";
+"Open History Window" = "Verlaufsfenster öffnen";
 "Export" = "Exportieren";
 "Export CSV…" = "CSV exportieren…";
 
@@ -367,3 +368,17 @@
 "Reset data usage statistics?" = "Datennutzungsstatistik zurücksetzen?";
 "Reset" = "Zurücksetzen";
 "This clears all recorded download and upload totals. This cannot be undone." = "Dadurch werden alle erfassten Download- und Upload-Summen gelöscht. Dies kann nicht rückgängig gemacht werden.";
+
+/* MARK: - HistoryWindow (roadmap 1.3a part 2) */
+"1 Hour" = "1 Stunde";
+"24 Hours" = "24 Stunden";
+"7 Days" = "7 Tage";
+"30 Days" = "30 Tage";
+"Period" = "Zeitraum";
+"Refresh" = "Aktualisieren";
+"Download" = "Download";
+"Upload" = "Upload";
+"Disk Read" = "Festplatte lesen";
+"Disk Write" = "Festplatte schreiben";
+"Go to Settings" = "Zu den Einstellungen";
+"Enable \"%@\" in Settings to record history." = "Aktiviere „%@“ in den Einstellungen, um den Verlauf aufzuzeichnen.";

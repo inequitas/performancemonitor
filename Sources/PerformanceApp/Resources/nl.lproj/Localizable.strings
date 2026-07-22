@@ -135,6 +135,7 @@
 
 /* MARK: - SettingsView: tabblad Geschiedenis */
 "Save history to disk" = "Geschiedenis opslaan op schijf";
+"Open History Window" = "Historievenster openen";
 "Export" = "Exporteren";
 "Export CSV…" = "CSV exporteren…";
 
@@ -367,3 +368,17 @@
 "Reset data usage statistics?" = "Datagebruikstatistieken resetten?";
 "Reset" = "Resetten";
 "This clears all recorded download and upload totals. This cannot be undone." = "Hiermee worden alle geregistreerde download- en uploadtotalen gewist. Dit kan niet ongedaan worden gemaakt.";
+
+/* MARK: - HistoryWindow (roadmap 1.3a part 2) */
+"1 Hour" = "1 uur";
+"24 Hours" = "24 uur";
+"7 Days" = "7 dagen";
+"30 Days" = "30 dagen";
+"Period" = "Periode";
+"Refresh" = "Vernieuwen";
+"Download" = "Download";
+"Upload" = "Upload";
+"Disk Read" = "Schijf lezen";
+"Disk Write" = "Schijf schrijven";
+"Go to Settings" = "Naar instellingen";
+"Enable \"%@\" in Settings to record history." = "Schakel \"%@\" in bij Instellingen om geschiedenis vast te leggen.";

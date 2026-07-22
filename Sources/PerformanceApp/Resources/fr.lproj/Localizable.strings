@@ -135,6 +135,7 @@
 
 /* MARK: - SettingsView : onglet Historique */
 "Save history to disk" = "Enregistrer l'historique sur le disque";
+"Open History Window" = "Ouvrir la fenêtre d'historique";
 "Export" = "Exporter";
 "Export CSV…" = "Exporter en CSV…";
 
@@ -367,3 +368,17 @@
 "Reset data usage statistics?" = "Réinitialiser les statistiques d'utilisation des données ?";
 "Reset" = "Réinitialiser";
 "This clears all recorded download and upload totals. This cannot be undone." = "Cela efface tous les totaux de téléchargement et d'envoi enregistrés. Cette action est irréversible.";
+
+/* MARK: - HistoryWindow (roadmap 1.3a part 2) */
+"1 Hour" = "1 heure";
+"24 Hours" = "24 heures";
+"7 Days" = "7 jours";
+"30 Days" = "30 jours";
+"Period" = "Période";
+"Refresh" = "Actualiser";
+"Download" = "Téléchargement";
+"Upload" = "Envoi";
+"Disk Read" = "Lecture disque";
+"Disk Write" = "Écriture disque";
+"Go to Settings" = "Aller aux Réglages";
+"Enable \"%@\" in Settings to record history." = "Activez « %@ » dans les Réglages pour enregistrer l'historique.";

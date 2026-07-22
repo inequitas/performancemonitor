@@ -930,12 +930,23 @@ private struct PanelMiniCard: View {
 private struct HistoryTab: View {
     let engine: MetricsEngine
     @ObservedObject var settings: SettingsStore
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         VStack(spacing: 16) {
             SettingsSection(icon: "clock.arrow.circlepath", title: String(localized: "History"), color: .purple) {
                 SettingsRow(label: String(localized: "Save history to disk")) {
                     Toggle("", isOn: $settings.persistHistoryEnabled).labelsHidden()
+                }
+                Divider().padding(.vertical, 4)
+                SettingsRow(label: String(localized: "History")) {
+                    Button(String(localized: "Open History Window")) {
+                        NSApp.setActivationPolicy(.regular)
+                        NSApp.activate(ignoringOtherApps: true)
+                        openWindow(id: "history")
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
                 }
                 if settings.persistHistoryEnabled {
                     Divider().padding(.vertical, 4)

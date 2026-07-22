@@ -135,6 +135,7 @@
 
 /* MARK: - SettingsView: pestaña Historial */
 "Save history to disk" = "Guardar historial en disco";
+"Open History Window" = "Abrir ventana de historial";
 "Export" = "Exportar";
 "Export CSV…" = "Exportar CSV…";
 
@@ -367,3 +368,17 @@
 "Reset data usage statistics?" = "¿Restablecer las estadísticas de uso de datos?";
 "Reset" = "Restablecer";
 "This clears all recorded download and upload totals. This cannot be undone." = "Esto borra todos los totales de descarga y subida registrados. Esta acción no se puede deshacer.";
+
+/* MARK: - HistoryWindow (roadmap 1.3a part 2) */
+"1 Hour" = "1 hora";
+"24 Hours" = "24 horas";
+"7 Days" = "7 días";
+"30 Days" = "30 días";
+"Period" = "Período";
+"Refresh" = "Actualizar";
+"Download" = "Descarga";
+"Upload" = "Subida";
+"Disk Read" = "Lectura de disco";
+"Disk Write" = "Escritura de disco";
+"Go to Settings" = "Ir a Ajustes";
+"Enable \"%@\" in Settings to record history." = "Activa \"%@\" en Ajustes para registrar el historial.";

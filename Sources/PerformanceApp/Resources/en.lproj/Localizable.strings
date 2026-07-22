@@ -135,6 +135,7 @@
 
 /* MARK: - SettingsView: History tab */
 "Save history to disk" = "Save history to disk";
+"Open History Window" = "Open History Window";
 "Export" = "Export";
 "Export CSV…" = "Export CSV…";
 
@@ -367,3 +368,17 @@
 "Reset data usage statistics?" = "Reset data usage statistics?";
 "Reset" = "Reset";
 "This clears all recorded download and upload totals. This cannot be undone." = "This clears all recorded download and upload totals. This cannot be undone.";
+
+/* MARK: - HistoryWindow (roadmap 1.3a part 2) */
+"1 Hour" = "1 Hour";
+"24 Hours" = "24 Hours";
+"7 Days" = "7 Days";
+"30 Days" = "30 Days";
+"Period" = "Period";
+"Refresh" = "Refresh";
+"Download" = "Download";
+"Upload" = "Upload";
+"Disk Read" = "Disk Read";
+"Disk Write" = "Disk Write";
+"Go to Settings" = "Go to Settings";
+"Enable \"%@\" in Settings to record history." = "Enable \"%@\" in Settings to record history.";
