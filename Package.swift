@@ -24,7 +24,8 @@ let package = Package(
             linkerSettings: [
                 .linkedFramework("IOBluetooth"),
                 .linkedFramework("CoreWLAN"),
-                .linkedFramework("IOKit")
+                .linkedFramework("IOKit"),
+                .linkedLibrary("sqlite3")
             ]
         ),
         .testTarget(

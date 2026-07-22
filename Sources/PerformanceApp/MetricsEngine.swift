@@ -121,6 +121,12 @@ final class MetricsEngine: ObservableObject {
     let history = HistoryStore()
     /// On-disk daily network data-usage persistence (roadmap 1.2b).
     let dataUsage = DataUsageStore()
+    /// Tiered SQLite history store (roadmap 1.3a, part 1 — recording only;
+    /// the history-window UI that reads it lands separately). Lives
+    /// alongside `history`; both are gated by the same
+    /// `persistHistoryEnabled` preference.
+    let historyDB = HistoryDatabase()
+    private var historyCompactionTask: Task<Void, Never>?
 
     // MARK: - Per-domain samplers
     //
@@ -408,6 +414,20 @@ final class MetricsEngine: ObservableObject {
         refresh()
         restartTimer()
         extraBarController = ExtraMenuBarController(engine: self, settings: settings)
+        startHistoryCompactionLoop()
+    }
+
+    /// Runs `HistoryDatabase.compact()` about once a minute for the lifetime
+    /// of the app. The `Task.detached` body hops onto `historyDB`'s own
+    /// actor for the actual work, so compaction never runs on the main
+    /// thread even though the loop is kicked off from here.
+    private func startHistoryCompactionLoop() {
+        historyCompactionTask = Task.detached(priority: .utility) { [historyDB] in
+            while !Task.isCancelled {
+                await historyDB.compact()
+                try? await Task.sleep(nanoseconds: 60_000_000_000)
+            }
+        }
     }
 
     private func startPingTimer() {
@@ -523,6 +543,7 @@ final class MetricsEngine: ObservableObject {
                        download: downloadSpeedKBps,
                        upload: uploadSpeedKBps,
                        diskFree: diskFreeGB)
+        recordHistorySample()
 
         if settings.publicIPEnabled, lastPublicIPFetch.map({ Date().timeIntervalSince($0) > 300 }) ?? true {
             fetchPublicIP()
@@ -633,6 +654,28 @@ final class MetricsEngine: ObservableObject {
     private func checkAlerts() {
         alerts.check(cpu: cpuUsagePercent, memUsed: memoryUsedGB, memTotal: memoryTotalGB,
                      diskFree: diskFreeGB, gpu: gpuUsagePercent, thermal: thermalState)
+    }
+
+    // MARK: - Tiered SQLite history (roadmap 1.3a)
+
+    /// Feeds the current tick's readings into `historyDB`, gated by the same
+    /// `persistHistoryEnabled` preference as the CSV store. `HistoryDatabase`
+    /// itself throttles to ~1 sample/second internally, so calling this every
+    /// tick is safe even at a faster refresh interval.
+    private func recordHistorySample() {
+        guard settings.persistHistoryEnabled else { return }
+        let memoryUsedPercent = memoryTotalGB > 0 ? (memoryUsedGB / memoryTotalGB) * 100 : 0
+        let values: [HistoryMetric: Double] = [
+            .cpuUsagePercent: cpuUsagePercent,
+            .memoryUsedPercent: memoryUsedPercent,
+            .gpuUsagePercent: gpuUsagePercent,
+            .downloadSpeedKBps: downloadSpeedKBps,
+            .uploadSpeedKBps: uploadSpeedKBps,
+            .diskReadKBps: diskReadKBps,
+            .diskWriteKBps: diskWriteKBps,
+        ]
+        let now = Date()
+        Task { [historyDB] in await historyDB.record(values, at: now) }
     }
 
     // MARK: - History export
