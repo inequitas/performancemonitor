@@ -119,6 +119,8 @@ final class MetricsEngine: ObservableObject {
     let settings = SettingsStore()
     /// On-disk history CSV persistence + export.
     let history = HistoryStore()
+    /// On-disk daily network data-usage persistence (roadmap 1.2b).
+    let dataUsage = DataUsageStore()
 
     // MARK: - Per-domain samplers
     //
@@ -564,6 +566,7 @@ final class MetricsEngine: ObservableObject {
         vpnIsFortiClient = s.vpnIsFortiClient
         appendCapped(downloadSpeedKBps, to: &downloadHistory)
         appendCapped(uploadSpeedKBps, to: &uploadHistory)
+        dataUsage.record(physicalBytesReceived: s.physicalBytesReceived, physicalBytesSent: s.physicalBytesSent)
     }
 
     // MARK: - Disk

@@ -355,3 +355,15 @@
 "Power" = "Puissance";
 "System Power" = "Puissance système";
 "Total system power draw, read from the System Management Controller (SMC).\n\nCovers the whole machine — CPU, GPU, display, and everything else on the same power rail — not just one component." = "Consommation électrique totale du système, lue depuis le System Management Controller (SMC).\n\nCouvre l'ensemble de la machine — CPU, GPU, écran et tout le reste sur le même rail d'alimentation — pas un seul composant.";
+
+/* MARK: - NetworkDetailView data usage (roadmap 1.2b) */
+"Data Usage" = "Utilisation des données";
+"Tracks bytes transferred over physical Wi-Fi/Ethernet interfaces only — VPN and other virtual interfaces are excluded so their tunneled traffic isn't counted twice.\n\nMeasurement starts the moment this feature first ran on this Mac; there is no data from before that." = "Ne comptabilise que les octets transférés via les interfaces Wi-Fi/Ethernet physiques — le VPN et les autres interfaces virtuelles sont exclus afin de ne pas compter deux fois le trafic tunnelisé.\n\nLa mesure commence dès que cette fonctionnalité s'est exécutée pour la première fois sur ce Mac ; aucune donnée n'est disponible avant cela.";
+"Reset Statistics" = "Réinitialiser les statistiques";
+"Today" = "Aujourd'hui";
+"This Week" = "Cette semaine";
+"This Month" = "Ce mois-ci";
+"Tracking since %@" = "Suivi depuis le %@";
+"Reset data usage statistics?" = "Réinitialiser les statistiques d'utilisation des données ?";
+"Reset" = "Réinitialiser";
+"This clears all recorded download and upload totals. This cannot be undone." = "Cela efface tous les totaux de téléchargement et d'envoi enregistrés. Cette action est irréversible.";

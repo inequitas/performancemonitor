@@ -354,3 +354,15 @@
 "Power" = "功耗";
 "System Power" = "系统功耗";
 "Total system power draw, read from the System Management Controller (SMC).\n\nCovers the whole machine — CPU, GPU, display, and everything else on the same power rail — not just one component." = "整机系统总功耗，读取自系统管理控制器（SMC）。\n\n涵盖整台设备——CPU、GPU、显示屏以及同一供电线路上的其他一切部件，而不仅仅是单个组件。";
+
+/* MARK: - NetworkDetailView data usage (roadmap 1.2b) */
+"Data Usage" = "数据用量";
+"Tracks bytes transferred over physical Wi-Fi/Ethernet interfaces only — VPN and other virtual interfaces are excluded so their tunneled traffic isn't counted twice.\n\nMeasurement starts the moment this feature first ran on this Mac; there is no data from before that." = "仅统计通过物理 Wi-Fi/以太网接口传输的字节数——VPN 及其他虚拟接口会被排除，以避免隧道流量被重复计算。\n\n统计从此功能在本 Mac 上首次运行时开始；此前没有数据。";
+"Reset Statistics" = "重置统计";
+"Today" = "今天";
+"This Week" = "本周";
+"This Month" = "本月";
+"Tracking since %@" = "自 %@ 起统计";
+"Reset data usage statistics?" = "重置数据用量统计？";
+"Reset" = "重置";
+"This clears all recorded download and upload totals. This cannot be undone." = "这将清除所有已记录的下载和上传总量。此操作无法撤销。";

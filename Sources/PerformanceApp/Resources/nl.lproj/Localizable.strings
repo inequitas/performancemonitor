@@ -355,3 +355,15 @@
 "Power" = "Vermogen";
 "System Power" = "Systeemvermogen";
 "Total system power draw, read from the System Management Controller (SMC).\n\nCovers the whole machine — CPU, GPU, display, and everything else on the same power rail — not just one component." = "Totaal stroomverbruik van het systeem, gelezen uit de System Management Controller (SMC).\n\nOmvat de hele machine — CPU, GPU, beeldscherm en al het andere op dezelfde voedingslijn — niet slechts één onderdeel.";
+
+/* MARK: - NetworkDetailView data usage (roadmap 1.2b) */
+"Data Usage" = "Datagebruik";
+"Tracks bytes transferred over physical Wi-Fi/Ethernet interfaces only — VPN and other virtual interfaces are excluded so their tunneled traffic isn't counted twice.\n\nMeasurement starts the moment this feature first ran on this Mac; there is no data from before that." = "Houdt alleen het aantal bytes bij dat via fysieke Wi-Fi/Ethernet-interfaces is verstuurd — VPN en andere virtuele interfaces worden uitgesloten, zodat getunneld verkeer niet dubbel wordt geteld.\n\nDe meting begint op het moment dat deze functie voor het eerst actief werd op deze Mac; data van daarvoor is niet beschikbaar.";
+"Reset Statistics" = "Statistieken resetten";
+"Today" = "Vandaag";
+"This Week" = "Deze week";
+"This Month" = "Deze maand";
+"Tracking since %@" = "Bijgehouden sinds %@";
+"Reset data usage statistics?" = "Datagebruikstatistieken resetten?";
+"Reset" = "Resetten";
+"This clears all recorded download and upload totals. This cannot be undone." = "Hiermee worden alle geregistreerde download- en uploadtotalen gewist. Dit kan niet ongedaan worden gemaakt.";

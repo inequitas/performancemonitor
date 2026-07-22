@@ -63,7 +63,14 @@ struct NetworkButterflyChart: View {
 
 struct NetworkDetailView: View {
     @ObservedObject var engine: MetricsEngine
+    @ObservedObject private var dataUsage: DataUsageStore
     @State private var expandedInterfaces: Set<String> = []
+    @State private var showResetUsageConfirm = false
+
+    init(engine: MetricsEngine) {
+        self.engine = engine
+        self.dataUsage = engine.dataUsage
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -155,7 +162,59 @@ struct NetworkDetailView: View {
                     }
                 }
             }
+            SectionCard {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Label(String(localized: "Data Usage"), systemImage: "chart.bar.doc.horizontal")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(MetricTheme.networkDown)
+                        Spacer()
+                        InfoButton(text: String(localized: "Tracks bytes transferred over physical Wi-Fi/Ethernet interfaces only — VPN and other virtual interfaces are excluded so their tunneled traffic isn't counted twice.\n\nMeasurement starts the moment this feature first ran on this Mac; there is no data from before that."))
+                        Button {
+                            showResetUsageConfirm = true
+                        } label: {
+                            Text(String(localized: "Reset Statistics")).font(.caption)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.secondary)
+                    }
+                    dataUsageRow(String(localized: "Today"), totals: DataUsageAggregation.today(dataUsage.dailyUsage, now: Date()))
+                    dataUsageRow(String(localized: "This Week"), totals: DataUsageAggregation.thisWeek(dataUsage.dailyUsage, now: Date()))
+                    dataUsageRow(String(localized: "This Month"), totals: DataUsageAggregation.thisMonth(dataUsage.dailyUsage, now: Date()))
+                    if let start = dataUsage.trackingStartDate {
+                        Text(String(format: String(localized: "Tracking since %@"), start.formatted(date: .abbreviated, time: .omitted)))
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                    }
+                }
+            }
+            .confirmationDialog(String(localized: "Reset data usage statistics?"),
+                                 isPresented: $showResetUsageConfirm,
+                                 titleVisibility: .visible) {
+                Button(String(localized: "Reset"), role: .destructive) { dataUsage.reset() }
+                Button(String(localized: "Cancel"), role: .cancel) {}
+            } message: {
+                Text(String(localized: "This clears all recorded download and upload totals. This cannot be undone."))
+            }
+
             Spacer()
+        }
+    }
+
+    @ViewBuilder
+    private func dataUsageRow(_ label: String, totals: DataUsageTotals) -> some View {
+        HStack {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(width: 76, alignment: .leading)
+            Spacer()
+            Label(NetworkFormatting.formatDataUsage(bytes: totals.downloadBytes), systemImage: "arrow.down")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(MetricTheme.networkDown)
+            Label(NetworkFormatting.formatDataUsage(bytes: totals.uploadBytes), systemImage: "arrow.up")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(MetricTheme.networkUp)
         }
     }
 
