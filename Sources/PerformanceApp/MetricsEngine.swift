@@ -68,7 +68,11 @@ final class MetricsEngine: ObservableObject {
     @Published var wifiRSSI: Int? = nil      // dBm, nil when not on WiFi
 
     @Published var publicIP: String?
-    private var lastPublicIPFetch: Date?
+    private var lastPublicIPFetchSuccess: Date?
+    private var lastPublicIPFetchFailure: Date?
+    private var publicIPFetchInFlight = false
+    private var lastPathSignature: String?
+    private var networkChangeDebounceTask: Task<Void, Never>?
     private var pathMonitor: NWPathMonitor?
     private var wifiMonitor: NWPathMonitor?
     private var ethernetMonitor: NWPathMonitor?
@@ -464,6 +468,11 @@ final class MetricsEngine: ObservableObject {
     private func startPathMonitor() {
         let monitor = NWPathMonitor()
         monitor.pathUpdateHandler = { [weak self] path in
+            // NWPathMonitor callbacks fire on `queue` below, not the main
+            // thread — the signature comparison happens here (off-main) so
+            // it captures every transient change, then the actual engine
+            // updates hop to @MainActor.
+            let signature = "\(path.status)|\(path.availableInterfaces.map(\.type).map(String.init(describing:)).sorted())"
             Task { @MainActor in
                 guard let self else { return }
                 self.isConnected = path.status == .satisfied
@@ -471,6 +480,24 @@ final class MetricsEngine: ObservableObject {
                     : path.usesInterfaceType(.wiredEthernet) ? "Ethernet"
                     : path.usesInterfaceType(.cellular) ? "Cellular"
                     : path.status == .satisfied ? "Other" : "Offline"
+
+                let changed = self.lastPathSignature != nil && self.lastPathSignature != signature
+                self.lastPathSignature = signature
+                if changed, self.settings.publicIPEnabled {
+                    // The old public IP belongs to the previous network path
+                    // and is no longer trustworthy — clear it immediately.
+                    // The actual fetch is debounced so a burst of transient
+                    // updates during a handoff (Wi-Fi -> hotspot etc.)
+                    // coalesces into a single request instead of one per
+                    // intermediate path state.
+                    self.publicIP = nil
+                    self.networkChangeDebounceTask?.cancel()
+                    self.networkChangeDebounceTask = Task { @MainActor [weak self] in
+                        try? await Task.sleep(nanoseconds: 800_000_000)
+                        guard !Task.isCancelled else { return }
+                        self?.fetchPublicIP(networkChanged: true)
+                    }
+                }
             }
         }
         monitor.start(queue: DispatchQueue(label: "NetworkPathMonitor"))
@@ -545,7 +572,12 @@ final class MetricsEngine: ObservableObject {
                        diskFree: diskFreeGB)
         recordHistorySample()
 
-        if settings.publicIPEnabled, lastPublicIPFetch.map({ Date().timeIntervalSince($0) > 300 }) ?? true {
+        if settings.publicIPEnabled,
+           PublicIPFetch.shouldFetch(lastSuccess: lastPublicIPFetchSuccess,
+                                      lastFailure: lastPublicIPFetchFailure,
+                                      now: Date(),
+                                      networkChanged: false,
+                                      inFlight: publicIPFetchInFlight) {
             fetchPublicIP()
         }
     }
@@ -725,13 +757,30 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - Public IP (opt-in, calls a third-party service)
 
-    private func fetchPublicIP() {
-        lastPublicIPFetch = Date()
+    /// - Parameter networkChanged: pass `true` when this fetch was triggered
+    ///   by a detected network-path change, so the caller's own throttle
+    ///   check can be skipped here too — the guard below still prevents a
+    ///   second concurrent request via `publicIPFetchInFlight`.
+    private func fetchPublicIP(networkChanged: Bool = false) {
+        guard !publicIPFetchInFlight else { return }
         guard let url = URL(string: "https://api.ipify.org?format=text") else { return }
-        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
-            guard let data, let ip = String(data: data, encoding: .utf8) else { return }
+        publicIPFetchInFlight = true
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             Task { @MainActor in
-                self?.publicIP = ip.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard let self else { return }
+                self.publicIPFetchInFlight = false
+
+                let httpStatus = (response as? HTTPURLResponse)?.statusCode
+                guard error == nil, httpStatus == 200,
+                      let data, let raw = String(data: data, encoding: .utf8),
+                      PublicIPFetch.isPlausibleIPAddress(raw)
+                else {
+                    self.lastPublicIPFetchFailure = Date()
+                    return
+                }
+                self.lastPublicIPFetchSuccess = Date()
+                self.lastPublicIPFetchFailure = nil
+                self.publicIP = raw.trimmingCharacters(in: .whitespacesAndNewlines)
             }
         }.resume()
     }
