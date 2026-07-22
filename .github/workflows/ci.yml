@@ -5,6 +5,12 @@ on:
     branches: [main, beta]
   pull_request:
 
+# Least-privilege GITHUB_TOKEN: this workflow only builds and tests, it never
+# writes to the repo. Explicit read-only scope silences the CodeQL
+# "missing-workflow-permissions" alert.
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
