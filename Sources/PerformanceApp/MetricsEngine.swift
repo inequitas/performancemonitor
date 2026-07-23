@@ -449,6 +449,9 @@ final class MetricsEngine: ObservableObject {
         pingTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.performLatencyCheck() }
         }
+        // Let macOS coalesce this wakeup with others (latency needn't be
+        // sampled on an exact 5s beat) — saves energy, especially on battery.
+        pingTimer?.tolerance = 1
     }
 
     private func performLatencyCheck() {
@@ -545,6 +548,10 @@ final class MetricsEngine: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: settings.refreshInterval, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.refresh() }
         }
+        // A ~15% tolerance lets the OS coalesce the refresh wakeup with other
+        // timers instead of forcing a precise wakeup each interval. The
+        // displayed cadence is unchanged; only the exact firing instant drifts.
+        timer?.tolerance = settings.refreshInterval * 0.15
     }
 
     // MARK: - Refresh coordinator
