@@ -77,6 +77,8 @@ final class SMCReader: @unchecked Sendable {
     let isOpen: Bool
     private var cpuTempKeys: [String]? = nil
     private var gpuTempKeys: [String]? = nil
+    private var cpuCatalogKeys: [String]? = nil
+    private var gpuCatalogKeys: [String]? = nil
     private var prevCpuReadings: [String: Double] = [:]
     private var prevGpuReadings: [String: Double] = [:]
 
@@ -168,6 +170,48 @@ final class SMCReader: @unchecked Sendable {
                   let mx  = readRPM("F\(i)Mx") else { return nil }
             return FanInfo(id: i, label: labels[i], actual: act, min: mn, max: mx)
         }
+    }
+
+    // Discovers (once) which curated CPU/GPU catalog sensors actually exist on
+    // this chip, by enumerating every SMC key a single time. Cached thereafter,
+    // so the per-tick minimal read never re-enumerates.
+    private func discoverCatalogKeys() {
+        var cpu: [String] = []
+        var gpu: [String] = []
+        guard let countVal = readDouble("#KEY") else {
+            cpuCatalogKeys = []; gpuCatalogKeys = []; return
+        }
+        let count = Int(countVal)
+        for i in 0..<count {
+            var input  = SMCKeyData_t()
+            var output = SMCKeyData_t()
+            input.data8  = SMCCmd.readIndex.rawValue
+            input.data32 = UInt32(i)
+            guard callRaw(&input, &output) == kSMCSuccess else { continue }
+            let k = fourCC(output.key)
+            guard k.hasPrefix("T"), k.count == 4 else { continue }
+            if let (_, category) = SMCSensorCatalog.categorize(key: k) {
+                if category == "CPU" { cpu.append(k) }
+                else if category == "GPU" { gpu.append(k) }
+            }
+        }
+        cpuCatalogKeys = cpu
+        gpuCatalogKeys = gpu
+    }
+
+    /// Cheap CPU/GPU averages for the menu bar and popover. Reads only the known
+    /// CPU/GPU catalog sensors present on this machine (discovered once), instead
+    /// of enumerating and reading *every* SMC key like `readAllTemperatures()`.
+    /// Produces the same averages the full path derives from its categorized set.
+    func averageCPUGPUTemperatures() -> (cpu: Double?, gpu: Double?) {
+        if cpuCatalogKeys == nil || gpuCatalogKeys == nil { discoverCatalogKeys() }
+        let cpuKeys = cpuCatalogKeys ?? []
+        let gpuKeys = gpuCatalogKeys ?? []
+        // Fall back to prefix-based readers if the catalog matched nothing (e.g.
+        // a chip whose keys aren't yet curated) so the popover never goes blank.
+        let cpu = cpuKeys.isEmpty ? cpuTemperature() : averageTemp(keys: cpuKeys, prev: &prevCpuReadings)
+        let gpu = gpuKeys.isEmpty ? gpuTemperature() : averageTemp(keys: gpuKeys, prev: &prevGpuReadings)
+        return (cpu, gpu)
     }
 
     // Returns all readable temperature sensors as (key, celsius) pairs, sorted by key.

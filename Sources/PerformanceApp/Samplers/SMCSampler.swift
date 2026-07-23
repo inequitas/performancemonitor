@@ -12,10 +12,20 @@ struct SMCSnapshot {
 }
 
 protocol SMCSampling: AnyObject {
-    /// Reads all SMC temperatures/fans off the main thread, throttled to once
-    /// every 2s. Returns `nil` when SMC is unavailable or the throttle blocks
-    /// this call — the engine then leaves thermal state unchanged.
-    func sample() async -> SMCSnapshot?
+    /// Reads SMC temperatures off the main thread, throttled to once every 2s.
+    /// Returns `nil` when SMC is unavailable or the throttle blocks this call —
+    /// the engine then leaves thermal state unchanged.
+    ///
+    /// When `extended` is false (menu bar / popover only), reads just the CPU
+    /// and GPU averages — the only per-sensor values observed outside the
+    /// Thermal detail window — and leaves the fan/extended/power fields empty.
+    /// When `extended` is true (Thermal window visible), reads the full sensor
+    /// set, fans, and system power.
+    func sample(extended: Bool) async -> SMCSnapshot?
+
+    /// Clears the 2s throttle so the next `sample` reads immediately. Used when
+    /// the Thermal window opens, so it shows the full sensor set at once.
+    func resetThrottle()
 }
 
 /// Owns the `SMCReader` handle and the 2s read throttle. `SMCReader` is
@@ -26,12 +36,30 @@ final class SMCSampler: SMCSampling {
     private let smc = SMCReader()
     private var cacheDate: Date = .distantPast
 
-    func sample() async -> SMCSnapshot? {
+    func resetThrottle() { cacheDate = .distantPast }
+
+    func sample(extended: Bool) async -> SMCSnapshot? {
         guard smc.isOpen else { return nil }
         let now = Date()
         guard now.timeIntervalSince(cacheDate) > 2 else { return nil }
         cacheDate = now
         let reader = smc  // capture before leaving @MainActor; SMCReader is @unchecked Sendable
+
+        // Minimal path: menu bar and popover only need the CPU/GPU averages.
+        // This skips enumerating and reading every SMC key — the dominant idle
+        // cost — and only the Thermal window pays for the full set below.
+        guard extended else {
+            return await Task.detached(priority: .utility) { () -> SMCSnapshot in
+                let (cpuT, gpuT) = reader.averageCPUGPUTemperatures()
+                return SMCSnapshot(cpuTemperatureC: cpuT,
+                                   gpuTemperatureC: gpuT,
+                                   fans: [],
+                                   extendedTemperatures: [],
+                                   unknownSMCTemperatures: [],
+                                   systemPowerWatts: nil)
+            }.value
+        }
+
         return await Task.detached(priority: .utility) { () -> SMCSnapshot in
             let cpuT     = reader.cpuTemperature()
             let gpuT     = reader.gpuTemperature()

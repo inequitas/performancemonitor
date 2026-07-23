@@ -287,6 +287,14 @@ final class MetricsEngine: ObservableObject {
                 // fresh instead of averaging over the whole invisible span.
                 networkProcessSampler.invalidateBaseline()
             }
+        case .thermal:
+            // Only the Thermal window needs the full per-sensor set. Force an
+            // immediate full read on open so it never shows a blank/stale grid
+            // while waiting for the next tick.
+            if visible {
+                smcSampler.resetThrottle()
+                updateSMC(forceExtended: true)
+            }
         default:
             break
         }
@@ -835,11 +843,19 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - SMC (temperatures + fans)
 
-    private func updateSMC() {
+    // The full per-sensor set (fans, extended/unknown temperatures, system
+    // power) is only displayed by the Thermal detail window. When it isn't
+    // visible we sample just the CPU/GPU averages the popover needs, and leave
+    // the extended fields untouched — no wasted SMC reads and no @Published
+    // churn on arrays nobody is observing. `forceExtended` covers the instant
+    // the Thermal window opens, before the next scheduled tick.
+    private func updateSMC(forceExtended: Bool = false) {
+        let extended = forceExtended || visiblePanels.contains(.thermal)
         Task { @MainActor [weak self] in
-            guard let self, let s = await self.smcSampler.sample() else { return }
+            guard let self, let s = await self.smcSampler.sample(extended: extended) else { return }
             self.cpuTemperatureC        = s.cpuTemperatureC
             self.gpuTemperatureC        = s.gpuTemperatureC
+            guard extended else { return }
             self.fans                   = s.fans
             self.extendedTemperatures   = s.extendedTemperatures
             self.unknownSMCTemperatures = s.unknownSMCTemperatures
