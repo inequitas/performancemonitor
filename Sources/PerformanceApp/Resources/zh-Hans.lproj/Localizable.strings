@@ -385,3 +385,18 @@
 
 /* MARK: - HistoryWindow weekly summary (roadmap 1.3b) */
 "%@ — avg %@, peak %@ (%@)" = "%@ — 平均 %@，峰值 %@（%@）";
+
+/* MARK: - About tab */
+"About" = "关于";
+"Links" = "链接";
+"Website" = "网站";
+"GitHub (Source Code)" = "GitHub（源代码）";
+"Report a Problem" = "反馈问题";
+"Support" = "支持";
+"Sponsor on GitHub" = "在 GitHub 上赞助";
+"Buy Me a Coffee (Ko-fi)" = "请我喝咖啡（Ko-fi）";
+"Version %@" = "版本 %@";
+"Beta" = "Beta";
+"Performance Monitor" = "Performance Monitor";
+"A lightweight, open-source system monitor for your Mac's menu bar." = "一款轻量级的开源系统监控工具，显示在 Mac 菜单栏中。";
+"MIT Licensed" = "MIT 许可";

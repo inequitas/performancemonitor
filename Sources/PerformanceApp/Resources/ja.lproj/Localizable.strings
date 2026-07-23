@@ -386,3 +386,18 @@
 
 /* MARK: - HistoryWindow weekly summary (roadmap 1.3b) */
 "%@ — avg %@, peak %@ (%@)" = "%@ — 平均 %@、ピーク %@（%@）";
+
+/* MARK: - About tab */
+"About" = "情報";
+"Links" = "リンク";
+"Website" = "ウェブサイト";
+"GitHub (Source Code)" = "GitHub（ソースコード）";
+"Report a Problem" = "問題を報告";
+"Support" = "サポート";
+"Sponsor on GitHub" = "GitHubでスポンサーになる";
+"Buy Me a Coffee (Ko-fi)" = "コーヒーをおごる（Ko-fi）";
+"Version %@" = "バージョン %@";
+"Beta" = "ベータ";
+"Performance Monitor" = "Performance Monitor";
+"A lightweight, open-source system monitor for your Mac's menu bar." = "Macのメニューバー用の軽量なオープンソースシステムモニターです。";
+"MIT Licensed" = "MITライセンス";

@@ -34,8 +34,11 @@ struct SettingsView: View {
 
             UpdatesTab(updater: updater, settings: engine.settings)
                 .tabItem { Label(String(localized: "Updates"), systemImage: "arrow.down.circle.fill") }
+
+            AboutTab(updater: updater)
+                .tabItem { Label(String(localized: "About"), systemImage: "info.circle.fill") }
         }
-        .frame(width: 500)
+        .frame(width: 560)
         .background(.regularMaterial)
         .modifier(SettingsWindowModifier(settings: engine.settings))
         .transaction { $0.animation = nil }
@@ -193,32 +196,12 @@ private struct GeneralTab: View {
                     }
                 }
             }
-
-            supportBlock
         }
         .padding(16)
         .transaction { $0.animation = nil }
         .onAppear {
             if initialAppLanguage == nil { initialAppLanguage = settings.appLanguage }
         }
-    }
-
-    /// Small, deliberately unobtrusive donation link — no banner, no popup.
-    /// Ko-fi is the current outlet; a GitHub Sponsors link may be added
-    /// alongside or in place of this once that application has been approved.
-    private var supportBlock: some View {
-        VStack(spacing: 2) {
-            Button(String(localized: "Support this project ♥")) {
-                NSWorkspace.shared.open(URL(string: "https://ko-fi.com/inequitas")!)
-            }
-            .buttonStyle(.link)
-            .font(.caption2)
-            Text(String(localized: "Performance Monitor is free and always will be."))
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.top, 2)
     }
 
     /// Relaunches the app so a language change (which macOS only picks up
@@ -671,6 +654,98 @@ private struct UpdatesTab: View {
             .pickerStyle(.menu)
             .frame(maxWidth: 100)
         }
+    }
+}
+
+// MARK: - About tab
+
+private struct AboutTab: View {
+    @ObservedObject var updater: UpdateChecker
+
+    var body: some View {
+        VStack(spacing: 16) {
+            header
+
+            SettingsSection(icon: "link", title: String(localized: "Links"), color: .blue) {
+                linkRow(String(localized: "Website"), systemImage: "globe",
+                        url: "https://perfmon.knhome.nl")
+                Divider().padding(.vertical, 4)
+                linkRow(String(localized: "GitHub (Source Code)"), systemImage: "chevron.left.forwardslash.chevron.right",
+                        url: "https://github.com/inequitas/performancemonitor")
+                Divider().padding(.vertical, 4)
+                linkRow(String(localized: "Report a Problem"), systemImage: "exclamationmark.bubble",
+                        url: "https://github.com/inequitas/performancemonitor/issues")
+            }
+
+            SettingsSection(icon: "heart.fill", title: String(localized: "Support"), color: .pink) {
+                linkRow(String(localized: "Sponsor on GitHub"), systemImage: "heart",
+                        url: "https://github.com/sponsors/inequitas")
+                Divider().padding(.vertical, 4)
+                linkRow(String(localized: "Buy Me a Coffee (Ko-fi)"), systemImage: "cup.and.saucer",
+                        url: "https://ko-fi.com/inequitas")
+                Text(String(localized: "Performance Monitor is free and always will be."))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 4)
+            }
+
+            footer
+        }
+        .padding(16)
+        .transaction { $0.animation = nil }
+    }
+
+    private var header: some View {
+        VStack(spacing: 6) {
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable()
+                .frame(width: 64, height: 64)
+            Text(String(localized: "Performance Monitor"))
+                .font(.title3.weight(.semibold))
+            HStack(spacing: 6) {
+                Text(String(format: String(localized: "Version %@"), updater.currentVersion))
+                    .font(.callout.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                if updater.isBetaChannel {
+                    Text(String(localized: "Beta"))
+                        .font(.caption2.weight(.semibold))
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(.orange.opacity(0.15), in: Capsule())
+                        .foregroundStyle(.orange)
+                }
+            }
+            Text(String(localized: "A lightweight, open-source system monitor for your Mac's menu bar."))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 24)
+                .padding(.top, 2)
+        }
+    }
+
+    private func linkRow(_ label: String, systemImage: String, url: String) -> some View {
+        SettingsRow(label: "") {
+            Button {
+                NSWorkspace.shared.open(URL(string: url)!)
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: systemImage)
+                    Text(label)
+                }
+            }
+            .buttonStyle(.link)
+            .font(.callout)
+        }
+    }
+
+    private var footer: some View {
+        Button(String(localized: "MIT Licensed")) {
+            NSWorkspace.shared.open(URL(string: "https://github.com/inequitas/performancemonitor/blob/main/LICENSE")!)
+        }
+        .buttonStyle(.link)
+        .font(.caption2)
+        .foregroundStyle(.secondary)
     }
 }
 

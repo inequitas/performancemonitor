@@ -386,3 +386,18 @@
 
 /* MARK: - HistoryWindow weekly summary (roadmap 1.3b) */
 "%@ — avg %@, peak %@ (%@)" = "%@ — Ø %@, Spitze %@ (%@)";
+
+/* MARK: - About tab */
+"About" = "Über";
+"Links" = "Links";
+"Website" = "Website";
+"GitHub (Source Code)" = "GitHub (Quellcode)";
+"Report a Problem" = "Problem melden";
+"Support" = "Unterstützung";
+"Sponsor on GitHub" = "Auf GitHub sponsern";
+"Buy Me a Coffee (Ko-fi)" = "Kaffee spendieren (Ko-fi)";
+"Version %@" = "Version %@";
+"Beta" = "Beta";
+"Performance Monitor" = "Performance Monitor";
+"A lightweight, open-source system monitor for your Mac's menu bar." = "Ein schlanker Open-Source-Systemmonitor für die Menüleiste deines Mac.";
+"MIT Licensed" = "MIT-lizenziert";
