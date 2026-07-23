@@ -1,10 +1,25 @@
 import SwiftUI
 import AppKit
 
+/// Owns the long-lived engine and updater without making the App's scene body
+/// observe them. `MetricsEngine` publishes ~80 @Published values every second;
+/// if the App held it as `@StateObject`, SwiftUI would re-evaluate the entire
+/// scene graph (`ViewGraphRootValueUpdater` / `AppBodyAccessor.updateBody`) on
+/// every tick, even with every window closed — a measurable idle cost. This
+/// container has no @Published of its own, so its `objectWillChange` never
+/// fires and the scene body is evaluated once. Open windows still observe the
+/// engine directly through their own `@ObservedObject`.
+@MainActor
+final class AppContainer: ObservableObject {
+    let engine = MetricsEngine()
+    let updater = UpdateChecker()
+}
+
 @main
 struct PerformanceApp: App {
-    @StateObject private var engine  = MetricsEngine()
-    @StateObject private var updater = UpdateChecker()
+    @StateObject private var container = AppContainer()
+    private var engine: MetricsEngine { container.engine }
+    private var updater: UpdateChecker { container.updater }
 
     // Invisible 1×1 anchor — keeps the app alive as a menu bar app.
     // All visible icons are managed by ExtraMenuBarController via NSStatusBar.
