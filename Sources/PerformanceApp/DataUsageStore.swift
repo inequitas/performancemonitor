@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import PerformanceAppCore
 
@@ -38,8 +39,22 @@ final class DataUsageStore: ObservableObject {
     private var previousCumulative: (down: UInt64, up: UInt64)?
     private let calendar = Calendar.current
 
+    /// Disk-write throttle. The in-memory `dailyUsage` is always current (and
+    /// drives the live UI); the CSV is a tiny durability backstop that only
+    /// needs to survive a quit or crash. Rewriting it every network tick meant
+    /// an atomic file write every second at idle — pure wasted I/O. Instead we
+    /// coalesce writes to at most once per minute and flush on clean quit.
+    private var lastDiskWrite: Date = .distantPast
+    private var pendingWrite = false
+    private let minWriteInterval: TimeInterval = 60
+
     init() {
         load()
+        NotificationCenter.default.addObserver(
+            forName: NSApplication.willTerminateNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.flushIfPending() }
+        }
     }
 
     /// Feeds one sample's cumulative physical-interface byte counters into
@@ -61,7 +76,27 @@ final class DataUsageStore: ObservableObject {
         } else {
             dailyUsage.append(DailyDataUsage(day: day, downloadBytes: deltaDown, uploadBytes: deltaUp))
         }
+        scheduleSave(now: now)
+    }
+
+    /// Persists at most once per `minWriteInterval`; between writes the newest
+    /// totals live in memory (and drive the UI) and are marked pending so a
+    /// later tick or the terminate flush commits them.
+    private func scheduleSave(now: Date) {
+        if now.timeIntervalSince(lastDiskWrite) >= minWriteInterval {
+            save()
+            lastDiskWrite = now
+            pendingWrite = false
+        } else {
+            pendingWrite = true
+        }
+    }
+
+    private func flushIfPending() {
+        guard pendingWrite else { return }
         save()
+        lastDiskWrite = Date()
+        pendingWrite = false
     }
 
     /// Clears all recorded history and removes the on-disk file. The next
@@ -70,6 +105,8 @@ final class DataUsageStore: ObservableObject {
     func reset() {
         dailyUsage = []
         previousCumulative = nil
+        pendingWrite = false
+        lastDiskWrite = .distantPast
         try? FileManager.default.removeItem(at: fileURL)
     }
 
