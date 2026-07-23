@@ -3,6 +3,22 @@ import AppKit
 import Charts
 import PerformanceAppCore
 
+// Known, deliberately unfixed: once this window has been opened and closed,
+// SwiftUI keeps its view tree alive and keeps laying it out on engine ticks —
+// the same pattern that made the popover cost ~6% idle CPU (fixed in 15afcd6,
+// see ExtraMenuBarController.mountPopoverContent / popoverDidClose).
+//
+// Measured here at roughly 60-97 `sizeThatFits` samples out of ~6000, against
+// 1070 for the popover, and it does NOT accumulate: SwiftUI reuses one tree per
+// WindowGroup, so repeated open/close keeps the cost flat. The difference was
+// below the noise floor (6.5% after open/close vs 6.9% with nothing ever
+// opened, 60s cputime deltas) — the "leaky" run actually measured lower.
+//
+// Gating the content on window visibility would risk a reopened window coming
+// back empty or mis-sized, because makeNSView runs once per window instance and
+// SwiftUI reuses the window. That is a visible regression traded for an
+// unmeasurable gain, so it stays as is. The History window behaves the same way.
+// Revisit only if a future change makes this measurable.
 struct DetailWindow: View {
     let kind: MetricsEngine.Panel
     @ObservedObject var engine: MetricsEngine
