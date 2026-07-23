@@ -17,6 +17,7 @@ final class ExtraMenuBarController: NSObject {
     private var localMonitor: Any?
     private var hotKeyRef: EventHotKeyRef?
     private var carbonHandlerRef: EventHandlerRef?
+    private var lastRenderKey: Int?
 
     // Global shortcut: ⌥⌘P — works system-wide to open/close the popover
     static let shortcutDisplay = "⌥⌘P"
@@ -116,16 +117,19 @@ final class ExtraMenuBarController: NSObject {
     // MARK: - Status item
 
     private func createStatusItem() {
-        guard let engine else { return }
+        guard engine != nil else { return }
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         item.button?.target = self
         item.button?.action = #selector(handleClick)
         item.button?.sendAction(on: [.leftMouseDown])
         statusItem = item
 
+        // Deliberately created *without* a contentViewController. See
+        // `mountPopoverContent()` — the SwiftUI tree only exists while the
+        // popover is actually on screen.
         let p = NSPopover()
-        p.contentViewController = NSHostingController(rootView: OverviewView(engine: engine))
         p.behavior = .transient
+        p.delegate = self
         sharedPopover = p
     }
 
@@ -134,9 +138,44 @@ final class ExtraMenuBarController: NSObject {
     private func render() {
         guard let engine else { return }
         let enabledMetrics = settings.menuBarOrder.filter { settings.isEnabled($0) }
+
+        // The engine republishes every metric each tick even when the values a
+        // menu-bar slot actually shows are unchanged (e.g. an idle network in
+        // "Text only" stays "↓0 ↑0"). Hashing exactly the inputs the drawing
+        // and the accessibility label depend on lets those ticks skip the whole
+        // NSImage/CoreGraphics pass.
+        let key = renderKey(for: enabledMetrics, engine: engine)
+        guard key != lastRenderKey else { return }
+        lastRenderKey = key
+
         let images = enabledMetrics.map { makeImage(for: $0, style: settings.styleFor($0), engine: engine) }
         statusItem?.button?.image = images.isEmpty ? nil : combinedImage(from: images)
         statusItem?.button?.setAccessibilityLabel(accessibilityLabel(for: enabledMetrics, engine: engine))
+    }
+
+    /// Hash of every value `makeImage` and `accessibilityLabel` read. Must be
+    /// kept in step with those two methods — anything they consult belongs here.
+    private func renderKey(for metrics: [MenuBarMetric], engine: MetricsEngine) -> Int {
+        var hasher = Hasher()
+        hasher.combine(settings.menuBarThresholdColor)
+        hasher.combine(settings.diskDisplayMode)
+        for metric in metrics {
+            hasher.combine(metric)
+            let effectiveStyle: MenuBarStyle =
+                (metric == .disk && settings.diskDisplayMode == .space) ? .text : settings.styleFor(metric)
+            hasher.combine(effectiveStyle)
+            hasher.combine(engine.textOnlyLabel(for: metric))   // drawn and/or spoken
+            if settings.menuBarThresholdColor {
+                let status = engine.thresholdStatus(for: metric)
+                hasher.combine(status.severity)
+                hasher.combine(status.label)
+            }
+            if effectiveStyle == .sparkline {
+                hasher.combine(engine.sparklineText(for: metric))
+                for sample in engine.sparklineHistory(for: metric) { hasher.combine(sample) }
+            }
+        }
+        return hasher.finalize()
     }
 
     // VoiceOver reads the icon-drawn image as nothing meaningful on its own, so the
@@ -264,17 +303,52 @@ final class ExtraMenuBarController: NSObject {
         if popover.isShown {
             popover.performClose(nil)
         } else {
+            mountPopoverContent()
             syncPopoverAppearance()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             NSApp.activate(ignoringOtherApps: true)
         }
     }
 
+    // MARK: - Popover content lifecycle
+    //
+    // A popover that keeps its NSHostingController alive keeps the whole
+    // OverviewView graph subscribed to the engine, so every metric tick
+    // (~80 @Published writes per second) re-ran SwiftUI layout for a view
+    // nobody was looking at — measurably the app's largest idle cost.
+    // The view is therefore built on demand when the popover opens and torn
+    // down again when it closes; opening is user-driven and rare, so paying
+    // the construction cost there is far cheaper than paying layout forever.
+
+    /// Builds the popover's SwiftUI content, laid out once up front so the
+    /// popover opens at its final size showing the engine's current values —
+    /// no empty first frame, no resize hitch.
+    private func mountPopoverContent() {
+        guard let engine,
+              let popover = sharedPopover,
+              popover.contentViewController == nil else { return }
+        let host = NSHostingController(rootView: OverviewView(engine: engine))
+        host.view.layoutSubtreeIfNeeded()
+        popover.contentViewController = host
+    }
+
+    /// Releases the SwiftUI tree once the close animation has finished, so
+    /// nothing observes the engine while the popover is hidden.
+    func popoverDidClose(_ notification: Notification) {
+        sharedPopover?.contentViewController = nil
+    }
+
     private func syncPopoverAppearance() {
-        sharedPopover?.appearance = switch settings.appAppearance {
+        // Only meaningful while the popover has content; assigning `appearance`
+        // invalidates the hosted view tree's effective appearance, which would
+        // itself force a SwiftUI layout pass on every tick.
+        guard let popover = sharedPopover, popover.contentViewController != nil else { return }
+        popover.appearance = switch settings.appAppearance {
         case .system: nil
         case .light:  NSAppearance(named: .aqua)
         case .dark:   NSAppearance(named: .darkAqua)
         }
     }
 }
+
+extension ExtraMenuBarController: NSPopoverDelegate {}

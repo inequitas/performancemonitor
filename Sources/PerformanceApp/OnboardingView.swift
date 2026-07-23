@@ -38,7 +38,7 @@ enum OnboardingGate {
 struct OnboardingView: View {
     let engine: MetricsEngine
     @Environment(\.dismissWindow) private var dismissWindow
-    @State private var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
+    @State private var launchAtLogin: Bool = LaunchAtLoginStatus.isEnabled
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -84,8 +84,9 @@ struct OnboardingView: View {
                         do {
                             if newValue { try SMAppService.mainApp.register() }
                             else { try SMAppService.mainApp.unregister() }
+                            LaunchAtLoginStatus.set(newValue)
                         } catch {
-                            launchAtLogin = SMAppService.mainApp.status == .enabled
+                            launchAtLogin = LaunchAtLoginStatus.refreshed()
                         }
                     }
             }

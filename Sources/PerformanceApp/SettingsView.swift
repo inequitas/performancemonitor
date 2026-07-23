@@ -2,6 +2,34 @@ import SwiftUI
 import ServiceManagement
 import PerformanceAppCore
 
+/// Cached "Launch at login" state.
+///
+/// `SMAppService.mainApp.status` is a *synchronous XPC round-trip to `smd`*.
+/// The App's scene body observes the engine, so SwiftUI re-initialises the
+/// `SettingsView` and `OnboardingView` structs on every metric tick — and a
+/// `@State` default value expression is evaluated on each of those inits.
+/// Reading the status there therefore blocked the main thread on XPC once a
+/// second even with both windows closed. SwiftUI only ever *uses* the first
+/// value anyway, so cache it; the setting can only change through the toggles
+/// below, which keep the cache in step.
+enum LaunchAtLoginStatus {
+    private static var cached: Bool?
+
+    /// Cheap cached read — safe to use as a `@State` default value.
+    static var isEnabled: Bool { cached ?? refreshed() }
+
+    /// Reads ServiceManagement for real and updates the cache.
+    @discardableResult
+    static func refreshed() -> Bool {
+        let value = SMAppService.mainApp.status == .enabled
+        cached = value
+        return value
+    }
+
+    /// Records a state we just applied ourselves, avoiding a redundant XPC call.
+    static func set(_ value: Bool) { cached = value }
+}
+
 struct SettingsView: View {
     // Plain let — no @ObservedObject. Each child tab observes the SettingsStore
     // directly (not the engine), so the TabView (and its tab-bar SF Symbol
@@ -10,7 +38,7 @@ struct SettingsView: View {
     // all. Appearance / dock changes are handled by SettingsWindowModifier.
     let engine: MetricsEngine
     let updater: UpdateChecker
-    @State private var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
+    @State private var launchAtLogin: Bool = LaunchAtLoginStatus.isEnabled
 
     var body: some View {
         TabView {
@@ -163,8 +191,9 @@ private struct GeneralTab: View {
                             do {
                                 if newValue { try SMAppService.mainApp.register() }
                                 else { try SMAppService.mainApp.unregister() }
+                                LaunchAtLoginStatus.set(newValue)
                             } catch {
-                                launchAtLogin = SMAppService.mainApp.status == .enabled
+                                launchAtLogin = LaunchAtLoginStatus.refreshed()
                             }
                         }
                 }
