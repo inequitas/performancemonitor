@@ -1,5 +1,32 @@
 # Changelog
 
+## v1.1.0 — Deeper, lighter, multilingual *(2026-07-24)*
+
+**New metrics**
+- **Power draw in watts** — total system power (from the SMC) plus battery charge/discharge wattage.
+- **SSD wear level** — percentage used, total bytes written, and power-on hours, read from the drive's NVMe SMART data (no root needed).
+- **Network data usage** — today / this week / this month totals for download and upload.
+
+**Look back in time**
+- **History window** — graphs from the last hour up to 30 days, with min/avg/max bands, backed by an efficient on-disk store. Includes a "last 7 days" summary.
+
+**Smarter & clearer**
+- **Sustained alerts** — CPU/GPU/memory alerts now only fire when a threshold stays crossed for a duration you set, instead of on every brief spike.
+- **Menu bar threshold colouring** — a menu bar value turns orange/red when it goes over your alert threshold.
+- **Personal Hotspot** is detected and shown with its own icon.
+
+**Now in your language**
+- **7 languages** — English, Dutch, German, French, Spanish, Simplified Chinese, and Japanese — with an in-app language switcher.
+
+**Lighter than ever**
+- **Idle CPU cut by ~80%** (roughly 13% → 2.5% on an M3 Pro): the popover and detail views stop doing layout work when closed, full sensor sampling only runs while the Thermal window is open, and the app's scene no longer re-renders on every tick.
+
+**Also**
+- **About tab** in Settings with links to the website, source code, and ways to support the project.
+- **Beta channel** opt-in directly in Settings, with a one-click way back to the stable release.
+- Fixed the public IP not updating after switching networks (e.g. Wi-Fi → Personal Hotspot).
+- First community contribution — the Bluetooth parser was refactored by **@jaideepkathiresan**. Thank you! 🙏
+
 ## v1.0.0 — First stable release *(2026-07-19)*
 - **Signed auto-updates** — updates downloaded in-app are now cryptographically verified with an Ed25519 (Curve25519) signature before the archive is unpacked or its quarantine flag is cleared. Because this app has no Apple Developer ID and is not notarised, this signature check is what stands in for Gatekeeper's trust guarantee. Downloads are also restricted to trusted GitHub hosts (`github.com`, `objects.githubusercontent.com`).
   - **Transition note:** this is the **first signed** release — it ships both the verifying client and its own signature. Older installed clients (which predate this change) will still install this release without verifying, since their code has no verification step. From the release **after** this one, verification is effectively enforced everywhere: every client in the field verifies, and any update whose signature is missing or invalid is refused. Each release must upload both `PerformanceApp.zip` and `PerformanceApp.zip.sig`.
