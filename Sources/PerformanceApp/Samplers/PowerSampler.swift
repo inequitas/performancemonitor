@@ -1,6 +1,6 @@
 import Foundation
 
-protocol PowerSampling: AnyObject {
+@MainActor protocol PowerSampling: AnyObject {
     /// Reads per-domain power off the main thread, throttled to once every 2s.
     /// Returns `nil` when IOReport is unavailable, the throttle blocks this
     /// call, or no baseline exists yet (the first sample only sets the baseline).
@@ -15,7 +15,7 @@ protocol PowerSampling: AnyObject {
 /// `@unchecked Sendable` and only ever touched from this sampler. Mirrors
 /// `SMCSampler`.
 @MainActor
-final class PowerSampler: @MainActor PowerSampling {
+final class PowerSampler: PowerSampling {
     private let reader = PowerReader()
     private var cacheDate: Date = .distantPast
 

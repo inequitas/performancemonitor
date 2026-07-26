@@ -11,7 +11,7 @@ struct SMCSnapshot {
     let systemPowerWatts: Double?
 }
 
-protocol SMCSampling: AnyObject {
+@MainActor protocol SMCSampling: AnyObject {
     /// Reads SMC temperatures off the main thread, throttled to once every 2s.
     /// Returns `nil` when SMC is unavailable or the throttle blocks this call —
     /// the engine then leaves thermal state unchanged.
@@ -32,7 +32,7 @@ protocol SMCSampling: AnyObject {
 /// `@unchecked Sendable` and is only ever touched from this sampler.
 /// Extracted verbatim from `MetricsEngine.updateSMC`.
 @MainActor
-final class SMCSampler: @MainActor SMCSampling {
+final class SMCSampler: SMCSampling {
     private let smc = SMCReader()
     private var cacheDate: Date = .distantPast
 
