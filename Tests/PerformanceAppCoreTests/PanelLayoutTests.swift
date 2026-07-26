@@ -73,29 +73,23 @@ struct ArrayReorderingTests {
         var list = ["cpu", "memory", "disk", "network"]
 
         // Move "memory" up (index 1 to 0)
-        let i = 1
-        #expect(i > 0)
-        list.swapAt(i, i - 1)
+        list.moveUp(at: 1)
         #expect(list == ["memory", "cpu", "disk", "network"])
 
         // Move "memory" down (index 0 to 1)
-        let j = 0
-        #expect(j < list.count - 1)
-        list.swapAt(j, j + 1)
+        list.moveDown(at: 0)
         #expect(list == ["cpu", "memory", "disk", "network"])
     }
 
     @Test func testMoveBoundsGuard() {
         var list = ["a", "b"]
 
-        // Move top item up does nothing if index == 0
-        let topIndex = 0
-        if topIndex > 0 { list.swapAt(topIndex, topIndex - 1) }
+        // Move top item up does nothing
+        list.moveUp(at: 0)
         #expect(list == ["a", "b"])
 
-        // Move bottom item down does nothing if index == count - 1
-        let bottomIndex = list.count - 1
-        if bottomIndex < list.count - 1 { list.swapAt(bottomIndex, bottomIndex + 1) }
+        // Move bottom item down does nothing
+        list.moveDown(at: list.count - 1)
         #expect(list == ["a", "b"])
     }
 }

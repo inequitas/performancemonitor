@@ -304,17 +304,15 @@ private struct MenuBarTab: View {
                     .animation(isMe ? nil : .interactiveSpring(response: 0.28, dampingFraction: 0.78),
                                value: dragDst)
                     .accessibilityAction(named: Text(String(localized: "Move Up"))) {
-                        guard i > 0 else { return }
                         var order = settings.menuBarOrder
-                        order.swapAt(i, i - 1)
+                        order.moveUp(at: i)
                         withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
                             settings.menuBarOrder = order
                         }
                     }
                     .accessibilityAction(named: Text(String(localized: "Move Down"))) {
-                        guard i < settings.menuBarOrder.count - 1 else { return }
                         var order = settings.menuBarOrder
-                        order.swapAt(i, i + 1)
+                        order.moveDown(at: i)
                         withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
                             settings.menuBarOrder = order
                         }
@@ -1042,15 +1040,15 @@ private struct PanelMiniCard: View {
             return true
         } isTargeted: { onTargeted($0) }
         .accessibilityAction(named: Text(String(localized: "Move Earlier"))) {
-            guard let idx = panelOrder.firstIndex(of: panel), idx > 0 else { return }
+            guard let idx = panelOrder.firstIndex(of: panel) else { return }
             var order = panelOrder
-            order.swapAt(idx, idx - 1)
+            order.moveUp(at: idx)
             withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) { panelOrder = order }
         }
         .accessibilityAction(named: Text(String(localized: "Move Later"))) {
-            guard let idx = panelOrder.firstIndex(of: panel), idx < panelOrder.count - 1 else { return }
+            guard let idx = panelOrder.firstIndex(of: panel) else { return }
             var order = panelOrder
-            order.swapAt(idx, idx + 1)
+            order.moveDown(at: idx)
             withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) { panelOrder = order }
         }
     }

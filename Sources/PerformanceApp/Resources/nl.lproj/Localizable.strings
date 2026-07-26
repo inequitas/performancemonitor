@@ -401,3 +401,9 @@
 "Performance Monitor" = "Performance Monitor";
 "A lightweight, open-source system monitor for your Mac's menu bar." = "Een lichtgewicht, opensource systeemmonitor voor de menubalk van je Mac.";
 "MIT Licensed" = "MIT-licentie";
+
+/* MARK: - Accessibility */
+"Move Up" = "Verplaats omhoog";
+"Move Down" = "Verplaats omlaag";
+"Move Earlier" = "Verplaats naar voren";
+"Move Later" = "Verplaats naar achteren";
