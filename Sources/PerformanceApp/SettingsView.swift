@@ -285,6 +285,14 @@ private struct MenuBarTab: View {
                 Toggle("", isOn: $settings.menuBarThresholdColor).labelsHidden()
             }
 
+            SettingsRow(label: String(localized: "Combine into one menu bar item")) {
+                Toggle("", isOn: $settings.combineMenuBarItems).labelsHidden()
+            }
+            Text(String(localized: "Show every enabled metric in a single menu bar icon instead of one icon per metric."))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
             ZStack(alignment: .topLeading) {
                 RoundedRectangle(cornerRadius: 14).fill(.ultraThinMaterial)
                 ForEach(Array(settings.menuBarOrder.enumerated()), id: \.element) { i, metric in

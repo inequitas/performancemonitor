@@ -138,6 +138,14 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(menuBarThresholdColor, forKey: "menuBarThresholdColor") }
     }
 
+    /// When on, all enabled menu-bar metrics are drawn into a single
+    /// NSStatusItem (separated by a thin divider) instead of one status item
+    /// per metric. Off by default so existing installs keep their current
+    /// per-metric status items unchanged.
+    @Published var combineMenuBarItems: Bool = false {
+        didSet { UserDefaults.standard.set(combineMenuBarItems, forKey: "combineMenuBarItems") }
+    }
+
     @Published var panelOrder: [MetricsEngine.Panel] = MetricsEngine.Panel.allCases {
         didSet { UserDefaults.standard.set(panelOrder.map(\.rawValue), forKey: Pref.panelOrder) }
     }
@@ -239,6 +247,7 @@ final class SettingsStore: ObservableObject {
         networkSparklineUpload = ud.bool(forKey: "networkSparklineUpload")
         diskSparklineWrite     = ud.bool(forKey: "diskSparklineWrite")
         menuBarThresholdColor  = ud.bool(forKey: "menuBarThresholdColor")
+        combineMenuBarItems    = ud.bool(forKey: "combineMenuBarItems")
         betaUpdatesOptIn       = ud.bool(forKey: "betaUpdatesOptIn")
 
         if let raw = ud.stringArray(forKey: Pref.panelOrder) {

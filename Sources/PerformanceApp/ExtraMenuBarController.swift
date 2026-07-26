@@ -4,14 +4,26 @@ import Combine
 import Carbon
 import PerformanceAppCore
 
-/// Owns the single NSStatusItem that shows all enabled metrics side-by-side.
-/// Subscribes to the engine's raw metric publishers and renders images itself,
-/// keeping all AppKit/CoreGraphics drawing out of MetricsEngine.
+/// Owns the NSStatusItem(s) that show all enabled metrics: either one item
+/// per metric, or (when "Combine into one menu bar item" is on) a single item
+/// with every metric's image side-by-side. Subscribes to the engine's raw
+/// metric publishers and renders images itself, keeping all AppKit/CoreGraphics
+/// drawing out of MetricsEngine.
 @MainActor
 final class ExtraMenuBarController: NSObject {
     private weak var engine: MetricsEngine?
     private let settings: SettingsStore
-    private var statusItem: NSStatusItem?
+    // Exactly one of these two is populated at any time, depending on
+    // `settings.combineMenuBarItems`: either a single item holding every
+    // enabled metric's image side-by-side, or one item per enabled metric
+    // (in `menuBarOrder`) so menu-bar managers like Bartender/Ice can hide or
+    // reposition metrics individually.
+    private var combinedStatusItem: NSStatusItem?
+    private var perMetricStatusItems: [MenuBarMetric: NSStatusItem] = [:]
+    /// The ordered, enabled-metric list the separate-item set was last built
+    /// for. Rebuilt (torn down + recreated) only when this changes, so a
+    /// plain value tick never touches NSStatusBar.
+    private var lastSeparateOrder: [MenuBarMetric] = []
     private var sharedPopover: NSPopover?
     private var cancellables: Set<AnyCancellable> = []
     private var localMonitor: Any?
@@ -59,7 +71,7 @@ final class ExtraMenuBarController: NSObject {
         self.engine = engine
         self.settings = settings
         super.init()
-        createStatusItem()
+        createPopover()
 
         // Re-render on metric ticks (engine) AND on menu-bar config / appearance
         // changes (settings), debounced so a burst of @Published updates triggers
@@ -116,21 +128,34 @@ final class ExtraMenuBarController: NSObject {
 
     // MARK: - Status item
 
-    private func createStatusItem() {
-        guard engine != nil else { return }
-        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        item.button?.target = self
-        item.button?.action = #selector(handleClick)
-        item.button?.sendAction(on: [.leftMouseDown])
-        statusItem = item
-
-        // Deliberately created *without* a contentViewController. See
-        // `mountPopoverContent()` — the SwiftUI tree only exists while the
-        // popover is actually on screen.
+    /// Deliberately created *without* a contentViewController. See
+    /// `mountPopoverContent()` — the SwiftUI tree only exists while the
+    /// popover is actually on screen.
+    private func createPopover() {
         let p = NSPopover()
         p.behavior = .transient
         p.delegate = self
         sharedPopover = p
+    }
+
+    private func makeStatusItem() -> NSStatusItem {
+        let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        item.button?.target = self
+        item.button?.action = #selector(handleClick(_:))
+        item.button?.sendAction(on: [.leftMouseDown])
+        return item
+    }
+
+    private func teardownCombinedItem() {
+        guard let item = combinedStatusItem else { return }
+        NSStatusBar.system.removeStatusItem(item)
+        combinedStatusItem = nil
+    }
+
+    private func teardownSeparateItems() {
+        for item in perMetricStatusItems.values { NSStatusBar.system.removeStatusItem(item) }
+        perMetricStatusItems.removeAll()
+        lastSeparateOrder = []
     }
 
     // MARK: - Rendering
@@ -138,6 +163,18 @@ final class ExtraMenuBarController: NSObject {
     private func render() {
         guard let engine else { return }
         let enabledMetrics = settings.menuBarOrder.filter { settings.isEnabled($0) }
+        if settings.combineMenuBarItems {
+            renderCombined(enabledMetrics: enabledMetrics, engine: engine)
+        } else {
+            renderSeparate(enabledMetrics: enabledMetrics, engine: engine)
+        }
+    }
+
+    /// One NSStatusItem holding every enabled metric's image side-by-side,
+    /// separated by a thin vertical divider.
+    private func renderCombined(enabledMetrics: [MenuBarMetric], engine: MetricsEngine) {
+        teardownSeparateItems()
+        if combinedStatusItem == nil { combinedStatusItem = makeStatusItem() }
 
         // The engine republishes every metric each tick even when the values a
         // menu-bar slot actually shows are unchanged (e.g. an idle network in
@@ -149,14 +186,46 @@ final class ExtraMenuBarController: NSObject {
         lastRenderKey = key
 
         let images = enabledMetrics.map { makeImage(for: $0, style: settings.styleFor($0), engine: engine) }
-        statusItem?.button?.image = images.isEmpty ? nil : combinedImage(from: images)
-        statusItem?.button?.setAccessibilityLabel(accessibilityLabel(for: enabledMetrics, engine: engine))
+        combinedStatusItem?.button?.image = images.isEmpty ? nil : combinedImage(from: images)
+        combinedStatusItem?.button?.setAccessibilityLabel(accessibilityLabel(for: enabledMetrics, engine: engine))
+    }
+
+    /// One NSStatusItem per enabled metric, in `menuBarOrder`, so a menu-bar
+    /// manager can hide/reposition each metric independently.
+    private func renderSeparate(enabledMetrics: [MenuBarMetric], engine: MetricsEngine) {
+        teardownCombinedItem()
+
+        // Status items can't be reordered in place, so any change to *which*
+        // metrics are enabled or *what order* they're in tears the whole set
+        // down and recreates it fresh, in the right order. A plain value tick
+        // (the common case) leaves the existing items untouched.
+        if enabledMetrics != lastSeparateOrder {
+            teardownSeparateItems()
+            for metric in enabledMetrics {
+                perMetricStatusItems[metric] = makeStatusItem()
+            }
+            lastSeparateOrder = enabledMetrics
+        }
+
+        let key = renderKey(for: enabledMetrics, engine: engine)
+        guard key != lastRenderKey else { return }
+        lastRenderKey = key
+
+        for metric in enabledMetrics {
+            guard let item = perMetricStatusItems[metric] else { continue }
+            item.button?.image = makeImage(for: metric, style: settings.styleFor(metric), engine: engine)
+            item.button?.setAccessibilityLabel(accessibilityLabel(for: [metric], engine: engine))
+        }
     }
 
     /// Hash of every value `makeImage` and `accessibilityLabel` read. Must be
     /// kept in step with those two methods — anything they consult belongs here.
     private func renderKey(for metrics: [MenuBarMetric], engine: MetricsEngine) -> Int {
         var hasher = Hasher()
+        // Included so a toggle of combine/separate mode is never mistaken for
+        // a no-op tick — the freshly (re)created status item(s) always get an
+        // explicit image/label set at least once after a mode switch.
+        hasher.combine(settings.combineMenuBarItems)
         hasher.combine(settings.menuBarThresholdColor)
         hasher.combine(settings.diskDisplayMode)
         for metric in metrics {
@@ -282,13 +351,26 @@ final class ExtraMenuBarController: NSObject {
         }
     }
 
+    /// Combines several already-rendered per-metric images into one, for
+    /// "Combine into one menu bar item" mode. A subtle 1pt divider marks the
+    /// boundary between metrics (skipped for single-metric configurations,
+    /// where there's nothing to separate).
     private func combinedImage(from images: [NSImage]) -> NSImage {
-        let gap: CGFloat = 2
+        let gap: CGFloat = 6
         let h:   CGFloat = 16
         let totalW = images.reduce(0) { $0 + $1.size.width } + gap * CGFloat(images.count - 1)
         return NSImage(size: NSSize(width: totalW, height: h), flipped: false) { _ in
+            guard let ctx = NSGraphicsContext.current?.cgContext else { return false }
             var x: CGFloat = 0
-            for img in images {
+            for (i, img) in images.enumerated() {
+                if i > 0 {
+                    let dividerX = x - gap / 2
+                    ctx.setStrokeColor(NSColor.white.withAlphaComponent(0.35).cgColor)
+                    ctx.setLineWidth(1)
+                    ctx.move(to: CGPoint(x: dividerX, y: 2))
+                    ctx.addLine(to: CGPoint(x: dividerX, y: h - 2))
+                    ctx.strokePath()
+                }
                 img.draw(in: NSRect(x: x, y: 0, width: img.size.width, height: h))
                 x += img.size.width + gap
             }
@@ -298,8 +380,14 @@ final class ExtraMenuBarController: NSObject {
 
     // MARK: - Click handling
 
-    @objc private func handleClick() {
-        guard let popover = sharedPopover, let button = statusItem?.button else { return }
+    /// `sender` is the status item button that was actually clicked — in
+    /// separate-items mode any one of them can trigger this. The keyboard
+    /// shortcut has no sender, so it falls back to whichever button currently
+    /// exists (combined item, or the first separate item).
+    @objc private func handleClick(_ sender: NSStatusBarButton? = nil) {
+        let anchorButton = sender ?? combinedStatusItem?.button
+            ?? settings.menuBarOrder.compactMap { perMetricStatusItems[$0]?.button }.first
+        guard let popover = sharedPopover, let button = anchorButton else { return }
         if popover.isShown {
             popover.performClose(nil)
         } else {

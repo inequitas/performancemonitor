@@ -77,6 +77,8 @@
 "Menu Bar Icons" = "Menu Bar Icons";
 "Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar." = "Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar.";
 "Colour when above alert threshold" = "Colour when above alert threshold";
+"Combine into one menu bar item" = "Combine into one menu bar item";
+"Show every enabled metric in a single menu bar icon instead of one icon per metric." = "Show every enabled metric in a single menu bar icon instead of one icon per metric.";
 "IO" = "IO";
 "Space" = "Space";
 "Text" = "Text";

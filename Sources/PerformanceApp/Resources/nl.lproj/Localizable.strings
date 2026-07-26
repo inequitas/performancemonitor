@@ -77,6 +77,8 @@
 "Menu Bar Icons" = "Menubalkpictogrammen";
 "Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar." = "Sleep de handgreep om de volgorde te wijzigen. Het bovenste ingeschakelde pictogram verschijnt uiterst rechts in de menubalk.";
 "Colour when above alert threshold" = "Kleur bij overschrijden van drempel";
+"Combine into one menu bar item" = "Combineren tot één menubalk-item";
+"Show every enabled metric in a single menu bar icon instead of one icon per metric." = "Toon alle ingeschakelde metrics in één menubalk-icoon in plaats van één icoon per metric.";
 "IO" = "IO";
 "Space" = "Ruimte";
 "Text" = "Tekst";

@@ -77,6 +77,8 @@
 "Menu Bar Icons" = "Menüleisten-Symbole";
 "Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar." = "Ziehe den Griff, um die Reihenfolge zu ändern. Das oberste aktivierte Symbol erscheint ganz rechts in der Menüleiste.";
 "Colour when above alert threshold" = "Farbe bei Überschreiten des Schwellenwerts";
+"Combine into one menu bar item" = "In einem Menüleisten-Element zusammenführen";
+"Show every enabled metric in a single menu bar icon instead of one icon per metric." = "Zeigt alle aktivierten Messwerte in einem einzigen Menüleisten-Symbol an statt in einem Symbol pro Messwert.";
 "IO" = "IO";
 "Space" = "Speicherplatz";
 "Text" = "Text";

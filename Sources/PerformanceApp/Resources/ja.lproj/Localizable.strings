@@ -77,6 +77,8 @@
 "Menu Bar Icons" = "メニューバーアイコン";
 "Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar." = "ハンドルをドラッグして順序を変更します。一番上の有効なアイコンがメニューバーの一番右に表示されます。";
 "Colour when above alert threshold" = "アラートしきい値を超えたときの色";
+"Combine into one menu bar item" = "1つのメニューバー項目にまとめる";
+"Show every enabled metric in a single menu bar icon instead of one icon per metric." = "有効なすべての指標を、指標ごとに個別のアイコンではなく、1つのメニューバーアイコンにまとめて表示します。";
 "IO" = "IO";
 "Space" = "空き容量";
 "Text" = "テキスト";

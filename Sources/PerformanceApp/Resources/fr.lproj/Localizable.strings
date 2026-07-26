@@ -77,6 +77,8 @@
 "Menu Bar Icons" = "Icônes de la barre des menus";
 "Drag the handle to reorder. The topmost enabled icon appears rightmost in the menu bar." = "Faites glisser la poignée pour réorganiser. L'icône activée la plus haute apparaît le plus à droite dans la barre des menus.";
 "Colour when above alert threshold" = "Couleur au-dessus du seuil d'alerte";
+"Combine into one menu bar item" = "Combiner en un seul élément de la barre de menus";
+"Show every enabled metric in a single menu bar icon instead of one icon per metric." = "Affiche toutes les métriques activées dans une seule icône de la barre de menus au lieu d'une icône par métrique.";
 "IO" = "IO";
 "Space" = "Espace";
 "Text" = "Texte";
