@@ -311,6 +311,20 @@ private struct MenuBarTab: View {
                     .offset(y: rowY(index: i, metric: metric))
                     .animation(isMe ? nil : .interactiveSpring(response: 0.28, dampingFraction: 0.78),
                                value: dragDst)
+                    .accessibilityAction(named: Text(String(localized: "Move Up"))) {
+                        var order = settings.menuBarOrder
+                        order.moveUp(at: i)
+                        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                            settings.menuBarOrder = order
+                        }
+                    }
+                    .accessibilityAction(named: Text(String(localized: "Move Down"))) {
+                        var order = settings.menuBarOrder
+                        order.moveDown(at: i)
+                        withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) {
+                            settings.menuBarOrder = order
+                        }
+                    }
                 }
             }
             .coordinateSpace(name: "menuBarList")
@@ -1033,6 +1047,18 @@ private struct PanelMiniCard: View {
             withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) { panelOrder = order }
             return true
         } isTargeted: { onTargeted($0) }
+        .accessibilityAction(named: Text(String(localized: "Move Earlier"))) {
+            guard let idx = panelOrder.firstIndex(of: panel) else { return }
+            var order = panelOrder
+            order.moveUp(at: idx)
+            withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) { panelOrder = order }
+        }
+        .accessibilityAction(named: Text(String(localized: "Move Later"))) {
+            guard let idx = panelOrder.firstIndex(of: panel) else { return }
+            var order = panelOrder
+            order.moveDown(at: idx)
+            withAnimation(.spring(response: 0.32, dampingFraction: 0.82)) { panelOrder = order }
+        }
     }
 }
 

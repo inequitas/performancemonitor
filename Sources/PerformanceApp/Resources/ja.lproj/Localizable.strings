@@ -407,3 +407,9 @@
 "Performance Monitor" = "Performance Monitor";
 "A lightweight, open-source system monitor for your Mac's menu bar." = "Macのメニューバー用の軽量なオープンソースシステムモニターです。";
 "MIT Licensed" = "MITライセンス";
+
+/* MARK: - Accessibility */
+"Move Up" = "上に移動";
+"Move Down" = "下に移動";
+"Move Earlier" = "前に移動";
+"Move Later" = "後に移動";

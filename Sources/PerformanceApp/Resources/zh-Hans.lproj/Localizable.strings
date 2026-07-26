@@ -406,3 +406,9 @@
 "Performance Monitor" = "Performance Monitor";
 "A lightweight, open-source system monitor for your Mac's menu bar." = "一款轻量级的开源系统监控工具，显示在 Mac 菜单栏中。";
 "MIT Licensed" = "MIT 许可";
+
+/* MARK: - Accessibility */
+"Move Up" = "上移";
+"Move Down" = "下移";
+"Move Earlier" = "前移";
+"Move Later" = "后移";

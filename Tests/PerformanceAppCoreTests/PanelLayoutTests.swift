@@ -66,3 +66,30 @@ struct PanelLayoutTests {
         #expect(row.id == "a-b")
     }
 }
+
+@Suite("ArrayReordering")
+struct ArrayReorderingTests {
+    @Test func testMoveUpAndDownInArray() {
+        var list = ["cpu", "memory", "disk", "network"]
+
+        // Move "memory" up (index 1 to 0)
+        list.moveUp(at: 1)
+        #expect(list == ["memory", "cpu", "disk", "network"])
+
+        // Move "memory" down (index 0 to 1)
+        list.moveDown(at: 0)
+        #expect(list == ["cpu", "memory", "disk", "network"])
+    }
+
+    @Test func testMoveBoundsGuard() {
+        var list = ["a", "b"]
+
+        // Move top item up does nothing
+        list.moveUp(at: 0)
+        #expect(list == ["a", "b"])
+
+        // Move bottom item down does nothing
+        list.moveDown(at: list.count - 1)
+        #expect(list == ["a", "b"])
+    }
+}
