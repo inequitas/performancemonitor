@@ -15,7 +15,7 @@ protocol PowerSampling: AnyObject {
 /// `@unchecked Sendable` and only ever touched from this sampler. Mirrors
 /// `SMCSampler`.
 @MainActor
-final class PowerSampler: PowerSampling {
+final class PowerSampler: @MainActor PowerSampling {
     private let reader = PowerReader()
     private var cacheDate: Date = .distantPast
 

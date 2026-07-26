@@ -32,7 +32,7 @@ protocol SMCSampling: AnyObject {
 /// `@unchecked Sendable` and is only ever touched from this sampler.
 /// Extracted verbatim from `MetricsEngine.updateSMC`.
 @MainActor
-final class SMCSampler: SMCSampling {
+final class SMCSampler: @MainActor SMCSampling {
     private let smc = SMCReader()
     private var cacheDate: Date = .distantPast
 
