@@ -107,6 +107,14 @@ final class MetricsEngine: ObservableObject {
     @Published var unknownSMCTemperatures: [TempReading] = []
     @Published var systemPowerWatts: Double?
 
+    // Per-domain power from IOReport's "Energy Model" group (Apple Silicon).
+    // Nil when unavailable or while the Thermal window (the only consumer) is
+    // hidden — sampling is gated on its visibility to keep idle cost at zero.
+    @Published var cpuPowerWatts: Double?
+    @Published var gpuPowerWatts: Double?
+    @Published var anePowerWatts: Double?
+    @Published var dramPowerWatts: Double?
+
     @Published var performanceCoreCount: Int = 0
     @Published var efficiencyCoreCount: Int = 0
 
@@ -148,6 +156,7 @@ final class MetricsEngine: ObservableObject {
     private let wifiSampler: WiFiSampling = WiFiSampler()
     private let gpuSampler: GPUSampling = GPUSampler()
     private let smcSampler: SMCSampling = SMCSampler()
+    private let powerSampler: PowerSampling = PowerSampler()
     private let bluetoothSampler = BluetoothSampler()
 
     enum Panel: String, CaseIterable, Identifiable, Codable, Transferable, PanelLayoutItem {
@@ -294,6 +303,13 @@ final class MetricsEngine: ObservableObject {
             if visible {
                 smcSampler.resetThrottle()
                 updateSMC(forceExtended: true)
+                powerSampler.resetThrottle()
+                updatePower()
+            } else {
+                // Drop the per-domain readings so a reopened window starts fresh
+                // and never briefly shows stale watts from a previous session.
+                cpuPowerWatts = nil; gpuPowerWatts = nil
+                anePowerWatts = nil; dramPowerWatts = nil
             }
         default:
             break
@@ -584,6 +600,7 @@ final class MetricsEngine: ObservableObject {
         bluetoothSampler.update()
         await applyGPU()
         updateSMC()
+        updatePower()
         checkAlerts()
         history.append(enabled: settings.persistHistoryEnabled,
                        cpu: cpuUsagePercent,
@@ -867,6 +884,23 @@ final class MetricsEngine: ObservableObject {
             self.extendedTemperatures   = s.extendedTemperatures
             self.unknownSMCTemperatures = s.unknownSMCTemperatures
             self.systemPowerWatts       = s.systemPowerWatts
+        }
+    }
+
+    // MARK: - Per-domain power (IOReport Energy Model)
+
+    // Only the Thermal detail window shows the per-domain watts, so — like the
+    // extended SMC set — we sample only while it is visible. The sampler itself
+    // throttles to a 2s cadence and needs one prior sample to form a delta, so
+    // the first value appears ~2s after the window opens.
+    private func updatePower() {
+        guard visiblePanels.contains(.thermal) else { return }
+        Task { @MainActor [weak self] in
+            guard let self, let s = await self.powerSampler.sample() else { return }
+            self.cpuPowerWatts  = s.cpuWatts
+            self.gpuPowerWatts  = s.gpuWatts
+            self.anePowerWatts  = s.aneWatts
+            self.dramPowerWatts = s.dramWatts
         }
     }
 

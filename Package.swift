@@ -14,9 +14,13 @@ let package = Package(
             name: "CNVMeSMART",
             path: "Sources/CNVMeSMART"
         ),
+        .target(
+            name: "CIOReport",
+            path: "Sources/CIOReport"
+        ),
         .executableTarget(
             name: "PerformanceApp",
-            dependencies: ["PerformanceAppCore", "CNVMeSMART"],
+            dependencies: ["PerformanceAppCore", "CNVMeSMART", "CIOReport"],
             path: "Sources/PerformanceApp",
             resources: [
                 .process("Resources")

@@ -32,16 +32,34 @@ struct ThermalDetailView: View {
                 }
             }
 
-            // System power draw — read from the SMC PSTR key (see SMCPowerCatalog)
-            if let watts = engine.systemPowerWatts {
+            // Power draw — total system power from the SMC PSTR key (see
+            // SMCPowerCatalog), plus per-domain draw from IOReport's Energy Model
+            // group (CPU/GPU/Neural Engine/Memory). Either source may be absent.
+            let hasDomainPower = engine.cpuPowerWatts != nil || engine.gpuPowerWatts != nil
+                || engine.anePowerWatts != nil || engine.dramPowerWatts != nil
+            if engine.systemPowerWatts != nil || hasDomainPower {
                 SectionCard {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Text(String(localized: "Power")).font(.subheadline.weight(.semibold))
                             Spacer()
-                            InfoButton(text: String(localized: "Total system power draw, read from the System Management Controller (SMC).\n\nCovers the whole machine — CPU, GPU, display, and everything else on the same power rail — not just one component."))
+                            InfoButton(text: String(localized: "System Power is the whole-machine draw read from the System Management Controller (SMC).\n\nThe per-component values (CPU, GPU, Neural Engine, Memory) come from Apple's on-chip energy counters (IOReport) and cover only those blocks of the SoC."))
                         }
-                        detailRow(String(localized: "System Power"), String(format: "%.1f W", watts))
+                        if let watts = engine.systemPowerWatts {
+                            detailRow(String(localized: "System Power"), String(format: "%.1f W", watts))
+                        }
+                        if let w = engine.cpuPowerWatts {
+                            detailRow(String(localized: "CPU Power"), String(format: "%.1f W", w))
+                        }
+                        if let w = engine.gpuPowerWatts {
+                            detailRow(String(localized: "GPU Power"), String(format: "%.1f W", w))
+                        }
+                        if let w = engine.anePowerWatts {
+                            detailRow(String(localized: "Neural Engine"), String(format: "%.1f W", w))
+                        }
+                        if let w = engine.dramPowerWatts {
+                            detailRow(String(localized: "Memory Power"), String(format: "%.1f W", w))
+                        }
                     }
                 }
             }

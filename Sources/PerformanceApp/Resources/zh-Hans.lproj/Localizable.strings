@@ -357,7 +357,11 @@
 /* MARK: - ThermalDetailView power (roadmap 1.2a) */
 "Power" = "功耗";
 "System Power" = "系统功耗";
-"Total system power draw, read from the System Management Controller (SMC).\n\nCovers the whole machine — CPU, GPU, display, and everything else on the same power rail — not just one component." = "整机系统总功耗，读取自系统管理控制器（SMC）。\n\n涵盖整台设备——CPU、GPU、显示屏以及同一供电线路上的其他一切部件，而不仅仅是单个组件。";
+"System Power is the whole-machine draw read from the System Management Controller (SMC).\n\nThe per-component values (CPU, GPU, Neural Engine, Memory) come from Apple's on-chip energy counters (IOReport) and cover only those blocks of the SoC." = "系统功耗是通过系统管理控制器（SMC）读取的整机功耗。\n\n各组件数值（CPU、GPU、神经网络引擎、内存）来自 Apple 芯片上的能耗计数器（IOReport），仅涵盖 SoC 的这些模块。";
+"CPU Power" = "CPU 功耗";
+"GPU Power" = "GPU 功耗";
+"Neural Engine" = "神经网络引擎";
+"Memory Power" = "内存功耗";
 
 /* MARK: - NetworkDetailView data usage (roadmap 1.2b) */
 "Data Usage" = "数据用量";

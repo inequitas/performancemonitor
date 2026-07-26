@@ -358,7 +358,11 @@
 /* MARK: - ThermalDetailView power (roadmap 1.2a) */
 "Power" = "Vermogen";
 "System Power" = "Systeemvermogen";
-"Total system power draw, read from the System Management Controller (SMC).\n\nCovers the whole machine — CPU, GPU, display, and everything else on the same power rail — not just one component." = "Totaal stroomverbruik van het systeem, gelezen uit de System Management Controller (SMC).\n\nOmvat de hele machine — CPU, GPU, beeldscherm en al het andere op dezelfde voedingslijn — niet slechts één onderdeel.";
+"System Power is the whole-machine draw read from the System Management Controller (SMC).\n\nThe per-component values (CPU, GPU, Neural Engine, Memory) come from Apple's on-chip energy counters (IOReport) and cover only those blocks of the SoC." = "Systeemvermogen is het totale verbruik van de hele machine, gelezen uit de System Management Controller (SMC).\n\nDe waarden per component (CPU, GPU, Neural Engine, geheugen) komen van Apple's energietellers op de chip (IOReport) en dekken alleen die blokken van de SoC.";
+"CPU Power" = "CPU-vermogen";
+"GPU Power" = "GPU-vermogen";
+"Neural Engine" = "Neural Engine";
+"Memory Power" = "Geheugenvermogen";
 
 /* MARK: - NetworkDetailView data usage (roadmap 1.2b) */
 "Data Usage" = "Datagebruik";
