@@ -185,7 +185,12 @@ final class ExtraMenuBarController: NSObject {
         guard key != lastRenderKey else { return }
         lastRenderKey = key
 
-        let images = enabledMetrics.map { makeImage(for: $0, style: settings.styleFor($0), engine: engine) }
+        // Draw list-reversed so the combined item matches the visual order of
+        // the separate items: NSStatusItems insert right-to-left, so the topmost
+        // metric in `menuBarOrder` ends up rightmost. `combinedImage` draws
+        // left-to-right, so the leftmost drawn metric must be the LAST in the
+        // list — keeping both modes in the same on-screen order.
+        let images = enabledMetrics.reversed().map { makeImage(for: $0, style: settings.styleFor($0), engine: engine) }
         combinedStatusItem?.button?.image = images.isEmpty ? nil : combinedImage(from: images)
         combinedStatusItem?.button?.setAccessibilityLabel(accessibilityLabel(for: enabledMetrics, engine: engine))
     }
