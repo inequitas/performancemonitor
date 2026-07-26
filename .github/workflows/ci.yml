@@ -22,8 +22,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # -warnings-as-errors is the safety net: any new compiler warning fails CI.
       - name: Build (release, arm64)
-        run: swift build -c release --arch arm64
+        run: swift build -c release --arch arm64 -Xswiftc -warnings-as-errors
 
       - name: Test
-        run: swift test
+        run: swift test -Xswiftc -warnings-as-errors
