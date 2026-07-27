@@ -114,6 +114,29 @@ struct DiskDetailView: View {
                 )
             }
 
+            SectionCard {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Label(String(localized: "Top Disk Usage"), systemImage: "internaldrive")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(MetricTheme.disk)
+                        Spacer()
+                        InfoButton(text: String(localized: "Shows combined read and write throughput for processes running under your user account.\n\nWithout administrator privileges macOS only reports disk activity for your own processes, so system processes are not listed and this is not a complete, system-wide ranking."))
+                    }
+                    if engine.topDiskProcesses.isEmpty {
+                        Text(String(localized: "Measuring…")).font(.caption).foregroundStyle(.secondary)
+                    } else {
+                        ForEach(engine.topDiskProcesses) { proc in
+                            HStack {
+                                Text(proc.name).font(.caption).lineLimit(1)
+                                Spacer()
+                                Text(formatSpeed(proc.value)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+
             Spacer()
         }
     }

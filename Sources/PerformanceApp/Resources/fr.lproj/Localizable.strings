@@ -439,3 +439,5 @@
 "Getting started" = "Prise en main";
 "Show the welcome tour again" = "Revoir la visite de bienvenue";
 "Show Tour" = "Afficher la visite";
+"Top Disk Usage" = "Top utilisation disque";
+"Shows combined read and write throughput for processes running under your user account.\n\nWithout administrator privileges macOS only reports disk activity for your own processes, so system processes are not listed and this is not a complete, system-wide ranking." = "Affiche le débit combiné en lecture et en écriture des processus exécutés sous votre compte utilisateur.\n\nSans privilèges d'administrateur, macOS ne signale l'activité disque que pour vos propres processus : les processus système ne sont donc pas répertoriés et il ne s'agit pas d'un classement complet à l'échelle du système.";

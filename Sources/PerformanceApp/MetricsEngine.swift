@@ -55,6 +55,7 @@ final class MetricsEngine: ObservableObject {
     @Published var topCPUProcesses: [ProcessUsage] = []
     @Published var topMemoryProcesses: [ProcessUsage] = []
     @Published var topNetworkProcesses: [ProcessUsage] = []
+    @Published var topDiskProcesses: [ProcessUsage] = []
 
     @Published var localInterfaces: [LocalInterface] = []
     @Published var dnsServers: [String] = []
@@ -152,6 +153,7 @@ final class MetricsEngine: ObservableObject {
     private let diskSampler: DiskSampling = DiskSampler()
     private let processSampler: ProcessSampling = ProcessSampler()
     private let networkProcessSampler: NetworkProcessSampling = NetworkProcessSampler()
+    private let diskProcessSampler: DiskProcessSampling = DiskProcessSampler()
     private let batterySampler: BatterySampling = BatterySampler()
     private let wifiSampler: WiFiSampling = WiFiSampler()
     private let gpuSampler: GPUSampling = GPUSampler()
@@ -265,14 +267,17 @@ final class MetricsEngine: ObservableObject {
 
     // MARK: - Panel visibility (drives process-list sampling cadence)
     //
-    // ps/nettop are heavy relative to the other samplers, so they only run
-    // while a window that actually displays their output is visible: the CPU
-    // and Memory detail windows show `topCPUProcesses`/`topMemoryProcesses`
-    // (ps), the Network detail window shows `topNetworkProcesses` (nettop).
-    // The popover (OverviewView) doesn't display process lists at all, so it
-    // isn't part of this gate. Nothing that feeds the menu bar depends on
-    // these three published arrays, so MenuBarConfig-driven metrics are
-    // unaffected and keep sampling every tick regardless of visibility.
+    // The per-process samplers are costlier than the other samplers, so they
+    // only run while a window that actually displays their output is visible:
+    // the CPU and Memory detail windows show `topCPUProcesses`/
+    // `topMemoryProcesses` (ps), the Network detail window shows
+    // `topNetworkProcesses` (nettop), the Disk detail window shows
+    // `topDiskProcesses` (a `proc_listpids` + `proc_pid_rusage` syscall loop —
+    // no subprocess, so cheaper than the other two, but still a full sweep over
+    // every live pid). The popover (OverviewView) doesn't display process lists
+    // at all, so it isn't part of this gate. Nothing that feeds the menu bar
+    // depends on these four published arrays, so MenuBarConfig-driven metrics
+    // are unaffected and keep sampling every tick regardless of visibility.
     private var visiblePanels: Set<Panel> = []
 
     /// Called by `DetailWindow` (via `WindowFloatAccessor`) whenever one of its
@@ -295,6 +300,15 @@ final class MetricsEngine: ObservableObject {
                 // Drop the rate baseline so the next visible sample starts
                 // fresh instead of averaging over the whole invisible span.
                 networkProcessSampler.invalidateBaseline()
+            }
+        case .disk:
+            if visible {
+                diskProcessSampler.resetThrottle()
+                updateDiskProcesses()
+            } else {
+                // Same reasoning as .network: drop the rate baseline so the next
+                // visible sample starts fresh.
+                diskProcessSampler.invalidateBaseline()
             }
         case .thermal:
             // Only the Thermal window needs the full per-sensor set. Force an
@@ -603,6 +617,7 @@ final class MetricsEngine: ObservableObject {
         await applyDisk()
         updateProcesses()
         updateNetworkProcesses()
+        updateDiskProcesses()
         await applyBattery()
         applyWiFi()
         bluetoothSampler.update()
@@ -718,6 +733,20 @@ final class MetricsEngine: ObservableObject {
                   let list = await self.networkProcessSampler.sample(topCount: self.settings.topProcessCount)
             else { return }
             self.topNetworkProcesses = list
+        }
+    }
+
+    // MARK: - Per-app disk I/O
+
+    private func updateDiskProcesses() {
+        // proc_pid_rusage is only swept while the Disk detail window is open —
+        // see `setPanelVisible`. The sampler itself throttles to a 3s cadence.
+        guard visiblePanels.contains(.disk) else { return }
+        Task { @MainActor [weak self] in
+            guard let self,
+                  let list = await self.diskProcessSampler.sample(topCount: self.settings.topProcessCount)
+            else { return }
+            self.topDiskProcesses = list
         }
     }
 

@@ -439,3 +439,5 @@
 "Getting started" = "Getting started";
 "Show the welcome tour again" = "Show the welcome tour again";
 "Show Tour" = "Show Tour";
+"Top Disk Usage" = "Top Disk Usage";
+"Shows combined read and write throughput for processes running under your user account.\n\nWithout administrator privileges macOS only reports disk activity for your own processes, so system processes are not listed and this is not a complete, system-wide ranking." = "Shows combined read and write throughput for processes running under your user account.\n\nWithout administrator privileges macOS only reports disk activity for your own processes, so system processes are not listed and this is not a complete, system-wide ranking.";
