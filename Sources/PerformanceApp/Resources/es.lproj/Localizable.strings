@@ -413,3 +413,29 @@
 "Move Down" = "Mover hacia abajo";
 "Move Earlier" = "Mover antes";
 "Move Later" = "Mover después";
+
+
+/* MARK: - Onboarding tour (1.2c) */
+"Skip" = "Omitir";
+"Back" = "Atrás";
+"Next" = "Siguiente";
+"It lives up here, in your menu bar." = "Vive aquí arriba, en tu barra de menús.";
+"What shows in your menu bar?" = "¿Qué se muestra en tu barra de menús?";
+"Pick the metrics you want to see. You can fine-tune these anytime in Settings." = "Elige las métricas que quieres ver. Puedes ajustarlas cuando quieras en Ajustes.";
+"Live preview" = "Vista previa en vivo";
+"Nothing selected — pick at least one metric above." = "Nada seleccionado: elige al menos una métrica arriba.";
+"Your at-a-glance overview" = "Tu resumen de un vistazo";
+"One click on the menu bar icon opens a compact overview of everything at once." = "Un clic en el icono de la barra de menús abre un resumen compacto de todo a la vez.";
+"Open the overview" = "Abrir el resumen";
+"Couldn't open it automatically — click the app's icon in your menu bar to see it." = "No se pudo abrir automáticamente: haz clic en el icono de la app en tu barra de menús para verlo.";
+"Click any card for a detailed window." = "Haz clic en cualquier tarjeta para ver una ventana detallada.";
+"Get a heads-up (optional)" = "Recibe un aviso (opcional)";
+"Optionally get a notification when something needs your attention. You can skip this entirely." = "Opcionalmente, recibe una notificación cuando algo requiera tu atención. Puedes omitir esto por completo.";
+"Enable alerts" = "Activar alertas";
+"Notify me when CPU is above" = "Avisarme cuando la CPU supere";
+"Fine-tune memory, disk, GPU and thermal alerts later in Settings." = "Ajusta las alertas de memoria, disco, GPU y temperatura más tarde en Ajustes.";
+"You're all set" = "Todo listo";
+"A couple of optional permissions, and you're ready to go." = "Un par de permisos opcionales y estarás listo.";
+"Getting started" = "Primeros pasos";
+"Show the welcome tour again" = "Mostrar el tutorial de bienvenida otra vez";
+"Show Tour" = "Mostrar tutorial";

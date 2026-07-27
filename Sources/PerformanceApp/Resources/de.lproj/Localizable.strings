@@ -413,3 +413,29 @@
 "Move Down" = "Nach unten";
 "Move Earlier" = "Nach vorne";
 "Move Later" = "Nach hinten";
+
+
+/* MARK: - Onboarding tour (1.2c) */
+"Skip" = "Überspringen";
+"Back" = "Zurück";
+"Next" = "Weiter";
+"It lives up here, in your menu bar." = "Sie lebt hier oben, in deiner Menüleiste.";
+"What shows in your menu bar?" = "Was in deiner Menüleiste erscheint?";
+"Pick the metrics you want to see. You can fine-tune these anytime in Settings." = "Wähle die Werte, die du sehen willst. Du kannst sie jederzeit in den Einstellungen anpassen.";
+"Live preview" = "Live-Vorschau";
+"Nothing selected — pick at least one metric above." = "Nichts ausgewählt – wähle oben mindestens einen Wert.";
+"Your at-a-glance overview" = "Dein Überblick auf einen Blick";
+"One click on the menu bar icon opens a compact overview of everything at once." = "Ein Klick auf das Menüleistensymbol öffnet eine kompakte Übersicht über alles auf einmal.";
+"Open the overview" = "Übersicht öffnen";
+"Couldn't open it automatically — click the app's icon in your menu bar to see it." = "Konnte nicht automatisch geöffnet werden – klicke auf das App-Symbol in deiner Menüleiste, um es zu sehen.";
+"Click any card for a detailed window." = "Klicke auf eine Karte für ein Detailfenster.";
+"Get a heads-up (optional)" = "Lass dich benachrichtigen (optional)";
+"Optionally get a notification when something needs your attention. You can skip this entirely." = "Erhalte optional eine Mitteilung, wenn etwas deine Aufmerksamkeit braucht. Du kannst das ganz überspringen.";
+"Enable alerts" = "Warnungen aktivieren";
+"Notify me when CPU is above" = "Benachrichtigen, wenn CPU über";
+"Fine-tune memory, disk, GPU and thermal alerts later in Settings." = "Feineinstellungen für Arbeitsspeicher-, Festplatten-, GPU- und Temperaturwarnungen später in den Einstellungen.";
+"You're all set" = "Alles bereit";
+"A couple of optional permissions, and you're ready to go." = "Ein paar optionale Berechtigungen, und du kannst loslegen.";
+"Getting started" = "Erste Schritte";
+"Show the welcome tour again" = "Willkommens-Tour erneut anzeigen";
+"Show Tour" = "Tour anzeigen";

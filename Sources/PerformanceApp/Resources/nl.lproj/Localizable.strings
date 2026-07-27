@@ -413,3 +413,29 @@
 "Move Down" = "Verplaats omlaag";
 "Move Earlier" = "Verplaats naar voren";
 "Move Later" = "Verplaats naar achteren";
+
+
+/* MARK: - Onboarding tour (1.2c) */
+"Skip" = "Overslaan";
+"Back" = "Terug";
+"Next" = "Volgende";
+"It lives up here, in your menu bar." = "Hij zit hierboven, in je menubalk.";
+"What shows in your menu bar?" = "Wat verschijnt in je menubalk?";
+"Pick the metrics you want to see. You can fine-tune these anytime in Settings." = "Kies de metrics die je wilt zien. Je kunt dit altijd verfijnen in Instellingen.";
+"Live preview" = "Live voorbeeld";
+"Nothing selected — pick at least one metric above." = "Niets geselecteerd — kies hierboven minstens één metric.";
+"Your at-a-glance overview" = "Je overzicht in één oogopslag";
+"One click on the menu bar icon opens a compact overview of everything at once." = "Eén klik op het menubalk-icoon opent een compact overzicht van alles tegelijk.";
+"Open the overview" = "Open het overzicht";
+"Couldn't open it automatically — click the app's icon in your menu bar to see it." = "Kon het niet automatisch openen — klik op het app-icoon in je menubalk om het te zien.";
+"Click any card for a detailed window." = "Klik op een kaart voor een gedetailleerd venster.";
+"Get a heads-up (optional)" = "Krijg een seintje (optioneel)";
+"Optionally get a notification when something needs your attention. You can skip this entirely." = "Ontvang optioneel een melding wanneer er iets je aandacht nodig heeft. Je kunt dit helemaal overslaan.";
+"Enable alerts" = "Meldingen inschakelen";
+"Notify me when CPU is above" = "Waarschuw me als CPU boven";
+"Fine-tune memory, disk, GPU and thermal alerts later in Settings." = "Verfijn geheugen-, schijf-, GPU- en temperatuurmeldingen later in Instellingen.";
+"You're all set" = "Je bent klaar";
+"A couple of optional permissions, and you're ready to go." = "Een paar optionele machtigingen en je kunt aan de slag.";
+"Getting started" = "Aan de slag";
+"Show the welcome tour again" = "Toon de welkomstrondleiding opnieuw";
+"Show Tour" = "Toon rondleiding";

@@ -712,6 +712,7 @@ private struct UpdatesTab: View {
 
 private struct AboutTab: View {
     @ObservedObject var updater: UpdateChecker
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         VStack(spacing: 16) {
@@ -738,6 +739,14 @@ private struct AboutTab: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
                     .padding(.top, 4)
+            }
+
+            SettingsSection(icon: "sparkles", title: String(localized: "Getting started"), color: .teal) {
+                SettingsRow(label: String(localized: "Show the welcome tour again")) {
+                    Button(String(localized: "Show Tour")) {
+                        openWindow(id: "onboarding")
+                    }
+                }
             }
 
             footer

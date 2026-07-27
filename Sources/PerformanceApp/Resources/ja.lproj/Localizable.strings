@@ -413,3 +413,29 @@
 "Move Down" = "下に移動";
 "Move Earlier" = "前に移動";
 "Move Later" = "後に移動";
+
+
+/* MARK: - Onboarding tour (1.2c) */
+"Skip" = "スキップ";
+"Back" = "戻る";
+"Next" = "次へ";
+"It lives up here, in your menu bar." = "メニューバー、この上にあります。";
+"What shows in your menu bar?" = "メニューバーに何を表示しますか？";
+"Pick the metrics you want to see. You can fine-tune these anytime in Settings." = "表示したい指標を選んでください。設定でいつでも調整できます。";
+"Live preview" = "ライブプレビュー";
+"Nothing selected — pick at least one metric above." = "何も選択されていません — 上で指標を1つ以上選んでください。";
+"Your at-a-glance overview" = "ひと目でわかる概要";
+"One click on the menu bar icon opens a compact overview of everything at once." = "メニューバーのアイコンをクリックすると、すべてをまとめたコンパクトな概要が開きます。";
+"Open the overview" = "概要を開く";
+"Couldn't open it automatically — click the app's icon in your menu bar to see it." = "自動的に開けませんでした — メニューバーのアプリアイコンをクリックして表示してください。";
+"Click any card for a detailed window." = "カードをクリックすると詳細ウインドウが開きます。";
+"Get a heads-up (optional)" = "通知を受け取る（任意）";
+"Optionally get a notification when something needs your attention. You can skip this entirely." = "注意が必要なときに通知を受け取ることもできます（任意）。この手順は省略しても構いません。";
+"Enable alerts" = "アラートを有効にする";
+"Notify me when CPU is above" = "CPU が次を超えたら通知";
+"Fine-tune memory, disk, GPU and thermal alerts later in Settings." = "メモリ・ディスク・GPU・温度のアラートは後で設定で調整できます。";
+"You're all set" = "準備完了";
+"A couple of optional permissions, and you're ready to go." = "いくつかの任意の許可を設定すれば、すぐに使い始められます。";
+"Getting started" = "はじめに";
+"Show the welcome tour again" = "ようこそツアーをもう一度表示";
+"Show Tour" = "ツアーを表示";

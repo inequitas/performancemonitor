@@ -413,3 +413,29 @@
 "Move Down" = "Move Down";
 "Move Earlier" = "Move Earlier";
 "Move Later" = "Move Later";
+
+
+/* MARK: - Onboarding tour (1.2c) */
+"Skip" = "Skip";
+"Back" = "Back";
+"Next" = "Next";
+"It lives up here, in your menu bar." = "It lives up here, in your menu bar.";
+"What shows in your menu bar?" = "What shows in your menu bar?";
+"Pick the metrics you want to see. You can fine-tune these anytime in Settings." = "Pick the metrics you want to see. You can fine-tune these anytime in Settings.";
+"Live preview" = "Live preview";
+"Nothing selected — pick at least one metric above." = "Nothing selected — pick at least one metric above.";
+"Your at-a-glance overview" = "Your at-a-glance overview";
+"One click on the menu bar icon opens a compact overview of everything at once." = "One click on the menu bar icon opens a compact overview of everything at once.";
+"Open the overview" = "Open the overview";
+"Couldn't open it automatically — click the app's icon in your menu bar to see it." = "Couldn't open it automatically — click the app's icon in your menu bar to see it.";
+"Click any card for a detailed window." = "Click any card for a detailed window.";
+"Get a heads-up (optional)" = "Get a heads-up (optional)";
+"Optionally get a notification when something needs your attention. You can skip this entirely." = "Optionally get a notification when something needs your attention. You can skip this entirely.";
+"Enable alerts" = "Enable alerts";
+"Notify me when CPU is above" = "Notify me when CPU is above";
+"Fine-tune memory, disk, GPU and thermal alerts later in Settings." = "Fine-tune memory, disk, GPU and thermal alerts later in Settings.";
+"You're all set" = "You're all set";
+"A couple of optional permissions, and you're ready to go." = "A couple of optional permissions, and you're ready to go.";
+"Getting started" = "Getting started";
+"Show the welcome tour again" = "Show the welcome tour again";
+"Show Tour" = "Show Tour";

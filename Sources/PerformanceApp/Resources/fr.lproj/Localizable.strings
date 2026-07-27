@@ -413,3 +413,29 @@
 "Move Down" = "Déplacer vers le bas";
 "Move Earlier" = "Déplacer vers l’avant";
 "Move Later" = "Déplacer vers l’arrière";
+
+
+/* MARK: - Onboarding tour (1.2c) */
+"Skip" = "Ignorer";
+"Back" = "Retour";
+"Next" = "Suivant";
+"It lives up here, in your menu bar." = "Elle se trouve ici, dans votre barre de menus.";
+"What shows in your menu bar?" = "Qu'affiche votre barre de menus ?";
+"Pick the metrics you want to see. You can fine-tune these anytime in Settings." = "Choisissez les mesures à afficher. Vous pourrez les ajuster à tout moment dans les Réglages.";
+"Live preview" = "Aperçu en direct";
+"Nothing selected — pick at least one metric above." = "Rien de sélectionné — choisissez au moins une mesure ci-dessus.";
+"Your at-a-glance overview" = "Votre aperçu en un coup d'œil";
+"One click on the menu bar icon opens a compact overview of everything at once." = "Un clic sur l'icône de la barre de menus ouvre un aperçu compact de tout à la fois.";
+"Open the overview" = "Ouvrir l'aperçu";
+"Couldn't open it automatically — click the app's icon in your menu bar to see it." = "Impossible de l'ouvrir automatiquement — cliquez sur l'icône de l'app dans votre barre de menus pour l'afficher.";
+"Click any card for a detailed window." = "Cliquez sur une carte pour une fenêtre détaillée.";
+"Get a heads-up (optional)" = "Soyez prévenu (facultatif)";
+"Optionally get a notification when something needs your attention. You can skip this entirely." = "Recevez éventuellement une notification lorsqu'un point requiert votre attention. Vous pouvez tout à fait ignorer cette étape.";
+"Enable alerts" = "Activer les alertes";
+"Notify me when CPU is above" = "M'avertir quand le CPU dépasse";
+"Fine-tune memory, disk, GPU and thermal alerts later in Settings." = "Ajustez les alertes mémoire, disque, GPU et thermiques plus tard dans les Réglages.";
+"You're all set" = "Tout est prêt";
+"A couple of optional permissions, and you're ready to go." = "Quelques autorisations facultatives, et vous êtes prêt.";
+"Getting started" = "Prise en main";
+"Show the welcome tour again" = "Revoir la visite de bienvenue";
+"Show Tour" = "Afficher la visite";

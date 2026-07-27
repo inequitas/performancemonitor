@@ -446,6 +446,14 @@ final class MetricsEngine: ObservableObject {
         startHistoryCompactionLoop()
     }
 
+    /// Opens the menu-bar popover (the live at-a-glance overview) from code —
+    /// used by the onboarding tour to show the real popover. Returns `false`
+    /// if there is no menu-bar status item to anchor it to.
+    @discardableResult
+    func showMenuBarPopover() -> Bool {
+        extraBarController?.openPopover() ?? false
+    }
+
     /// Runs `HistoryDatabase.compact()` about once a minute for the lifetime
     /// of the app. The `Task.detached` body hops onto `historyDB`'s own
     /// actor for the actual work, so compaction never runs on the main

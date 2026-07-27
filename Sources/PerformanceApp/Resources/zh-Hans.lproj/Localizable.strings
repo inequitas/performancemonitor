@@ -412,3 +412,29 @@
 "Move Down" = "下移";
 "Move Earlier" = "前移";
 "Move Later" = "后移";
+
+
+/* MARK: - Onboarding tour (1.2c) */
+"Skip" = "跳过";
+"Back" = "上一步";
+"Next" = "下一步";
+"It lives up here, in your menu bar." = "它就在上方的菜单栏里。";
+"What shows in your menu bar?" = "菜单栏显示哪些内容？";
+"Pick the metrics you want to see. You can fine-tune these anytime in Settings." = "选择你想查看的指标。随时可在“设置”中微调。";
+"Live preview" = "实时预览";
+"Nothing selected — pick at least one metric above." = "未选择任何项 — 请在上方至少选择一个指标。";
+"Your at-a-glance overview" = "一目了然的概览";
+"One click on the menu bar icon opens a compact overview of everything at once." = "单击菜单栏图标即可打开所有信息的紧凑概览。";
+"Open the overview" = "打开概览";
+"Couldn't open it automatically — click the app's icon in your menu bar to see it." = "无法自动打开 — 请点击菜单栏中的应用图标查看。";
+"Click any card for a detailed window." = "点击任意卡片可打开详细窗口。";
+"Get a heads-up (optional)" = "获得提醒（可选）";
+"Optionally get a notification when something needs your attention. You can skip this entirely." = "可选择在有情况需要关注时收到通知。你完全可以跳过此步骤。";
+"Enable alerts" = "启用提醒";
+"Notify me when CPU is above" = "当 CPU 高于以下值时通知我";
+"Fine-tune memory, disk, GPU and thermal alerts later in Settings." = "稍后可在“设置”中微调内存、磁盘、GPU 和温度提醒。";
+"You're all set" = "一切就绪";
+"A couple of optional permissions, and you're ready to go." = "只需几项可选权限，即可开始使用。";
+"Getting started" = "开始使用";
+"Show the welcome tour again" = "再次显示欢迎导览";
+"Show Tour" = "显示导览";
