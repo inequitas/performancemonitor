@@ -2,7 +2,7 @@
 
 **[perfmon.knhome.nl](https://perfmon.knhome.nl)** — A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
 
-[![CI](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml/badge.svg)](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml) ![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.0.0-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green) [![Sponsor](https://img.shields.io/badge/%E2%9D%A4-Sponsor-ea4aaa)](https://github.com/sponsors/inequitas)
+[![CI](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml/badge.svg)](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml) ![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.1.0-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green) [![Sponsor](https://img.shields.io/badge/%E2%9D%A4-Sponsor-ea4aaa)](https://github.com/sponsors/inequitas)
 
 <p align="center">
   <img src="screenshots/Main_Screen.png" width="420" alt="Performance Monitor overview popover showing CPU, memory, disk, thermal, GPU, battery, network and Bluetooth cards">
@@ -25,12 +25,14 @@
 
 ---
 
-## What's new in v1.0.0
+## What's new in v1.1.0
 
-- **Signed auto-updates** — in-app updates are cryptographically verified (Ed25519) before installation
-- **Beta channel** — separate "Performance Monitor Beta" app for testing pre-releases alongside the stable app
-- **Lighter footprint** — process sampling only runs while visible; all system reads off the main thread
-- **First-run onboarding, VoiceOver support, and local (never uploaded) crash reports**
+- **Now in 7 languages** — English, Dutch, German, French, Spanish, Simplified Chinese, and Japanese, with an in-app language switcher
+- **More metrics** — per-component power draw in watts (CPU / GPU / Neural Engine / memory), SSD wear level, and network data usage per day / week / month
+- **History window** — graphs from the last hour up to 30 days, with a "last 7 days" summary
+- **Smarter alerts** — fire only when a threshold stays crossed for a duration you set, plus optional menu bar threshold colouring
+- **Even lighter** — idle CPU cut by roughly 80%
+- **First community contributions** — thanks to @jaideepkathiresan and @Borisserz 🙏
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
