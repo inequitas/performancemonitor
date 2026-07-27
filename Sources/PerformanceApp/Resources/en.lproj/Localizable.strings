@@ -195,7 +195,6 @@
 
 /* MARK: - DetailShared */
 "Case" = "Case";
-"%ld percent, low battery" = "%ld percent, low battery";
 "Resume live updates" = "Resume live updates";
 "Pause list" = "Pause list";
 "No data captured." = "No data captured.";
@@ -224,7 +223,6 @@
 /* MARK: - BatteryDetailView */
 "Source" = "Source";
 "State" = "State";
-"Charging" = "Charging";
 "Discharging" = "Discharging";
 "Time to full" = "Time to full";
 "Time remaining" = "Time remaining";

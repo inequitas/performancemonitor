@@ -195,7 +195,6 @@
 
 /* MARK: - DetailShared */
 "Case" = "Boîtier";
-"%ld percent, low battery" = "%ld pour cent, batterie faible";
 "Resume live updates" = "Reprendre les mises à jour en direct";
 "Pause list" = "Mettre la liste en pause";
 "No data captured." = "Aucune donnée capturée.";
@@ -224,7 +223,6 @@
 /* MARK: - BatteryDetailView */
 "Source" = "Source";
 "State" = "État";
-"Charging" = "En charge";
 "Discharging" = "En décharge";
 "Time to full" = "Temps avant charge complète";
 "Time remaining" = "Temps restant";

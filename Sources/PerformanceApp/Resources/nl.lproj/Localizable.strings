@@ -195,7 +195,6 @@
 
 /* MARK: - DetailShared */
 "Case" = "Hoesje";
-"%ld percent, low battery" = "%ld procent, batterij bijna leeg";
 "Resume live updates" = "Live updates hervatten";
 "Pause list" = "Lijst pauzeren";
 "No data captured." = "Geen data vastgelegd.";
@@ -224,7 +223,6 @@
 /* MARK: - BatteryDetailView */
 "Source" = "Bron";
 "State" = "Status";
-"Charging" = "Opladen";
 "Discharging" = "Ontladen";
 "Time to full" = "Tijd tot vol";
 "Time remaining" = "Resterende tijd";

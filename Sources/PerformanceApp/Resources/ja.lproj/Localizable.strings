@@ -195,7 +195,6 @@
 
 /* MARK: - DetailShared */
 "Case" = "ケース";
-"%ld percent, low battery" = "%ld パーセント、バッテリー残量わずか";
 "Resume live updates" = "ライブ更新を再開";
 "Pause list" = "リストを一時停止";
 "No data captured." = "データが記録されていません。";
@@ -224,7 +223,6 @@
 /* MARK: - BatteryDetailView */
 "Source" = "電源";
 "State" = "状態";
-"Charging" = "充電中";
 "Discharging" = "放電中";
 "Time to full" = "満充電までの時間";
 "Time remaining" = "残り時間";

@@ -194,7 +194,6 @@
 
 /* MARK: - DetailShared */
 "Case" = "充电盒";
-"%ld percent, low battery" = "%ld%%，电量不足";
 "Resume live updates" = "恢复实时更新";
 "Pause list" = "暂停列表";
 "No data captured." = "未采集到数据。";
@@ -223,7 +222,6 @@
 /* MARK: - BatteryDetailView */
 "Source" = "来源";
 "State" = "状态";
-"Charging" = "充电中";
 "Discharging" = "放电中";
 "Time to full" = "充满所需时间";
 "Time remaining" = "剩余时间";
