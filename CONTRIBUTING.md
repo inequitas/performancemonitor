@@ -13,7 +13,9 @@ Accidentally targeted `main`? No problem — just change the base branch with th
 
 ## Building
 
-See [README.md](README.md#building-from-source) — `bash build_app.sh` is all you need (Apple Silicon Mac, Xcode Command Line Tools, Swift 5.10+). Run the tests with `swift test`.
+See [README.md](README.md#building-from-source) — `bash build_app.sh` is all you need (Apple Silicon Mac, Xcode Command Line Tools, Swift 5.10+).
+
+Run the tests with `bash scripts/test.sh` (it takes the same arguments as `swift test`, e.g. `bash scripts/test.sh --filter DiskIORates`). Use it rather than a bare `swift test`: with only the Command Line Tools installed, swift-testing isn't on the default search path and `swift test` fails with `no such module 'Testing'`. The script adds the three search paths needed and is a plain `swift test` everywhere else.
 
 ## Translations
 
@@ -28,4 +30,4 @@ Open a PR that edits the value side of any entry (the English key must stay unch
 
 - Keep the app dependency-free: system frameworks only.
 - No telemetry, analytics, or network calls beyond what the README documents.
-- Match the existing code style; run `swift test` before opening a PR.
+- Match the existing code style; run `bash scripts/test.sh` before opening a PR.

@@ -129,11 +129,11 @@ fi
 
 # --- (d) test + build ----------------------------------------------------
 echo "==> Running swift test..."
-# PM_SWIFT_TEST_FLAGS: extra flags for machines where Testing.framework is not
-# on the default search path (Command Line Tools without full Xcode), e.g.
-#   PM_SWIFT_TEST_FLAGS="-Xswiftc -F -Xswiftc /Library/Developer/CommandLineTools/Library/Developer/Frameworks"
-# shellcheck disable=SC2086
-swift test ${PM_SWIFT_TEST_FLAGS:-}
+# Via scripts/test.sh, which adds the search paths a Command-Line-Tools-only
+# Mac needs to find swift-testing (a plain `swift test` there fails with "no
+# such module 'Testing'"). PM_SWIFT_TEST_FLAGS still overrides, and is passed
+# straight through.
+bash scripts/test.sh
 
 echo "==> Running build_app.sh $([ "$BETA" = true ] && echo '--beta')..."
 if [ "$BETA" = true ]; then
