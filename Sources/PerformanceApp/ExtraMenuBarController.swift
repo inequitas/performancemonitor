@@ -268,33 +268,47 @@ final class ExtraMenuBarController: NSObject {
     /// shortcut has no sender, so it falls back to whichever button currently
     /// exists (combined item, or the first separate item).
     @objc private func handleClick(_ sender: NSStatusBarButton? = nil) {
-        let anchorButton = sender ?? combinedStatusItem?.button
-            ?? settings.menuBarOrder.compactMap { perMetricStatusItems[$0]?.button }.first
-        guard let popover = sharedPopover, let button = anchorButton else { return }
+        guard let popover = sharedPopover else { return }
         if popover.isShown {
             popover.performClose(nil)
         } else {
-            mountPopoverContent()
-            syncPopoverAppearance()
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-            NSApp.activate(ignoringOtherApps: true)
+            showPopover(from: sender)
         }
+    }
+
+    /// The status-item button to anchor the popover to. `preferred` is the
+    /// button that was actually clicked (any one of the separate items can
+    /// trigger a click); everything else falls back to the combined item, then
+    /// the first separate item in menu-bar order.
+    private func anchorButton(preferred: NSStatusBarButton? = nil) -> NSStatusBarButton? {
+        preferred ?? combinedStatusItem?.button
+            ?? settings.menuBarOrder.compactMap { perMetricStatusItems[$0]?.button }.first
+    }
+
+    /// Shows the shared popover anchored to a menu-bar status item. Shared by
+    /// real clicks (`handleClick`) and the onboarding tour's "Open the overview"
+    /// step, so both anchor to the icon in exactly the same way.
+    private func showPopover(from preferred: NSStatusBarButton? = nil) {
+        guard let popover = sharedPopover, let button = anchorButton(preferred: preferred) else { return }
+        mountPopoverContent()
+        syncPopoverAppearance()
+        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        NSApp.activate(ignoringOtherApps: true)
     }
 
     /// Opens the shared popover from outside a status-item click — used by the
     /// onboarding tour's "Open the overview" step so it shows the real popover,
-    /// anchored to the menu-bar icon. Drives the *actual* status-item button's
-    /// action (`performClick`) rather than showing a popover relative to some
-    /// other view, so the anchoring is byte-for-byte identical to a real click.
-    /// No-op if already shown. Returns `false` when there is no status item to
-    /// anchor to (e.g. no menu-bar metric enabled), so the caller can show a
-    /// fallback hint instead.
+    /// anchored to the menu-bar icon. Shows it directly relative to the status
+    /// item rather than going through the button's `performClick`, whose action
+    /// is gated to `.leftMouseDown` and so isn't reliably delivered by a
+    /// synthetic click — that left the popover unanchored, opening in the wrong
+    /// corner. No-op if already shown. Returns `false` when there is no status
+    /// item to anchor to (e.g. no menu-bar metric enabled), so the caller can
+    /// show a fallback hint instead.
     @discardableResult
     func openPopover() -> Bool {
-        let anchorButton = combinedStatusItem?.button
-            ?? settings.menuBarOrder.compactMap { perMetricStatusItems[$0]?.button }.first
-        guard let popover = sharedPopover, let button = anchorButton else { return false }
-        if !popover.isShown { button.performClick(nil) }
+        guard let popover = sharedPopover, anchorButton() != nil else { return false }
+        if !popover.isShown { showPopover() }
         return true
     }
 
