@@ -21,3 +21,7 @@ xcuserdata/
 scripts/private_key.txt
 # Local planning doc (not published)
 ROADMAP.md
+
+# Output van scripts/benchmark.sh (lokale metingen)
+benchmark-*.csv
+measurements/
