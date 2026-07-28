@@ -28,7 +28,7 @@
 ## What's new in v1.1.0
 
 - **Now in 7 languages** — English, Dutch, German, French, Spanish, Simplified Chinese, and Japanese, with an in-app language switcher
-- **More metrics** — per-component power draw in watts (CPU / GPU / Neural Engine / memory), SSD wear level, and network data usage per day / week / month
+- **More metrics** — power draw in watts (total system power, plus battery charge/discharge), SSD wear level, and network data usage per day / week / month
 - **History window** — graphs from the last hour up to 30 days, with a "last 7 days" summary
 - **Smarter alerts** — fire only when a threshold stays crossed for a duration you set, plus optional menu bar threshold colouring
 - **Even lighter** — idle CPU cut by roughly 80%
