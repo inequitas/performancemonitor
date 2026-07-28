@@ -3,38 +3,61 @@ import AppKit
 import Charts
 import PerformanceAppCore
 
-// Known, deliberately unfixed: once this window has been opened and closed,
-// SwiftUI keeps its view tree alive and keeps laying it out on engine ticks —
-// the same pattern that made the popover cost ~6% idle CPU (fixed in 15afcd6,
-// see ExtraMenuBarController.mountPopoverContent / popoverDidClose).
+// Once a detail window has been opened, SwiftUI keeps its view tree alive after
+// the window closes, and that tree stays subscribed to the engine's ~80
+// @Published writes per second — so a window nobody can see keeps re-evaluating
+// its body forever. Same pattern as the popover, fixed in 15afcd6 (see
+// ExtraMenuBarController.mountPopoverContent / popoverDidClose).
 //
-// Measured here at roughly 60-97 `sizeThatFits` samples out of ~6000, against
-// 1070 for the popover, and it does NOT accumulate: SwiftUI reuses one tree per
-// WindowGroup, so repeated open/close keeps the cost flat. The difference was
-// below the noise floor (6.5% after open/close vs 6.9% with nothing ever
-// opened, 60s cputime deltas) — the "leaky" run actually measured lower.
+// This was measured on 23 Jul and deliberately left alone: 6.5% after
+// open/close vs 6.9% with nothing ever opened, i.e. lost in the noise. That
+// call was right at the time and wrong a few hours later — `518f968` landed the
+// same evening and took the idle floor from 5.3% to 2.5%. Re-measured 28 Jul
+// against the lower floor, the same absolute cost is now the dominant one:
 //
-// Gating the content on window visibility would risk a reopened window coming
-// back empty or mis-sized, because makeNSView runs once per window instance and
-// SwiftUI reuses the window. That is a visible regression traded for an
-// unmeasurable gain, so it stays as is. The History window behaves the same way.
-// Revisit only if a future change makes this measurable.
+//     never opened a window       1.76% CPU / 78 MB
+//     after one open + close      4.25% CPU / 108 MB   (and it never drops back)
+//
+// Confirmed with `sample <pid> 20` while CGWindowListCopyWindowInfo reported
+// zero on-screen windows: the profile still contained MemoryDetailView.body
+// .getter over Combine's Published.subscript.getter. The old comment ended with
+// "revisit only if a future change makes this measurable" — this is that revisit.
+//
+// The fix is to unmount the content while the window is not visible. The old
+// worry was that a reopened window would come back empty or mis-sized, since
+// makeNSView runs once per window instance and SwiftUI reuses the window. That
+// is handled by construction: the window's size comes from the outer .frame
+// below (and from setContentSize in WindowFloatAccessor), never from the
+// content, and the placeholder keeps the scroll content's height stable, so
+// there is nothing left to collapse.
 struct DetailWindow: View {
     let kind: MetricsEngine.Panel
     @ObservedObject var engine: MetricsEngine
 
+    /// Mirrors the window's real on-screen visibility, driven by
+    /// `WindowFloatAccessor` from the same occlusion/close events that already
+    /// gate ps/nettop sampling. While false, the content tree is torn down and
+    /// stops observing the engine entirely.
+    @State private var isContentVisible = true
+
     var body: some View {
         ScrollView {
             Group {
-                switch kind {
-                case .cpu:       CPUDetailView(engine: engine)
-                case .memory:    MemoryDetailView(engine: engine)
-                case .network:   NetworkDetailView(engine: engine)
-                case .disk:      DiskDetailView(engine: engine)
-                case .gpu:       GPUDetailView(engine: engine)
-                case .battery:   BatteryDetailView(engine: engine)
-                case .bluetooth: BluetoothDetailView(engine: engine)
-                case .thermal:   ThermalDetailView(engine: engine)
+                if isContentVisible {
+                    switch kind {
+                    case .cpu:       CPUDetailView(engine: engine)
+                    case .memory:    MemoryDetailView(engine: engine)
+                    case .network:   NetworkDetailView(engine: engine)
+                    case .disk:      DiskDetailView(engine: engine)
+                    case .gpu:       GPUDetailView(engine: engine)
+                    case .battery:   BatteryDetailView(engine: engine)
+                    case .bluetooth: BluetoothDetailView(engine: engine)
+                    case .thermal:   ThermalDetailView(engine: engine)
+                    }
+                } else {
+                    // Holds the scroll content's height so nothing reflows while
+                    // the real content is unmounted. Observes nothing.
+                    Color.clear.frame(height: detailWindowHeight)
                 }
             }
             .padding()
@@ -43,7 +66,8 @@ struct DetailWindow: View {
         .frame(width: detailWindowWidth, height: detailWindowHeight)
         .navigationTitle(kind.title)
         .background(.regularMaterial)
-        .background(WindowFloatAccessor(kind: kind, engine: engine))
+        .background(WindowFloatAccessor(kind: kind, engine: engine,
+                                        isContentVisible: $isContentVisible))
         .preferredColorScheme(engine.settings.preferredColorScheme)
     }
 }
@@ -318,9 +342,16 @@ struct CopyableIPRow: View {
 private struct WindowFloatAccessor: NSViewRepresentable {
     let kind: MetricsEngine.Panel
     let engine: MetricsEngine
+    /// Drives `DetailWindow.isContentVisible`. Updated from the very same
+    /// events that report visibility to the engine, so the content tree and the
+    /// sampling gate can never disagree about whether this window is on screen.
+    @Binding var isContentVisible: Bool
 
     func makeNSView(context: Context) -> NSView {
         let view = NSView()
+        // Captured explicitly: the notification closures below outlive this
+        // struct value, and a Binding copy keeps working on its own.
+        let visibility = $isContentVisible
         DispatchQueue.main.async {
             guard let window = view.window else { return }
             window.level = .floating
@@ -332,7 +363,9 @@ private struct WindowFloatAccessor: NSViewRepresentable {
             window.setContentSize(NSSize(width: detailWindowWidth, height: detailWindowHeight))
             window.styleMask.remove(.resizable)
 
-            engine.setPanelVisible(window.occlusionState.contains(.visible), for: kind)
+            let visible = window.occlusionState.contains(.visible)
+            engine.setPanelVisible(visible, for: kind)
+            visibility.wrappedValue = visible
 
             NotificationCenter.default.addObserver(
                 forName: NSWindow.didChangeOcclusionStateNotification,
@@ -341,7 +374,9 @@ private struct WindowFloatAccessor: NSViewRepresentable {
             ) { [weak engine] note in
                 guard let win = note.object as? NSWindow else { return }
                 Task { @MainActor in
-                    engine?.setPanelVisible(win.occlusionState.contains(.visible), for: kind)
+                    let visible = win.occlusionState.contains(.visible)
+                    engine?.setPanelVisible(visible, for: kind)
+                    visibility.wrappedValue = visible
                 }
             }
 
@@ -352,6 +387,10 @@ private struct WindowFloatAccessor: NSViewRepresentable {
             ) { [weak engine] _ in
                 Task { @MainActor in
                     engine?.setPanelVisible(false, for: kind)
+                    // Tears the content tree down for good: without this the
+                    // closed window keeps re-evaluating its body on every
+                    // engine tick, which is the whole point of this change.
+                    visibility.wrappedValue = false
                     guard let engine, !engine.settings.showInDock else { return }
                     if !NSApp.hasOtherVisibleTitledWindow(besides: window) {
                         NSApp.setActivationPolicy(.accessory)
