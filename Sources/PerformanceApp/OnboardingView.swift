@@ -41,6 +41,7 @@ struct OnboardingView: View {
     let engine: MetricsEngine
     @Environment(\.dismissWindow) private var dismissWindow
     @State private var step = 0
+    @State private var direction = 1
     private let stepCount = 5
 
     var body: some View {
@@ -52,17 +53,34 @@ struct OnboardingView: View {
             Divider()
 
             // Each step is its own small view; the wizard is a plain switch.
-            Group {
-                switch step {
-                case 0:  WelcomeStep()
-                case 1:  MenuBarStep(engine: engine, settings: engine.settings)
-                case 2:  PopoverStep(engine: engine)
-                case 3:  AlertsStep(alerts: engine.alerts)
-                default: PermissionsStep()
+            // `.id(step)` makes SwiftUI treat every step as a distinct view so
+            // the asymmetric transition below actually plays instead of the
+            // content just cross-fading in place.
+            // The clip has to sit on a stable parent rather than on the
+            // transitioning view: `.clipped()` applied to the step itself would
+            // only clip it to its own bounds, which move with the slide. This
+            // fixed container is what keeps a sliding step inside the content
+            // band.
+            ZStack(alignment: .topLeading) {
+                Group {
+                    switch step {
+                    case 0:  WelcomeStep()
+                    case 1:  MenuBarStep(engine: engine, settings: engine.settings)
+                    case 2:  PopoverStep(engine: engine)
+                    case 3:  AlertsStep(alerts: engine.alerts)
+                    default: PermissionsStep()
+                    }
                 }
+                .id(step)
+                .transition(.asymmetric(
+                    insertion: .move(edge: direction > 0 ? .trailing : .leading).combined(with: .opacity),
+                    removal: .move(edge: direction > 0 ? .leading : .trailing).combined(with: .opacity)
+                ))
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .padding(20)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .padding(20)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .clipped()
 
             Divider()
 
@@ -74,8 +92,6 @@ struct OnboardingView: View {
         .background(.regularMaterial)
         .background(OnboardingWindowAccessor(settings: engine.settings))
         .preferredColorScheme(engine.settings.preferredColorScheme)
-        // No cross-step animation jitter as the window's fixed size stays put.
-        .transaction { $0.animation = nil }
     }
 
     private var bottomBar: some View {
@@ -86,21 +102,30 @@ struct OnboardingView: View {
                 Button(String(localized: "Skip")) { finish() }
                     .buttonStyle(.plain)
                     .foregroundStyle(.secondary)
+                    .font(.callout)
             }
 
             Spacer()
 
             if step > 0 {
-                Button(String(localized: "Back")) { step -= 1 }
+                Button(String(localized: "Back")) {
+                    direction = -1
+                    withAnimation(.easeInOut(duration: 0.28)) { step -= 1 }
+                }
             }
 
             if step < stepCount - 1 {
-                Button(String(localized: "Next")) { step += 1 }
-                    .buttonStyle(.borderedProminent)
-                    .keyboardShortcut(.defaultAction)
+                Button(String(localized: "Next")) {
+                    direction = 1
+                    withAnimation(.easeInOut(duration: 0.28)) { step += 1 }
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .keyboardShortcut(.defaultAction)
             } else {
                 Button(String(localized: "Get Started")) { finish() }
                     .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
                     .keyboardShortcut(.defaultAction)
             }
         }
@@ -121,11 +146,12 @@ private struct ProgressDots: View {
     var body: some View {
         HStack(spacing: 8) {
             ForEach(0..<total, id: \.self) { i in
-                Circle()
+                Capsule()
                     .fill(i == current ? Color.accentColor : Color.secondary.opacity(0.3))
-                    .frame(width: i == current ? 9 : 7, height: i == current ? 9 : 7)
+                    .frame(width: i == current ? 18 : 7, height: 7)
             }
         }
+        .animation(.easeInOut(duration: 0.28), value: current)
     }
 }
 
@@ -172,6 +198,7 @@ private struct WelcomeStep: View {
             HStack(alignment: .top, spacing: 14) {
                 Image(nsImage: NSApp.applicationIconImage)
                     .resizable().frame(width: 52, height: 52)
+                    .shadow(color: .black.opacity(0.15), radius: 6, y: 2)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(String(localized: "Welcome to Performance Monitor"))
                         .font(.title2.weight(.semibold))
@@ -205,7 +232,7 @@ private struct MenuBarStep: View {
     @ObservedObject var settings: SettingsStore
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 16) {
             StepHeader(title: String(localized: "What shows in your menu bar?"),
                        subtitle: String(localized: "Pick the metrics you want to see. You can fine-tune these anytime in Settings."))
 
@@ -298,6 +325,11 @@ private struct MenuBarPreview: View {
         .frame(height: 28)
         .frame(maxWidth: .infinity)
         .background(Color.black.opacity(0.85), in: RoundedRectangle(cornerRadius: 7))
+        // This redraws every metrics tick (~1/second) with fresh live images;
+        // animating those transitions would jitter, so suppress locally now
+        // that the root-level blanket suppression is gone (it would otherwise
+        // have killed the new step-slide transition too).
+        .transaction { $0.animation = nil }
     }
 
     private func previewImage(for metric: MenuBarMetric) -> NSImage {
@@ -412,7 +444,7 @@ private struct PermissionsStep: View {
             }
             .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
 
             HStack {
                 Label(String(localized: "Launch at login"), systemImage: "power")
