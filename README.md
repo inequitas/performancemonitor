@@ -5,7 +5,7 @@
 [![CI](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml/badge.svg)](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml) ![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.1.0-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green) [![Sponsor](https://img.shields.io/badge/%E2%9D%A4-Sponsor-ea4aaa)](https://github.com/sponsors/inequitas)
 
 <p align="center">
-  <img src="screenshots/Main_Screen.png" width="420" alt="Performance Monitor overview popover showing CPU, memory, disk, thermal, GPU, battery, network and Bluetooth cards">
+  <img src="screenshots/demo.gif" width="420" alt="Performance Monitor in use: live metrics in the menu bar, the overview popover with CPU, memory, disk, thermal, GPU, battery, network and Bluetooth cards, and the CPU detail window with per-core usage and top processes">
 </p>
 
 <p align="center">
