@@ -43,8 +43,24 @@ struct OnboardingView: View {
     @State private var step = 0
     @State private var direction = 1
     private let stepCount = 5
+    /// Mirrors the window's on-screen visibility; see `WindowVisibilityAccessor`.
+    /// It matters most here because step 2's live menu-bar preview redraws real
+    /// status-item images on every tick — left mounted after the tour closes it
+    /// would go on drawing them forever.
+    @State private var isContentVisible = true
 
     var body: some View {
+        VStack(spacing: 0) {
+            if isContentVisible { tour } else { Color.clear }
+        }
+        .frame(width: 460, height: 520)
+        .background(.regularMaterial)
+        .background(OnboardingWindowAccessor(settings: engine.settings,
+                                             isContentVisible: $isContentVisible))
+        .preferredColorScheme(engine.settings.preferredColorScheme)
+    }
+
+    private var tour: some View {
         VStack(spacing: 0) {
             ProgressDots(current: step, total: stepCount)
                 .padding(.top, 18)
@@ -88,10 +104,6 @@ struct OnboardingView: View {
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
         }
-        .frame(width: 460, height: 520)
-        .background(.regularMaterial)
-        .background(OnboardingWindowAccessor(settings: engine.settings))
-        .preferredColorScheme(engine.settings.preferredColorScheme)
     }
 
     private var bottomBar: some View {
@@ -474,47 +486,42 @@ private struct PermissionsStep: View {
 // policy on close (if Show in Dock is off). Also guarantees the "shown once"
 // flag is set even if the window is closed via the titlebar instead of the
 // "Get Started"/"Skip" buttons.
-private struct OnboardingWindowAccessor: NSViewRepresentable {
+private struct OnboardingWindowAccessor: View {
     let settings: SettingsStore
+    @Binding var isContentVisible: Bool
 
-    func makeNSView(context: Context) -> NSView {
-        let view = NSView()
-        DispatchQueue.main.async {
-            guard let window = view.window else { return }
-            window.styleMask.remove(.resizable)
-            // Anchor the window to the top-right, just under the menu bar — near
-            // where the app's own status item lives — so the "it lives up here"
-            // hint and the upward arrow line up with reality. `visibleFrame`
-            // already excludes the menu bar, so its maxY is exactly the top of
-            // the usable area. Prefer the screen under the mouse, falling back
-            // to the main screen.
-            let mouse = NSEvent.mouseLocation
-            let screen = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) }
-                ?? NSScreen.main
-            if let vf = screen?.visibleFrame {
-                let margin: CGFloat = 8
-                let size = window.frame.size
-                let x = vf.maxX - size.width - margin
-                let y = vf.maxY - size.height - margin
-                window.setFrameOrigin(NSPoint(x: x, y: y))
+    var body: some View {
+        WindowVisibilityAccessor(
+            isVisible: $isContentVisible,
+            configure: { window in configure(window) },
+            onClose: { [weak settings] window in
+                // Closing via the titlebar counts as completing the tour, so it
+                // never reappears automatically.
+                OnboardingGate.markCompleted()
+                restoreAccessoryPolicyIfLastWindow(besides: window, settings: settings)
             }
-            window.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
-            NotificationCenter.default.addObserver(
-                forName: NSWindow.willCloseNotification,
-                object: window,
-                queue: .main
-            ) { [weak settings] _ in
-                Task { @MainActor in
-                    OnboardingGate.markCompleted()
-                    guard let settings, !settings.showInDock else { return }
-                    if !NSApp.hasOtherVisibleTitledWindow(besides: window) {
-                        NSApp.setActivationPolicy(.accessory)
-                    }
-                }
-            }
-        }
-        return view
+        )
     }
-    func updateNSView(_ nsView: NSView, context: Context) {}
+
+    private func configure(_ window: NSWindow) {
+        window.styleMask.remove(.resizable)
+        // Anchor the window to the top-right, just under the menu bar — near
+        // where the app's own status item lives — so the "it lives up here"
+        // hint and the upward arrow line up with reality. `visibleFrame`
+        // already excludes the menu bar, so its maxY is exactly the top of
+        // the usable area. Prefer the screen under the mouse, falling back
+        // to the main screen.
+        let mouse = NSEvent.mouseLocation
+        let screen = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) }
+            ?? NSScreen.main
+        if let vf = screen?.visibleFrame {
+            let margin: CGFloat = 8
+            let size = window.frame.size
+            let x = vf.maxX - size.width - margin
+            let y = vf.maxY - size.height - margin
+            window.setFrameOrigin(NSPoint(x: x, y: y))
+        }
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
 }

@@ -339,66 +339,33 @@ struct CopyableIPRow: View {
 // `setPanelVisible`, so ps/nettop sampling for the CPU/Memory/Network panels
 // only runs while their window is really visible (not minimized/fully
 // occluded) — see `MetricsEngine.setPanelVisible`.
-private struct WindowFloatAccessor: NSViewRepresentable {
+private struct WindowFloatAccessor: View {
     let kind: MetricsEngine.Panel
     let engine: MetricsEngine
-    /// Drives `DetailWindow.isContentVisible`. Updated from the very same
-    /// events that report visibility to the engine, so the content tree and the
-    /// sampling gate can never disagree about whether this window is on screen.
+    /// Drives `DetailWindow.isContentVisible` from the very same events that
+    /// report visibility to the engine, so the content tree and the sampling
+    /// gate can never disagree about whether this window is on screen.
     @Binding var isContentVisible: Bool
 
-    func makeNSView(context: Context) -> NSView {
-        let view = NSView()
-        // Captured explicitly: the notification closures below outlive this
-        // struct value, and a Binding copy keeps working on its own.
-        let visibility = $isContentVisible
-        DispatchQueue.main.async {
-            guard let window = view.window else { return }
-            window.level = .floating
-            window.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
-            // Force every detail window to exactly the same content size.
-            // SwiftUI's frame/defaultSize hints are unreliable when windows have
-            // been resized or when content height differs between tabs.
-            window.setContentSize(NSSize(width: detailWindowWidth, height: detailWindowHeight))
-            window.styleMask.remove(.resizable)
-
-            let visible = window.occlusionState.contains(.visible)
-            engine.setPanelVisible(visible, for: kind)
-            visibility.wrappedValue = visible
-
-            NotificationCenter.default.addObserver(
-                forName: NSWindow.didChangeOcclusionStateNotification,
-                object: window,
-                queue: .main
-            ) { [weak engine] note in
-                guard let win = note.object as? NSWindow else { return }
-                Task { @MainActor in
-                    let visible = win.occlusionState.contains(.visible)
-                    engine?.setPanelVisible(visible, for: kind)
-                    visibility.wrappedValue = visible
-                }
+    var body: some View {
+        WindowVisibilityAccessor(
+            isVisible: $isContentVisible,
+            configure: { window in
+                window.level = .floating
+                window.makeKeyAndOrderFront(nil)
+                NSApp.activate(ignoringOtherApps: true)
+                // Force every detail window to exactly the same content size.
+                // SwiftUI's frame/defaultSize hints are unreliable when windows
+                // have been resized or when content height differs between tabs.
+                window.setContentSize(NSSize(width: detailWindowWidth, height: detailWindowHeight))
+                window.styleMask.remove(.resizable)
+            },
+            onVisibilityChange: { [weak engine] visible in
+                engine?.setPanelVisible(visible, for: kind)
+            },
+            onClose: { [weak engine] window in
+                restoreAccessoryPolicyIfLastWindow(besides: window, settings: engine?.settings)
             }
-
-            NotificationCenter.default.addObserver(
-                forName: NSWindow.willCloseNotification,
-                object: window,
-                queue: .main
-            ) { [weak engine] _ in
-                Task { @MainActor in
-                    engine?.setPanelVisible(false, for: kind)
-                    // Tears the content tree down for good: without this the
-                    // closed window keeps re-evaluating its body on every
-                    // engine tick, which is the whole point of this change.
-                    visibility.wrappedValue = false
-                    guard let engine, !engine.settings.showInDock else { return }
-                    if !NSApp.hasOtherVisibleTitledWindow(besides: window) {
-                        NSApp.setActivationPolicy(.accessory)
-                    }
-                }
-            }
-        }
-        return view
+        )
     }
-    func updateNSView(_ nsView: NSView, context: Context) {}
 }

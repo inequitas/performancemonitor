@@ -21,23 +21,43 @@ struct HistoryWindow: View {
     @State private var weeklyDataUsage: DataUsageTotals = .zero
     private let weeklyWindow: TimeInterval = 7 * 86_400
 
-    private struct LoadKey: Equatable { let period: HistoryPeriod; let enabled: Bool }
+    /// Mirrors the window's on-screen visibility; see `WindowVisibilityAccessor`.
+    @State private var isContentVisible = true
+
+    private struct LoadKey: Equatable {
+        let period: HistoryPeriod
+        let enabled: Bool
+        let visible: Bool
+    }
 
     private var hasAnyData: Bool { samplesByMetric.values.contains { !$0.isEmpty } }
 
     var body: some View {
         VStack(spacing: 0) {
-            header
-            Divider()
-            content
+            // Unmounted while the window is off screen: SwiftUI keeps this
+            // scene's tree alive after the window closes, and it observes the
+            // engine and re-queries the history database every 10 seconds. See
+            // WindowVisibilityAccessor for the measurements behind this.
+            if isContentVisible {
+                header
+                Divider()
+                content
+            } else {
+                Color.clear
+            }
         }
         .frame(minWidth: 480, idealWidth: 520, minHeight: 560, idealHeight: 640)
         .navigationTitle(String(localized: "History"))
         .background(.regularMaterial)
-        .background(HistoryWindowFocuser(settings: engine.settings))
+        .background(HistoryWindowFocuser(settings: engine.settings,
+                                         isContentVisible: $isContentVisible))
         .preferredColorScheme(engine.settings.preferredColorScheme)
-        .task(id: LoadKey(period: period, enabled: engine.settings.persistHistoryEnabled)) {
-            guard engine.settings.persistHistoryEnabled else { return }
+        // `id:` includes visibility so closing the window cancels the reload
+        // loop instead of leaving it querying the database forever.
+        .task(id: LoadKey(period: period,
+                          enabled: engine.settings.persistHistoryEnabled,
+                          visible: isContentVisible)) {
+            guard isContentVisible, engine.settings.persistHistoryEnabled else { return }
             await loadAll()
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: 10_000_000_000)
@@ -352,29 +372,20 @@ private struct HistoryChartCard: View {
 // open, and restores the .accessory activation policy on close (when
 // "Show in Dock" is off and no other titled window remains visible).
 
-private struct HistoryWindowFocuser: NSViewRepresentable {
+private struct HistoryWindowFocuser: View {
     let settings: SettingsStore
+    @Binding var isContentVisible: Bool
 
-    func makeNSView(context: Context) -> NSView {
-        let view = NSView()
-        DispatchQueue.main.async {
-            guard let window = view.window else { return }
-            window.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
-            NotificationCenter.default.addObserver(
-                forName: NSWindow.willCloseNotification,
-                object: window,
-                queue: .main
-            ) { [weak settings] _ in
-                Task { @MainActor in
-                    guard let settings, !settings.showInDock else { return }
-                    if !NSApp.hasOtherVisibleTitledWindow(besides: window) {
-                        NSApp.setActivationPolicy(.accessory)
-                    }
-                }
+    var body: some View {
+        WindowVisibilityAccessor(
+            isVisible: $isContentVisible,
+            configure: { window in
+                window.makeKeyAndOrderFront(nil)
+                NSApp.activate(ignoringOtherApps: true)
+            },
+            onClose: { [weak settings] window in
+                restoreAccessoryPolicyIfLastWindow(besides: window, settings: settings)
             }
-        }
-        return view
+        )
     }
-    func updateNSView(_ nsView: NSView, context: Context) {}
 }
