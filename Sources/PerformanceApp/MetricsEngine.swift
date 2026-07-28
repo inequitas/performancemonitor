@@ -296,10 +296,14 @@ final class MetricsEngine: ObservableObject {
             if visible {
                 networkProcessSampler.resetThrottle()
                 updateNetworkProcesses()
+                // Latency is only ever displayed by the Network detail window,
+                // so the probe only runs while that window is on screen.
+                startPingTimer()
             } else {
                 // Drop the rate baseline so the next visible sample starts
                 // fresh instead of averaging over the whole invisible span.
                 networkProcessSampler.invalidateBaseline()
+                stopPingTimer()
             }
         case .disk:
             if visible {
@@ -435,8 +439,10 @@ final class MetricsEngine: ObservableObject {
         // subsequent user changes (the load path is guarded).
         settings.onRefreshIntervalChanged = { [weak self] in self?.restartTimer() }
         settings.onPingServerChanged = { [weak self] in
-            self?.pingHistory = []
-            self?.startPingTimer()
+            guard let self else { return }
+            self.pingHistory = []
+            // Only re-arm if someone is actually looking at the result.
+            if self.visiblePanels.contains(.network) { self.startPingTimer() }
         }
         settings.onPublicIPEnabledChanged = { [weak self] enabled in
             if enabled { self?.fetchPublicIP() } else { self?.publicIP = nil }
@@ -452,7 +458,8 @@ final class MetricsEngine: ObservableObject {
         updateDisplays()
         updateVolumes()
         startPathMonitor()
-        startPingTimer()
+        // The ping timer is deliberately NOT started here — it only runs while
+        // the Network detail window is visible. See `setPanelVisible`.
         if settings.publicIPEnabled { fetchPublicIP() }
         refresh()
         restartTimer()
@@ -481,6 +488,11 @@ final class MetricsEngine: ObservableObject {
         }
     }
 
+    /// Fires a real HEAD request at an external host every 5 seconds, so it is
+    /// started only while the Network detail window is visible — its only
+    /// consumer — and stopped again when that window goes away. Left running
+    /// unconditionally it was well over 700 needless requests an hour, waking
+    /// the radio and draining battery for a number nobody was looking at.
     private func startPingTimer() {
         pingTimer?.invalidate()
         performLatencyCheck()
@@ -490,6 +502,11 @@ final class MetricsEngine: ObservableObject {
         // Let macOS coalesce this wakeup with others (latency needn't be
         // sampled on an exact 5s beat) — saves energy, especially on battery.
         pingTimer?.tolerance = 1
+    }
+
+    private func stopPingTimer() {
+        pingTimer?.invalidate()
+        pingTimer = nil
     }
 
     private func performLatencyCheck() {

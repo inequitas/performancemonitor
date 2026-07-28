@@ -19,6 +19,31 @@ final class HistoryStore {
     }()
     private var fileHandle: FileHandle?
 
+    /// Disk-write throttle, mirroring `DataUsageStore`. Rows were written
+    /// straight through on every engine tick — as often as twice a second — so
+    /// enabling history persistence meant a synchronous main-actor file write
+    /// at that rate forever. The CSV is a durability backstop, not a live feed,
+    /// so rows are buffered and flushed at most once a minute and on quit.
+    private var pendingRows: [String] = []
+    private var lastDiskWrite: Date = .distantPast
+    private let minWriteInterval: TimeInterval = 60
+    private var terminateObserver: NSObjectProtocol?
+
+    init() {
+        // Buffered rows would otherwise be lost on quit. Mirrors DataUsageStore.
+        terminateObserver = NotificationCenter.default.addObserver(
+            forName: NSApplication.willTerminateNotification, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.flushPendingRows() }
+        }
+    }
+
+    deinit {
+        if let terminateObserver {
+            NotificationCenter.default.removeObserver(terminateObserver)
+        }
+    }
+
     /// Appends one sampled row to the on-disk history CSV. No-ops unless
     /// persistence is enabled. The file (with header) is created lazily on the
     /// first enabled append.
@@ -39,10 +64,21 @@ final class HistoryStore {
             fileHandle?.seekToEndOfFile()
         }
 
-        let row = "\(Date().timeIntervalSince1970),\(cpu),\(memory),\(download),\(upload),\(diskFree)\n"
-        if let data = row.data(using: .utf8) {
-            fileHandle?.write(data)
-        }
+        pendingRows.append("\(Date().timeIntervalSince1970),\(cpu),\(memory),\(download),\(upload),\(diskFree)\n")
+
+        let now = Date()
+        guard now.timeIntervalSince(lastDiskWrite) >= minWriteInterval else { return }
+        lastDiskWrite = now
+        flushPendingRows()
+    }
+
+    /// Writes any buffered rows out in one go. Safe to call when nothing is
+    /// pending. Called on the once-a-minute cadence and on clean quit.
+    func flushPendingRows() {
+        guard !pendingRows.isEmpty, let handle = fileHandle else { return }
+        let blob = pendingRows.joined()
+        pendingRows.removeAll(keepingCapacity: true)
+        if let data = blob.data(using: .utf8) { handle.write(data) }
     }
 
     /// Prompts for a destination and writes the engine's in-memory ring-buffer

@@ -96,31 +96,26 @@ private struct SettingsWindowModifier: ViewModifier {
 // runs once per window instance — if it only registered the observer when
 // showInDock was false at first-open, toggling the setting later on the same
 // window instance would leave the dock icon stuck.
-private struct WindowFocuser: NSViewRepresentable {
+private struct WindowFocuser: View {
     let settings: SettingsStore
 
-    func makeNSView(context: Context) -> NSView {
-        let view = NSView()
-        DispatchQueue.main.async {
-            guard let window = view.window else { return }
-            window.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
-            NotificationCenter.default.addObserver(
-                forName: NSWindow.willCloseNotification,
-                object: window,
-                queue: .main
-            ) { [weak settings] _ in
-                Task { @MainActor in
-                    guard let settings, !settings.showInDock else { return }
-                    if !NSApp.hasOtherVisibleTitledWindow(besides: window) {
-                        NSApp.setActivationPolicy(.accessory)
-                    }
-                }
+    var body: some View {
+        // Settings has no expensive content to unmount — the tabs deliberately
+        // observe only the narrow stores they need, never the engine — so this
+        // takes a constant binding and uses the accessor purely for its window
+        // hooks and its observer bookkeeping (the hand-rolled version here
+        // discarded its NotificationCenter token on every window open).
+        WindowVisibilityAccessor(
+            isVisible: .constant(true),
+            configure: { window in
+                window.makeKeyAndOrderFront(nil)
+                NSApp.activate(ignoringOtherApps: true)
+            },
+            onClose: { [weak settings] window in
+                restoreAccessoryPolicyIfLastWindow(besides: window, settings: settings)
             }
-        }
-        return view
+        )
     }
-    func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
 // MARK: - General tab
