@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About the developer — Performance Monitor</title>
+<meta name="description" content="Who makes Performance Monitor, and how to get in touch. A personal project by Kevin Stam, in the Netherlands.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<style>
+  :root { --bg:#0e0e13; --card:#17171f; --text:#e8e8ee; --dim:#9a9aa8; --accent:#6b9eff; }
+  * { margin:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.65; }
+  .wrap { max-width:760px; margin:0 auto; padding:0 24px; }
+  header { padding:56px 0 8px; }
+  h1 { font-size:2.1rem; letter-spacing:-.02em; }
+  .updated { color:var(--dim); font-size:.9rem; margin-top:8px; }
+  h2 { font-size:1.25rem; margin:36px 0 12px; }
+  ul { padding-left:22px; margin:12px 0; }
+  li { margin-bottom:10px; }
+  .lead { font-size:1.1rem; color:var(--dim); margin-top:20px; }
+  .card { background:var(--card); border:1px solid #22222b; border-radius:14px; padding:20px; margin:20px 0; }
+  .card p + p { margin-top:10px; }
+  code { font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:.92em; background:#0a0a0f; border:1px solid #22222b; border-radius:5px; padding:1px 5px; }
+  a { color:var(--accent); }
+  footer { padding:48px 0 60px; margin-top:40px; color:var(--dim); font-size:.9rem; border-top:1px solid #1c1c24; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>About the developer</h1>
+  <p class="updated">Performance Monitor for macOS · last updated 30 July 2026</p>
+</header>
+
+<p class="lead">Performance Monitor is made by one person, not a company. If you are about to install software from someone you have never heard of, it is reasonable to want to know who that someone is. This page answers that.</p>
+
+<div class="card">
+  <p><strong>Kevin Stam</strong>, in the Netherlands.</p>
+  <p>Software developer by profession. Performance Monitor is a personal project, built in my own time and given away for free; it is not a product of my employer and has no company behind it.</p>
+  <p><a href="https://www.linkedin.com/in/kevin-stam/">LinkedIn</a> · <a href="https://github.com/inequitas">GitHub (@inequitas)</a></p>
+</div>
+
+<h2>Why this project exists</h2>
+
+<p>I wanted to see what my Mac was doing without paying a subscription or sending telemetry somewhere to find out. The good menu bar monitors are paid, several free ones are abandoned or phone home, and more than one of them costs a noticeable slice of the very thing it is measuring. So I wrote one that does not do any of that.</p>
+
+<p>It is free, MIT licensed, and it will stay that way. There is no paid tier and no feature held back. Everything it measures stays on your machine, and because the source is public you can verify that instead of believing it.</p>
+
+<h2>Getting in touch</h2>
+
+<p>The most useful place for anything about the app is GitHub, because it keeps the answer visible for whoever asks the same thing next:</p>
+
+<ul>
+  <li><strong>Bugs and feature requests</strong> — <a href="https://github.com/inequitas/performancemonitor/issues">open an issue</a>.</li>
+  <li><strong>Questions and general discussion</strong> — <a href="https://github.com/inequitas/performancemonitor/discussions">Discussions</a>.</li>
+  <li><strong>Anything private, including security reports</strong> — the <strong>Report a vulnerability</strong> form on the <a href="https://github.com/inequitas/performancemonitor/security">Security tab</a>. It opens a thread visible only to you and me. See the <a href="https://github.com/inequitas/performancemonitor/blob/main/SECURITY.md">security policy</a> for what to include.</li>
+  <li><strong>Anything else</strong> — <a href="https://www.linkedin.com/in/kevin-stam/">LinkedIn</a>.</li>
+</ul>
+
+<h2>What I will not do</h2>
+
+<p>Worth stating, since trust is the whole point of this page. I do not collect analytics, I do not run a mailing list, I will not add telemetry later, and there is no account to create. The app makes exactly three network requests and the <a href="privacy.html">privacy policy</a> names all three.</p>
+
+<h2>Honest limitations</h2>
+
+<p>This is a spare-time project maintained by one person. That has consequences worth knowing before you rely on it:</p>
+
+<ul>
+  <li>The app is <strong>Apple Silicon only</strong> (M1 or later, macOS 14 or newer). It will not run on Intel Macs.</li>
+  <li>It is <strong>ad-hoc signed rather than notarised</strong>, because an Apple Developer ID costs €99 a year and that is hard to justify for something given away. In practice the first launch needs a right-click, then Open. Updates are verified against an Ed25519 signature regardless.</li>
+  <li>Replies may take days. Bugs get fixed when I have an evening, not within an SLA.</li>
+  <li>The non-English translations were machine-generated and reviewed only for placeholders and layout, not by native speakers. Corrections are genuinely welcome.</li>
+</ul>
+
+<footer>
+  <a href="/">Performance Monitor</a> ·
+  <a href="privacy.html">Privacy Policy</a> ·
+  <a href="terms.html">Terms of Service</a> ·
+  <a href="https://github.com/inequitas/performancemonitor">GitHub</a><br><br>
+  MIT licensed. Made in the Netherlands.
+</footer>
+
+</div>
+</body>
+</html>
