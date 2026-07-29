@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terms of Service — Performance Monitor</title>
+<meta name="description" content="The terms the Performance Monitor app and this website are provided under. Free, MIT licensed, no warranty.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<style>
+  :root { --bg:#0e0e13; --card:#17171f; --text:#e8e8ee; --dim:#9a9aa8; --accent:#6b9eff; }
+  * { margin:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.65; }
+  .wrap { max-width:760px; margin:0 auto; padding:0 24px; }
+  header { padding:56px 0 8px; }
+  h1 { font-size:2.1rem; letter-spacing:-.02em; }
+  .updated { color:var(--dim); font-size:.9rem; margin-top:8px; }
+  h2 { font-size:1.25rem; margin:36px 0 12px; }
+  ul { padding-left:22px; margin:12px 0; }
+  li { margin-bottom:10px; }
+  .lead { font-size:1.1rem; color:var(--dim); margin-top:20px; }
+  .card { background:var(--card); border:1px solid #22222b; border-radius:14px; padding:20px; margin:20px 0; }
+  code { font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:.92em; background:#0a0a0f; border:1px solid #22222b; border-radius:5px; padding:1px 5px; }
+  a { color:var(--accent); }
+  footer { padding:48px 0 60px; margin-top:40px; color:var(--dim); font-size:.9rem; border-top:1px solid #1c1c24; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Terms of Service</h1>
+  <p class="updated">Performance Monitor for macOS · last updated 30 July 2026</p>
+</header>
+
+<p class="lead">Performance Monitor is free, open-source software released under the MIT licence. These terms describe what you may do with it, and what you should not expect from it. They are deliberately short, because a free MIT-licensed app does not need much more.</p>
+
+<div class="card">
+  <strong>The short version:</strong> the software is free to use, copy, modify and redistribute under the MIT licence. It comes with no warranty of any kind. It reads system information and shows it to you; it does not change how your Mac operates.
+</div>
+
+<h2>Licence</h2>
+
+<p>The software and its source code are licensed under the <a href="https://github.com/inequitas/performancemonitor/blob/main/LICENSE">MIT licence</a>. That licence is the operative agreement for the software itself: if anything here appears to conflict with it, the MIT licence governs. You may use the app privately or commercially, modify it, and distribute your own versions, provided the copyright notice and licence text travel with it.</p>
+
+<h2>No warranty</h2>
+
+<p>The app is provided "as is", without warranty of any kind, express or implied. That is the MIT licence's own wording and it is meant literally. The author is not liable for any claim, damages or other liability arising from the software or its use.</p>
+
+<p>In plain terms: this is a hobby project maintained by one person and given away. It is written carefully and tested, but it may contain bugs, may misreport a value, and may stop working after a macOS update. Do not rely on it as the sole basis for a decision that matters, such as concluding that a drive is healthy or that a machine is not overheating.</p>
+
+<h2>What the app does and does not do</h2>
+
+<ul>
+  <li>It <strong>reads</strong> system information through documented macOS interfaces and displays it. Everything it reads is available to any unprivileged process on your Mac.</li>
+  <li>It does <strong>not</strong> modify system settings, adjust fan speeds, throttle hardware, or otherwise change how your Mac behaves.</li>
+  <li>It can <strong>quit a process</strong> when you explicitly ask it to from a process list. That sends an ordinary quit signal, and unsaved work in that process may be lost. That action is yours, and its consequences are too.</li>
+</ul>
+
+<h2>Installation and updates</h2>
+
+<p>The app is ad-hoc signed rather than notarised by Apple, because an Apple Developer ID costs €99 a year and that is not currently justified for software given away for free. In practice this means macOS asks you to confirm on first launch by right-clicking the app and choosing Open. This is a deliberate, documented tradeoff and is described on the <a href="/">home page</a> and in the README.</p>
+
+<p>Updates downloaded through the app are verified against an Ed25519 signature before they are unpacked or run. An update that fails verification is refused. You are of course free to ignore updates, or to build from source instead.</p>
+
+<h2>Requirements</h2>
+
+<p>The app requires an Apple Silicon Mac (M1 or later) running macOS 14 or newer. It is built arm64-only and will not run on Intel Macs. No refund question arises, as nothing is ever charged.</p>
+
+<h2>Payments and support</h2>
+
+<p>The app is free and every feature is included; nothing is held back behind a payment. Sponsorship through <a href="https://github.com/sponsors/inequitas">GitHub Sponsors</a> or <a href="https://ko-fi.com/inequitas">Ko-fi</a> is voluntary, buys no features, entitles you to no support or service level, and is handled entirely by those platforms under their own terms. Contributions are gratefully received and are not purchases.</p>
+
+<h2>Third parties</h2>
+
+<p>This site and the app link to services operated by others, including GitHub, Homebrew, GitHub Sponsors and Ko-fi. Those services have their own terms and privacy policies, and this project has no control over them. Performance Monitor is not affiliated with, endorsed by, or sponsored by Apple Inc. Apple, Mac, macOS and Apple Silicon are trademarks of Apple Inc.</p>
+
+<h2>Contributions</h2>
+
+<p>Contributions are welcome; see <a href="https://github.com/inequitas/performancemonitor/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>. By submitting a pull request you agree that your contribution is licensed under the same MIT licence as the rest of the project.</p>
+
+<h2>Changes to these terms</h2>
+
+<p>These terms may be updated. The date at the top reflects the last change, and every revision is visible in the <a href="https://github.com/inequitas/performancemonitor/commits/main/docs/terms.html">page's history</a>.</p>
+
+<h2>Contact</h2>
+
+<p>Questions, bug reports and feature requests belong on <a href="https://github.com/inequitas/performancemonitor/issues">GitHub Issues</a>. For anything private, use the <strong>Report a vulnerability</strong> form on the <a href="https://github.com/inequitas/performancemonitor/security">Security tab</a>, which opens a thread visible only to you and the maintainer.</p>
+
+<footer>
+  <a href="/">Performance Monitor</a> ·
+  <a href="privacy.html">Privacy Policy</a> ·
+  <a href="https://github.com/inequitas/performancemonitor">GitHub</a><br><br>
+  MIT licensed. Made in the Netherlands.
+</footer>
+
+</div>
+</body>
+</html>
