@@ -1,0 +1,28 @@
+version: 2
+
+# Only GitHub Actions is watched here, and that is deliberate.
+#
+# The app itself has no third-party dependencies — Package.swift declares only
+# this repository's own targets — so there is no Swift package graph for
+# Dependabot to check. Staying dependency-free is a design goal, not an
+# oversight, and if that ever changes a "swift" ecosystem entry belongs here.
+#
+# Actions are a different matter: a workflow step runs someone else's code in
+# CI, so keeping those pinned versions current is worth automating.
+#
+# Monthly rather than weekly: there is one action in use, so a tighter cadence
+# would only add noise for a single maintainer. Dependabot still opens a PR as
+# soon as it finds an update, whatever the interval.
+#
+# Pull requests target `beta`, matching CONTRIBUTING.md — `main` only ever
+# receives merges from `beta` or release commits.
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "beta"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
