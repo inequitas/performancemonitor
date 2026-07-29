@@ -31,3 +31,23 @@ Open a PR that edits the value side of any entry (the English key must stay unch
 - Keep the app dependency-free: system frameworks only.
 - No telemetry, analytics, or network calls beyond what the README documents.
 - Match the existing code style; run `bash scripts/test.sh` before opening a PR.
+
+## The idle-CPU budget
+
+A system monitor that costs a noticeable slice of the thing it is measuring is a bad system monitor, so this one has a budget: **under 3% idle CPU** on an Apple Silicon Mac with nothing open. Getting there took several rounds of work, and it is easy to give back by accident.
+
+Two rules carry most of that:
+
+**Nothing expensive runs for a surface nobody is looking at.** `ps` and `nettop`, the extended SMC sensor set, per-domain power, per-process disk I/O and the latency probe are all gated on whether the window that displays them is actually visible. See `MetricsEngine.setPanelVisible`. If you add a metric that only one window shows, gate it the same way.
+
+**A closed window must stop working.** SwiftUI keeps a scene's view tree alive after its window closes, and a tree that observes `MetricsEngine` will happily re-evaluate its body on every published change forever. Window scenes therefore unmount their content while hidden, driven by `WindowVisibilityAccessor`. Any `.task` loop inside such a tree keeps running too, so include visibility in its `id:`.
+
+### Measuring it
+
+`scripts/benchmark.sh` samples cumulative CPU time and reports the real usage per interval. Do not use `ps -o %cpu` for this; that column is an average since the process launched, so sampling it repeatedly measures the wrong thing.
+
+```sh
+bash scripts/benchmark.sh -d 5 -i 10 -l "my-change"
+```
+
+Verify the state you think you are measuring before trusting a number. `sample <pid> 20` shows what is actually being evaluated: if a `*DetailView`, `MetricChart` or `OverviewView` frame turns up while no window is on screen, something is still mounted that should not be. A previous attempt at this measurement concluded there was no problem, because one build had a window open and the other did not.
