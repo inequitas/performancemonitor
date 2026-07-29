@@ -1,5 +1,31 @@
 # Changelog
 
+## Unreleased
+
+Currently on the beta channel. Released versions are listed below.
+
+**Deeper into the chip**
+- **Per-component power draw** — CPU, GPU, Neural Engine and memory wattage read separately, on top of the total system power that 1.1.0 added. Useful now that running models locally is normal; Activity Monitor doesn't show this.
+- **Per-process disk I/O** — a "Top Disk Usage" list in the Disk window, so a disk that will not stop rattling is finally explainable. Covers processes running under your own user account, which the window says plainly.
+
+**A proper first run**
+- **Guided tour** — a five-step walkthrough on first launch that explains the app and sets it up as you go, including a live preview of the menu bar that renders with the real drawing code. Reachable again later from Settings → About.
+
+**Menu bar**
+- **Fixed-width values** so items stop jittering and neighbouring icons stop shifting around, which matters if you use a menu bar manager.
+- **Compact mode** that combines every enabled metric into a single menu bar item.
+- Drag-reordering in Settings is now keyboard-accessible, contributed by **@Borisserz**.
+
+**Lighter again**
+- Closed windows now tear their content down instead of quietly carrying on. A detail window that had been opened once kept re-rendering for the rest of the session, which by itself roughly doubled idle CPU and never dropped back. The History window also kept re-querying its database every ten seconds after being closed.
+- The latency probe now only runs while the Network window is open. It was firing a request at an external host every five seconds for the entire session, for a number nothing was displaying.
+- History rows are batched to disk once a minute rather than written on every tick.
+- Measured on an M3 Pro: roughly 4.2% idle CPU before these changes, roughly 2.2% after, both after a detail window had been opened and closed. `scripts/benchmark.sh` reproduces it.
+
+**Also**
+- `scripts/test.sh` runs the test suite on machines with only the Command Line Tools installed, where a bare `swift test` cannot find swift-testing.
+- A security policy and a code of conduct.
+
 ## v1.1.0 — Deeper, lighter, multilingual *(2026-07-24)*
 
 **New metrics**
