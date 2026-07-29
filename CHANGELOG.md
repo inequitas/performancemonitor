@@ -1,22 +1,22 @@
 # Changelog
 
-## v1.1.0 — Deeper, lighter, multilingual *(2026-07-24)*
+## v1.1.0: Deeper, lighter, multilingual *(2026-07-24)*
 
 **New metrics**
-- **Power draw in watts** — total system power (from the SMC) plus battery charge/discharge wattage.
-- **SSD wear level** — percentage used, total bytes written, and power-on hours, read from the drive's NVMe SMART data (no root needed).
-- **Network data usage** — today / this week / this month totals for download and upload.
+- **Power draw in watts**: total system power (from the SMC) plus battery charge/discharge wattage.
+- **SSD wear level**: percentage used, total bytes written, and power-on hours, read from the drive's NVMe SMART data (no root needed).
+- **Network data usage**: today / this week / this month totals for download and upload.
 
 **Look back in time**
-- **History window** — graphs from the last hour up to 30 days, with min/avg/max bands, backed by an efficient on-disk store. Includes a "last 7 days" summary.
+- **History window**: graphs from the last hour up to 30 days, with min/avg/max bands, backed by an efficient on-disk store. Includes a "last 7 days" summary.
 
 **Smarter & clearer**
-- **Sustained alerts** — CPU/GPU/memory alerts now only fire when a threshold stays crossed for a duration you set, instead of on every brief spike.
-- **Menu bar threshold colouring** — a menu bar value turns orange/red when it goes over your alert threshold.
+- **Sustained alerts**: CPU/GPU/memory alerts now only fire when a threshold stays crossed for a duration you set, instead of on every brief spike.
+- **Menu bar threshold colouring**: a menu bar value turns orange/red when it goes over your alert threshold.
 - **Personal Hotspot** is detected and shown with its own icon.
 
 **Now in your language**
-- **7 languages** — English, Dutch, German, French, Spanish, Simplified Chinese, and Japanese — with an in-app language switcher.
+- **7 languages**: English, Dutch, German, French, Spanish, Simplified Chinese, and Japanese, with an in-app language switcher.
 
 **Lighter than ever**
 - **Idle CPU cut by ~80%** (roughly 13% → 2.5% on an M3 Pro): the popover and detail views stop doing layout work when closed, full sensor sampling only runs while the Thermal window is open, and the app's scene no longer re-renders on every tick.
@@ -25,119 +25,119 @@
 - **About tab** in Settings with links to the website, source code, and ways to support the project.
 - **Beta channel** opt-in directly in Settings, with a one-click way back to the stable release.
 - Fixed the public IP not updating after switching networks (e.g. Wi-Fi → Personal Hotspot).
-- First community contribution — the Bluetooth parser was refactored by **@jaideepkathiresan**. Thank you! 🙏
+- First community contribution: the Bluetooth parser was refactored by **@jaideepkathiresan**. Thank you! 🙏
 
-## v1.0.0 — First stable release *(2026-07-19)*
-- **Signed auto-updates** — updates downloaded in-app are now cryptographically verified with an Ed25519 (Curve25519) signature before the archive is unpacked or its quarantine flag is cleared. Because this app has no Apple Developer ID and is not notarised, this signature check is what stands in for Gatekeeper's trust guarantee. Downloads are also restricted to trusted GitHub hosts (`github.com`, `objects.githubusercontent.com`).
-  - **Transition note:** this is the **first signed** release — it ships both the verifying client and its own signature. Older installed clients (which predate this change) will still install this release without verifying, since their code has no verification step. From the release **after** this one, verification is effectively enforced everywhere: every client in the field verifies, and any update whose signature is missing or invalid is refused. Each release must upload both `PerformanceApp.zip` and `PerformanceApp.zip.sig`.
-- **Beta update channel** — `1.x.y-beta.N` builds are published as GitHub pre-releases and are only offered to installs of the separate "Performance Monitor Beta" app (own bundle ID, own settings, badged icon). Stable installs can never be offered a beta; beta installs are offered newer betas and the next stable.
-- **Big internal restructure** — the monolithic metrics engine was split into a thin coordinator with per-domain samplers, a settings store, a history store, and pure parsing/formatting logic in a separate library covered by a test suite (88 tests, from zero).
-- **Lower own footprint** — process lists (`ps`/`nettop`) are only sampled while a window that shows them is actually visible (max every 3 s), and all IOKit/mach reads moved off the main thread. The app no longer spawns helper processes every second while idle in the menu bar.
-- **First-run onboarding** — a one-time welcome window explains the menu bar location, key features, the Bluetooth/notification permission prompts, and offers Start-at-login. Existing users don't see it.
-- **Accessibility** — VoiceOver label on the menu bar item with live values, chart summaries, and text alternatives for colour-only status (connection dots, temperature, battery).
-- **Local crash reports** — crashes are captured via Apple's MetricKit and written as JSON to `~/Library/Application Support/PerformanceApp/CrashReports/`. Nothing is uploaded; everything stays on your Mac.
-- **Apple Silicon only** — the app is built and verified arm64-only (M1 or later, macOS 14+); requirements are now stated explicitly.
+## v1.0.0: First stable release *(2026-07-19)*
+- **Signed auto-updates**: updates downloaded in-app are now cryptographically verified with an Ed25519 (Curve25519) signature before the archive is unpacked or its quarantine flag is cleared. Because this app has no Apple Developer ID and is not notarised, this signature check is what stands in for Gatekeeper's trust guarantee. Downloads are also restricted to trusted GitHub hosts (`github.com`, `objects.githubusercontent.com`).
+  - **Transition note:** this is the **first signed** release, and it ships both the verifying client and its own signature. Older installed clients (which predate this change) will still install this release without verifying, since their code has no verification step. From the release **after** this one, verification is effectively enforced everywhere: every client in the field verifies, and any update whose signature is missing or invalid is refused. Each release must upload both `PerformanceApp.zip` and `PerformanceApp.zip.sig`.
+- **Beta update channel**: `1.x.y-beta.N` builds are published as GitHub pre-releases and are only offered to installs of the separate "Performance Monitor Beta" app (own bundle ID, own settings, badged icon). Stable installs can never be offered a beta; beta installs are offered newer betas and the next stable.
+- **Big internal restructure**: the monolithic metrics engine was split into a thin coordinator with per-domain samplers, a settings store, a history store, and pure parsing/formatting logic in a separate library covered by a test suite (88 tests, from zero).
+- **Lower own footprint**: process lists (`ps`/`nettop`) are only sampled while a window that shows them is actually visible (max every 3 s), and all IOKit/mach reads moved off the main thread. The app no longer spawns helper processes every second while idle in the menu bar.
+- **First-run onboarding**: a one-time welcome window explains the menu bar location, key features, the Bluetooth/notification permission prompts, and offers Start-at-login. Existing users don't see it.
+- **Accessibility**: VoiceOver label on the menu bar item with live values, chart summaries, and text alternatives for colour-only status (connection dots, temperature, battery).
+- **Local crash reports**: crashes are captured via Apple's MetricKit and written as JSON to `~/Library/Application Support/PerformanceApp/CrashReports/`. Nothing is uploaded; everything stays on your Mac.
+- **Apple Silicon only**: the app is built and verified arm64-only (M1 or later, macOS 14+); requirements are now stated explicitly.
 
-### v0.3.13 — Fix Dock icon fix (for real this time) *(2026-07-17)*
-- **Dock icon fix, root cause** — v0.3.12 fixed a stale-snapshot bug but the underlying "is another window still open" check was itself broken: `NSStatusBarWindow` (the menu bar icon's backing window) reports `isVisible == true` permanently, so the check always thought another window was open and never restored the accessory activation policy. It now only counts other real, titled app windows via a new `NSApp.hasOtherVisibleTitledWindow(besides:)` helper, ignoring status-bar/popover plumbing windows.
+### v0.3.13: Fix Dock icon fix (for real this time) *(2026-07-17)*
+- **Dock icon fix, root cause**: v0.3.12 fixed a stale-snapshot bug but the underlying "is another window still open" check was itself broken: `NSStatusBarWindow` (the menu bar icon's backing window) reports `isVisible == true` permanently, so the check always thought another window was open and never restored the accessory activation policy. It now only counts other real, titled app windows via a new `NSApp.hasOtherVisibleTitledWindow(besides:)` helper, ignoring status-bar/popover plumbing windows.
 
-### v0.3.12 — Fix Dock icon getting stuck on *(2026-07-17)*
-- **Dock icon fix** — opening a detail window (or Settings while another window was still open) could permanently pin the Dock icon visible for the rest of the session, even with Show in Dock off; `WindowFloatAccessor` had no restore-on-close logic at all, and `WindowFocuser` only decided once, at first open, whether to ever restore it. Both now read `showInDock` live when the window closes instead of a stale snapshot.
+### v0.3.12: Fix Dock icon getting stuck on *(2026-07-17)*
+- **Dock icon fix**: opening a detail window (or Settings while another window was still open) could permanently pin the Dock icon visible for the rest of the session, even with Show in Dock off; `WindowFloatAccessor` had no restore-on-close logic at all, and `WindowFocuser` only decided once, at first open, whether to ever restore it. Both now read `showInDock` live when the window closes instead of a stale snapshot.
 
-### v0.3.11 — Settings icon jump fix, brightness removed *(2026-07-13)*
-- **Settings icons fixed** — SF Symbol animations fully suppressed across all settings tabs; icons no longer jump on each metrics refresh
-- **Brightness removed** — display brightness control removed; macOS 15+ restricts the private CoreDisplay API to entitled system apps, making it a no-op
+### v0.3.11: Settings icon jump fix, brightness removed *(2026-07-13)*
+- **Settings icons fixed**: SF Symbol animations fully suppressed across all settings tabs; icons no longer jump on each metrics refresh
+- **Brightness removed**: display brightness control removed; macOS 15+ restricts the private CoreDisplay API to entitled system apps, making it a no-op
 
-### v0.3.10 — Bug fixes: SMART status, global shortcut, appearance, brightness *(2026-07-13)*
-- **SMART status** — disk health now reads correctly on Apple Silicon via `diskutil`, checked at startup and every 5 minutes; shows in GPU & Disk detail
-- **Global shortcut** — ⌥⌘P now works system-wide (from desktop, other apps) using Carbon `RegisterEventHotKey`; no Accessibility permission needed
-- **Appearance** — System/Light/Dark picker now correctly applies to the main popover (overview) and all detail windows, not just Settings
-- **Brightness controls** — moved from Settings to the GPU & Displays detail view; shows a per-display brightness slider for each controllable display
-- **Settings icon flicker** — animation suppression broadened to cover the full Settings tab view
+### v0.3.10 Bug fixes: SMART status, global shortcut, appearance, brightness *(2026-07-13)*
+- **SMART status**: disk health now reads correctly on Apple Silicon via `diskutil`, checked at startup and every 5 minutes; shows in GPU & Disk detail
+- **Global shortcut**: ⌥⌘P now works system-wide (from desktop, other apps) using Carbon `RegisterEventHotKey`; no Accessibility permission needed
+- **Appearance**: System/Light/Dark picker now correctly applies to the main popover (overview) and all detail windows, not just Settings
+- **Brightness controls**: moved from Settings to the GPU & Displays detail view; shows a per-display brightness slider for each controllable display
+- **Settings icon flicker**: animation suppression broadened to cover the full Settings tab view
 
-### v0.3.9 — Adaptive network speed units, settings icon fix *(2026-07-04)*
-- **Adaptive network units** — menu bar network speed now scales automatically: K below 1 MB/s, M up to 1 GB/s, G above that (e.g. `30k`, `1.4m`, `0.2g`)
-- **Settings icon jump fixed** — section icons no longer shift position when section content changes height (e.g. toggling alerts on/off)
+### v0.3.9: Adaptive network speed units, settings icon fix *(2026-07-04)*
+- **Adaptive network units**: menu bar network speed now scales automatically, using K below 1 MB/s, M up to 1 GB/s, G above that (e.g. `30k`, `1.4m`, `0.2g`)
+- **Settings icon jump fixed**: section icons no longer shift position when section content changes height (e.g. toggling alerts on/off)
 
-### v0.3.8 — Network detail expansion, menu bar & settings improvements *(2026-07-04)*
-- **Network detail expansion** — each interface row (Ethernet, Wi-Fi, etc.) now expands to show IP, Subnet mask, Gateway, and DNS server; collapsed state shows IP and prefix length at a glance
-- **IPv4 only** — network details filter out IPv6 addresses throughout; only human-friendly addresses shown
-- **Menu bar drag fix** — reordering menu bar metrics now tracks the mouse precisely regardless of where within the row you grab
-- **Panel reordering fix** — drag-to-reorder in Settings → Panels no longer flickers when crossing card boundaries
-- **Settings row spacing** — metric rows in Settings now have consistent horizontal padding
+### v0.3.8: Network detail expansion, menu bar & settings improvements *(2026-07-04)*
+- **Network detail expansion**: each interface row (Ethernet, Wi-Fi, etc.) now expands to show IP, Subnet mask, Gateway, and DNS server; collapsed state shows IP and prefix length at a glance
+- **IPv4 only**: network details filter out IPv6 addresses throughout; only human-friendly addresses shown
+- **Menu bar drag fix**: reordering menu bar metrics now tracks the mouse precisely regardless of where within the row you grab
+- **Panel reordering fix**: drag-to-reorder in Settings → Panels no longer flickers when crossing card boundaries
+- **Settings row spacing**: metric rows in Settings now have consistent horizontal padding
 
-### v0.3.7 — UI improvements *(2026-07-03)*
-- **Full-card tap** — every overview panel is now fully tappable to open its detail view, not just the chart area
-- **Disk detail** — new Storage section at the top shows volume name, a used/free fill bar, and GB counts; redundant header text removed from the read/write section
-- **GPU detail** — each display now shows its color profile, True Tone badge, and connection type (Built-in / HDMI / DisplayPort / Thunderbolt)
+### v0.3.7: UI improvements *(2026-07-03)*
+- **Full-card tap**: every overview panel is now fully tappable to open its detail view, not just the chart area
+- **Disk detail**: new Storage section at the top shows volume name, a used/free fill bar, and GB counts; redundant header text removed from the read/write section
+- **GPU detail**: each display now shows its color profile, True Tone badge, and connection type (Built-in / HDMI / DisplayPort / Thunderbolt)
 
-### v0.3.6 — Network & notification improvements *(2026-07-03)*
+### v0.3.6: Network & notification improvements *(2026-07-03)*
 - **Primary network interface** highlighted in green and sorted to the top in both the overview IP list and network detail view
-- **Ping server setting** in Settings → Metrics — choose between Apple (default), Cloudflare (1.1.1.1), Google (8.8.8.8), or Quad9 (9.9.9.9); switching takes effect immediately
+- **Ping server setting** in Settings → Metrics: choose between Apple (default), Cloudflare (1.1.1.1), Google (8.8.8.8), or Quad9 (9.9.9.9); switching takes effect immediately
 - **Notification permissions** requested at launch so the dialog appears proactively rather than silently failing later
 - **Notification status banner** in Settings → Updates warns when notifications are disabled with a direct link to System Settings
 - **Bundle ID** changed to `com.performancemonitor`
-- **Settings icon flicker** fixed — section icons no longer animate on each metrics update
+- **Settings icon flicker** fixed: section icons no longer animate on each metrics update
 
-### v0.3.5 — Battery card improvements *(2026-07-03)*
-- **Battery overview card** shows an explicit "Charging" / "On Battery" status label, charging wattage clearly labelled as charging speed, and time remaining on battery — "0h 0m" suppressed when nearly full
+### v0.3.5: Battery card improvements *(2026-07-03)*
+- **Battery overview card** shows an explicit "Charging" / "On Battery" status label, charging wattage clearly labelled as charging speed, and time remaining on battery, with "0h 0m" suppressed when nearly full
 - **Battery detail icon** reflects actual charge level (0 / 25 / 50 / 75 / 100%) and adds a bolt when charging, updating live
 - **Periodic update checks** every 3 hours while the app is running
 
-### v0.3.4 — In-app update checker *(2026-07-03)*
+### v0.3.4: In-app update checker *(2026-07-03)*
 - **Updates tab** in Settings checks GitHub on launch and notifies when a new version is available
 - **System notification** with three actions: Update Now, Remind Me Later, Skip This Version
-- **One-click install** — downloads the release zip, replaces the app bundle, and relaunches automatically; falls back to revealing the new app in Finder if permissions prevent replacement
-- **Configurable snooze** — set the "Remind Me Later" duration to 1, 3, 7, or 14 days from Settings → Updates
-- **Settings window focus** fixed — no longer hides behind other apps on open
-- **Settings window sizing** — all tabs now auto-size to their content, no scrolling required
+- **One-click install**: downloads the release zip, replaces the app bundle, and relaunches automatically; falls back to revealing the new app in Finder if permissions prevent replacement
+- **Configurable snooze**: set the "Remind Me Later" duration to 1, 3, 7, or 14 days from Settings → Updates
+- **Settings window focus** fixed: no longer hides behind other apps on open
+- **Settings window sizing**: all tabs now auto-size to their content, no scrolling required
 
-### v0.3.3 — Extended temperature sensors, multi-generation Apple Silicon support *(2026-07-03)*
-- **Extended SMC sensor coverage** across all Apple Silicon generations (M1 / M2 / M3 / M4) — CPU and GPU temperatures now read correctly on all chips including M3 (Te\*/Tf\* keys) and M4
-- **Trackpad temperature** — Force Touch haptic actuator sensors (M3/M4 TD\* grid) averaged into a single Trackpad entry; individual palm-rest sensors shown on M1/M2
-- **System group** — Trackpad, WiFi Proximity, Airport Proximity, Charger Proximity, and board sensors grouped under an expandable System row that starts open
-- **Storage group** — SSD temperature shown with expandable sub-rows for Macs with multiple drives (up to 4 SSDs mapped)
-- **Memory group** — Memory module temperatures shown with expandable sub-rows
-- **Airflow temperatures** — Intake air temperature (TaLP / TaRF) shown alongside each fan's RPM in the Fans section
+### v0.3.3: Extended temperature sensors, multi-generation Apple Silicon support *(2026-07-03)*
+- **Extended SMC sensor coverage** across all Apple Silicon generations (M1 / M2 / M3 / M4): CPU and GPU temperatures now read correctly on all chips including M3 (Te\*/Tf\* keys) and M4
+- **Trackpad temperature**: Force Touch haptic actuator sensors (M3/M4 TD\* grid) averaged into a single Trackpad entry; individual palm-rest sensors shown on M1/M2
+- **System group**: Trackpad, WiFi Proximity, Airport Proximity, Charger Proximity, and board sensors grouped under an expandable System row that starts open
+- **Storage group**: SSD temperature shown with expandable sub-rows for Macs with multiple drives (up to 4 SSDs mapped)
+- **Memory group**: Memory module temperatures shown with expandable sub-rows
+- **Airflow temperatures**: Intake air temperature (TaLP / TaRF) shown alongside each fan's RPM in the Fans section
 - **Battery thermistors** suppressed from temperature list (already shown in the Battery detail view)
 
-### v0.3.2 — Butterfly charts, VPN indicator, temperature colours *(2026-07-03)*
+### v0.3.2: Butterfly charts, VPN indicator, temperature colours *(2026-07-03)*
 - **Network and Disk detail charts** redesigned as butterfly charts: download/read grows upward, upload/write grows downward on a shared scale with max, midpoint, and 0 labels outside the chart area so they never overlap the data
-- **VPN shield** always visible in the Network overview card — green when a VPN is active, blue specifically for FortiClient, grey when off
-- **Temperature colour coding** in the Thermal and Battery detail views — CPU/GPU thresholds at 60 / 75 / 90 °C (green → yellow → orange → red); Battery at 35 / 45 / 55 °C
+- **VPN shield** always visible in the Network overview card: green when a VPN is active, blue specifically for FortiClient, grey when off
+- **Temperature colour coding** in the Thermal and Battery detail views: CPU/GPU thresholds at 60 / 75 / 90 °C (green → yellow → orange → red); Battery at 35 / 45 / 55 °C
 
-### v0.3.1 — Persistent settings *(2026-07-02)*
+### v0.3.1: Persistent settings *(2026-07-02)*
 - All settings now survive restarts and app updates: panel order and visibility, alert toggles and thresholds, menu bar style and metric, refresh interval, card styles (area/gauge), dock visibility, and all other preferences
 - Dock icon option fixed: no longer reappears after closing Settings
 - Settings use `UserDefaults` with stable keys; new settings added in future versions default gracefully without breaking existing saved data
 
-### v0.3.0 — Settings tabs, visual panel manager, configurable alerts *(2026-07-02)*
+### v0.3.0: Settings tabs, visual panel manager, configurable alerts *(2026-07-02)*
 - **Settings redesigned** into four tabs: General, Metrics, Alerts, History, and Panels
-- **Visual panel manager** — drag-and-drop mini grid in Settings → Panels mirrors the actual layout; drag any card to reorder, including moving Network and Bluetooth between grid rows; tap the eye icon to show or hide individual panels
-- **Configurable alerts** — each metric (CPU, Memory, Disk, GPU, Thermal) has its own enable toggle and threshold slider; alerts are fully independent of each other
-- **Unified panel layout** — full-width cards (Network, Bluetooth) can now be positioned anywhere in the overview, appearing between grid rows as you arrange them
+- **Visual panel manager**: drag-and-drop mini grid in Settings → Panels mirrors the actual layout; drag any card to reorder, including moving Network and Bluetooth between grid rows; tap the eye icon to show or hide individual panels
+- **Configurable alerts**: each metric (CPU, Memory, Disk, GPU, Thermal) has its own enable toggle and threshold slider; alerts are fully independent of each other
+- **Unified panel layout**: full-width cards (Network, Bluetooth) can now be positioned anywhere in the overview, appearing between grid rows as you arrange them
 
-### v0.2.2 — GPU utilization, menu bar sparkline, Settings fix *(2026-07-01)*
-- **GPU utilization %** — live usage read from `IOAccelerator`; GPU card switches between chart, gauge, and info (GPU name + displays) views from the card menu
-- **Menu bar sparkline** — mini live chart in the menu bar showing the last 30 seconds of the selected metric; toggle between sparkline and plain text in Settings → Menu bar style
+### v0.2.2: GPU utilization, menu bar sparkline, Settings fix *(2026-07-01)*
+- **GPU utilization %**: live usage read from `IOAccelerator`; GPU card switches between chart, gauge, and info (GPU name + displays) views from the card menu
+- **Menu bar sparkline**: mini live chart in the menu bar showing the last 30 seconds of the selected metric; toggle between sparkline and plain text in Settings → Menu bar style
 - **Settings window** now opens in front correctly on menu bar-only apps
 
-### v0.2.1 — Disk card redesign, UI polish *(2026-07-01)*
+### v0.2.1: Disk card redesign, UI polish *(2026-07-01)*
 - **Disk card** replaced the unlabelled single sparkline with a labelled butterfly chart: read speed (indigo) grows upward, write speed (purple) grows downward, on a shared scale
-- **Disk gauge mode** — new ring view showing disk used %, with free / total GB alongside
-- **Chart styles simplified** — line and bar removed everywhere; only Area and Gauge remain
+- **Disk gauge mode**: new ring view showing disk used %, with free / total GB alongside
+- **Chart styles simplified**: line and bar removed everywhere; only Area and Gauge remain
 - **Centered values** across all overview cards (CPU, Memory, Thermal, Battery, GPU, Disk)
 
-### v0.2.0 — SMC temperatures, fan readings, network connection indicators *(2026-07-01)*
+### v0.2.0: SMC temperatures, fan readings, network connection indicators *(2026-07-01)*
 - **Thermal card** on the main overview now shows CPU, GPU, and Battery temperatures simultaneously, each colour-coded
-- **SMC temperature fix** — resolved a critical bug where `dataType` was read from the wrong IOKit response, causing temperatures to disappear entirely
-- **Fan RPM fix** — corrected data-type decoding (float vs fixed-point) and key name detection; fans now labelled **Left** / **Right** on two-fan Macs
-- **Fan control removed** — SMC writes require a root-level privileged helper; unprivileged writes return `kIOReturnError`. Fan speeds remain read-only.
-- **Network connection indicators** — WiFi and Ethernet icons shown left of bandwidth speeds; primary connection is green, secondary (when both active) is white; updates in real time when connections change
+- **SMC temperature fix**: resolved a critical bug where `dataType` was read from the wrong IOKit response, causing temperatures to disappear entirely
+- **Fan RPM fix**: corrected data-type decoding (float vs fixed-point) and key name detection; fans now labelled **Left** / **Right** on two-fan Macs
+- **Fan control removed**: SMC writes require a root-level privileged helper; unprivileged writes return `kIOReturnError`. Fan speeds remain read-only.
+- **Network connection indicators**: WiFi and Ethernet icons shown left of bandwidth speeds; primary connection is green, secondary (when both active) is white; updates in real time when connections change
 
 ### v0.1.1 *(2026-07-01)*
 - Bluetooth battery percentage for AirPods (Left/Right/Case) and BLE devices (e.g. Logitech MX Master via GATT)
 - Ring gauge chart style for CPU, Memory, and Disk cards
 
 ### v0.1.0 *(2026-07-01)*
-- Initial release — CPU, Memory, Network, Disk, GPU, Battery, Bluetooth, Thermal overview
+- Initial release: CPU, Memory, Network, Disk, GPU, Battery, Bluetooth, Thermal overview

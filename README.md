@@ -1,6 +1,6 @@
 # Performance Monitor
 
-**[perfmon.knhome.nl](https://perfmon.knhome.nl)** — A lightweight macOS menu bar app that gives you real-time system metrics at a glance — CPU, memory, network, disk, GPU, battery, and Bluetooth, all in a clean popover interface.
+A lightweight macOS menu bar app that gives you real-time system metrics at a glance (CPU, memory, network, disk, GPU, battery, and Bluetooth), all in a clean popover interface. More at **[perfmon.knhome.nl](https://perfmon.knhome.nl)**.
 
 [![CI](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml/badge.svg)](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml) ![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.1.0-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green) [![Sponsor](https://img.shields.io/badge/%E2%9D%A4-Sponsor-ea4aaa)](https://github.com/sponsors/inequitas)
 
@@ -20,19 +20,19 @@
 
 ## Requirements
 
-- **Apple Silicon (M1 or later)** — this build is arm64-only and will not run on Intel Macs
+- **Apple Silicon (M1 or later)**: this build is arm64-only and will not run on Intel Macs
 - **macOS 14 (Sonoma) or later**
 
 ---
 
 ## What's new in v1.1.0
 
-- **Now in 7 languages** — English, Dutch, German, French, Spanish, Simplified Chinese, and Japanese, with an in-app language switcher
-- **More metrics** — power draw in watts (total system power, plus battery charge/discharge), SSD wear level, and network data usage per day / week / month
-- **History window** — graphs from the last hour up to 30 days, with a "last 7 days" summary
-- **Smarter alerts** — fire only when a threshold stays crossed for a duration you set, plus optional menu bar threshold colouring
-- **Even lighter** — idle CPU cut by roughly 80%
-- **First community contributions** — thanks to @jaideepkathiresan and @Borisserz 🙏
+- **Now in 7 languages**: English, Dutch, German, French, Spanish, Simplified Chinese, and Japanese, with an in-app language switcher
+- **More metrics**: power draw in watts (total system power, plus battery charge/discharge), SSD wear level, and network data usage per day / week / month
+- **History window**: graphs from the last hour up to 30 days, with a "last 7 days" summary
+- **Smarter alerts**: fire only when a threshold stays crossed for a duration you set, plus optional menu bar threshold colouring
+- **Even lighter**: idle CPU cut by roughly 80%
+- **First community contributions**: thanks to @jaideepkathiresan and @Borisserz 🙏
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
@@ -54,7 +54,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 ### Network
 - Live upload and download throughput
 - Butterfly chart in detail view: download up, upload down, shared scale with axis labels
-- VPN indicator: shield icon always visible — green (VPN on), blue (FortiClient), grey (off)
+- VPN indicator: shield icon always visible, green (VPN on), blue (FortiClient), grey (off)
 - Connection type indicator: WiFi and/or Ethernet icon; primary connection is green, secondary is white
 - Local IP address (tap to copy)
 - Public IP address (tap to copy)
@@ -82,8 +82,8 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 ### Bluetooth
 - Connected and paired device list
 - Battery percentage per device:
-  - **AirPods** — Left, Right, and Case shown separately
-  - **BLE devices** (e.g. Logitech MX Master) — battery read via GATT Battery Service
+  - **AirPods**: Left, Right, and Case shown separately
+  - **BLE devices** (e.g. Logitech MX Master): battery read via GATT Battery Service
 
 ---
 
@@ -101,7 +101,7 @@ brew install --cask inequitas/tap/performance-monitor
 
 1. Download the latest `Performance Monitor.app` from [Releases](https://github.com/inequitas/performancemonitor/releases)
 2. Unzip and drag to `/Applications`
-3. Launch — the app appears in your menu bar
+3. Launch, and the app appears in your menu bar
 4. Grant **Bluetooth** permission when prompted to see Bluetooth device info
 
 > **Gatekeeper note:** The app is ad-hoc signed (no Apple Developer ID). On first launch, right-click the app → **Open** to bypass the unidentified developer warning.
@@ -114,7 +114,7 @@ Beta builds let early testers try upcoming changes before they reach the stable 
 
 - **Workflow:** new features are developed on the `beta` branch (branched from `main`). Beta builds are tagged `vX.Y.Z-beta.N` (e.g. `v1.1.0-beta.1`) and published as GitHub **pre-releases**. Stable releases are still tagged `vX.Y.Z` from `main`, as before.
 - **Building a beta:** `bash build_app.sh --beta` produces "Performance Monitor Beta" with its own bundle ID (`com.performancemonitor.beta`, so its settings are separate from the stable app) and a badged icon. `scripts/release.sh X.Y.Z-beta.N --beta [--publish]` builds, tags, and publishes it as a pre-release.
-- **Update channel:** each build embeds a `PMUpdateChannel` key (`stable` or `beta`) in its `Info.plist`. Stable installs only ever see stable releases (GitHub's "latest" endpoint never returns a pre-release). Beta installs check the full releases list and are offered the newest version — beta or stable — so a beta install eventually rolls onto the corresponding stable release once one ships. The channel is shown in Settings → Updates when running the beta build.
+- **Update channel:** each build embeds a `PMUpdateChannel` key (`stable` or `beta`) in its `Info.plist`. Stable installs only ever see stable releases (GitHub's "latest" endpoint never returns a pre-release). Beta installs check the full releases list and are offered the newest version (beta or stable), so a beta install eventually rolls onto the corresponding stable release once one ships. The channel is shown in Settings → Updates when running the beta build.
 
 ---
 
@@ -145,7 +145,7 @@ No data is collected or transmitted. Everything runs locally.
 
 ## Support
 
-Performance Monitor is free and will stay free — no paywalled features, ever.
+Performance Monitor is free and will stay free: no paywalled features, ever.
 If it saves you the price of a paid alternative, consider [sponsoring on GitHub](https://github.com/sponsors/inequitas) or [buying a coffee on Ko-fi](https://ko-fi.com/inequitas); it helps cover Apple's Developer Program fee so the app can be notarised. A ⭐ on the repo helps too. Supporters are listed in [SUPPORTERS.md](SUPPORTERS.md).
 
 ## License
@@ -160,19 +160,19 @@ If it saves you the price of a paid alternative, consider [sponsoring on GitHub]
 - Sparkline shows the last 30 seconds of history, updated every second
 
 ### Thermal & Fans
-- CPU, GPU, and Battery temperatures read from the SMC via IOKit — works across all Apple Silicon (M1–M4)
+- CPU, GPU, and Battery temperatures read from the SMC via IOKit, which works across all Apple Silicon (M1–M4)
 - All three temperatures shown on the main overview card, colour-coded green → yellow → orange → red
 - **Extended sensor detail** in the Thermal view: individual CPU cores, GPU clusters, Trackpad, Storage, Memory, and System board sensors
-- Grouped rows with expandable chevrons — tap to see individual core or cluster readings
+- Grouped rows with expandable chevrons: tap to see individual core or cluster readings
 - System group (Trackpad, WiFi/Airport proximity, Charger) shown expanded by default
 - Fan speeds (Left/Right) with min/max range, position bar, and intake airflow temperature
 - System thermal pressure level (Nominal → Critical)
 
 ## Tech Stack
 
-- **Swift / SwiftUI** — UI and app lifecycle
-- **IOKit** — CPU, disk, battery, and HID device metrics
-- **CoreWLAN** — Wi-Fi signal strength
-- **IOBluetooth** — Paired Bluetooth device list
-- **CoreBluetooth** — BLE GATT Battery Service reads
-- **Swift Package Manager** — No Xcode project required
+- **Swift / SwiftUI**: UI and app lifecycle
+- **IOKit**: CPU, disk, battery, and HID device metrics
+- **CoreWLAN**: Wi-Fi signal strength
+- **IOBluetooth**: Paired Bluetooth device list
+- **CoreBluetooth**: BLE GATT Battery Service reads
+- **Swift Package Manager**: No Xcode project required

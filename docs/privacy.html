@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Privacy Policy — Performance Monitor</title>
+<title>Privacy Policy · Performance Monitor</title>
 <meta name="description" content="Performance Monitor collects nothing. What little network traffic the app makes, and why, spelled out in full.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
 <style>
@@ -36,7 +36,7 @@
 <p class="lead">Performance Monitor collects nothing about you. There is no telemetry, no analytics, no crash reporting service, no account, and no server of ours for anything to be sent to. This page explains what that means in practice, and describes the handful of network requests the app does make so that nothing is left implicit.</p>
 
 <div class="card">
-  <strong>The short version:</strong> everything the app measures stays on your Mac. It talks to the network only to check for updates, and — if you leave those features on — to look up your public IP address and to measure network latency. It never sends anything about your usage, your machine, or your metrics anywhere.
+  <strong>The short version:</strong> everything the app measures stays on your Mac. It talks to the network only to check for updates, and (if you leave those features on) to look up your public IP address and to measure network latency. It never sends anything about your usage, your machine, or your metrics anywhere.
 </div>
 
 <h2>What the app collects about you</h2>
@@ -45,15 +45,15 @@
 
 <h2>What stays on your Mac</h2>
 
-<p>All measurements the app takes — CPU, memory, network throughput, disk activity, GPU, temperatures, fan speeds, SSD wear, battery health, Bluetooth device names and battery levels, per-process usage — are read from macOS on your machine and displayed on your machine. They are never transmitted.</p>
+<p>All measurements the app takes (CPU, memory, network throughput, disk activity, GPU, temperatures, fan speeds, SSD wear, battery health, Bluetooth device names and battery levels, per-process usage) are read from macOS on your machine and displayed on your machine. They are never transmitted.</p>
 
 <p>Some of it is written to disk locally, in <code>~/Library/Application Support/PerformanceApp/</code>:</p>
 
 <ul>
-  <li><strong>History</strong> — if you enable it, sampled metrics are stored so the History window can show trends over time.</li>
-  <li><strong>Network data usage totals</strong> — daily download and upload totals, if that feature is on.</li>
-  <li><strong>Crash reports</strong> — captured through Apple's MetricKit and written as local JSON files. These are not uploaded anywhere, not to us and not to Apple on our behalf. If you want to share one, you have to send it yourself.</li>
-  <li><strong>Preferences</strong> — your settings, in the standard macOS preferences location.</li>
+  <li><strong>History</strong>: if you enable it, sampled metrics are stored so the History window can show trends over time.</li>
+  <li><strong>Network data usage totals</strong>: daily download and upload totals, if that feature is on.</li>
+  <li><strong>Crash reports</strong>: captured through Apple's MetricKit and written as local JSON files. These are not uploaded anywhere, not to us and not to Apple on our behalf. If you want to share one, you have to send it yourself.</li>
+  <li><strong>Preferences</strong>: your settings, in the standard macOS preferences location.</li>
 </ul>
 
 <p>You can delete any of it at any time. Removing that folder resets the app's stored data.</p>
@@ -63,9 +63,9 @@
 <p>There are three, and only three:</p>
 
 <ul>
-  <li><strong>Update checks</strong> — the app asks <code>api.github.com</code> whether a newer release exists, and downloads it from GitHub if you choose to install it. GitHub sees the request the way any website sees a visitor: your IP address and the request itself. Nothing identifying you or your machine is added by us. Downloads are verified against an Ed25519 signature before they are unpacked.</li>
-  <li><strong>Public IP lookup</strong> — the Network view can show your public IP address. Finding it out requires asking something outside your network, so the app asks <code>api.ipify.org</code>, a service that returns your IP address and nothing else. This is a setting you can switch off, and when it is off no request is made.</li>
-  <li><strong>Latency measurement</strong> — the latency figure in the Network view is measured by sending a small request to a host you pick in Settings: Apple, Cloudflare, Google or Quad9. That host sees a request from your IP address, as it would from any device. You choose which one, and the app contacts no other.</li>
+  <li><strong>Update checks</strong>: the app asks <code>api.github.com</code> whether a newer release exists, and downloads it from GitHub if you choose to install it. GitHub sees the request the way any website sees a visitor: your IP address and the request itself. Nothing identifying you or your machine is added by us. Downloads are verified against an Ed25519 signature before they are unpacked.</li>
+  <li><strong>Public IP lookup</strong>: the Network view can show your public IP address. Finding it out requires asking something outside your network, so the app asks <code>api.ipify.org</code>, a service that returns your IP address and nothing else. This is a setting you can switch off, and when it is off no request is made.</li>
+  <li><strong>Latency measurement</strong>: the latency figure in the Network view is measured by sending a small request to a host you pick in Settings: Apple, Cloudflare, Google or Quad9. That host sees a request from your IP address, as it would from any device. You choose which one, and the app contacts no other.</li>
 </ul>
 
 <p>Beyond those, the app opens links in your browser when you click them, such as the GitHub repository or the sponsorship pages. Those are ordinary visits to those sites, subject to their own policies, and only happen when you click.</p>
@@ -73,8 +73,8 @@
 <h2>Permissions the app asks for</h2>
 
 <ul>
-  <li><strong>Bluetooth</strong> — to list your paired devices and read their battery levels, including AirPods. Declining it means those readings are unavailable; everything else works normally.</li>
-  <li><strong>Notifications</strong> — to deliver threshold alerts, if you enable them. Also optional.</li>
+  <li><strong>Bluetooth</strong>: to list your paired devices and read their battery levels, including AirPods. Declining it means those readings are unavailable; everything else works normally.</li>
+  <li><strong>Notifications</strong>: to deliver threshold alerts, if you enable them. Also optional.</li>
 </ul>
 
 <p>Neither permission is used for anything beyond what it says, and neither sends data anywhere.</p>
