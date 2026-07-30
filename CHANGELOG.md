@@ -1,8 +1,6 @@
 # Changelog
 
-## Unreleased
-
-Currently on the beta channel. Released versions are listed below.
+## v1.2.0: Deeper into the chip, lighter than ever *(2026-07-30)*
 
 **Deeper into the chip**
 - **Per-component power draw**: CPU, GPU, Neural Engine and memory wattage read separately, on top of the total system power that 1.1.0 added. Useful now that running models locally is normal; Activity Monitor doesn't show this.
