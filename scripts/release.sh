@@ -85,7 +85,11 @@ echo "==> Working tree is clean."
 
 # --- (c) CHANGELOG.md section (required for stable, optional for beta) -------
 CHANGELOG="CHANGELOG.md"
-VERSION_HEADING_RE="^#{2,3}[[:space:]]+v${VERSION}([[:space:]]|\$)"
+# The trailing class allows a colon so headings like "## v1.2.0: Title" match:
+# changelog headings used to separate the version from its title with an em
+# dash, and dropping those em dashes left the colon directly against the
+# version number.
+VERSION_HEADING_RE="^#{2,3}[[:space:]]+v${VERSION}([[:space:]:]|\$)"
 DEFAULT_BETA_NOTES="Beta build ${TAG}. See CHANGELOG.md (Unreleased) for in-progress changes — beta releases don't require their own changelog section. This is a pre-release, offered only to installs on the beta update channel."
 
 if [ "$BETA" = true ] && ! grep -qE "$VERSION_HEADING_RE" "$CHANGELOG"; then
