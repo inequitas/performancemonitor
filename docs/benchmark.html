@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What a system monitor costs · Performance Monitor</title>
+<meta name="description" content="A closed window kept rendering for the rest of the session and doubled the idle CPU of my own system monitor. The bug had been found once before and correctly dismissed. Here is how it was measured, and how you can measure yours.">
+<meta property="og:title" content="What a system monitor costs">
+<meta property="og:description" content="A closed window kept rendering and doubled my app's idle CPU. It had been found before and correctly dismissed. Here is the measurement.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+<style>
+  :root { --bg:#0e0e13; --card:#17171f; --text:#e8e8ee; --dim:#9a9aa8; --accent:#6b9eff; --green:#4cd274; --red:#ff6b6b; }
+  * { margin:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+  .wrap { max-width:720px; margin:0 auto; padding:0 24px; }
+  header { padding:56px 0 8px; }
+  h1 { font-size:2.2rem; letter-spacing:-.02em; line-height:1.2; }
+  .updated { color:var(--dim); font-size:.9rem; margin-top:10px; }
+  h2 { font-size:1.3rem; margin:40px 0 12px; }
+  p { margin:16px 0; }
+  ul { padding-left:22px; margin:16px 0; }
+  li { margin-bottom:8px; }
+  .lead { font-size:1.15rem; color:var(--dim); margin-top:22px; }
+  .card { background:var(--card); border:1px solid #22222b; border-radius:14px; padding:20px; margin:24px 0; }
+  code { font-family:ui-monospace,"SF Mono",Menlo,monospace; font-size:.9em; background:#0a0a0f; border:1px solid #22222b; border-radius:5px; padding:1px 5px; }
+  pre { font-family:ui-monospace,"SF Mono",Menlo,monospace; background:#0a0a0f; border:1px solid #22222b; border-radius:10px; padding:14px 18px; overflow-x:auto; font-size:.88rem; line-height:1.5; margin:20px 0; }
+  pre code { background:none; border:none; padding:0; }
+  table { border-collapse:collapse; width:100%; margin:20px 0; font-size:.95rem; }
+  th, td { text-align:left; padding:9px 12px; border-bottom:1px solid #22222b; }
+  th { color:var(--dim); font-weight:600; font-size:.85rem; text-transform:uppercase; letter-spacing:.04em; }
+  td.num { font-variant-numeric:tabular-nums; }
+  .bad { color:var(--red); }
+  .good { color:var(--green); }
+  a { color:var(--accent); }
+  footer { padding:48px 0 60px; margin-top:48px; color:var(--dim); font-size:.9rem; border-top:1px solid #1c1c24; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>What a system monitor costs</h1>
+  <p class="updated">30 July 2026 · Kevin Stam</p>
+</header>
+
+<p class="lead">I write a system monitor for the macOS menu bar, and its selling point is that it does not cost you much of the machine it measures. Last week I decided to check that claim properly. It turned out to be true only if you never opened a window.</p>
+
+<h2>The claim, and the doubt</h2>
+
+<p>Performance Monitor sits in the menu bar and samples CPU, memory, disk, network, GPU, temperatures and battery. An app like that is in an awkward position: every cycle it spends is a cycle it then reports as used. So the app gates its expensive work on visibility. The <code>ps</code> and <code>nettop</code> process lists, the extended sensor set, per-domain power and per-process disk I/O all run only while a window that displays them is on screen.</p>
+
+<p>That gating went in months ago and the idle figure looked good, so I stopped thinking about it. Then I measured the beta against the released version and got a number I did not like.</p>
+
+<h2>First I measured it wrong</h2>
+
+<p>Worth admitting up front, because the mistake is the useful part.</p>
+
+<p>My first instinct was <code>ps -o %cpu</code>. That column is not current usage: it is an average over the life of the process. Sampling it repeatedly measures something that converges rather than something that is happening. The project's own benchmark script says so in a comment, which I had written and then ignored.</p>
+
+<p>The second mistake was worse. I ran the beta and the released build side by side, got 4.3% against 1.8%, and concluded the beta had regressed. It had not. The beta had a detail window open and the released build did not, because I had just launched it. I had compared a window doing live chart work against an app sitting idle, and read it as a regression.</p>
+
+<p>The fix for both is the same: verify the state you think you are measuring before you believe the number.</p>
+
+<pre><code>sample &lt;pid&gt; 20 -file profile.txt</code></pre>
+
+<p>and, separately, ask the window server what is actually on screen through <code>CGWindowListCopyWindowInfo</code>. If the profile contains a view that should not be mounted, the number is not measuring what you think.</p>
+
+<h2>The finding</h2>
+
+<p>Once both builds were genuinely idle, with the window list confirming nothing on screen, the profile still contained this:</p>
+
+<pre><code>MemoryDetailView.body.getter    (in Performance Monitor)
+  Published.subscript.getter    (in Combine)
+  SectionCard&lt;ProcessListView&gt;  (in Performance Monitor)</code></pre>
+
+<p>The Memory detail window had been closed for minutes. Its SwiftUI view tree was still alive, still subscribed to the metrics engine, and still re-evaluating its body on every published change. The engine publishes roughly eighty times a second. Nothing was on screen to show any of it.</p>
+
+<p>SwiftUI keeps a scene's view tree after its window closes. That is reasonable behaviour on its own, since reopening is then instant. It stops being reasonable when the tree observes a firehose.</p>
+
+<p>The numbers, measured with the project's benchmark script over four minutes, both builds running at the same time on an M3 Pro:</p>
+
+<table>
+  <thead><tr><th>State</th><th>CPU</th><th>Memory</th></tr></thead>
+  <tbody>
+    <tr><td>Fresh launch, no window ever opened</td><td class="num good">1.76%</td><td class="num">78 MB</td></tr>
+    <tr><td>After opening and closing one detail window</td><td class="num bad">4.25%</td><td class="num">108 MB</td></tr>
+  </tbody>
+</table>
+
+<p>One window, opened once, closed again. The cost stayed for the rest of the session and never came back down. The History window was worse: besides its charts it runs a task that re-queries its database every ten seconds, and a task lives as long as the view does. Closing that window left a database query running on a timer indefinitely.</p>
+
+<h2>The part that bothers me</h2>
+
+<p>This had been found before. Seven days earlier, in fact, by me. There was a comment in the source explaining that the leak existed and had been deliberately left alone:</p>
+
+<div class="card">
+  <p style="margin:0"><em>"Measured here at roughly 60 to 97 <code>sizeThatFits</code> samples out of ~6000 ... The difference was below the noise floor (6.5% after open/close vs 6.9% with nothing ever opened) ... That is a visible regression traded for an unmeasurable gain, so it stays as is. Revisit only if a future change makes this measurable."</em></p>
+</div>
+
+<p>That call was correct when it was made. Against an idle floor of nearly 7%, an extra couple of percentage points genuinely was noise.</p>
+
+<p>What makes it interesting is what happened next. Later the same evening, a separate change stopped the app's top-level scene from observing the engine, and the idle floor dropped from 5.3% to 2.5%. The same absolute cost was suddenly the largest single thing the app did while doing nothing.</p>
+
+<p>The comment had even written its own trigger: <em>revisit only if a future change makes this measurable</em>. That change landed a few hours later, and nobody went back. A conditional decision was recorded correctly and then quietly expired, because the condition was written where a person had to notice it rather than somewhere a tool would.</p>
+
+<p>I do not have a tidy answer for that. Lowering a floor turns yesterday's noise into today's dominant cost, and dismissals age worse than fixes do.</p>
+
+<h2>A second thing, found while looking</h2>
+
+<p>An audit of what runs per tick versus what is actually displayed turned up something separate. The latency figure in the Network window was measured by a timer started at launch and never stopped, firing a real HTTPS request at an external host every five seconds for the entire session. Over seven hundred requests an hour, for a number displayed in one window that is usually closed.</p>
+
+<p>That is not a large amount of CPU. It is radio wakeups, battery, and unprompted outbound traffic from an app whose main promise is that nothing leaves your machine. It now starts when the Network window becomes visible and stops when it goes away. Measured over a minute, with both builds running:</p>
+
+<table>
+  <thead><tr><th>Build</th><th>Network traffic in 60s</th></tr></thead>
+  <tbody>
+    <tr><td>Before</td><td class="num bad">10,751 bytes</td></tr>
+    <tr><td>After</td><td class="num good">271 bytes</td></tr>
+  </tbody>
+</table>
+
+<h2>Where it ended up</h2>
+
+<p>Window scenes now unmount their content while hidden, driven by the same occlusion and close events that already gated the samplers, so the view tree and the sampling gate cannot disagree about whether a window is on screen. After real use, including opening and closing several windows, the profile contains zero <code>DetailView</code>, <code>MetricChart</code> and <code>Charts</code> frames, against 24, 56 and 840 for the build without the fix.</p>
+
+<table>
+  <thead><tr><th>Build, after a window had been opened and closed</th><th>CPU</th><th>Memory</th></tr></thead>
+  <tbody>
+    <tr><td>1.1.0</td><td class="num bad">4.18%</td><td class="num">89 MB</td></tr>
+    <tr><td>1.2.0</td><td class="num good">2.21%</td><td class="num">99 MB</td></tr>
+  </tbody>
+</table>
+
+<p>Roughly half. Not all of it: a window that has been opened and closed still costs about half a percentage point and thirty-five megabytes over a fresh launch, so something beyond the content tree is still retained. That is written down and not yet chased.</p>
+
+<p>Two honest caveats. There is around 0.3 percentage points of variance between runs, so treat these as "comfortably under 3%" rather than as exact figures. And the memory number went up, not down, because 1.2.0 also added per-domain power measurement and per-process disk I/O. It would be convenient to leave that out.</p>
+
+<h2>Measure your own</h2>
+
+<p>The script is in the repository and it takes no arguments to be useful. It samples cumulative CPU time and divides by elapsed wall time, which is the measurement <code>ps -o %cpu</code> does not give you, and it sums every process belonging to an app rather than only the visible one.</p>
+
+<pre><code>bash scripts/benchmark.sh -d 5 -i 10 -l "idle"</code></pre>
+
+<p>It knows about several menu bar monitors and reports on whichever are running, so you can put yours next to mine, or next to each other. I have deliberately not published comparisons with other apps here, because I have not measured them under conditions I would defend, and a benchmark of someone else's software run carelessly is worse than no benchmark.</p>
+
+<p>If you do run it, one thing matters more than the numbers: check what state you are actually in. Close everything, confirm with the window list, and profile once to see what is mounted. I got that wrong twice in one afternoon on an app I wrote.</p>
+
+<p>Performance Monitor is free and open source. <a href="/">The app</a>, <a href="https://github.com/inequitas/performancemonitor">the source</a>, and <a href="https://github.com/inequitas/performancemonitor/blob/main/scripts/benchmark.sh">the benchmark script</a>.</p>
+
+<footer>
+  <a href="/">Performance Monitor</a> ·
+  <a href="about.html">About the developer</a> ·
+  <a href="privacy.html">Privacy Policy</a> ·
+  <a href="terms.html">Terms of Service</a> ·
+  <a href="https://github.com/inequitas/performancemonitor">GitHub</a><br><br>
+  MIT licensed. Made in the Netherlands.
+</footer>
+
+</div>
+</body>
+</html>
