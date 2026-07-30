@@ -205,6 +205,11 @@
 
 <p>Two honest caveats. There is around 0.3 percentage points of variance between runs, so treat these as "comfortably under 3%" rather than as exact figures. And the memory number went up, not down, because 1.2.0 also added per-domain power measurement and per-process disk I/O. It would be convenient to leave that out.</p>
 
+<figure>
+  <img src="top-cpu.png" alt="The Performance Monitor CPU window, showing per-core bars and a top-process list in which Performance Monitor itself appears at 1.0 percent, below WindowServer and Control Centre">
+  <figcaption>The app in its own process list, third from the top. Two things this is not: it is with a window open, which is the expensive state rather than the idle one, and the app divides by the core count here, so this is a share of the whole machine rather than of one core. Neither figure on this page is directly comparable to it.</figcaption>
+</figure>
+
 <h2>Measure your own</h2>
 
 <p>The script is in the repository and it takes no arguments to be useful. It samples cumulative CPU time and divides by elapsed wall time, which is the measurement <code>ps -o %cpu</code> does not give you, and it sums every process belonging to an app rather than only the visible one.</p>
