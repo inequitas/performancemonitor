@@ -2,7 +2,7 @@
 
 A lightweight macOS menu bar app that gives you real-time system metrics at a glance (CPU, memory, network, disk, GPU, battery, and Bluetooth), all in a clean popover interface. More at **[perfmon.knhome.nl](https://perfmon.knhome.nl)**.
 
-[![CI](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml/badge.svg)](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml) ![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.1.0-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green) [![Sponsor](https://img.shields.io/badge/%E2%9D%A4-Sponsor-ea4aaa)](https://github.com/sponsors/inequitas)
+[![CI](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml/badge.svg)](https://github.com/inequitas/performancemonitor/actions/workflows/ci.yml) ![macOS](https://img.shields.io/badge/macOS-14%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.10-orange) ![Version](https://img.shields.io/badge/version-1.2.0-lightgrey) ![License](https://img.shields.io/badge/license-MIT-green) [![Sponsor](https://img.shields.io/badge/%E2%9D%A4-Sponsor-ea4aaa)](https://github.com/sponsors/inequitas)
 
 <p align="center">
   <img src="screenshots/demo.gif" width="420" alt="Performance Monitor in use: live metrics in the menu bar, the overview popover with CPU, memory, disk, thermal, GPU, battery, network and Bluetooth cards, and the CPU detail window with per-core usage and top processes">
@@ -25,14 +25,15 @@ A lightweight macOS menu bar app that gives you real-time system metrics at a gl
 
 ---
 
-## What's new in v1.1.0
+## What's new in v1.2.0
 
-- **Now in 7 languages**: English, Dutch, German, French, Spanish, Simplified Chinese, and Japanese, with an in-app language switcher
-- **More metrics**: power draw in watts (total system power, plus battery charge/discharge), SSD wear level, and network data usage per day / week / month
-- **History window**: graphs from the last hour up to 30 days, with a "last 7 days" summary
-- **Smarter alerts**: fire only when a threshold stays crossed for a duration you set, plus optional menu bar threshold colouring
-- **Even lighter**: idle CPU cut by roughly 80%
-- **First community contributions**: thanks to @jaideepkathiresan and @Borisserz 🙏
+- **Per-component power draw**: CPU, GPU, Neural Engine and memory wattage read separately, on top of the total system power that 1.1.0 added
+- **Per-process disk I/O**: a "Top Disk Usage" list in the Disk window, for processes running under your own user account
+- **Guided tour**: a five-step walkthrough on first launch, with a live preview of the menu bar. Reachable again from Settings → About
+- **Steadier menu bar**: fixed-width values so items stop jittering, plus a compact mode that combines every metric into one item
+- **Lighter again**: closed windows now tear their content down instead of quietly carrying on. A detail window that had been opened once kept re-rendering for the rest of the session
+
+That last one is worth more than a bullet point: [what a system monitor costs](https://perfmon.knhome.nl/benchmark.html) is the write-up of how it was measured, what it turned out to be, and the two ways I measured it wrong first.
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
@@ -139,7 +140,10 @@ The build script compiles a release binary, assembles the `.app` bundle (under t
 |---|---|
 | Bluetooth | Read paired device names and battery levels |
 
-No data is collected or transmitted. Everything runs locally.
+No telemetry, no analytics, no account. Every measurement is taken and displayed on your own machine.
+The app makes exactly three network requests: an update check against GitHub, an optional public-IP lookup
+you can switch off, and a latency probe to a host you pick in Settings. The
+[privacy policy](https://perfmon.knhome.nl/privacy.html) names all three.
 
 ---
 
