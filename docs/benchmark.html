@@ -33,6 +33,20 @@
   .good { color:var(--green); }
   a { color:var(--accent); }
   .chart { width:100%; height:auto; margin:22px 0; }
+  .fig-note { color:var(--dim); font-size:.85rem; margin:-6px 0 0; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:28px 0; }
+  .kpi { background:var(--card); border:1px solid #22222b; border-radius:12px; padding:16px; text-align:center; }
+  .kpi b { display:block; font-size:1.6rem; font-variant-numeric:tabular-nums; line-height:1.2; }
+  .kpi span { color:var(--dim); font-size:.8rem; display:block; margin-top:4px; }
+  .tl { list-style:none; padding:0; margin:24px 0; border-left:2px solid #2a2a35; }
+  .tl li { position:relative; padding:0 0 18px 22px; margin:0; }
+  .tl li::before { content:""; position:absolute; left:-7px; top:7px; width:12px; height:12px; border-radius:50%; background:var(--dim); border:2px solid var(--bg); }
+  .tl li.hit::before { background:var(--red); }
+  .tl li.fix::before { background:var(--green); }
+  .tl time { display:block; color:var(--dim); font-size:.8rem; text-transform:uppercase; letter-spacing:.04em; }
+  .check { background:var(--card); border:1px solid #22222b; border-radius:14px; padding:18px 22px; margin:24px 0; }
+  .check p { margin:0 0 10px; font-weight:600; }
+  .check ul { margin:0; }
   figure { margin:26px 0; }
   figure img { display:block; width:min(340px,100%); margin:0 auto; border-radius:12px; box-shadow:0 18px 50px rgba(0,0,0,.5); }
   figcaption { color:var(--dim); font-size:.85rem; text-align:center; margin-top:10px; }
@@ -52,6 +66,13 @@
 </header>
 
 <p class="lead">I write a system monitor for the macOS menu bar, and its selling point is that it does not cost you much of the machine it measures. Last week I decided to check that claim properly. It turned out to be true only if you never opened a window.</p>
+
+<div class="kpis">
+  <div class="kpi"><b class="good">1.76%</b><span>idle, fresh launch</span></div>
+  <div class="kpi"><b class="bad">4.25%</b><span>after one window</span></div>
+  <div class="kpi"><b class="good">2.21%</b><span>after the fix</span></div>
+  <div class="kpi"><b>7 days</b><span>since it was dismissed</span></div>
+</div>
 
 <figure>
   <img src="Main_Screen.png" alt="The Performance Monitor overview popover, showing cards for CPU, memory, disk, thermal, GPU, battery, network and Bluetooth">
@@ -105,17 +126,16 @@
   </tbody>
 </table>
 
-<svg class="chart" viewBox="0 0 640 172" role="img" aria-label="Bar chart. Fresh launch 1.76 percent. After opening and closing one window, 4.25 percent. Same action on version 1.2.0, 2.21 percent." xmlns="http://www.w3.org/2000/svg">
-<title>Idle CPU by state</title><desc>Bar chart. Fresh launch 1.76 percent. After opening and closing one window, 4.25 percent. Same action on version 1.2.0, 2.21 percent.</desc>
-<text x="0" y="27" class="c-lab">1.1.0, fresh launch</text>
-<rect x="228" y="15" width="154" height="18" rx="4" class="c-ok"/>
-<text x="391" y="29" class="c-val c-okt">1.76%</text>
-<text x="0" y="73" class="c-lab">1.1.0, after one window</text>
-<rect x="228" y="61" width="372" height="18" rx="4" class="c-bad"/>
-<text x="609" y="75" class="c-val c-badt">4.25%</text>
-<text x="0" y="119" class="c-lab">1.2.0, after one window</text>
-<rect x="228" y="107" width="193" height="18" rx="4" class="c-ok"/>
-<text x="430" y="121" class="c-val c-okt">2.21%</text>
+<svg class="chart" viewBox="0 0 640 142" role="img" aria-label="Idle CPU. Fresh launch 1.76 percent, after one window 4.25 percent, version 1.2.0 after one window 2.21 percent." xmlns="http://www.w3.org/2000/svg"><desc>Idle CPU. Fresh launch 1.76 percent, after one window 4.25 percent, version 1.2.0 after one window 2.21 percent.</desc>
+<text x="0" y="22" class="c-lab">1.1.0, fresh launch</text>
+<rect x="228" y="10" width="111" height="18" rx="4" class="c-ok"/>
+<text x="349" y="24" class="c-val c-okt">1.76%</text>
+<text x="0" y="66" class="c-lab">1.1.0, after one window</text>
+<rect x="228" y="54" width="268" height="18" rx="4" class="c-bad"/>
+<text x="506" y="68" class="c-val c-badt">4.25%</text>
+<text x="0" y="110" class="c-lab">1.2.0, after one window</text>
+<rect x="228" y="98" width="139" height="18" rx="4" class="c-ok"/>
+<text x="377" y="112" class="c-val c-okt">2.21%</text>
 </svg>
 
 <p>One window, opened once, closed again. The cost stayed for the rest of the session and never came back down. The History window was worse: besides its charts it runs a task that re-queries its database every ten seconds, and a task lives as long as the view does. Closing that window left a database query running on a timer indefinitely.</p>
@@ -127,6 +147,13 @@
 <div class="card">
   <p style="margin:0"><em>"Measured here at roughly 60 to 97 <code>sizeThatFits</code> samples out of ~6000 ... The difference was below the noise floor (6.5% after open/close vs 6.9% with nothing ever opened) ... That is a visible regression traded for an unmeasurable gain, so it stays as is. Revisit only if a future change makes this measurable."</em></p>
 </div>
+
+<ol class="tl">
+  <li class="hit"><time>23 July, afternoon</time>Leak found and measured: 6.5% after open and close, against 6.9% with nothing opened. Correctly judged to be noise, and left in place with a comment saying to revisit if it ever became measurable.</li>
+  <li><time>23 July, evening</time>An unrelated change stops the top-level scene from observing the engine. The idle floor drops from 5.3% to 2.5%. The condition in that comment is now met, and nobody notices.</li>
+  <li class="hit"><time>30 July</time>Found again while chasing a different number. Same bug, now the largest single cost of an idle app.</li>
+  <li class="fix"><time>30 July</time>Fixed. Window scenes unmount their content while hidden. Zero view frames in the profile afterwards.</li>
+</ol>
 
 <p>That call was correct when it was made. Against an idle floor of nearly 7%, an extra couple of percentage points genuinely was noise.</p>
 
@@ -150,15 +177,15 @@
   </tbody>
 </table>
 
-<svg class="chart" viewBox="0 0 640 126" role="img" aria-label="Bar chart. Before the fix, 10751 bytes per minute. After, 271 bytes per minute." xmlns="http://www.w3.org/2000/svg">
-<title>Network traffic while idle</title><desc>Bar chart. Before the fix, 10751 bytes per minute. After, 271 bytes per minute.</desc>
-<text x="0" y="27" class="c-lab">Before</text>
-<rect x="228" y="15" width="372" height="18" rx="4" class="c-bad"/>
-<text x="609" y="29" class="c-val c-badt">10751 bytes/min</text>
-<text x="0" y="73" class="c-lab">After</text>
-<rect x="228" y="61" width="9" height="18" rx="4" class="c-ok"/>
-<text x="246" y="75" class="c-val c-okt">271 bytes/min</text>
+<svg class="chart" viewBox="0 0 640 98" role="img" aria-label="Network traffic per minute while idle. Before 10751 bytes, after 271 bytes." xmlns="http://www.w3.org/2000/svg"><desc>Network traffic per minute while idle. Before 10751 bytes, after 271 bytes.</desc>
+<text x="0" y="22" class="c-lab">Before</text>
+<rect x="228" y="10" width="268" height="18" rx="4" class="c-bad"/>
+<text x="506" y="24" class="c-val c-badt">10,751</text>
+<text x="0" y="66" class="c-lab">After</text>
+<rect x="228" y="54" width="7" height="18" rx="4" class="c-ok"/>
+<text x="245" y="68" class="c-val c-okt">271</text>
 </svg>
+<p class="fig-note">Bytes sent and received per minute, app idle.</p>
 
 <h2>Where it ended up</h2>
 
@@ -183,6 +210,17 @@
 <pre><code>bash scripts/benchmark.sh -d 5 -i 10 -l "idle"</code></pre>
 
 <p>It knows about several menu bar monitors and reports on whichever are running, so you can put yours next to mine, or next to each other. I have deliberately not published comparisons with other apps here, because I have not measured them under conditions I would defend, and a benchmark of someone else's software run carelessly is worse than no benchmark.</p>
+
+<div class="check">
+  <p>Before you trust a number:</p>
+  <ul>
+    <li>Close every window and confirm it with the window list, not by looking.</li>
+    <li>Profile once and check nothing is mounted that should not be.</li>
+    <li>Compare like with like. Both builds idle, or both with the same window open.</li>
+    <li>Use CPU time deltas, not <code>ps -o %cpu</code>.</li>
+    <li>Run it more than once. There is real variance between runs.</li>
+  </ul>
+</div>
 
 <p>If you do run it, one thing matters more than the numbers: check what state you are actually in. Close everything, confirm with the window list, and profile once to see what is mounted. I got that wrong twice in one afternoon on an app I wrote.</p>
 
