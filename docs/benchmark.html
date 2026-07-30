@@ -201,6 +201,8 @@
 
 <p>Roughly half. Not all of it: a window that has been opened and closed still costs about half a percentage point and thirty-five megabytes over a fresh launch, so something beyond the content tree is still retained. That is written down and not yet chased.</p>
 
+<p>One note on the scale, because it is easy to compare the wrong things. Every percentage here is a share of a single core, which is what <code>ps</code> and <code>top</code> report for a process. The app's own process list divides that by the core count instead, so it shows a share of the whole machine and a much smaller number for the same work. Neither is wrong; they answer different questions.</p>
+
 <p>Two honest caveats. There is around 0.3 percentage points of variance between runs, so treat these as "comfortably under 3%" rather than as exact figures. And the memory number went up, not down, because 1.2.0 also added per-domain power measurement and per-process disk I/O. It would be convenient to leave that out.</p>
 
 <h2>Measure your own</h2>
