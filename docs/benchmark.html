@@ -32,6 +32,14 @@
   .bad { color:var(--red); }
   .good { color:var(--green); }
   a { color:var(--accent); }
+  .chart { width:100%; height:auto; margin:22px 0; }
+  figure { margin:26px 0; }
+  figure img { display:block; width:min(340px,100%); margin:0 auto; border-radius:12px; box-shadow:0 18px 50px rgba(0,0,0,.5); }
+  figcaption { color:var(--dim); font-size:.85rem; text-align:center; margin-top:10px; }
+  .c-lab { fill:var(--dim); font-size:13px; font-family:inherit; }
+  .c-val { font-size:13px; font-weight:600; font-family:inherit; font-variant-numeric:tabular-nums; }
+  .c-ok { fill:var(--green); } .c-okt { fill:var(--green); }
+  .c-bad { fill:var(--red); } .c-badt { fill:var(--red); }
   footer { padding:48px 0 60px; margin-top:48px; color:var(--dim); font-size:.9rem; border-top:1px solid #1c1c24; }
 </style>
 </head>
@@ -44,6 +52,11 @@
 </header>
 
 <p class="lead">I write a system monitor for the macOS menu bar, and its selling point is that it does not cost you much of the machine it measures. Last week I decided to check that claim properly. It turned out to be true only if you never opened a window.</p>
+
+<figure>
+  <img src="Main_Screen.png" alt="The Performance Monitor overview popover, showing cards for CPU, memory, disk, thermal, GPU, battery, network and Bluetooth">
+  <figcaption>The thing being measured. Everything here is read on the machine it is reporting on.</figcaption>
+</figure>
 
 <h2>The claim, and the doubt</h2>
 
@@ -73,6 +86,11 @@
   Published.subscript.getter    (in Combine)
   SectionCard&lt;ProcessListView&gt;  (in Performance Monitor)</code></pre>
 
+<figure>
+  <img src="cpu_screen.png" alt="A Performance Monitor detail window, showing a usage chart, per-core bars and a list of top processes">
+  <figcaption>A detail window. Charts, per-core bars and a live process list, all subscribed to the metrics engine. The problem was not what this costs while you are looking at it.</figcaption>
+</figure>
+
 <p>The Memory detail window had been closed for minutes. Its SwiftUI view tree was still alive, still subscribed to the metrics engine, and still re-evaluating its body on every published change. The engine publishes roughly eighty times a second. Nothing was on screen to show any of it.</p>
 
 <p>SwiftUI keeps a scene's view tree after its window closes. That is reasonable behaviour on its own, since reopening is then instant. It stops being reasonable when the tree observes a firehose.</p>
@@ -86,6 +104,19 @@
     <tr><td>After opening and closing one detail window</td><td class="num bad">4.25%</td><td class="num">108 MB</td></tr>
   </tbody>
 </table>
+
+<svg class="chart" viewBox="0 0 640 172" role="img" aria-label="Bar chart. Fresh launch 1.76 percent. After opening and closing one window, 4.25 percent. Same action on version 1.2.0, 2.21 percent." xmlns="http://www.w3.org/2000/svg">
+<title>Idle CPU by state</title><desc>Bar chart. Fresh launch 1.76 percent. After opening and closing one window, 4.25 percent. Same action on version 1.2.0, 2.21 percent.</desc>
+<text x="0" y="27" class="c-lab">1.1.0, fresh launch</text>
+<rect x="228" y="15" width="154" height="18" rx="4" class="c-ok"/>
+<text x="391" y="29" class="c-val c-okt">1.76%</text>
+<text x="0" y="73" class="c-lab">1.1.0, after one window</text>
+<rect x="228" y="61" width="372" height="18" rx="4" class="c-bad"/>
+<text x="609" y="75" class="c-val c-badt">4.25%</text>
+<text x="0" y="119" class="c-lab">1.2.0, after one window</text>
+<rect x="228" y="107" width="193" height="18" rx="4" class="c-ok"/>
+<text x="430" y="121" class="c-val c-okt">2.21%</text>
+</svg>
 
 <p>One window, opened once, closed again. The cost stayed for the rest of the session and never came back down. The History window was worse: besides its charts it runs a task that re-queries its database every ten seconds, and a task lives as long as the view does. Closing that window left a database query running on a timer indefinitely.</p>
 
@@ -118,6 +149,16 @@
     <tr><td>After</td><td class="num good">271 bytes</td></tr>
   </tbody>
 </table>
+
+<svg class="chart" viewBox="0 0 640 126" role="img" aria-label="Bar chart. Before the fix, 10751 bytes per minute. After, 271 bytes per minute." xmlns="http://www.w3.org/2000/svg">
+<title>Network traffic while idle</title><desc>Bar chart. Before the fix, 10751 bytes per minute. After, 271 bytes per minute.</desc>
+<text x="0" y="27" class="c-lab">Before</text>
+<rect x="228" y="15" width="372" height="18" rx="4" class="c-bad"/>
+<text x="609" y="29" class="c-val c-badt">10751 bytes/min</text>
+<text x="0" y="73" class="c-lab">After</text>
+<rect x="228" y="61" width="9" height="18" rx="4" class="c-ok"/>
+<text x="246" y="75" class="c-val c-okt">271 bytes/min</text>
+</svg>
 
 <h2>Where it ended up</h2>
 
