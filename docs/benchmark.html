@@ -68,9 +68,9 @@
 <p class="lead">I write a system monitor for the macOS menu bar, and its selling point is that it does not cost you much of the machine it measures. Last week I decided to check that claim properly. It turned out to be true only if you never opened a window.</p>
 
 <div class="kpis">
-  <div class="kpi"><b class="good">1.76%</b><span>idle, fresh launch</span></div>
-  <div class="kpi"><b class="bad">4.25%</b><span>after one window</span></div>
-  <div class="kpi"><b class="good">2.21%</b><span>after the fix</span></div>
+  <div class="kpi"><b class="good">1.76%</b><span>1.1.0, fresh launch</span></div>
+  <div class="kpi"><b class="bad">4.25%</b><span>1.1.0, after one window</span></div>
+  <div class="kpi"><b class="good">2.21%</b><span>after the fix, same state</span></div>
   <div class="kpi"><b>7 days</b><span>since it was dismissed</span></div>
 </div>
 
@@ -203,7 +203,44 @@
 
 <p>One note on the scale, because it is easy to compare the wrong things. Every percentage here is a share of a single core, which is what <code>ps</code> and <code>top</code> report for a process. The app's own process list divides that by the core count instead, so it shows a share of the whole machine and a much smaller number for the same work. Neither is wrong; they answer different questions.</p>
 
-<p>Two honest caveats. There is around 0.3 percentage points of variance between runs, so treat these as "comfortably under 3%" rather than as exact figures. And the memory number went up, not down, because 1.2.0 also added per-domain power measurement and per-process disk I/O. It would be convenient to leave that out.</p>
+<h2>The four states, kept apart</h2>
+
+<p>Three numbers have appeared so far and they belong to different situations, which is easy to lose track of. All four states, in one place:</p>
+
+<table>
+  <thead><tr><th>Version and state</th><th>CPU</th><th>Memory</th></tr></thead>
+  <tbody>
+    <tr><td>1.1.0, fresh launch, no window ever opened</td><td class="num good">1.76%</td><td class="num">78 MB</td></tr>
+    <tr><td>1.1.0, after one window opened and closed</td><td class="num bad">4.25%</td><td class="num">108 MB</td></tr>
+    <tr><td>1.2.0, fresh launch, no window ever opened</td><td class="num good">2.41%</td><td class="num">77 MB</td></tr>
+    <tr><td>1.2.0, after one window opened and closed</td><td class="num good">2.21%</td><td class="num">99 MB</td></tr>
+  </tbody>
+</table>
+
+<p>The comparison that matters is between the two rows in the same state. In the state a real user ends up in, having opened a window at some point, 4.25% became 2.21%. The two fresh-launch rows are the honest cost of the release: 1.2.0 does more than 1.1.0, and it shows.</p>
+
+<h2>How solid are these numbers</h2>
+
+<p>The 1.2.0 idle figure is the one worth pinning down, since it is the headline. Eight consecutive two-minute runs, app freshly launched, no window ever opened:</p>
+
+<table>
+  <thead><tr><th>Runs</th><th>Mean</th><th>Std dev</th><th>Range</th></tr></thead>
+  <tbody>
+    <tr><td class="num">8</td><td class="num">2.41%</td><td class="num">0.08 pp</td><td class="num">2.31% to 2.51%</td></tr>
+  </tbody>
+</table>
+
+<p>Within one session the measurement is tight. Between sessions it is not: separate runs taken over several days, with different things running on the machine, landed anywhere from 2.10% to 2.67% for the same build. So the number is reproducible to about a tenth of a point if you measure back to back, and to roughly half a point if you compare across days. The other figures on this page are single runs and should be read with that in mind.</p>
+
+<p>Everything here was measured on one machine: an Apple M3 Pro, 11 cores, 18 GB, macOS 26.5.2, in ordinary use rather than in a quiet room. These are not universal figures, and the point of publishing the script is that you should not have to take them as such.</p>
+
+<h2>The memory, honestly</h2>
+
+<p>An earlier version of this page said the memory figure went up because 1.2.0 added per-domain power measurement and per-process disk I/O. That was a reasonable guess and it is wrong.</p>
+
+<p>Compared fresh to fresh, 1.1.0 sits at 78 MB and 1.2.0 at 77 MB. The new features cost essentially nothing. The higher numbers, 99 MB and 108 MB, only appear after a window has been opened, and they are the same retention story as the CPU: something is held after the window closes. Unmounting the content recovered most of the CPU cost and less of the memory. A window that has been opened and closed still costs about thirty-five megabytes over a fresh launch.</p>
+
+<p>What I cannot tell you is what that thirty-five megabytes consists of. Separating retained view state from allocator behaviour and from whatever SwiftUI caches per scene needs a heap profile I have not taken. The analysis stops here, and saying so seems better than an explanation that sounds tidy.</p>
 
 <figure>
   <img src="top-cpu.png" alt="The Performance Monitor CPU window, showing per-core bars and a top-process list in which Performance Monitor itself appears at 1.0 percent, below WindowServer and Control Centre">
