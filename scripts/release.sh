@@ -28,7 +28,7 @@ cd "$(dirname "$0")/.."
 #      rewritten). beta: a CHANGELOG.md section is used if present, but not
 #      required — falls back to short default release notes.
 #   d) swift test && bash build_app.sh [--beta]
-#   e) [--publish only] git tag vVERSION
+#   e) [--publish only] git tag -a vVERSION (signed if tag.gpgsign is set)
 #   f) [--publish only] gh release create vVERSION <zip> <zip>.sig
 #      --title <title> --notes-file <notes> [--prerelease for beta]
 #   g) [--publish, stable only] best-effort scripts/update_tap.sh bump of the
@@ -183,7 +183,9 @@ fi
 
 # --- (e) tag -------------------------------------------------------------
 echo "==> Tagging ${TAG}..."
-git tag "$TAG"
+# Annotated, and signed when the repo has tag.gpgsign set. A bare `git tag`
+# fails outright under that setting because a signed tag needs a message.
+git tag -a "$TAG" -m "$TITLE"
 # gh release create refuses local-only tags — push it first.
 git push origin "$TAG"
 
