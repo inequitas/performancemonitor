@@ -439,3 +439,7 @@
 "Show Tour" = "ツアーを表示";
 "Top Disk Usage" = "ディスク使用量トップ";
 "Shows combined read and write throughput for processes running under your user account.\n\nWithout administrator privileges macOS only reports disk activity for your own processes, so system processes are not listed and this is not a complete, system-wide ranking." = "お使いのユーザーアカウントで実行中のプロセスの、読み込みと書き込みを合計したスループットを表示します。\n\n管理者権限がない場合、macOSは自分のプロセスのディスク活動しか報告しません。そのためシステムプロセスは一覧に表示されず、これはシステム全体の完全なランキングではありません。";
+
+/* MARK: - Process glossary */
+"What is %@?" = "%@ とは？";
+"High usage is normal for this one." = "このプロセスは使用率が高くても正常です。";

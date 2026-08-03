@@ -439,3 +439,7 @@
 "Show Tour" = "Tour anzeigen";
 "Top Disk Usage" = "Top-Festplattennutzung";
 "Shows combined read and write throughput for processes running under your user account.\n\nWithout administrator privileges macOS only reports disk activity for your own processes, so system processes are not listed and this is not a complete, system-wide ranking." = "Zeigt den kombinierten Lese- und Schreibdurchsatz von Prozessen, die unter deinem Benutzerkonto laufen.\n\nOhne Administratorrechte meldet macOS nur die Festplattenaktivität deiner eigenen Prozesse. Systemprozesse werden daher nicht aufgeführt und dies ist keine vollständige, systemweite Rangliste.";
+
+/* MARK: - Process glossary */
+"What is %@?" = "Was ist %@?";
+"High usage is normal for this one." = "Hohe Auslastung ist hier normal.";

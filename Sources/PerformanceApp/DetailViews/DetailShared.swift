@@ -162,6 +162,54 @@ struct InfoButton: View {
     }
 }
 
+// MARK: - Glossary
+
+/// The "what is this?" affordance on a process row. Only appears for processes
+/// the glossary knows about, which is deliberately a minority: an unfamiliar
+/// system process is worth explaining, and an app the user installed themselves
+/// is not.
+private struct GlossaryButton: View {
+    let processName: String
+    let entry: GlossaryEntry
+    @State private var showing = false
+
+    var body: some View {
+        Button { showing = true } label: {
+            Image(systemName: entry.expectedHigh ? "checkmark.circle" : "questionmark.circle")
+                .font(.caption2)
+                .foregroundStyle(entry.expectedHigh ? AnyShapeStyle(Color.green.opacity(0.8)) : AnyShapeStyle(.tertiary))
+        }
+        .buttonStyle(.plain)
+        .help(entry.title)
+        .accessibilityLabel(Text(String(format: String(localized: "What is %@?"), processName)))
+        .popover(isPresented: $showing, arrowEdge: .trailing) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(entry.title).font(.subheadline.weight(.semibold))
+                if let vendor = entry.vendor {
+                    Text(vendor).font(.caption2).foregroundStyle(.tertiary)
+                }
+                Text(entry.description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                if entry.expectedHigh {
+                    Label(String(localized: "High usage is normal for this one."),
+                          systemImage: "checkmark.circle")
+                        .font(.caption2)
+                        .foregroundStyle(.green)
+                        .padding(.top, 2)
+                }
+                Text(processName)
+                    .font(.caption2.monospaced())
+                    .foregroundStyle(.tertiary)
+                    .padding(.top, 2)
+            }
+            .padding(14)
+            .frame(width: 300, alignment: .leading)
+        }
+    }
+}
+
 // MARK: - Process list
 
 struct ProcessListView: View {
@@ -202,10 +250,14 @@ struct ProcessListView: View {
                     .font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(displayed.prefix(engine.settings.topProcessCount)) { proc in
+                    let known = GlossaryStore.shared.entry(for: proc.name)
                     HStack(spacing: 6) {
                         Text(proc.name)
                             .font(.caption)
                             .lineLimit(1)
+                        if let known {
+                            GlossaryButton(processName: proc.name, entry: known)
+                        }
                         Spacer()
                         Text(String(format: "%.1f%@", proc.value, unit))
                             .font(.caption.monospacedDigit())

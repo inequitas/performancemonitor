@@ -17,6 +17,10 @@ public struct GlossaryEntry: Equatable, Sendable {
     public enum Match: Equatable, Sendable {
         /// Exact process name, the common case.
         case name(String)
+        /// Process name suffix. Chromium and Electron apps all name their
+        /// child processes "<app> Helper (Renderer)" and similar, so one entry
+        /// can explain the pattern rather than needing one per app.
+        case nameSuffix(String)
         /// Exact bundle identifier.
         case bundleID(String)
         /// Bundle identifier prefix, for families of helpers.
@@ -102,6 +106,19 @@ public struct ProcessGlossary: Sendable {
                 return false
             }) { return hit }
         }
+
+        // Then a name suffix, so the Electron helper convention is covered
+        // once. Longest suffix wins, so a specific helper beats the generic
+        // "Helper" catch-all.
+        let suffixHits = entries.filter { entry in
+            if case let .nameSuffix(s) = entry.match { return name.hasSuffix(s) }
+            return false
+        }
+        if let hit = suffixHits.max(by: { a, b in
+            guard case let .nameSuffix(sa) = a.match, case let .nameSuffix(sb) = b.match
+            else { return false }
+            return sa.count < sb.count
+        }) { return hit }
 
         if let bundleID {
             if let hit = entries.first(where: { entry in

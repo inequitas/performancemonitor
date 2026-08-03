@@ -439,3 +439,7 @@
 "Show Tour" = "Toon rondleiding";
 "Top Disk Usage" = "Topschijfgebruik";
 "Shows combined read and write throughput for processes running under your user account.\n\nWithout administrator privileges macOS only reports disk activity for your own processes, so system processes are not listed and this is not a complete, system-wide ranking." = "Toont de gecombineerde lees- en schrijfsnelheid van processen die onder jouw gebruikersaccount draaien.\n\nZonder beheerdersrechten rapporteert macOS alleen schijfactiviteit van je eigen processen; systeemprocessen ontbreken daardoor en dit is dus geen volledige ranglijst van het hele systeem.";
+
+/* MARK: - Process glossary */
+"What is %@?" = "Wat is %@?";
+"High usage is normal for this one." = "Hoog verbruik is hier normaal.";

@@ -79,6 +79,15 @@ assemble_variant() {
         cp "${LANG_DIR}/"*.strings "${app_dir}/Contents/Resources/${LPROJ_NAME}/"
     done
 
+    # Process glossary, one JSON per language. Copied flat into
+    # Contents/Resources for the same reason as the .strings files above: the
+    # app resolves resources against Bundle.main, not the SwiftPM resource
+    # bundle, which this script does not ship.
+    if compgen -G "Sources/PerformanceApp/Resources/Glossary/glossary.*.json" > /dev/null; then
+        cp Sources/PerformanceApp/Resources/Glossary/glossary.*.json \
+           "${app_dir}/Contents/Resources/"
+    fi
+
     cat > "${app_dir}/Contents/Info.plist" << PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

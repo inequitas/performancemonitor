@@ -56,6 +56,29 @@ struct ProcessGlossaryTests {
         #expect(g.lookup(name: observed)?.title == "exact")
     }
 
+    @Test func nameSuffixMatchesElectronHelpers() {
+        let g = ProcessGlossary(entries: [entry(.nameSuffix(" Helper (Renderer)"), title: "renderer")])
+        #expect(g.lookup(name: "Claude Helper (Renderer)")?.title == "renderer")
+        #expect(g.lookup(name: "Microsoft Teams WebView Helper (Renderer)")?.title == "renderer")
+    }
+
+    @Test func longestNameSuffixWins() {
+        let g = ProcessGlossary(entries: [
+            entry(.nameSuffix(" Helper"), title: "generic"),
+            entry(.nameSuffix(" Helper (Renderer)"), title: "renderer")
+        ])
+        #expect(g.lookup(name: "Claude Helper (Renderer)")?.title == "renderer")
+        #expect(g.lookup(name: "Claude Helper")?.title == "generic")
+    }
+
+    @Test func exactNameBeatsSuffix() {
+        let g = ProcessGlossary(entries: [
+            entry(.nameSuffix(" Helper"), title: "suffix"),
+            entry(.name("Claude Helper"), title: "exact")
+        ])
+        #expect(g.lookup(name: "Claude Helper")?.title == "exact")
+    }
+
     @Test func bundleIDMatchesWhenNameDoesNot() {
         let g = ProcessGlossary(entries: [entry(.bundleID("com.example.thing"), title: "Thing")])
         #expect(g.lookup(name: "unrecognised", bundleID: "com.example.thing")?.title == "Thing")

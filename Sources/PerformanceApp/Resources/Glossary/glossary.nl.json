@@ -1,0 +1,898 @@
+{
+  "version": 1,
+  "language": "nl",
+  "entries": [
+    {
+      "match": {
+        "name": "kernel_task"
+      },
+      "title": "Kernel",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "De kern van macOS zelf. Dit proces gebruikt ook bewust CPU om de machine koel te houden, dus hoog gebruik hier betekent vaak dat warmte wordt beheerd in plaats van dat er iets mis is. Afsluiten is niet mogelijk en zou ook niet helpen."
+    },
+    {
+      "match": {
+        "name": "WindowServer"
+      },
+      "title": "Window Server",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Tekent alles wat je ziet en geeft je klikken door aan apps. Het gebruik stijgt met het aantal schermen, hoge verversingssnelheden en animatie, dus externe monitoren maken dit proces drukker. Essentieel."
+    },
+    {
+      "match": {
+        "name": "launchd"
+      },
+      "title": "launchd",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Het eerste proces dat macOS start, met proces-ID 1. Het start en bewaakt alle andere diensten. Essentieel, sluit dit nooit af."
+    },
+    {
+      "match": {
+        "name": "loginwindow"
+      },
+      "title": "Login Window",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Beheert je aanmeldsessie en coördineert het afmelden en afsluiten. Als je dit afsluit, word je meteen uitgelogd."
+    },
+    {
+      "match": {
+        "name": "Dock"
+      },
+      "title": "Dock",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Het Dock, Mission Control en Stage Manager. Afsluiten is onschadelijk; macOS herstart het binnen een seconde."
+    },
+    {
+      "match": {
+        "name": "Finder"
+      },
+      "title": "Finder",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "De bestandsbeheerder en het bureaublad. Veilig om af te sluiten, en het komt meteen weer terug."
+    },
+    {
+      "match": {
+        "name": "SystemUIServer"
+      },
+      "title": "Menubalk-extra's",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Tekent het oudere type menubalkitem rechts in de menubalk. Afsluiten herstart het proces en de pictogrammen verschijnen weer."
+    },
+    {
+      "match": {
+        "name": "ControlCenter"
+      },
+      "title": "Bedieningspaneel",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Bedieningspaneel en de meeste moderne menubalkitems. Herstart vanzelf als je het afsluit."
+    },
+    {
+      "match": {
+        "name": "WindowManager"
+      },
+      "title": "Stage Manager",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Regelt Stage Manager en het naast elkaar plaatsen van vensters. Inactief tenzij je deze functies gebruikt."
+    },
+    {
+      "match": {
+        "name": "runningboardd"
+      },
+      "title": "RunningBoard",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Bepaalt welke processen mogen draaien en pauzeert apps die niet worden gebruikt. Onderdeel van hoe macOS achtergrond-apps efficiënt houdt."
+    },
+    {
+      "match": {
+        "name": "mds"
+      },
+      "title": "Spotlight (indexserver)",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "De Spotlight-indexserver. Dit proces coördineert het indexeren maar doet zelf weinig werk; het zware werk gebeurt in mds_stores en mdworker."
+    },
+    {
+      "match": {
+        "name": "mds_stores"
+      },
+      "title": "Spotlight (indexeren)",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Schrijft de Spotlight-index. Zwaar gebruik is normaal voor een tijdje na het kopiëren van veel bestanden, een migratie of een macOS-update, en het zakt vanzelf weer af. Zakt het nooit af, dan kan de index opnieuw worden opgebouwd."
+    },
+    {
+      "match": {
+        "name": "mdworker"
+      },
+      "title": "Spotlight (bestandslezer)",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Leest individuele bestanden zodat Spotlight de inhoud kan indexeren. Veel kortlevende exemplaren hiervan zijn normaal."
+    },
+    {
+      "match": {
+        "name": "mdworker_shared"
+      },
+      "title": "Spotlight (bestandslezer)",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Leest individuele bestanden voor de Spotlight-index. Kortlevend en wordt in groepjes gestart."
+    },
+    {
+      "match": {
+        "name": "corespotlightd"
+      },
+      "title": "Spotlight (app-data)",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Indexeert data die apps aan Spotlight doorgeven, zoals mail en berichten, in plaats van bestanden op de schijf."
+    },
+    {
+      "match": {
+        "name": "bird"
+      },
+      "title": "iCloud Drive",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Synchroniseert iCloud Drive. Actief terwijl bestanden worden geüpload of gedownload, verder stil. De vreemde naam is historisch bepaald."
+    },
+    {
+      "match": {
+        "name": "cloudd"
+      },
+      "title": "iCloud",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Communiceert met iCloud voor apps die daar data opslaan. De activiteit volgt wat er op dat moment wordt gesynchroniseerd."
+    },
+    {
+      "match": {
+        "name": "fileproviderd"
+      },
+      "title": "Bestandsproviders",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Draait cloudopslag-integraties die in Finder verschijnen, waaronder iCloud Drive, Dropbox en OneDrive."
+    },
+    {
+      "match": {
+        "name": "backupd"
+      },
+      "title": "Time Machine",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Voert Time Machine-back-ups uit. Hoog schijf- en CPU-gebruik tijdens een back-up is het werk dat wordt gedaan, en het stopt zodra de back-up klaar is."
+    },
+    {
+      "match": {
+        "name": "nsurlsessiond"
+      },
+      "title": "Achtergronddownloads",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Download en upload op de achtergrond namens apps, waaronder App Store- en systeemupdates."
+    },
+    {
+      "match": {
+        "name": "apsd"
+      },
+      "title": "Pushmeldingen",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Houdt de verbinding met Apples pushmeldingsdienst in stand. Bijna altijd inactief."
+    },
+    {
+      "match": {
+        "name": "photoanalysisd"
+      },
+      "title": "Foto's (analyse)",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Doorzoekt je fotobibliotheek op gezichten, scènes en duplicaten. Draait na een grote import urenlang op volle kracht en stopt daarna helemaal. Het wacht ook tot de Mac inactief is en op de stroom aangesloten."
+    },
+    {
+      "match": {
+        "name": "photolibraryd"
+      },
+      "title": "Foto's (bibliotheek)",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Beheert de fotobibliotheek zolang Foto's of iets dat ervan leest geopend is."
+    },
+    {
+      "match": {
+        "name": "mediaanalysisd"
+      },
+      "title": "Media-analyse",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Analyseert foto's en video voor Visueel opzoeken en Live Text. Draait bij voorkeur terwijl de Mac inactief is."
+    },
+    {
+      "match": {
+        "name": "coreaudiod"
+      },
+      "title": "Core Audio",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verwerkt alle audio-invoer en -uitvoer. Constant laag gebruik terwijl er iets afspeelt is normaal, en het stopt nooit helemaal."
+    },
+    {
+      "match": {
+        "name": "AudioComponentRegistrar"
+      },
+      "title": "Audio-plug-inscanner",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Scant audioplug-ins zodat apps ze kunnen weergeven. Draait kort na het installeren van plug-ins."
+    },
+    {
+      "match": {
+        "name": "airportd"
+      },
+      "title": "Wifi",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Beheert de wifiverbinding, inclusief het scannen naar netwerken. Korte activiteit wanneer netwerken veranderen is te verwachten."
+    },
+    {
+      "match": {
+        "name": "bluetoothd"
+      },
+      "title": "Bluetooth",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Beheert Bluetooth-apparaten en hun verbindingen."
+    },
+    {
+      "match": {
+        "name": "sharingd"
+      },
+      "title": "Delen",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Maakt AirDrop, Handoff, Universeel klembord en schermdelen mogelijk."
+    },
+    {
+      "match": {
+        "name": "rapportd"
+      },
+      "title": "Continuïteit",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Vindt Apple-apparaten in de buurt voor Handoff, Sidecar en Continuïteitscamera."
+    },
+    {
+      "match": {
+        "name": "mDNSResponder"
+      },
+      "title": "Bonjour",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Zoekt namen op in je lokale netwerk en vindt printers, speakers en andere apparaten. Het is ook betrokken bij gewone naamopzoekingen."
+    },
+    {
+      "match": {
+        "name": "configd"
+      },
+      "title": "Systeemconfiguratie",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Houdt de netwerkconfiguratie bij en laat apps weten wanneer die verandert."
+    },
+    {
+      "match": {
+        "name": "symptomsd"
+      },
+      "title": "Netwerkkwaliteit",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Houdt de netwerkomstandigheden in de gaten zodat het systeem kan reageren op een slechte verbinding."
+    },
+    {
+      "match": {
+        "name": "socketfilterfw"
+      },
+      "title": "Applicatiefirewall",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "De applicatiefirewall van macOS. Inactief tenzij deze is ingeschakeld en aan het filteren is."
+    },
+    {
+      "match": {
+        "name": "trustd"
+      },
+      "title": "Certificaatcontroles",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Controleert certificaten wanneer apps beveiligde verbindingen maken. Frequente korte pieken zijn normaal; het doet dit namens wat er op dat moment het netwerk gebruikt."
+    },
+    {
+      "match": {
+        "name": "securityd"
+      },
+      "title": "Sleutelhanger",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Beheert sleutelhangers en cryptografische bewerkingen."
+    },
+    {
+      "match": {
+        "name": "syspolicyd"
+      },
+      "title": "Gatekeeper",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Controleert apps voordat ze draaien en handhaaft Gatekeeper. Het is het drukst de eerste keer dat je een nieuw gedownloade app opent."
+    },
+    {
+      "match": {
+        "name": "amfid"
+      },
+      "title": "Codeondertekening",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Verifieert codehandtekeningen wanneer programma's starten."
+    },
+    {
+      "match": {
+        "name": "XProtect"
+      },
+      "title": "XProtect",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Apples ingebouwde malwarescanner. Draait af en toe en kort."
+    },
+    {
+      "match": {
+        "name": "XProtectRemediatorScan"
+      },
+      "title": "XProtect-scan",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Apples malware-opruimscan. Draait volgens een schema, gebruikt een paar minuten CPU en stopt dan."
+    },
+    {
+      "match": {
+        "name": "opendirectoryd"
+      },
+      "title": "Directoryservices",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Verwerkt gebruikersaccounts, groepen en authenticatie."
+    },
+    {
+      "match": {
+        "name": "tccd"
+      },
+      "title": "Privacymachtigingen",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Handhaaft de privacymachtigingen die je verleent, zoals toegang tot camera, microfoon en schermopname."
+    },
+    {
+      "match": {
+        "name": "cfprefsd"
+      },
+      "title": "Voorkeuren",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Leest en schrijft app-voorkeuren. Aanwezig bij elke gebruikerssessie en normaal gesproken inactief."
+    },
+    {
+      "match": {
+        "name": "distnoted"
+      },
+      "title": "Meldingen (intern)",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Geeft interne meldingen door tussen processen. Niet de meldingen die je op het scherm ziet."
+    },
+    {
+      "match": {
+        "name": "notifyd"
+      },
+      "title": "Meldingen (intern)",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Bezorgt systeemmeldingen op laag niveau tussen processen."
+    },
+    {
+      "match": {
+        "name": "logd"
+      },
+      "title": "Uniforme logging",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verzamelt het systeemlog. Korte activiteit is normaal; aanhoudend zwaar gebruik betekent meestal dat iets anders overmatig aan het loggen is."
+    },
+    {
+      "match": {
+        "name": "diagnosticd"
+      },
+      "title": "Diagnostiek",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verzamelt diagnostische informatie wanneer een app of het systeem daarom vraagt."
+    },
+    {
+      "match": {
+        "name": "powerd"
+      },
+      "title": "Energiebeheer",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Beheert slaapstand, ontwaken en energieclaims. Dit bepaalt of je Mac in slaap mag gaan."
+    },
+    {
+      "match": {
+        "name": "thermalmonitord"
+      },
+      "title": "Temperatuurbeheer",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Houdt de temperatuur in de gaten en vraagt het systeem om te vertragen wanneer dat nodig is."
+    },
+    {
+      "match": {
+        "name": "lsd"
+      },
+      "title": "Launch Services",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Houdt bij welke app welk bestandstype opent."
+    },
+    {
+      "match": {
+        "name": "launchservicesd"
+      },
+      "title": "Launch Services",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Registreert geïnstalleerde apps en de documenten die ze kunnen openen."
+    },
+    {
+      "match": {
+        "name": "appleeventsd"
+      },
+      "title": "Apple Events",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Routeert automatiseringsberichten tussen apps, waaronder AppleScript en Opdrachten."
+    },
+    {
+      "match": {
+        "name": "UserEventAgent"
+      },
+      "title": "Systeemgebeurtenissen",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Draait kleine systeemplug-ins die reageren op gebeurtenissen zoals het aansluiten van apparaten."
+    },
+    {
+      "match": {
+        "name": "fseventsd"
+      },
+      "title": "Bestandssysteemgebeurtenissen",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Registreert wijzigingen in het bestandssysteem zodat apps kunnen worden verteld wat er is veranderd. Actief terwijl grote aantallen bestanden worden weggeschreven."
+    },
+    {
+      "match": {
+        "name": "revisiond"
+      },
+      "title": "Documentversies",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Slaat de versiegeschiedenis van documenten op voor apps die 'Terugzetten naar' ondersteunen."
+    },
+    {
+      "match": {
+        "name": "spindump"
+      },
+      "title": "Hangrapportage",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Neemt monsters van een app die niet meer reageert, zodat er een rapport kan worden gemaakt. Als dit actief is, betekent dat dat iets anders is vastgelopen."
+    },
+    {
+      "match": {
+        "name": "ReportCrash"
+      },
+      "title": "Crashrapportage",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Schrijft een crashrapport nadat een app onverwacht afsluit. Kortlevend."
+    },
+    {
+      "match": {
+        "name": "swift-frontend"
+      },
+      "title": "Swift-compiler",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Compileert Swift-code. Zwaar CPU-gebruik tijdens een build is de build zelf."
+    },
+    {
+      "match": {
+        "name": "clang"
+      },
+      "title": "Clang-compiler",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Compileert C-, C++- en Objective-C-code."
+    },
+    {
+      "match": {
+        "name": "SourceKitService"
+      },
+      "title": "Xcode (code-intelligentie)",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Zorgt voor aanvulling en syntaxiscontrole binnen Xcode. Kan zwaar zijn in grote projecten."
+    },
+    {
+      "match": {
+        "name": "XCBBuildService"
+      },
+      "title": "Xcode (buildsysteem)",
+      "category": "developer",
+      "vendor": "Apple",
+      "description": "Coördineert Xcode-builds."
+    },
+    {
+      "match": {
+        "name": "com.apple.CodeSigningHelper"
+      },
+      "title": "Codeondertekeningshelper",
+      "category": "developer",
+      "vendor": "Apple",
+      "description": "Ondertekent code tijdens een build."
+    },
+    {
+      "match": {
+        "name": "node"
+      },
+      "title": "Node.js",
+      "category": "developer",
+      "vendor": null,
+      "description": "Een Node.js-programma. Wat het doet, hangt volledig af van welk project het heeft gestart."
+    },
+    {
+      "match": {
+        "name": "Terminal"
+      },
+      "title": "Terminal",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "De Terminal-app. Het CPU-gebruik hoort meestal bij wat er binnenin draait."
+    },
+    {
+      "match": {
+        "name": "com.apple.WebKit.WebContent"
+      },
+      "title": "Safari (webpagina)",
+      "category": "helper",
+      "vendor": "Apple",
+      "description": "Rendert een webpagina voor Safari of een andere WebKit-app. Elk tabblad krijgt er een eigen, dus een zwaar tabblad verschijnt hier in plaats van bij Safari zelf."
+    },
+    {
+      "match": {
+        "name": "com.apple.WebKit.Networking"
+      },
+      "title": "Safari (netwerk)",
+      "category": "helper",
+      "vendor": "Apple",
+      "description": "Verwerkt netwerkverzoeken voor Safari en andere WebKit-apps."
+    },
+    {
+      "match": {
+        "name": "com.apple.WebKit.GPU"
+      },
+      "title": "Safari (graphics)",
+      "category": "helper",
+      "vendor": "Apple",
+      "description": "Tekent pagina-inhoud voor Safari met de GPU."
+    },
+    {
+      "match": {
+        "name": "Safari"
+      },
+      "title": "Safari",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "Safari zelf. Losse pagina's draaien in aparte processen, dus een druk tabblad verschijnt onder Safari (webpagina) in plaats van hier."
+    },
+    {
+      "match": {
+        "name": "wdavdaemon"
+      },
+      "title": "Microsoft Defender",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "De scanengine van Microsoft Defender. Aanhoudend hoog gebruik op een ontwikkelaarsmachine betekent meestal dat het build-output aan het scannen is; buildmappen uitsluiten is de gebruikelijke oplossing, en op beheerde Macs is dat een beslissing van IT."
+    },
+    {
+      "match": {
+        "name": "wdavdaemon_enterprise"
+      },
+      "title": "Microsoft Defender (beheerd)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Het beheerde onderdeel van Microsoft Defender, geconfigureerd door je organisatie in plaats van door jou."
+    },
+    {
+      "match": {
+        "name": "wdavdaemon_unprivileged"
+      },
+      "title": "Microsoft Defender (scanner)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Het onderdeel van Microsoft Defender dat bestanden inspecteert zonder verhoogde rechten."
+    },
+    {
+      "match": {
+        "name": "com.microsoft.autoupdate.helper"
+      },
+      "title": "Microsoft AutoUpdate",
+      "category": "background",
+      "vendor": "Microsoft",
+      "description": "Controleert op en installeert updates voor Microsoft-applicaties."
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper (Renderer)"
+      },
+      "title": "Browsertabblad of -venster",
+      "category": "helper",
+      "vendor": null,
+      "description": "Een pagina of venster van een app gebouwd op Chromium of Electron, waaronder veel desktop-apps naast browsers. Elk tabblad krijgt zijn eigen proces, dus een zware pagina verschijnt hier in plaats van onder de app zelf."
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper (GPU)"
+      },
+      "title": "Grafische app-helper",
+      "category": "helper",
+      "vendor": null,
+      "description": "Tekent de interface van een Chromium- of Electron-app met de GPU."
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper (Plugin)"
+      },
+      "title": "App-plug-inhelper",
+      "category": "helper",
+      "vendor": null,
+      "description": "Draait een plug-in voor een Chromium- of Electron-app, geïsoleerd van de app zelf."
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper"
+      },
+      "title": "App-helperproces",
+      "category": "helper",
+      "vendor": null,
+      "description": "Een achtergrondproces dat hoort bij de app waarvan de naam ervoor staat. Chromium- en Electron-apps verdelen hun werk over meerdere van deze processen."
+    },
+    {
+      "match": {
+        "name": "plugin-container"
+      },
+      "title": "Firefox (pagina of plug-in)",
+      "category": "helper",
+      "vendor": "Mozilla",
+      "description": "Rendert een pagina of draait een plug-in voor Firefox. Meerdere tegelijk is normaal, en een zwaar tabblad verschijnt hier in plaats van onder Firefox."
+    },
+    {
+      "match": {
+        "name": "firefox"
+      },
+      "title": "Firefox",
+      "category": "app",
+      "vendor": "Mozilla",
+      "description": "Firefox zelf. Losse pagina's draaien als plugin-container, dus een druk tabblad verschijnt daar."
+    },
+    {
+      "match": {
+        "name": "corebrightnessd"
+      },
+      "title": "Schermhelderheid",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Beheert schermhelderheid, Nachtmodus en True Tone."
+    },
+    {
+      "match": {
+        "name": "nearbyd"
+      },
+      "title": "Apparaten in de buurt",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Detecteert Apple-apparaten in de buurt voor AirDrop, Handoff en Continuïteit."
+    },
+    {
+      "match": {
+        "name": "wifip2pd"
+      },
+      "title": "Wifi Direct",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verwerkt de directe apparaat-naar-apparaat-wifiverbinding die wordt gebruikt door AirDrop en AirPlay."
+    },
+    {
+      "match": {
+        "name": "SidecarRelay"
+      },
+      "title": "Sidecar",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Draait Sidecar, waarmee een iPad als tweede scherm wordt gebruikt."
+    },
+    {
+      "match": {
+        "name": "ContinuityCaptureAgent"
+      },
+      "title": "Continuïteitscamera",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Laat je iPhone dienen als camera of microfoon voor deze Mac."
+    },
+    {
+      "match": {
+        "name": "com.apple.cmio.registerassistantservice"
+      },
+      "title": "Cameraservice",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Registreert camera-apparaten zodat apps ze kunnen gebruiken."
+    },
+    {
+      "match": {
+        "name": "com.apple.DriverKit-AppleBCMWLAN"
+      },
+      "title": "Wifi-driver",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "De wifi-hardwaredriver, die buiten de kernel draait zoals macOS nu vereist."
+    },
+    {
+      "match": {
+        "name": "netext"
+      },
+      "title": "Defender (netwerkextensie)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Het netwerkfilter van Microsoft Defender, geïnstalleerd als systeemextensie door je organisatie."
+    },
+    {
+      "match": {
+        "name": "epsext"
+      },
+      "title": "Defender (endpointbeveiliging)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "De endpointbeveiligingsextensie van Microsoft Defender, die proces- en bestandsactiviteit inspecteert terwijl die plaatsvindt."
+    },
+    {
+      "match": {
+        "name": "Performance Monitor"
+      },
+      "title": "Performance Monitor",
+      "category": "app",
+      "vendor": null,
+      "description": "Deze app zelf. Ze bemonstert wat je hier ziet en pauzeert die bemonstering wanneer er geen venster open is. Staat deze app hier langdurig bovenaan, dan is dat een bug die het melden waard is."
+    },
+    {
+      "match": {
+        "name": "locationd"
+      },
+      "title": "Locatievoorzieningen",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Bepaalt waar je Mac zich bevindt, met behulp van wifinetwerken in plaats van gps. Draait wanneer een app of het systeem daarom vraagt, onder andere voor tijdzone en weer."
+    },
+    {
+      "match": {
+        "name": "searchpartyd"
+      },
+      "title": "Zoek mijn",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Maakt Zoek mijn mogelijk, inclusief de anonieme doorschakeling die helpt om verloren apparaten van anderen te lokaliseren."
+    },
+    {
+      "match": {
+        "name": "mediaremoted"
+      },
+      "title": "Mediabediening",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verwerkt afspelen, pauzeren en overslaan vanaf toetsenborden, koptelefoons en Bedieningspaneel."
+    },
+    {
+      "match": {
+        "name": "VTDecoderXPCService"
+      },
+      "title": "Videodecoder",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Decodeert video namens een app, in een apart proces voor de veiligheid. Actief terwijl er ergens video wordt afgespeeld."
+    },
+    {
+      "match": {
+        "name": "contextstored"
+      },
+      "title": "Siri-suggesties",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Slaat de gebruikspatronen op het apparaat op die achter Siri-suggesties en Spotlight-rangschikking zitten."
+    },
+    {
+      "match": {
+        "name": "zsh"
+      },
+      "title": "Shell",
+      "category": "developer",
+      "vendor": null,
+      "description": "Een opdrachtregel-shell. Het CPU-gebruik hoort bij het commando dat erbinnen draait."
+    },
+    {
+      "match": {
+        "name": "bash"
+      },
+      "title": "Shell",
+      "category": "developer",
+      "vendor": null,
+      "description": "Een opdrachtregel-shell. Het CPU-gebruik hoort bij het commando dat erbinnen draait."
+    },
+    {
+      "match": {
+        "name": "Spotlight"
+      },
+      "title": "Spotlight (zoekvenster)",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "Het Spotlight-zoekvenster zelf, niet de indexeerder. Indexeren verschijnt als mds_stores."
+    },
+    {
+      "match": {
+        "name": "Music"
+      },
+      "title": "Muziek",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "De Muziek-app."
+    },
+    {
+      "match": {
+        "name": "Mail"
+      },
+      "title": "Mail",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "De Mail-app. Het ophalen en indexeren van een grote mailbox houdt de app na het instellen een tijdje bezig."
+    }
+  ]
+}
