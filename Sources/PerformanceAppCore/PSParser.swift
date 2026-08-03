@@ -1,10 +1,17 @@
 import Foundation
 
-/// Pure parser for the output of `ps -arcwwwxo pid,comm,%cpu,%mem`.
+/// Pure parser for the output of `ps -arcwwwxo pid,%cpu,%mem,comm`.
 ///
-/// Extracted from `MetricsEngine.updateProcesses` in the Part-B decomposition.
 /// The first line (the column header) is dropped; each remaining line is
-/// `pid comm... %cpu %mem`, where the command name may contain spaces.
+/// `pid %cpu %mem comm...`, where the command name may contain spaces and runs
+/// to the end of the line.
+///
+/// The column order matters. `ps` gives every column except the last a fixed
+/// width, so asking for `comm` anywhere but last silently truncates process
+/// names to 16 characters: "Performance Monitor" arrives as "Performance Moni"
+/// and three different WebKit helpers all arrive as "com.apple.WebKit". Putting
+/// it last lets it run to full length, which the process lists show and the
+/// glossary needs in order to tell those helpers apart.
 public enum PSParser {
     /// Parses `ps` output into the top CPU and top memory consumers.
     ///
@@ -27,9 +34,9 @@ public enum PSParser {
             let parts = line.split(separator: " ", omittingEmptySubsequences: true)
             guard parts.count >= 4,
                   let pid = Int32(parts[0]),
-                  let rawCPU = Double(parts[parts.count - 2]),
-                  let mem = Double(parts[parts.count - 1]) else { continue }
-            let name = parts[1..<(parts.count - 2)].joined(separator: " ")
+                  let rawCPU = Double(parts[1]),
+                  let mem = Double(parts[2]) else { continue }
+            let name = parts[3...].joined(separator: " ")
             let cpu = (rawCPU / cpus * 10).rounded() / 10
             cpuList.append(ProcessUsage(pid: pid, name: name, value: cpu))
             memList.append(ProcessUsage(pid: pid, name: name, value: mem))

@@ -4,14 +4,15 @@ import Testing
 @Suite("PSParser")
 struct PSParserTests {
 
-    // Representative `ps -arcwwwxo pid,comm,%cpu,%mem` output. First line is the
-    // header; %cpu is per-core (so 200.0 = two cores fully pinned).
+    // Representative `ps -arcwwwxo pid,%cpu,%mem,comm` output. First line is the
+    // header; %cpu is per-core (so 200.0 = two cores fully pinned). `comm` comes
+    // last so that ps does not truncate it to 16 characters.
     private let sample = """
-    PID COMM %CPU %MEM
-    1234 WindowServer 150.0 3.2
-    5678 kernel_task 40.0 1.0
-    9012 Google Chrome Helper 20.0 5.5
-    3456 Finder 0.0 0.8
+    PID %CPU %MEM COMM
+    1234 150.0 3.2 WindowServer
+    5678 40.0 1.0 kernel_task
+    9012 20.0 5.5 Google Chrome Helper
+    3456 0.0 0.8 Finder
     """
 
     @Test func headerIsDropped() {
@@ -58,17 +59,29 @@ struct PSParserTests {
     }
 
     @Test func headerOnlyYieldsNothing() {
-        let (cpu, _) = PSParser.parse("PID COMM %CPU %MEM", topCount: 10, logicalCPUs: 8)
+        let (cpu, _) = PSParser.parse("PID %CPU %MEM COMM", topCount: 10, logicalCPUs: 8)
         #expect(cpu.isEmpty)
+    }
+
+    @Test func longNamesSurviveIntact() {
+        // The reason comm is the last column: anywhere else ps cuts it at 16
+        // characters, which collapses three different WebKit helpers into one
+        // name and leaves the process lists showing "Performance Moni".
+        let long = """
+        PID %CPU %MEM COMM
+        1234 10.0 1.0 com.apple.WebKit.WebContent
+        """
+        let (cpu, _) = PSParser.parse(long, topCount: 10, logicalCPUs: 1)
+        #expect(cpu.first?.name == "com.apple.WebKit.WebContent")
     }
 
     @Test func truncatedAndMalformedLinesAreSkipped() {
         let messy = """
-        PID COMM %CPU %MEM
-        1234 WindowServer 150.0 3.2
-        notapid Foo 10.0 2.0
-        5678 OnlyThreeCols 12.0
-        9012 Bar 20.0 4.0
+        PID %CPU %MEM COMM
+        1234 150.0 3.2 WindowServer
+        notapid 10.0 2.0 Foo
+        5678 12.0 OnlyThreeCols
+        9012 20.0 4.0 Bar
         """
         let (cpu, _) = PSParser.parse(messy, topCount: 10, logicalCPUs: 1)
         // Only the two well-formed rows survive.
