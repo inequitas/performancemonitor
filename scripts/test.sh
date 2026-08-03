@@ -44,4 +44,8 @@ elif [ -d "${FRAMEWORKS}/Testing.framework" ]; then
     echo "==> swift-testing found under ${DEVELOPER_DIR}; adding search paths"
 fi
 
-exec swift test "${FLAGS[@]}" "$@"
+# ${FLAGS[@]+...} rather than "${FLAGS[@]}": under `set -u`, bash 3.2 (which
+# is what macOS ships) treats an empty array as unbound and aborts. FLAGS is
+# empty on any machine with full Xcode, where no extra search paths are
+# needed, so that is the normal case rather than an edge one.
+exec swift test ${FLAGS[@]+"${FLAGS[@]}"} "$@"
