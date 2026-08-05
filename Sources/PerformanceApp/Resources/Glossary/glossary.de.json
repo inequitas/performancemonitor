@@ -1,0 +1,898 @@
+{
+  "version": 1,
+  "language": "de",
+  "entries": [
+    {
+      "match": {
+        "name": "kernel_task"
+      },
+      "title": "Kernel",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Der Kern von macOS selbst. Er nutzt auch absichtlich CPU-Leistung, um die Maschine kühl zu halten, daher bedeutet eine hohe Auslastung hier oft, dass Wärme reguliert wird und nicht, dass etwas falsch läuft. Beenden ist nicht möglich und würde auch nichts bringen."
+    },
+    {
+      "match": {
+        "name": "WindowServer"
+      },
+      "title": "Window Server",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Zeichnet alles, was du siehst, und leitet deine Klicks an Apps weiter. Die Auslastung steigt mit der Anzahl der Bildschirme, hohen Bildwiederholraten und Animationen, externe Monitore machen den Prozess also aktiver. Essenziell."
+    },
+    {
+      "match": {
+        "name": "launchd"
+      },
+      "title": "launchd",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Der erste Prozess, den macOS startet, mit Prozess-ID 1. Er startet und überwacht alle anderen Dienste. Essenziell, beende ihn nie."
+    },
+    {
+      "match": {
+        "name": "loginwindow"
+      },
+      "title": "Anmeldefenster",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verwaltet deine Anmeldesitzung und koordiniert das Abmelden und Herunterfahren. Wenn du es beendest, wirst du sofort abgemeldet."
+    },
+    {
+      "match": {
+        "name": "Dock"
+      },
+      "title": "Dock",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Das Dock, Mission Control und Stage Manager. Beenden ist unbedenklich; macOS startet es innerhalb einer Sekunde neu."
+    },
+    {
+      "match": {
+        "name": "Finder"
+      },
+      "title": "Finder",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Der Dateimanager und der Schreibtisch. Kann gefahrlos beendet werden und kommt sofort wieder zurück."
+    },
+    {
+      "match": {
+        "name": "SystemUIServer"
+      },
+      "title": "Menüleisten-Extras",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Zeichnet die älteren Menüleistensymbole rechts in der Menüleiste. Wenn du es beendest, startet es neu und die Symbole erscheinen wieder."
+    },
+    {
+      "match": {
+        "name": "ControlCenter"
+      },
+      "title": "Kontrollzentrum",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Das Kontrollzentrum und die meisten modernen Menüleistensymbole. Startet von selbst neu, wenn es beendet wird."
+    },
+    {
+      "match": {
+        "name": "WindowManager"
+      },
+      "title": "Stage Manager",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Kümmert sich um Stage Manager und das Anordnen von Fenstern. Inaktiv, solange du diese Funktionen nicht nutzt."
+    },
+    {
+      "match": {
+        "name": "runningboardd"
+      },
+      "title": "RunningBoard",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Entscheidet, welche Prozesse laufen dürfen, und pausiert Apps, die nicht genutzt werden. Ein Teil davon, wie macOS Hintergrund-Apps sparsam hält."
+    },
+    {
+      "match": {
+        "name": "mds"
+      },
+      "title": "Spotlight (Indexserver)",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Der Spotlight-Indexserver. Er koordiniert die Indizierung, erledigt aber selbst kaum Arbeit; die eigentliche Arbeit passiert in mds_stores und mdworker."
+    },
+    {
+      "match": {
+        "name": "mds_stores"
+      },
+      "title": "Spotlight (Indizierung)",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Schreibt den Spotlight-Index. Starke Auslastung ist eine Zeit lang normal nach dem Kopieren vieler Dateien, einer Migration oder einem macOS-Update, und legt sich von selbst wieder. Legt sie sich nie, kann der Index neu aufgebaut werden."
+    },
+    {
+      "match": {
+        "name": "mdworker"
+      },
+      "title": "Spotlight (Dateileser)",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Liest einzelne Dateien, damit Spotlight ihren Inhalt indizieren kann. Viele kurzlebige Exemplare davon sind normal."
+    },
+    {
+      "match": {
+        "name": "mdworker_shared"
+      },
+      "title": "Spotlight (Dateileser)",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Liest einzelne Dateien für den Spotlight-Index. Kurzlebig und wird in Gruppen gestartet."
+    },
+    {
+      "match": {
+        "name": "corespotlightd"
+      },
+      "title": "Spotlight (App-Daten)",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Indiziert Daten, die Apps an Spotlight übergeben, etwa Mail und Nachrichten, statt Dateien auf der Festplatte."
+    },
+    {
+      "match": {
+        "name": "bird"
+      },
+      "title": "iCloud Drive",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Synchronisiert iCloud Drive. Aktiv, während Dateien hoch- oder heruntergeladen werden, sonst ruhig. Der ungewöhnliche Name ist historisch bedingt."
+    },
+    {
+      "match": {
+        "name": "cloudd"
+      },
+      "title": "iCloud",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Kommuniziert mit iCloud für Apps, die dort Daten speichern. Die Aktivität richtet sich danach, was gerade synchronisiert wird."
+    },
+    {
+      "match": {
+        "name": "fileproviderd"
+      },
+      "title": "Datei-Provider",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Betreibt die Cloud-Speicher-Integrationen, die im Finder erscheinen, darunter iCloud Drive, Dropbox und OneDrive."
+    },
+    {
+      "match": {
+        "name": "backupd"
+      },
+      "title": "Time Machine",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Führt Time Machine-Backups aus. Hohe Festplatten- und CPU-Auslastung während eines Backups ist die eigentliche Arbeit, und sie endet, sobald das Backup fertig ist."
+    },
+    {
+      "match": {
+        "name": "nsurlsessiond"
+      },
+      "title": "Hintergrund-Downloads",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Lädt im Hintergrund im Auftrag von Apps herunter und hoch, darunter App Store- und Systemupdates."
+    },
+    {
+      "match": {
+        "name": "apsd"
+      },
+      "title": "Push-Benachrichtigungen",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Hält die Verbindung zu Apples Push-Benachrichtigungsdienst aufrecht. Fast immer inaktiv."
+    },
+    {
+      "match": {
+        "name": "photoanalysisd"
+      },
+      "title": "Fotos (Analyse)",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Durchsucht deine Fotomediathek nach Gesichtern, Motiven und Duplikaten. Läuft nach einem großen Import stundenlang auf Hochtouren und stoppt danach endgültig. Wartet außerdem, bis der Mac inaktiv ist und am Netzteil hängt."
+    },
+    {
+      "match": {
+        "name": "photolibraryd"
+      },
+      "title": "Fotos (Mediathek)",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Verwaltet die Fotomediathek, solange Fotos oder etwas, das darauf zugreift, geöffnet ist."
+    },
+    {
+      "match": {
+        "name": "mediaanalysisd"
+      },
+      "title": "Medienanalyse",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Analysiert Bilder und Videos für die Visuelle Suche und Live Text. Läuft bevorzugt, während der Mac inaktiv ist."
+    },
+    {
+      "match": {
+        "name": "coreaudiod"
+      },
+      "title": "Core Audio",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verarbeitet alle Audioein- und -ausgaben. Konstant niedrige Auslastung, während etwas abgespielt wird, ist normal, und es stoppt nie ganz."
+    },
+    {
+      "match": {
+        "name": "AudioComponentRegistrar"
+      },
+      "title": "Audio-Plug-in-Scanner",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Durchsucht Audio-Plug-ins, damit Apps sie auflisten können. Läuft kurz nach der Installation von Plug-ins."
+    },
+    {
+      "match": {
+        "name": "airportd"
+      },
+      "title": "WLAN",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verwaltet die WLAN-Verbindung, einschließlich der Suche nach Netzwerken. Kurze Aktivität ist zu erwarten, wenn sich Netzwerke ändern."
+    },
+    {
+      "match": {
+        "name": "bluetoothd"
+      },
+      "title": "Bluetooth",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verwaltet Bluetooth-Geräte und ihre Verbindungen."
+    },
+    {
+      "match": {
+        "name": "sharingd"
+      },
+      "title": "Freigabe",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Treibt AirDrop, Handoff, die Universelle Zwischenablage und die Bildschirmfreigabe an."
+    },
+    {
+      "match": {
+        "name": "rapportd"
+      },
+      "title": "Continuity",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Findet Apple-Geräte in der Nähe für Handoff, Sidecar und Continuity Camera."
+    },
+    {
+      "match": {
+        "name": "mDNSResponder"
+      },
+      "title": "Bonjour",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Löst Namen in deinem lokalen Netzwerk auf und findet Drucker, Lautsprecher und andere Geräte. Es ist auch an gewöhnlichen Namensauflösungen beteiligt."
+    },
+    {
+      "match": {
+        "name": "configd"
+      },
+      "title": "Systemkonfiguration",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verfolgt die Netzwerkkonfiguration und informiert Apps, wenn sie sich ändert."
+    },
+    {
+      "match": {
+        "name": "symptomsd"
+      },
+      "title": "Netzwerkqualität",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Beobachtet die Netzwerkbedingungen, damit das System auf eine schlechte Verbindung reagieren kann."
+    },
+    {
+      "match": {
+        "name": "socketfilterfw"
+      },
+      "title": "Anwendungs-Firewall",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Die Anwendungs-Firewall von macOS. Inaktiv, außer sie ist aktiviert und filtert gerade."
+    },
+    {
+      "match": {
+        "name": "trustd"
+      },
+      "title": "Zertifikatsprüfungen",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Prüft Zertifikate, wenn Apps sichere Verbindungen aufbauen. Häufige kurze Aktivitätsschübe sind normal; es tut dies im Auftrag von dem, was gerade das Netzwerk nutzt."
+    },
+    {
+      "match": {
+        "name": "securityd"
+      },
+      "title": "Schlüsselbund",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Verwaltet Schlüsselbunde und kryptografische Vorgänge."
+    },
+    {
+      "match": {
+        "name": "syspolicyd"
+      },
+      "title": "Gatekeeper",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Prüft Apps, bevor sie ausgeführt werden, und setzt Gatekeeper durch. Am aktivsten ist es, wenn du eine neu heruntergeladene App zum ersten Mal öffnest."
+    },
+    {
+      "match": {
+        "name": "amfid"
+      },
+      "title": "Codesignierung",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Überprüft Codesignaturen, wenn Programme starten."
+    },
+    {
+      "match": {
+        "name": "XProtect"
+      },
+      "title": "XProtect",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Apples integrierter Malware-Scanner. Läuft gelegentlich und kurz."
+    },
+    {
+      "match": {
+        "name": "XProtectRemediatorScan"
+      },
+      "title": "XProtect-Scan",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Apples Scan zur Malware-Beseitigung. Läuft nach einem Zeitplan, nutzt einige Minuten lang CPU-Leistung und stoppt dann."
+    },
+    {
+      "match": {
+        "name": "opendirectoryd"
+      },
+      "title": "Verzeichnisdienste",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Verwaltet Benutzerkonten, Gruppen und Authentifizierung."
+    },
+    {
+      "match": {
+        "name": "tccd"
+      },
+      "title": "Datenschutzberechtigungen",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Setzt die Datenschutzberechtigungen durch, die du erteilst, etwa den Zugriff auf Kamera, Mikrofon und Bildschirmaufnahme."
+    },
+    {
+      "match": {
+        "name": "cfprefsd"
+      },
+      "title": "Einstellungen",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Liest und schreibt App-Einstellungen. In jeder Benutzersitzung vorhanden und normalerweise inaktiv."
+    },
+    {
+      "match": {
+        "name": "distnoted"
+      },
+      "title": "Benachrichtigungen (intern)",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Leitet interne Benachrichtigungen zwischen Prozessen weiter. Nicht die Benachrichtigungen, die du auf dem Bildschirm siehst."
+    },
+    {
+      "match": {
+        "name": "notifyd"
+      },
+      "title": "Benachrichtigungen (intern)",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Übermittelt systemnahe Benachrichtigungen auf niedriger Ebene zwischen Prozessen."
+    },
+    {
+      "match": {
+        "name": "logd"
+      },
+      "title": "Einheitliche Protokollierung",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Sammelt das Systemprotokoll. Kurze Aktivität ist normal; anhaltend hohe Auslastung bedeutet meist, dass etwas anderes übermäßig protokolliert."
+    },
+    {
+      "match": {
+        "name": "diagnosticd"
+      },
+      "title": "Diagnose",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Sammelt Diagnoseinformationen, wenn eine App oder das System danach fragt."
+    },
+    {
+      "match": {
+        "name": "powerd"
+      },
+      "title": "Energieverwaltung",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verwaltet Ruhezustand, Aufwachen und Energieansprüche. Es entscheidet, ob dein Mac in den Ruhezustand gehen darf."
+    },
+    {
+      "match": {
+        "name": "thermalmonitord"
+      },
+      "title": "Temperaturüberwachung",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Überwacht die Temperatur und bittet das System bei Bedarf, sich zu verlangsamen."
+    },
+    {
+      "match": {
+        "name": "lsd"
+      },
+      "title": "Launch Services",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Behält den Überblick, welche App welchen Dateityp öffnet."
+    },
+    {
+      "match": {
+        "name": "launchservicesd"
+      },
+      "title": "Launch Services",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Registriert installierte Apps und die Dokumente, die sie öffnen können."
+    },
+    {
+      "match": {
+        "name": "appleeventsd"
+      },
+      "title": "Apple Events",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Leitet Automatisierungsnachrichten zwischen Apps weiter, darunter AppleScript und Kurzbefehle."
+    },
+    {
+      "match": {
+        "name": "UserEventAgent"
+      },
+      "title": "Systemereignisse",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Führt kleine Systemerweiterungen aus, die auf Ereignisse wie das Anschließen von Geräten reagieren."
+    },
+    {
+      "match": {
+        "name": "fseventsd"
+      },
+      "title": "Dateisystemereignisse",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Zeichnet Änderungen im Dateisystem auf, damit Apps mitgeteilt werden kann, was sich geändert hat. Aktiv, während viele Dateien geschrieben werden."
+    },
+    {
+      "match": {
+        "name": "revisiond"
+      },
+      "title": "Dokumentversionen",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Speichert den Versionsverlauf von Dokumenten für Apps, die 'Zurücksetzen auf' unterstützen."
+    },
+    {
+      "match": {
+        "name": "spindump"
+      },
+      "title": "Hang-Bericht",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Erstellt Stichproben einer App, die nicht mehr reagiert, damit ein Bericht erstellt werden kann. Seine Anwesenheit bedeutet, dass etwas anderes hängt."
+    },
+    {
+      "match": {
+        "name": "ReportCrash"
+      },
+      "title": "Absturzbericht",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Schreibt einen Absturzbericht, nachdem eine App unerwartet beendet wurde. Kurzlebig."
+    },
+    {
+      "match": {
+        "name": "swift-frontend"
+      },
+      "title": "Swift-Compiler",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Kompiliert Swift-Code. Hohe CPU-Auslastung während eines Builds ist der Build selbst."
+    },
+    {
+      "match": {
+        "name": "clang"
+      },
+      "title": "Clang-Compiler",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Kompiliert C-, C++- und Objective-C-Code."
+    },
+    {
+      "match": {
+        "name": "SourceKitService"
+      },
+      "title": "Xcode (Code-Intelligenz)",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Sorgt für Vervollständigung und Syntaxprüfung in Xcode. Kann bei großen Projekten stark auslasten."
+    },
+    {
+      "match": {
+        "name": "XCBBuildService"
+      },
+      "title": "Xcode (Build-System)",
+      "category": "developer",
+      "vendor": "Apple",
+      "description": "Koordiniert Xcode-Builds."
+    },
+    {
+      "match": {
+        "name": "com.apple.CodeSigningHelper"
+      },
+      "title": "Codesignierungs-Helper",
+      "category": "developer",
+      "vendor": "Apple",
+      "description": "Signiert Code während eines Builds."
+    },
+    {
+      "match": {
+        "name": "node"
+      },
+      "title": "Node.js",
+      "category": "developer",
+      "vendor": null,
+      "description": "Ein Node.js-Programm. Was es tut, hängt vollständig davon ab, welches Projekt es gestartet hat."
+    },
+    {
+      "match": {
+        "name": "Terminal"
+      },
+      "title": "Terminal",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "Die App Terminal. Ihre CPU-Auslastung gehört meist zu dem, was darin läuft."
+    },
+    {
+      "match": {
+        "name": "com.apple.WebKit.WebContent"
+      },
+      "title": "Safari (Webseite)",
+      "category": "helper",
+      "vendor": "Apple",
+      "description": "Rendert eine Webseite für Safari oder eine andere WebKit-App. Jeder Tab bekommt einen eigenen Prozess, daher erscheint ein rechenintensiver Tab hier und nicht bei Safari selbst."
+    },
+    {
+      "match": {
+        "name": "com.apple.WebKit.Networking"
+      },
+      "title": "Safari (Netzwerk)",
+      "category": "helper",
+      "vendor": "Apple",
+      "description": "Verarbeitet Netzwerkanfragen für Safari und andere WebKit-Apps."
+    },
+    {
+      "match": {
+        "name": "com.apple.WebKit.GPU"
+      },
+      "title": "Safari (Grafik)",
+      "category": "helper",
+      "vendor": "Apple",
+      "description": "Zeichnet Seiteninhalte für Safari mit der GPU."
+    },
+    {
+      "match": {
+        "name": "Safari"
+      },
+      "title": "Safari",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "Safari selbst. Einzelne Seiten laufen in eigenen Prozessen, daher erscheint ein aktiver Tab unter Safari (Webseite) statt hier."
+    },
+    {
+      "match": {
+        "name": "wdavdaemon"
+      },
+      "title": "Microsoft Defender",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Die Scan-Engine von Microsoft Defender. Anhaltend hohe Auslastung auf einem Entwicklerrechner bedeutet meist, dass Build-Ausgaben gescannt werden; das Ausschließen von Build-Verzeichnissen ist die übliche Lösung und auf verwalteten Macs eine Entscheidung der IT-Abteilung."
+    },
+    {
+      "match": {
+        "name": "wdavdaemon_enterprise"
+      },
+      "title": "Microsoft Defender (verwaltet)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Die verwaltete Komponente von Microsoft Defender, konfiguriert von deiner Organisation statt von dir."
+    },
+    {
+      "match": {
+        "name": "wdavdaemon_unprivileged"
+      },
+      "title": "Microsoft Defender (Scanner)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Der Teil von Microsoft Defender, der Dateien ohne erhöhte Rechte prüft."
+    },
+    {
+      "match": {
+        "name": "com.microsoft.autoupdate.helper"
+      },
+      "title": "Microsoft AutoUpdate",
+      "category": "background",
+      "vendor": "Microsoft",
+      "description": "Sucht nach Updates für Microsoft-Anwendungen und installiert sie."
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper (Renderer)"
+      },
+      "title": "Browser-Tab oder -Fenster",
+      "category": "helper",
+      "vendor": null,
+      "description": "Eine Seite oder ein Fenster einer App, die auf Chromium oder Electron basiert, wozu neben Browsern auch viele Desktop-Apps zählen. Jeder Tab bekommt einen eigenen Prozess, daher erscheint eine rechenintensive Seite hier und nicht unter der App selbst."
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper (GPU)"
+      },
+      "title": "App-Grafik-Helper",
+      "category": "helper",
+      "vendor": null,
+      "description": "Zeichnet die Oberfläche einer Chromium- oder Electron-App mit der GPU."
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper (Plugin)"
+      },
+      "title": "App-Plug-in-Helper",
+      "category": "helper",
+      "vendor": null,
+      "description": "Führt ein Plug-in für eine Chromium- oder Electron-App aus, isoliert von der App selbst."
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper"
+      },
+      "title": "App-Hilfsprozess",
+      "category": "helper",
+      "vendor": null,
+      "description": "Ein Hintergrundprozess, der zu der davor genannten App gehört. Chromium- und Electron-Apps verteilen ihre Arbeit auf mehrere davon."
+    },
+    {
+      "match": {
+        "name": "plugin-container"
+      },
+      "title": "Firefox (Seite oder Plug-in)",
+      "category": "helper",
+      "vendor": "Mozilla",
+      "description": "Rendert eine Seite oder führt ein Plug-in für Firefox aus. Mehrere gleichzeitig sind normal, und ein rechenintensiver Tab erscheint hier statt unter Firefox."
+    },
+    {
+      "match": {
+        "name": "firefox"
+      },
+      "title": "Firefox",
+      "category": "app",
+      "vendor": "Mozilla",
+      "description": "Firefox selbst. Einzelne Seiten laufen als plugin-container, daher erscheint ein aktiver Tab dort."
+    },
+    {
+      "match": {
+        "name": "corebrightnessd"
+      },
+      "title": "Bildschirmhelligkeit",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verwaltet die Bildschirmhelligkeit, Night Shift und True Tone."
+    },
+    {
+      "match": {
+        "name": "nearbyd"
+      },
+      "title": "Geräte in der Nähe",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Erkennt Apple-Geräte in der Nähe für AirDrop, Handoff und Continuity."
+    },
+    {
+      "match": {
+        "name": "wifip2pd"
+      },
+      "title": "Wi-Fi Direct",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verarbeitet die direkte Geräte-zu-Geräte-WLAN-Verbindung, die von AirDrop und AirPlay genutzt wird."
+    },
+    {
+      "match": {
+        "name": "SidecarRelay"
+      },
+      "title": "Sidecar",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Betreibt Sidecar, das ein iPad als zweiten Bildschirm nutzt."
+    },
+    {
+      "match": {
+        "name": "ContinuityCaptureAgent"
+      },
+      "title": "Continuity Camera",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Lässt dein iPhone als Kamera oder Mikrofon für diesen Mac dienen."
+    },
+    {
+      "match": {
+        "name": "com.apple.cmio.registerassistantservice"
+      },
+      "title": "Kameradienst",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Registriert Kamerageräte, damit Apps sie nutzen können."
+    },
+    {
+      "match": {
+        "name": "com.apple.DriverKit-AppleBCMWLAN"
+      },
+      "title": "WLAN-Treiber",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Der WLAN-Hardwaretreiber, der außerhalb des Kernels läuft, wie es macOS mittlerweile verlangt."
+    },
+    {
+      "match": {
+        "name": "netext"
+      },
+      "title": "Defender (Netzwerkerweiterung)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Der Netzwerkfilter von Microsoft Defender, von deiner Organisation als Systemerweiterung installiert."
+    },
+    {
+      "match": {
+        "name": "epsext"
+      },
+      "title": "Defender (Endpunktsicherheit)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Die Endpunktsicherheits-Erweiterung von Microsoft Defender, die Prozess- und Dateiaktivität in Echtzeit prüft."
+    },
+    {
+      "match": {
+        "name": "Performance Monitor"
+      },
+      "title": "Performance Monitor",
+      "category": "app",
+      "vendor": null,
+      "description": "Diese App selbst. Sie erfasst, was du hier siehst, und pausiert diese Erfassung, wenn kein Fenster geöffnet ist. Steht sie hier länger an der Spitze, ist das ein Fehler, den es sich zu melden lohnt."
+    },
+    {
+      "match": {
+        "name": "locationd"
+      },
+      "title": "Ortungsdienste",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Ermittelt, wo sich dein Mac befindet, mithilfe von WLAN-Netzwerken statt GPS. Läuft, wenn eine App oder das System danach fragt, unter anderem für Zeitzone und Wetter."
+    },
+    {
+      "match": {
+        "name": "searchpartyd"
+      },
+      "title": "Wo ist?",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Treibt Wo ist? an, einschließlich der anonymen Weiterleitung, die hilft, verlorene Geräte anderer Personen zu orten."
+    },
+    {
+      "match": {
+        "name": "mediaremoted"
+      },
+      "title": "Mediensteuerung",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Verarbeitet Wiedergabe, Pause und Überspringen von Tastaturen, Kopfhörern und dem Kontrollzentrum."
+    },
+    {
+      "match": {
+        "name": "VTDecoderXPCService"
+      },
+      "title": "Video-Decoder",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Dekodiert Video im Auftrag einer App, aus Sicherheitsgründen in einem separaten Prozess. Aktiv, während irgendetwas Video abspielt."
+    },
+    {
+      "match": {
+        "name": "contextstored"
+      },
+      "title": "Siri-Vorschläge",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Speichert die Nutzungsmuster auf dem Gerät, die hinter Siri-Vorschlägen und der Spotlight-Rangfolge stehen."
+    },
+    {
+      "match": {
+        "name": "zsh"
+      },
+      "title": "Shell",
+      "category": "developer",
+      "vendor": null,
+      "description": "Eine Kommandozeilen-Shell. Ihre CPU-Auslastung gehört zu dem Befehl, der darin läuft."
+    },
+    {
+      "match": {
+        "name": "bash"
+      },
+      "title": "Shell",
+      "category": "developer",
+      "vendor": null,
+      "description": "Eine Kommandozeilen-Shell. Ihre CPU-Auslastung gehört zu dem Befehl, der darin läuft."
+    },
+    {
+      "match": {
+        "name": "Spotlight"
+      },
+      "title": "Spotlight (Suchfenster)",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "Das Spotlight-Suchfenster selbst, nicht die Indizierung. Diese erscheint als mds_stores."
+    },
+    {
+      "match": {
+        "name": "Music"
+      },
+      "title": "Musik",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "Die App Musik."
+    },
+    {
+      "match": {
+        "name": "Mail"
+      },
+      "title": "Mail",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "Die App Mail. Das Abrufen und Indizieren eines großen Postfachs hält sie nach der Einrichtung eine Zeit lang beschäftigt."
+    }
+  ]
+}

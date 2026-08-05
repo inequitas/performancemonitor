@@ -1,0 +1,898 @@
+{
+  "version": 1,
+  "language": "ja",
+  "entries": [
+    {
+      "match": {
+        "name": "kernel_task"
+      },
+      "title": "カーネル",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "macOS自体の中核です。マシンを冷却するために意図的にCPUを使用することもあるため、ここでの使用率が高い場合は、問題があるというより発熱が管理されていることを意味することがよくあります。終了させることはできず、終了させても意味はありません。"
+    },
+    {
+      "match": {
+        "name": "WindowServer"
+      },
+      "title": "Window Server",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "画面に表示されるすべてを描画し、クリックをアプリに伝えます。ディスプレイの台数、高いリフレッシュレート、アニメーションが増えるほど負荷が高まるため、外部ディスプレイを接続するとより忙しくなります。必須のプロセスです。"
+    },
+    {
+      "match": {
+        "name": "launchd"
+      },
+      "title": "launchd",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "macOSが最初に起動するプロセスで、プロセスID 1を持ちます。他のすべてのサービスを起動し、監督します。必須のプロセスであり、絶対に終了させないでください。"
+    },
+    {
+      "match": {
+        "name": "loginwindow"
+      },
+      "title": "ログインウィンドウ",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "ログインセッションを管理し、ログアウトとシステム終了を調整します。終了させると即座にログアウトされます。"
+    },
+    {
+      "match": {
+        "name": "Dock"
+      },
+      "title": "Dock",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Dock、Mission Control、Stage Managerです。終了させても問題はなく、macOSが1秒以内に再起動します。"
+    },
+    {
+      "match": {
+        "name": "Finder"
+      },
+      "title": "Finder",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "ファイルマネージャとデスクトップです。終了させても安全で、すぐに元通りになります。"
+    },
+    {
+      "match": {
+        "name": "SystemUIServer"
+      },
+      "title": "メニューバーエクストラ",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "メニューバー右側にある旧タイプのメニューバー項目を描画します。終了させると再起動し、アイコンが再び表示されます。"
+    },
+    {
+      "match": {
+        "name": "ControlCenter"
+      },
+      "title": "コントロールセンター",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "コントロールセンターと、最近のメニューバー項目の大部分です。終了させても自動的に再起動します。"
+    },
+    {
+      "match": {
+        "name": "WindowManager"
+      },
+      "title": "Stage Manager",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Stage Managerとウィンドウのタイル表示を処理します。これらの機能を使用していない場合はアイドル状態です。"
+    },
+    {
+      "match": {
+        "name": "runningboardd"
+      },
+      "title": "RunningBoard",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "どのプロセスを実行できるかを決定し、使用されていないアプリを一時停止します。macOSがバックグラウンドアプリを低コストに保つ仕組みの一部です。"
+    },
+    {
+      "match": {
+        "name": "mds"
+      },
+      "title": "Spotlight (インデックスサーバー)",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Spotlightのインデックスサーバーです。インデックス作成を統括しますが、それ自体が行う作業はわずかで、実際の重い処理はmds_storesとmdworkerが担っています。"
+    },
+    {
+      "match": {
+        "name": "mds_stores"
+      },
+      "title": "Spotlight (インデックス作成)",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Spotlightのインデックスを書き込みます。大量のファイルコピー、移行、macOSのアップデートの後にしばらく高負荷になるのは正常で、自然に落ち着きます。落ち着かない場合は、インデックスを再構築できます。"
+    },
+    {
+      "match": {
+        "name": "mdworker"
+      },
+      "title": "Spotlight (ファイル読み取り)",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Spotlightがファイルの内容をインデックスできるよう、個々のファイルを読み取ります。短時間で終了するプロセスが多数現れるのは正常です。"
+    },
+    {
+      "match": {
+        "name": "mdworker_shared"
+      },
+      "title": "Spotlight (ファイル読み取り)",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Spotlightのインデックスのために個々のファイルを読み取ります。短時間で終了し、まとまって起動します。"
+    },
+    {
+      "match": {
+        "name": "corespotlightd"
+      },
+      "title": "Spotlight (アプリデータ)",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "ディスク上のファイルではなく、メールやメッセージなどアプリがSpotlightに渡すデータをインデックスします。"
+    },
+    {
+      "match": {
+        "name": "bird"
+      },
+      "title": "iCloud Drive",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "iCloud Driveを同期します。ファイルのアップロードやダウンロード中は動作し、それ以外は静かです。この変わった名前は歴史的な経緯によるものです。"
+    },
+    {
+      "match": {
+        "name": "cloudd"
+      },
+      "title": "iCloud",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "iCloudにデータを保存するアプリのために、iCloudと通信します。動作状況は同期対象によって変わります。"
+    },
+    {
+      "match": {
+        "name": "fileproviderd"
+      },
+      "title": "ファイルプロバイダ",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "iCloud Drive、Dropbox、OneDriveなど、Finderに表示されるクラウドストレージの連携機能を実行します。"
+    },
+    {
+      "match": {
+        "name": "backupd"
+      },
+      "title": "Time Machine",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Time Machineのバックアップを実行します。バックアップ中にディスクとCPUの使用率が高くなるのはその作業自体であり、バックアップが完了すると止まります。"
+    },
+    {
+      "match": {
+        "name": "nsurlsessiond"
+      },
+      "title": "バックグラウンドダウンロード",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "App Storeやシステムアップデートを含め、アプリに代わってバックグラウンドでダウンロードとアップロードを行います。"
+    },
+    {
+      "match": {
+        "name": "apsd"
+      },
+      "title": "プッシュ通知",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Appleのプッシュ通知サービスへの接続を維持します。ほぼ常にアイドル状態です。"
+    },
+    {
+      "match": {
+        "name": "photoanalysisd"
+      },
+      "title": "写真 (解析)",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "写真ライブラリをスキャンし、顔、シーン、重複を検出します。大量の写真を取り込んだ後は数時間にわたり高負荷で動作し、その後は完全に停止します。また、Macがアイドル状態になり電源に接続されるまで動作を待ちます。"
+    },
+    {
+      "match": {
+        "name": "photolibraryd"
+      },
+      "title": "写真 (ライブラリ)",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "写真、またはそこからデータを読み取るアプリが開いている間、写真ライブラリを管理します。"
+    },
+    {
+      "match": {
+        "name": "mediaanalysisd"
+      },
+      "title": "メディア解析",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "ビジュアル検索とライブテキストのために、画像や動画を解析します。Macがアイドル状態のときに動作することを優先します。"
+    },
+    {
+      "match": {
+        "name": "coreaudiod"
+      },
+      "title": "Core Audio",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "すべてのオーディオの入力と出力を処理します。何かが再生されている間、常に低い使用率になるのは正常であり、完全に停止することはありません。"
+    },
+    {
+      "match": {
+        "name": "AudioComponentRegistrar"
+      },
+      "title": "オーディオプラグインスキャナー",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "アプリがオーディオプラグインを一覧表示できるよう、それらをスキャンします。プラグインのインストール後、短時間だけ動作します。"
+    },
+    {
+      "match": {
+        "name": "airportd"
+      },
+      "title": "Wi-Fi",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "ネットワークのスキャンを含め、Wi-Fi接続を管理します。ネットワークが変化したときに短時間動作するのは想定内です。"
+    },
+    {
+      "match": {
+        "name": "bluetoothd"
+      },
+      "title": "Bluetooth",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Bluetoothデバイスとその接続を管理します。"
+    },
+    {
+      "match": {
+        "name": "sharingd"
+      },
+      "title": "共有",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "AirDrop、Handoff、ユニバーサルクリップボード、画面共有を支えています。"
+    },
+    {
+      "match": {
+        "name": "rapportd"
+      },
+      "title": "Continuity",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Handoff、Sidecar、Continuity Cameraのために近くのApple製デバイスを見つけます。"
+    },
+    {
+      "match": {
+        "name": "mDNSResponder"
+      },
+      "title": "Bonjour",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "ローカルネットワーク上の名前を解決し、プリンター、スピーカーなどのデバイスを見つけます。通常の名前解決にも関わっています。"
+    },
+    {
+      "match": {
+        "name": "configd"
+      },
+      "title": "システム構成",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "ネットワーク構成を追跡し、変更があったことをアプリに伝えます。"
+    },
+    {
+      "match": {
+        "name": "symptomsd"
+      },
+      "title": "ネットワーク品質",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "ネットワークの状態を監視し、システムが接続不良に対応できるようにします。"
+    },
+    {
+      "match": {
+        "name": "socketfilterfw"
+      },
+      "title": "アプリケーションファイアウォール",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "macOSのアプリケーションファイアウォールです。有効化されてフィルタリングを行っているとき以外はアイドル状態です。"
+    },
+    {
+      "match": {
+        "name": "trustd"
+      },
+      "title": "証明書の確認",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "アプリが安全な接続を確立する際に証明書を確認します。頻繁に短時間の動作が見られるのは正常で、ネットワークを使用している何かのために代行して行っています。"
+    },
+    {
+      "match": {
+        "name": "securityd"
+      },
+      "title": "キーチェーン",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "キーチェーンと暗号処理を管理します。"
+    },
+    {
+      "match": {
+        "name": "syspolicyd"
+      },
+      "title": "Gatekeeper",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "アプリの実行前にチェックを行い、Gatekeeperを適用します。ダウンロードしたばかりのアプリを初めて開くときに最も動作が活発になります。"
+    },
+    {
+      "match": {
+        "name": "amfid"
+      },
+      "title": "コード署名",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "プログラムの起動時にコード署名を検証します。"
+    },
+    {
+      "match": {
+        "name": "XProtect"
+      },
+      "title": "XProtect",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Apple標準搭載のマルウェアスキャナーです。時々、短時間だけ動作します。"
+    },
+    {
+      "match": {
+        "name": "XProtectRemediatorScan"
+      },
+      "title": "XProtectスキャン",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Appleのマルウェア修復スキャンです。スケジュールに従って実行され、数分間CPUを使用した後に停止します。"
+    },
+    {
+      "match": {
+        "name": "opendirectoryd"
+      },
+      "title": "ディレクトリサービス",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "ユーザーアカウント、グループ、認証を処理します。"
+    },
+    {
+      "match": {
+        "name": "tccd"
+      },
+      "title": "プライバシー権限",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "カメラ、マイク、画面収録へのアクセスなど、許可したプライバシー権限を適用します。"
+    },
+    {
+      "match": {
+        "name": "cfprefsd"
+      },
+      "title": "環境設定",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "アプリの環境設定を読み書きします。すべてのユーザーセッションに存在し、通常はアイドル状態です。"
+    },
+    {
+      "match": {
+        "name": "distnoted"
+      },
+      "title": "通知 (内部)",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "プロセス間で内部的な通知を伝達します。画面に表示される通知ではありません。"
+    },
+    {
+      "match": {
+        "name": "notifyd"
+      },
+      "title": "通知 (内部)",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "プロセス間で低レベルなシステム通知を配信します。"
+    },
+    {
+      "match": {
+        "name": "logd"
+      },
+      "title": "統合ログ",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "システムログを収集します。短時間の動作は正常ですが、継続的に高負荷が続く場合は、通常、他の何かが過剰にログを記録していることを意味します。"
+    },
+    {
+      "match": {
+        "name": "diagnosticd"
+      },
+      "title": "診断",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "アプリまたはシステムが要求したときに診断情報を収集します。"
+    },
+    {
+      "match": {
+        "name": "powerd"
+      },
+      "title": "電源管理",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "スリープ、スリープ解除、電源アサーションを管理します。Macがスリープしてよいかどうかを決定するのはこのプロセスです。"
+    },
+    {
+      "match": {
+        "name": "thermalmonitord"
+      },
+      "title": "サーマル管理",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "温度を監視し、必要に応じてシステムに速度を落とすよう要求します。"
+    },
+    {
+      "match": {
+        "name": "lsd"
+      },
+      "title": "Launch Services",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "どのアプリがどのファイル形式を開くかを記録します。"
+    },
+    {
+      "match": {
+        "name": "launchservicesd"
+      },
+      "title": "Launch Services",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "インストールされているアプリと、それらが開けるドキュメントを登録します。"
+    },
+    {
+      "match": {
+        "name": "appleeventsd"
+      },
+      "title": "Apple Events",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "AppleScriptやShortcutsを含め、アプリ間の自動化メッセージを中継します。"
+    },
+    {
+      "match": {
+        "name": "UserEventAgent"
+      },
+      "title": "システムイベント",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "デバイスの接続など、イベントに応じて動作する小さなシステムプラグインを実行します。"
+    },
+    {
+      "match": {
+        "name": "fseventsd"
+      },
+      "title": "ファイルシステムイベント",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "アプリに変更内容を通知できるよう、ファイルシステムの変更を記録します。大量のファイルが書き込まれている間は活発に動作します。"
+    },
+    {
+      "match": {
+        "name": "revisiond"
+      },
+      "title": "書類のバージョン管理",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "以前のバージョンに戻す機能に対応するアプリのために、書類のバージョン履歴を保存します。"
+    },
+    {
+      "match": {
+        "name": "spindump"
+      },
+      "title": "ハングレポーター",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "応答を停止したアプリをサンプリングし、レポートを作成できるようにします。これが存在すること自体、他の何かが固まっていることを意味します。"
+    },
+    {
+      "match": {
+        "name": "ReportCrash"
+      },
+      "title": "クラッシュレポーター",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "アプリが予期せず終了した後にクラッシュレポートを作成します。短時間で終了します。"
+    },
+    {
+      "match": {
+        "name": "swift-frontend"
+      },
+      "title": "Swiftコンパイラ",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Swiftのコードをコンパイルします。ビルド中にCPU使用率が高くなるのは、ビルドそのものが行われているためです。"
+    },
+    {
+      "match": {
+        "name": "clang"
+      },
+      "title": "Clangコンパイラ",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "C、C++、Objective-Cのコードをコンパイルします。"
+    },
+    {
+      "match": {
+        "name": "SourceKitService"
+      },
+      "title": "Xcode (コードインテリジェンス)",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Xcode内で補完と構文チェックを提供します。大規模なプロジェクトでは負荷が高くなることがあります。"
+    },
+    {
+      "match": {
+        "name": "XCBBuildService"
+      },
+      "title": "Xcode (ビルドシステム)",
+      "category": "developer",
+      "vendor": "Apple",
+      "description": "Xcodeのビルドを統括します。"
+    },
+    {
+      "match": {
+        "name": "com.apple.CodeSigningHelper"
+      },
+      "title": "コード署名ヘルパー",
+      "category": "developer",
+      "vendor": "Apple",
+      "description": "ビルド中にコードに署名します。"
+    },
+    {
+      "match": {
+        "name": "node"
+      },
+      "title": "Node.js",
+      "category": "developer",
+      "vendor": null,
+      "description": "Node.jsのプログラムです。何を行っているかは、それを起動したプロジェクトによって完全に異なります。"
+    },
+    {
+      "match": {
+        "name": "Terminal"
+      },
+      "title": "ターミナル",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "ターミナルアプリです。CPU使用率は通常、その中で実行されているものに属します。"
+    },
+    {
+      "match": {
+        "name": "com.apple.WebKit.WebContent"
+      },
+      "title": "Safari (Webページ)",
+      "category": "helper",
+      "vendor": "Apple",
+      "description": "SafariまたはほかのWebKitベースのアプリのために、1つのWebページを描画します。タブごとに専用のプロセスが割り当てられるため、負荷の高いタブはSafari自体ではなくここに表示されます。"
+    },
+    {
+      "match": {
+        "name": "com.apple.WebKit.Networking"
+      },
+      "title": "Safari (ネットワーク)",
+      "category": "helper",
+      "vendor": "Apple",
+      "description": "SafariやほかのWebKitアプリのネットワークリクエストを処理します。"
+    },
+    {
+      "match": {
+        "name": "com.apple.WebKit.GPU"
+      },
+      "title": "Safari (グラフィックス)",
+      "category": "helper",
+      "vendor": "Apple",
+      "description": "GPUを使ってSafariのページコンテンツを描画します。"
+    },
+    {
+      "match": {
+        "name": "Safari"
+      },
+      "title": "Safari",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "Safari自体です。個々のページは別プロセスで動作するため、負荷の高いタブはここではなくSafari (Webページ)に表示されます。"
+    },
+    {
+      "match": {
+        "name": "wdavdaemon"
+      },
+      "title": "Microsoft Defender",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Microsoft Defenderのスキャンエンジンです。開発機での継続的な高負荷は、通常ビルド出力をスキャンしていることを意味し、ビルドディレクトリを除外するのが一般的な対処法ですが、管理対象Macではこれは組織のIT部門の判断事項です。"
+    },
+    {
+      "match": {
+        "name": "wdavdaemon_enterprise"
+      },
+      "title": "Microsoft Defender (管理対象)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Microsoft Defenderの管理対象コンポーネントで、利用者本人ではなく組織によって構成されます。"
+    },
+    {
+      "match": {
+        "name": "wdavdaemon_unprivileged"
+      },
+      "title": "Microsoft Defender (スキャナー)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "権限を昇格せずにファイルを検査する、Microsoft Defenderの一部です。"
+    },
+    {
+      "match": {
+        "name": "com.microsoft.autoupdate.helper"
+      },
+      "title": "Microsoft AutoUpdate",
+      "category": "background",
+      "vendor": "Microsoft",
+      "description": "Microsoft製アプリケーションのアップデートを確認し、インストールします。"
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper (Renderer)"
+      },
+      "title": "ブラウザのタブまたはウィンドウ",
+      "category": "helper",
+      "vendor": null,
+      "description": "ChromiumまたはElectronをベースに構築されたアプリ (多くのデスクトップアプリやブラウザを含む) の1つのページまたはウィンドウです。タブごとに専用のプロセスが割り当てられるため、負荷の高いページはアプリ自体ではなくここに表示されます。"
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper (GPU)"
+      },
+      "title": "アプリのグラフィックスヘルパー",
+      "category": "helper",
+      "vendor": null,
+      "description": "GPUを使ってChromiumまたはElectronアプリのインターフェースを描画します。"
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper (Plugin)"
+      },
+      "title": "アプリのプラグインヘルパー",
+      "category": "helper",
+      "vendor": null,
+      "description": "ChromiumまたはElectronアプリのプラグインを、アプリ本体から分離して実行します。"
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper"
+      },
+      "title": "アプリのヘルパープロセス",
+      "category": "helper",
+      "vendor": null,
+      "description": "直前に名前が付いたアプリに属するバックグラウンドプロセスです。ChromiumおよびElectronアプリは、作業をこうした複数のプロセスに分割します。"
+    },
+    {
+      "match": {
+        "name": "plugin-container"
+      },
+      "title": "Firefox (ページまたはプラグイン)",
+      "category": "helper",
+      "vendor": "Mozilla",
+      "description": "Firefoxのために1つのページを描画するか、1つのプラグインを実行します。複数存在するのは正常で、負荷の高いタブはFirefox自体ではなくここに表示されます。"
+    },
+    {
+      "match": {
+        "name": "firefox"
+      },
+      "title": "Firefox",
+      "category": "app",
+      "vendor": "Mozilla",
+      "description": "Firefox自体です。個々のページはplugin-containerとして動作するため、負荷の高いタブはそちらに表示されます。"
+    },
+    {
+      "match": {
+        "name": "corebrightnessd"
+      },
+      "title": "画面の明るさ",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "画面の明るさ、Night Shift、True Toneを管理します。"
+    },
+    {
+      "match": {
+        "name": "nearbyd"
+      },
+      "title": "近くのデバイス",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "AirDrop、Handoff、Continuityのために近くのApple製デバイスを検出します。"
+    },
+    {
+      "match": {
+        "name": "wifip2pd"
+      },
+      "title": "Wi-Fi Direct",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "AirDropやAirPlayで使用される、デバイス間の直接的なWi-Fi通信を処理します。"
+    },
+    {
+      "match": {
+        "name": "SidecarRelay"
+      },
+      "title": "Sidecar",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "iPadを外部ディスプレイとして使用するSidecarを実行します。"
+    },
+    {
+      "match": {
+        "name": "ContinuityCaptureAgent"
+      },
+      "title": "Continuity Camera",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "iPhoneをこのMacのカメラまたはマイクとして使用できるようにします。"
+    },
+    {
+      "match": {
+        "name": "com.apple.cmio.registerassistantservice"
+      },
+      "title": "カメラサービス",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "アプリがカメラデバイスを使用できるよう登録します。"
+    },
+    {
+      "match": {
+        "name": "com.apple.DriverKit-AppleBCMWLAN"
+      },
+      "title": "Wi-Fiドライバ",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Wi-Fiハードウェアのドライバで、macOSが現在要求する通り、カーネルの外側で動作します。"
+    },
+    {
+      "match": {
+        "name": "netext"
+      },
+      "title": "Defender (ネットワーク拡張機能)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Microsoft Defenderのネットワークフィルターで、組織によってシステム拡張機能としてインストールされます。"
+    },
+    {
+      "match": {
+        "name": "epsext"
+      },
+      "title": "Defender (エンドポイントセキュリティ)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Microsoft Defenderのエンドポイントセキュリティ拡張機能で、プロセスとファイルの活動をリアルタイムで検査します。"
+    },
+    {
+      "match": {
+        "name": "Performance Monitor"
+      },
+      "title": "Performance Monitor",
+      "category": "app",
+      "vendor": null,
+      "description": "このアプリ自身です。ここに表示される内容をサンプリングし、ウィンドウが開いていないときはそのサンプリングを一時停止します。もしこれがこのリストの上位に長時間居座るようであれば、それは報告する価値のあるバグです。"
+    },
+    {
+      "match": {
+        "name": "locationd"
+      },
+      "title": "位置情報サービス",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "GPSではなくWi-Fiネットワークを使って、Macの現在地を割り出します。タイムゾーンや天気など、アプリまたはシステムが要求したときに動作します。"
+    },
+    {
+      "match": {
+        "name": "searchpartyd"
+      },
+      "title": "探す",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "「探す」を支えるプロセスで、他人が紛失したデバイスの位置特定を助ける匿名のリレー機能も含まれます。"
+    },
+    {
+      "match": {
+        "name": "mediaremoted"
+      },
+      "title": "メディアコントロール",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "キーボード、ヘッドフォン、コントロールセンターからの再生、一時停止、スキップを処理します。"
+    },
+    {
+      "match": {
+        "name": "VTDecoderXPCService"
+      },
+      "title": "ビデオデコーダ",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "安全のため別プロセスで、アプリに代わって動画をデコードします。動画が再生されている間は動作します。"
+    },
+    {
+      "match": {
+        "name": "contextstored"
+      },
+      "title": "Siri Suggestions",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Siri SuggestionsやSpotlightのランキングの背後にある、デバイス上の利用パターンを保存します。"
+    },
+    {
+      "match": {
+        "name": "zsh"
+      },
+      "title": "シェル",
+      "category": "developer",
+      "vendor": null,
+      "description": "コマンドラインシェルです。CPU使用率は、その中で実行されているコマンドに属します。"
+    },
+    {
+      "match": {
+        "name": "bash"
+      },
+      "title": "シェル",
+      "category": "developer",
+      "vendor": null,
+      "description": "コマンドラインシェルです。CPU使用率は、その中で実行されているコマンドに属します。"
+    },
+    {
+      "match": {
+        "name": "Spotlight"
+      },
+      "title": "Spotlight (検索ウィンドウ)",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "インデクサーではなく、Spotlightの検索ウィンドウ自体です。インデックス作成はmds_storesとして表示されます。"
+    },
+    {
+      "match": {
+        "name": "Music"
+      },
+      "title": "ミュージック",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "ミュージックアプリです。"
+    },
+    {
+      "match": {
+        "name": "Mail"
+      },
+      "title": "メール",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "メールアプリです。大きなメールボックスの取得とインデックス作成のため、設定後しばらくは動作が続きます。"
+    }
+  ]
+}

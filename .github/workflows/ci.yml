@@ -22,6 +22,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      # Cheap and first: a mistranslated glossary entry fails silently at
+      # runtime, so it has to be caught here rather than by a user noticing a
+      # process has no explanation in their language.
+      - name: Check process glossary
+        run: bash scripts/check-glossary.sh
+
       # -warnings-as-errors is the safety net: any new compiler warning fails CI.
       - name: Build (release, arm64)
         run: swift build -c release --arch arm64 -Xswiftc -warnings-as-errors

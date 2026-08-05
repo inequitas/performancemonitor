@@ -1,0 +1,898 @@
+{
+  "version": 1,
+  "language": "zh-Hans",
+  "entries": [
+    {
+      "match": {
+        "name": "kernel_task"
+      },
+      "title": "内核",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "macOS 本身的核心。它也会有意使用 CPU 来让机器保持凉爽,因此这里出现高占用往往意味着系统正在管理发热,而不是出了什么问题。无法将其退出,退出也无济于事。"
+    },
+    {
+      "match": {
+        "name": "WindowServer"
+      },
+      "title": "Window Server",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "绘制你看到的一切内容,并将点击传递给应用。显示器数量、高刷新率和动画效果越多,它的占用就越高,因此外接显示器会让它更加繁忙。至关重要。"
+    },
+    {
+      "match": {
+        "name": "launchd"
+      },
+      "title": "launchd",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "macOS 启动的第一个进程,进程 ID 为 1。它负责启动并监督其他所有服务。至关重要,切勿将其退出。"
+    },
+    {
+      "match": {
+        "name": "loginwindow"
+      },
+      "title": "登录窗口",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "掌管你的登录会话,并负责协调注销与关机。将其退出会立即让你注销登录。"
+    },
+    {
+      "match": {
+        "name": "Dock"
+      },
+      "title": "程序坞",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "程序坞、调度中心和 Stage Manager 所在的进程。将其退出没有影响,macOS 会在一秒内重新启动它。"
+    },
+    {
+      "match": {
+        "name": "Finder"
+      },
+      "title": "Finder",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "文件管理器与桌面。可以放心将其退出,它会立刻重新出现。"
+    },
+    {
+      "match": {
+        "name": "SystemUIServer"
+      },
+      "title": "菜单栏附加项目",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "绘制菜单栏右侧较旧样式的菜单栏项目。将其退出后它会重新启动,图标随后会再次出现。"
+    },
+    {
+      "match": {
+        "name": "ControlCenter"
+      },
+      "title": "控制中心",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "负责控制中心以及大多数现代样式的菜单栏项目。退出后会自动重新启动。"
+    },
+    {
+      "match": {
+        "name": "WindowManager"
+      },
+      "title": "Stage Manager",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "负责处理 Stage Manager 与窗口的平铺排列。除非你正在使用这些功能,否则处于闲置状态。"
+    },
+    {
+      "match": {
+        "name": "runningboardd"
+      },
+      "title": "RunningBoard",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "决定哪些进程可以运行,并暂停未在使用的应用。这是 macOS 让后台应用保持低消耗的机制之一。"
+    },
+    {
+      "match": {
+        "name": "mds"
+      },
+      "title": "Spotlight（索引服务器）",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "Spotlight 的索引服务器。它负责协调索引编制工作,但自身做的事情很少;真正繁重的工作由 mds_stores 和 mdworker 完成。"
+    },
+    {
+      "match": {
+        "name": "mds_stores"
+      },
+      "title": "Spotlight（索引）",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "写入 Spotlight 索引。在大量文件复制、迁移或 macOS 更新之后,短时间内占用较高是正常现象,之后会自行平息。如果一直不平息,可以重建索引。"
+    },
+    {
+      "match": {
+        "name": "mdworker"
+      },
+      "title": "Spotlight（文件读取）",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "逐个读取文件,以便 Spotlight 为其内容建立索引。同时出现多个生命周期很短的副本是正常现象。"
+    },
+    {
+      "match": {
+        "name": "mdworker_shared"
+      },
+      "title": "Spotlight（文件读取）",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "为 Spotlight 索引读取单个文件。生命周期很短,并以批次方式启动。"
+    },
+    {
+      "match": {
+        "name": "corespotlightd"
+      },
+      "title": "Spotlight（应用数据）",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "为应用交给 Spotlight 的数据建立索引,例如邮件和信息,而非磁盘上的文件。"
+    },
+    {
+      "match": {
+        "name": "bird"
+      },
+      "title": "iCloud Drive",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "同步 iCloud Drive。文件上传或下载时会较为繁忙,其余时候则很安静。这个奇怪的名字是历史遗留问题。"
+    },
+    {
+      "match": {
+        "name": "cloudd"
+      },
+      "title": "iCloud",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "为将数据存储在 iCloud 中的应用与 iCloud 通信。活动情况取决于当前正在同步的内容。"
+    },
+    {
+      "match": {
+        "name": "fileproviderd"
+      },
+      "title": "文件提供程序",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "运行在 Finder 中显示的云存储集成功能,包括 iCloud Drive、Dropbox 和 OneDrive。"
+    },
+    {
+      "match": {
+        "name": "backupd"
+      },
+      "title": "Time Machine",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "执行 Time Machine 备份。备份过程中磁盘和 CPU 占用较高正是备份工作本身,备份完成后便会停止。"
+    },
+    {
+      "match": {
+        "name": "nsurlsessiond"
+      },
+      "title": "后台下载",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "代表应用在后台执行下载和上传,包括 App Store 与系统更新。"
+    },
+    {
+      "match": {
+        "name": "apsd"
+      },
+      "title": "推送通知",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "维持与 Apple 推送通知服务的连接。几乎始终处于闲置状态。"
+    },
+    {
+      "match": {
+        "name": "photoanalysisd"
+      },
+      "title": "照片（分析）",
+      "category": "background",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "扫描你的照片资料库以识别面孔、场景和重复项。在大批量导入照片后,它会高强度运行数小时,之后就彻底停止。它还会等待 Mac 处于闲置状态并接通电源时才运行。"
+    },
+    {
+      "match": {
+        "name": "photolibraryd"
+      },
+      "title": "照片（资料库）",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "在“照片”应用或任何读取该资料库的程序打开期间,管理照片资料库。"
+    },
+    {
+      "match": {
+        "name": "mediaanalysisd"
+      },
+      "title": "媒体分析",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "为看图识物（Visual Look Up）和实况文本（Live Text）功能分析图像与视频。倾向于在 Mac 闲置时运行。"
+    },
+    {
+      "match": {
+        "name": "coreaudiod"
+      },
+      "title": "Core Audio",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "处理所有音频输入和输出。只要有内容在播放,持续保持较低占用就是正常的,并且它从不会完全停止。"
+    },
+    {
+      "match": {
+        "name": "AudioComponentRegistrar"
+      },
+      "title": "音频插件扫描程序",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "扫描音频插件,以便应用能够列出它们。安装插件后会短暂运行。"
+    },
+    {
+      "match": {
+        "name": "airportd"
+      },
+      "title": "Wi-Fi",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "管理 Wi-Fi 连接,包括扫描网络。网络发生变化时出现短暂活动是正常现象。"
+    },
+    {
+      "match": {
+        "name": "bluetoothd"
+      },
+      "title": "蓝牙",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "管理蓝牙设备及其连接。"
+    },
+    {
+      "match": {
+        "name": "sharingd"
+      },
+      "title": "共享",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "为 AirDrop、Handoff、通用剪贴板和屏幕共享提供支持。"
+    },
+    {
+      "match": {
+        "name": "rapportd"
+      },
+      "title": "Continuity",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "为 Handoff、Sidecar 和 Continuity Camera 查找附近的 Apple 设备。"
+    },
+    {
+      "match": {
+        "name": "mDNSResponder"
+      },
+      "title": "Bonjour",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "解析本地网络中的名称,并查找打印机、扬声器等设备。它也参与日常的普通名称查询。"
+    },
+    {
+      "match": {
+        "name": "configd"
+      },
+      "title": "系统配置",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "跟踪网络配置,并在配置发生变化时通知应用。"
+    },
+    {
+      "match": {
+        "name": "symptomsd"
+      },
+      "title": "网络质量",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "监测网络状况,以便系统能够对不佳的连接做出反应。"
+    },
+    {
+      "match": {
+        "name": "socketfilterfw"
+      },
+      "title": "应用程序防火墙",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "macOS 的应用程序防火墙。除非已启用并正在过滤,否则处于闲置状态。"
+    },
+    {
+      "match": {
+        "name": "trustd"
+      },
+      "title": "证书检查",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "在应用建立安全连接时检查证书。频繁出现的短暂活动是正常现象,它是在替正在使用网络的程序执行这项工作。"
+    },
+    {
+      "match": {
+        "name": "securityd"
+      },
+      "title": "钥匙串",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "管理钥匙串与加密操作。"
+    },
+    {
+      "match": {
+        "name": "syspolicyd"
+      },
+      "title": "Gatekeeper",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "在应用运行前对其进行检查,并执行 Gatekeeper 的规则。第一次打开新下载的应用时,它最为繁忙。"
+    },
+    {
+      "match": {
+        "name": "amfid"
+      },
+      "title": "代码签名",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "在程序启动时验证代码签名。"
+    },
+    {
+      "match": {
+        "name": "XProtect"
+      },
+      "title": "XProtect",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Apple 内置的恶意软件扫描程序。偶尔短暂运行。"
+    },
+    {
+      "match": {
+        "name": "XProtectRemediatorScan"
+      },
+      "title": "XProtect 扫描",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "Apple 的恶意软件修复扫描。按计划运行,占用 CPU 数分钟后便会停止。"
+    },
+    {
+      "match": {
+        "name": "opendirectoryd"
+      },
+      "title": "目录服务",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "处理用户账户、群组和身份验证。"
+    },
+    {
+      "match": {
+        "name": "tccd"
+      },
+      "title": "隐私权限",
+      "category": "security",
+      "vendor": "Apple",
+      "description": "执行你所授予的隐私权限,例如摄像头、麦克风和屏幕录制的访问权限。"
+    },
+    {
+      "match": {
+        "name": "cfprefsd"
+      },
+      "title": "偏好设置",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "读取和写入应用的偏好设置。每个用户会话中都会存在,通常处于闲置状态。"
+    },
+    {
+      "match": {
+        "name": "distnoted"
+      },
+      "title": "通知（内部）",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "在进程之间传递内部通知,并非你在屏幕上看到的那种通知。"
+    },
+    {
+      "match": {
+        "name": "notifyd"
+      },
+      "title": "通知（内部）",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "在进程之间传递底层的系统通知。"
+    },
+    {
+      "match": {
+        "name": "logd"
+      },
+      "title": "统一日志",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "收集系统日志。短暂活动是正常现象;持续高占用通常意味着有其他东西在过度记录日志。"
+    },
+    {
+      "match": {
+        "name": "diagnosticd"
+      },
+      "title": "诊断",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "在应用或系统请求时收集诊断信息。"
+    },
+    {
+      "match": {
+        "name": "powerd"
+      },
+      "title": "电源管理",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "管理睡眠、唤醒和电源声明,由它决定你的 Mac 是否可以进入睡眠。"
+    },
+    {
+      "match": {
+        "name": "thermalmonitord"
+      },
+      "title": "温度管理",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "监测温度,并在需要时要求系统降低速度。"
+    },
+    {
+      "match": {
+        "name": "lsd"
+      },
+      "title": "Launch Services",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "记录哪个应用负责打开哪种文件类型。"
+    },
+    {
+      "match": {
+        "name": "launchservicesd"
+      },
+      "title": "Launch Services",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "登记已安装的应用及其能够打开的文稿类型。"
+    },
+    {
+      "match": {
+        "name": "appleeventsd"
+      },
+      "title": "Apple Events",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "在应用之间传递自动化消息,包括 AppleScript 和“快捷指令”。"
+    },
+    {
+      "match": {
+        "name": "UserEventAgent"
+      },
+      "title": "系统事件",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "运行一些小型系统插件,对设备连接等事件做出响应。"
+    },
+    {
+      "match": {
+        "name": "fseventsd"
+      },
+      "title": "文件系统事件",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "记录文件系统的变化,以便告知应用发生了哪些改动。在大量文件被写入时会较为繁忙。"
+    },
+    {
+      "match": {
+        "name": "revisiond"
+      },
+      "title": "文稿版本管理",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "为支持“恢复到”功能的应用保存文稿的版本历史记录。"
+    },
+    {
+      "match": {
+        "name": "spindump"
+      },
+      "title": "无响应报告器",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "对已停止响应的应用进行采样,以便生成报告。它的出现说明有其他东西卡住了。"
+    },
+    {
+      "match": {
+        "name": "ReportCrash"
+      },
+      "title": "崩溃报告器",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "在应用意外退出后写入崩溃报告。生命周期很短。"
+    },
+    {
+      "match": {
+        "name": "swift-frontend"
+      },
+      "title": "Swift 编译器",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "编译 Swift 代码。构建期间 CPU 占用较高,正是构建过程本身。"
+    },
+    {
+      "match": {
+        "name": "clang"
+      },
+      "title": "Clang 编译器",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "编译 C、C++ 和 Objective-C 代码。"
+    },
+    {
+      "match": {
+        "name": "SourceKitService"
+      },
+      "title": "Xcode（代码智能）",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "在 Xcode 中提供自动完成和语法检查功能。在大型项目中可能占用较高。"
+    },
+    {
+      "match": {
+        "name": "XCBBuildService"
+      },
+      "title": "Xcode（构建系统）",
+      "category": "developer",
+      "vendor": "Apple",
+      "description": "协调 Xcode 的构建过程。"
+    },
+    {
+      "match": {
+        "name": "com.apple.CodeSigningHelper"
+      },
+      "title": "代码签名辅助程序",
+      "category": "developer",
+      "vendor": "Apple",
+      "description": "在构建过程中对代码进行签名。"
+    },
+    {
+      "match": {
+        "name": "node"
+      },
+      "title": "Node.js",
+      "category": "developer",
+      "vendor": null,
+      "description": "一个 Node.js 程序。它在做什么完全取决于是哪个项目启动了它。"
+    },
+    {
+      "match": {
+        "name": "Terminal"
+      },
+      "title": "终端",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "“终端”应用。它的 CPU 占用通常归于其中运行的程序。"
+    },
+    {
+      "match": {
+        "name": "com.apple.WebKit.WebContent"
+      },
+      "title": "Safari（网页）",
+      "category": "helper",
+      "vendor": "Apple",
+      "description": "为 Safari 或其他基于 WebKit 的应用渲染一个网页。每个标签页都有自己的进程,因此占用较高的标签页会显示在这里,而不是显示为 Safari 本身。"
+    },
+    {
+      "match": {
+        "name": "com.apple.WebKit.Networking"
+      },
+      "title": "Safari（网络）",
+      "category": "helper",
+      "vendor": "Apple",
+      "description": "为 Safari 及其他 WebKit 应用处理网络请求。"
+    },
+    {
+      "match": {
+        "name": "com.apple.WebKit.GPU"
+      },
+      "title": "Safari（图形）",
+      "category": "helper",
+      "vendor": "Apple",
+      "description": "使用 GPU 为 Safari 绘制页面内容。"
+    },
+    {
+      "match": {
+        "name": "Safari"
+      },
+      "title": "Safari",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "Safari 本身。各个页面在独立的进程中运行,因此繁忙的标签页会显示在 Safari（网页）下,而不是这里。"
+    },
+    {
+      "match": {
+        "name": "wdavdaemon"
+      },
+      "title": "Microsoft Defender",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Microsoft Defender 的扫描引擎。在开发者机器上持续高占用,通常意味着它正在扫描构建输出;将构建目录排除在扫描范围之外是常见的解决办法,而在受管理的 Mac 上,这是 IT 部门需要做出的决定。"
+    },
+    {
+      "match": {
+        "name": "wdavdaemon_enterprise"
+      },
+      "title": "Microsoft Defender（受管理）",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Microsoft Defender 的受管理组件,由你所在的组织配置,而非由你本人配置。"
+    },
+    {
+      "match": {
+        "name": "wdavdaemon_unprivileged"
+      },
+      "title": "Microsoft Defender（扫描程序）",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Microsoft Defender 中不需要提升权限即可检查文件的部分。"
+    },
+    {
+      "match": {
+        "name": "com.microsoft.autoupdate.helper"
+      },
+      "title": "Microsoft AutoUpdate",
+      "category": "background",
+      "vendor": "Microsoft",
+      "description": "检查并安装 Microsoft 应用程序的更新。"
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper (Renderer)"
+      },
+      "title": "浏览器标签页或窗口",
+      "category": "helper",
+      "vendor": null,
+      "description": "基于 Chromium 或 Electron 构建的应用的一个页面或窗口,这类应用不仅包括浏览器,也包括许多桌面应用。每个标签页都有自己的进程,因此占用较高的页面会显示在这里,而不是显示在应用本身下。"
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper (GPU)"
+      },
+      "title": "应用图形辅助进程",
+      "category": "helper",
+      "vendor": null,
+      "description": "使用 GPU 绘制 Chromium 或 Electron 应用的界面。"
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper (Plugin)"
+      },
+      "title": "应用插件辅助进程",
+      "category": "helper",
+      "vendor": null,
+      "description": "为 Chromium 或 Electron 应用运行插件,与应用本身相互隔离。"
+    },
+    {
+      "match": {
+        "nameSuffix": " Helper"
+      },
+      "title": "应用辅助进程",
+      "category": "helper",
+      "vendor": null,
+      "description": "属于其名称前所标示应用的后台进程。Chromium 和 Electron 应用会将工作拆分到多个这样的进程中。"
+    },
+    {
+      "match": {
+        "name": "plugin-container"
+      },
+      "title": "Firefox（页面或插件）",
+      "category": "helper",
+      "vendor": "Mozilla",
+      "description": "为 Firefox 渲染一个页面或运行一个插件。同时存在多个是正常现象,占用较高的标签页会显示在这里,而不是显示在 Firefox 下。"
+    },
+    {
+      "match": {
+        "name": "firefox"
+      },
+      "title": "Firefox",
+      "category": "app",
+      "vendor": "Mozilla",
+      "description": "Firefox 本身。各个页面以 plugin-container 的形式运行,因此繁忙的标签页会显示在那里。"
+    },
+    {
+      "match": {
+        "name": "corebrightnessd"
+      },
+      "title": "屏幕亮度",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "管理屏幕亮度、夜览（Night Shift）和原彩显示（True Tone）功能。"
+    },
+    {
+      "match": {
+        "name": "nearbyd"
+      },
+      "title": "附近的设备",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "为 AirDrop、Handoff 和 Continuity 检测附近的 Apple 设备。"
+    },
+    {
+      "match": {
+        "name": "wifip2pd"
+      },
+      "title": "Wi-Fi Direct",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "处理 AirDrop 和 AirPlay 所使用的设备间直连 Wi-Fi。"
+    },
+    {
+      "match": {
+        "name": "SidecarRelay"
+      },
+      "title": "Sidecar",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "运行 Sidecar 功能,该功能可将 iPad 用作第二台显示器。"
+    },
+    {
+      "match": {
+        "name": "ContinuityCaptureAgent"
+      },
+      "title": "Continuity Camera",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "让你的 iPhone 可以作为这台 Mac 的摄像头或麦克风使用。"
+    },
+    {
+      "match": {
+        "name": "com.apple.cmio.registerassistantservice"
+      },
+      "title": "相机服务",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "登记摄像头设备,以便应用能够使用它们。"
+    },
+    {
+      "match": {
+        "name": "com.apple.DriverKit-AppleBCMWLAN"
+      },
+      "title": "Wi-Fi 驱动程序",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "Wi-Fi 硬件驱动程序,按照 macOS 目前的要求在内核之外运行。"
+    },
+    {
+      "match": {
+        "name": "netext"
+      },
+      "title": "Defender（网络扩展）",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Microsoft Defender 的网络过滤器,由你所在的组织以系统扩展的形式安装。"
+    },
+    {
+      "match": {
+        "name": "epsext"
+      },
+      "title": "Defender（终端安全）",
+      "category": "security",
+      "vendor": "Microsoft",
+      "description": "Microsoft Defender 的终端安全扩展,实时检查进程和文件的活动。"
+    },
+    {
+      "match": {
+        "name": "Performance Monitor"
+      },
+      "title": "Performance Monitor",
+      "category": "app",
+      "vendor": null,
+      "description": "本应用自身。它对你在这里看到的内容进行采样,在没有窗口打开时会暂停采样。如果它长时间占据这份列表的首位,那就是一个值得报告的漏洞。"
+    },
+    {
+      "match": {
+        "name": "locationd"
+      },
+      "title": "定位服务",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "使用 Wi-Fi 网络而非 GPS 来判断你的 Mac 所在的位置。在应用或系统提出请求时运行,例如用于确定时区和天气。"
+    },
+    {
+      "match": {
+        "name": "searchpartyd"
+      },
+      "title": "查找",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "为“查找”功能提供支持,包括帮助定位他人丢失设备的匿名中继功能。"
+    },
+    {
+      "match": {
+        "name": "mediaremoted"
+      },
+      "title": "媒体控制",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "处理来自键盘、耳机和控制中心的播放、暂停和切换操作。"
+    },
+    {
+      "match": {
+        "name": "VTDecoderXPCService"
+      },
+      "title": "视频解码器",
+      "category": "system",
+      "vendor": "Apple",
+      "description": "代表应用解码视频,出于安全考虑在独立进程中运行。只要有视频在播放就会处于活动状态。"
+    },
+    {
+      "match": {
+        "name": "contextstored"
+      },
+      "title": "Siri 建议",
+      "category": "background",
+      "vendor": "Apple",
+      "description": "存储支撑 Siri 建议和 Spotlight 排序功能的设备端使用习惯数据。"
+    },
+    {
+      "match": {
+        "name": "zsh"
+      },
+      "title": "Shell",
+      "category": "developer",
+      "vendor": null,
+      "description": "一种命令行 Shell。它的 CPU 占用归于其中运行的命令。"
+    },
+    {
+      "match": {
+        "name": "bash"
+      },
+      "title": "Shell",
+      "category": "developer",
+      "vendor": null,
+      "description": "一种命令行 Shell。它的 CPU 占用归于其中运行的命令。"
+    },
+    {
+      "match": {
+        "name": "Spotlight"
+      },
+      "title": "Spotlight（搜索窗口）",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "Spotlight 搜索窗口本身,并非索引程序。索引工作会显示为 mds_stores。"
+    },
+    {
+      "match": {
+        "name": "Music"
+      },
+      "title": "音乐",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "“音乐”应用。"
+    },
+    {
+      "match": {
+        "name": "Mail"
+      },
+      "title": "邮件",
+      "category": "app",
+      "vendor": "Apple",
+      "description": "“邮件”应用。在设置完成后,获取并为大型邮箱建立索引会使其忙碌一段时间。"
+    }
+  ]
+}
