@@ -961,6 +961,211 @@
       "vendor": "Anthropic",
       "expectedHigh": false,
       "description": "ターミナルで動く Anthropic のコーディング支援ツールです。Claude デスクトップ App とは別のプログラムのため、行が分かれます。"
+    },
+    {
+      "match": {
+        "name": "MSTeams"
+      },
+      "title": "Microsoft Teams",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Microsoft のチャット・会議アプリです。ウインドウごとに Web ビュー、通話に別プロセスを使うため、通常はグループとして表示されます。"
+    },
+    {
+      "match": {
+        "name": "Microsoft Teams WebView"
+      },
+      "title": "Microsoft Teams（ウインドウ）",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Teams のウインドウやパネル 1 つ分です。開いているビューごとに 1 つ動くため、複数同時に現れます。",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "Microsoft Teams ModuleHost"
+      },
+      "title": "Microsoft Teams（アドイン）",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "会議アドインなど、Teams の中で別に読み込まれる部分を動かします。",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "WhatsApp"
+      },
+      "title": "WhatsApp",
+      "category": "app",
+      "vendor": "Meta",
+      "expectedHigh": false,
+      "description": "WhatsApp のデスクトップアプリです。開いているチャットやメディアが増えるほどメモリを使います。"
+    },
+    {
+      "match": {
+        "name": "OneDrive"
+      },
+      "title": "OneDrive",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Microsoft のファイル同期です。アップロードやダウンロード中は活発で、同期が終われば静かになります。"
+    },
+    {
+      "match": {
+        "name": "com.apple.geod"
+      },
+      "title": "位置情報サービス",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Mac の位置を割り出します。位置情報を求める App のほか、時間帯や「探す」でも使われます。"
+    },
+    {
+      "match": {
+        "name": "Siri"
+      },
+      "title": "Siri",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Siri と macOS の提案機能を支えるバックグラウンドサービスです。デバイス上で動き、短時間だけ起動します。"
+    },
+    {
+      "match": {
+        "name": "siriactionsd"
+      },
+      "title": "Siri（ショートカット）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "ショートカットと、App が Siri に提供する操作を扱います。",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "siriknowledged"
+      },
+      "title": "Siri（デバイス上の知識）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Siri や Spotlight が提案に使うデバイス上の情報を保持します。",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "duetexpertd"
+      },
+      "title": "使用状況の提案",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "いつどの App を使うかを学習し、macOS が提案できるようにします。デバイス上で動き、ほとんどの時間は待機しています。"
+    },
+    {
+      "match": {
+        "name": "chronod"
+      },
+      "title": "ウィジェット",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "デスクトップや通知センターのウィジェットを最新に保ちます。"
+    },
+    {
+      "match": {
+        "name": "NotificationCenter"
+      },
+      "title": "通知センター",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "通知と、それらをまとめるパネルを表示します。"
+    },
+    {
+      "match": {
+        "name": "AppleSpell"
+      },
+      "title": "スペルチェック",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "システムのテキスト入力を使うすべての App で、スペルと文法を確認します。"
+    },
+    {
+      "match": {
+        "name": "BackgroundShortcutRunner"
+      },
+      "title": "ショートカット（バックグラウンド）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "App を開いたときではなく、自動的に実行されるショートカットを動かします。"
+    },
+    {
+      "match": {
+        "name": "IntuneMdmDaemon"
+      },
+      "title": "Microsoft Intune",
+      "category": "security",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "勤務先がこの Mac を管理するための設定やポリシーを適用します。業務用マシンに入っています。"
+    },
+    {
+      "match": {
+        "name": "logioptionsplus_agent"
+      },
+      "title": "Logi Options+",
+      "category": "app",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "ロジクールのマウスやキーボード用ソフトで、ボタン割り当てやジェスチャを扱います。"
+    },
+    {
+      "match": {
+        "name": "LogiPluginService"
+      },
+      "title": "Logi Options+（プラグイン）",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "対応アプリごとの動作を追加する Logi Options+ の部分です。",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "com.apple.Virtualization.VirtualMachine"
+      },
+      "title": "仮想マシン",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Apple の Virtualization フレームワークで動く仮想マシンで、別の OS を動かすツールが使います。使用量は中で動いているものによります。"
+    },
+    {
+      "match": {
+        "name": "com.apple.SafariPlatformSupport.Helper"
+      },
+      "title": "Safari（プラットフォーム支援）",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "拡張機能や Web App などのために Safari が使うバックグラウンドの補助プロセスです。"
+    },
+    {
+      "match": {
+        "name": "WallpaperAerialsExtension"
+      },
+      "title": "壁紙（空撮）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "動く空撮の壁紙やスクリーンセーバを再生します。表示中だけ動作します。"
     }
   ]
 }

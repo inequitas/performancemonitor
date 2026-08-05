@@ -293,6 +293,8 @@ final class ExtraMenuBarController: NSObject {
         mountPopoverContent()
         syncPopoverAppearance()
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        // After show, so the content view exists to take the override.
+        FirstMouse.enable(on: popover)
         NSApp.activate(ignoringOtherApps: true)
     }
 

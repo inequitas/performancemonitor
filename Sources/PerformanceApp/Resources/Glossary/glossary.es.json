@@ -961,6 +961,211 @@
       "vendor": "Anthropic",
       "expectedHigh": false,
       "description": "El asistente de programación de Anthropic en una terminal. Es un programa distinto de la app de escritorio Claude, por eso aparecen en filas separadas."
+    },
+    {
+      "match": {
+        "name": "MSTeams"
+      },
+      "title": "Microsoft Teams",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "La app de chat y reuniones de Microsoft. Ejecuta una vista web por ventana y un proceso aparte para las llamadas, por eso suele aparecer como grupo."
+    },
+    {
+      "match": {
+        "name": "Microsoft Teams WebView"
+      },
+      "title": "Microsoft Teams (ventana)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Una ventana o panel de Teams. Teams ejecuta uno por cada vista abierta, por eso aparecen varios.",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "Microsoft Teams ModuleHost"
+      },
+      "title": "Microsoft Teams (complementos)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Ejecuta las partes de Teams que se cargan por separado, como los complementos de reunión.",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "WhatsApp"
+      },
+      "title": "WhatsApp",
+      "category": "app",
+      "vendor": "Meta",
+      "expectedHigh": false,
+      "description": "La app de escritorio de WhatsApp. El uso de memoria crece con el número de chats y archivos abiertos."
+    },
+    {
+      "match": {
+        "name": "OneDrive"
+      },
+      "title": "OneDrive",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "La sincronización de archivos de Microsoft. Activa al subir o bajar archivos, tranquila cuando todo está al día."
+    },
+    {
+      "match": {
+        "name": "com.apple.geod"
+      },
+      "title": "Localización",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Determina dónde está el Mac, para las apps que lo piden y para cosas como la zona horaria o Buscar."
+    },
+    {
+      "match": {
+        "name": "Siri"
+      },
+      "title": "Siri",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Los servicios en segundo plano detrás de Siri y de las sugerencias de macOS. Funcionan en el propio equipo y solo se activan un momento."
+    },
+    {
+      "match": {
+        "name": "siriactionsd"
+      },
+      "title": "Siri (atajos)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Gestiona los Atajos y las acciones que las apps ofrecen a Siri.",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "siriknowledged"
+      },
+      "title": "Siri (conocimiento local)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Mantiene la información local que Siri y Spotlight usan para sus sugerencias.",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "duetexpertd"
+      },
+      "title": "Sugerencias",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Aprende qué apps usas y cuándo, para que macOS pueda sugerirlas. Funciona en el equipo y casi siempre está inactivo."
+    },
+    {
+      "match": {
+        "name": "chronod"
+      },
+      "title": "Widgets",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Mantiene actualizados los widgets del escritorio y del centro de notificaciones."
+    },
+    {
+      "match": {
+        "name": "NotificationCenter"
+      },
+      "title": "Centro de notificaciones",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Muestra las notificaciones y el panel donde se agrupan."
+    },
+    {
+      "match": {
+        "name": "AppleSpell"
+      },
+      "title": "Corrector ortográfico",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Revisa la ortografía y la gramática de todas las apps que usan los campos de texto del sistema."
+    },
+    {
+      "match": {
+        "name": "BackgroundShortcutRunner"
+      },
+      "title": "Atajos (segundo plano)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Ejecuta los atajos que se activan solos en lugar de al abrir la app."
+    },
+    {
+      "match": {
+        "name": "IntuneMdmDaemon"
+      },
+      "title": "Microsoft Intune",
+      "category": "security",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Aplica los ajustes y las políticas con las que una empresa gestiona este Mac. Presente en equipos de trabajo."
+    },
+    {
+      "match": {
+        "name": "logioptionsplus_agent"
+      },
+      "title": "Logi Options+",
+      "category": "app",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "El software de Logitech para sus ratones y teclados, encargado de botones y gestos."
+    },
+    {
+      "match": {
+        "name": "LogiPluginService"
+      },
+      "title": "Logi Options+ (complementos)",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "La parte de Logi Options+ que añade comportamiento por app en las aplicaciones compatibles.",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "com.apple.Virtualization.VirtualMachine"
+      },
+      "title": "Máquina virtual",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Una máquina virtual mediante el framework Virtualization de Apple, usada por herramientas que ejecutan otro sistema. Su consumo es el de lo que corre dentro."
+    },
+    {
+      "match": {
+        "name": "com.apple.SafariPlatformSupport.Helper"
+      },
+      "title": "Safari (soporte de plataforma)",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Procesos auxiliares que Safari usa para extensiones y apps web."
+    },
+    {
+      "match": {
+        "name": "WallpaperAerialsExtension"
+      },
+      "title": "Fondo de pantalla (aéreos)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Reproduce los fondos y salvapantallas aéreos en movimiento. Solo trabaja mientras uno está en pantalla."
     }
   ]
 }

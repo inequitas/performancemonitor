@@ -961,6 +961,211 @@
       "vendor": "Anthropic",
       "expectedHigh": false,
       "description": "Anthropic's programmeerassistent die in een terminal draait. Een ander programma dan de Claude-desktop-app, daarom staan ze als aparte regels."
+    },
+    {
+      "match": {
+        "name": "MSTeams"
+      },
+      "title": "Microsoft Teams",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "De chat- en vergaderapp van Microsoft. Draait een webweergave per venster en een apart proces voor gesprekken, en verschijnt daarom meestal als groep."
+    },
+    {
+      "match": {
+        "name": "Microsoft Teams WebView"
+      },
+      "title": "Microsoft Teams (venster)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Eén Teams-venster of -paneel. Teams draait er één per geopende weergave, vandaar dat er meerdere tegelijk zijn.",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "Microsoft Teams ModuleHost"
+      },
+      "title": "Microsoft Teams (invoegtoepassingen)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Draait de onderdelen van Teams die apart worden geladen, zoals vergader-invoegtoepassingen.",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "WhatsApp"
+      },
+      "title": "WhatsApp",
+      "category": "app",
+      "vendor": "Meta",
+      "expectedHigh": false,
+      "description": "De WhatsApp-desktopapp. Het geheugengebruik groeit met het aantal geopende chats en media."
+    },
+    {
+      "match": {
+        "name": "OneDrive"
+      },
+      "title": "OneDrive",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "De bestandssynchronisatie van Microsoft. Druk tijdens up- of downloaden, en stil zodra alles gelijk is."
+    },
+    {
+      "match": {
+        "name": "com.apple.geod"
+      },
+      "title": "Locatievoorzieningen",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Bepaalt waar de Mac is, voor apps die erom vragen en voor zaken als tijdzone en Zoek mijn."
+    },
+    {
+      "match": {
+        "name": "Siri"
+      },
+      "title": "Siri",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "De achtergronddiensten achter Siri en de suggesties die macOS doet. Ze draaien op het apparaat zelf en worden kort wakker in plaats van continu te werken."
+    },
+    {
+      "match": {
+        "name": "siriactionsd"
+      },
+      "title": "Siri (opdrachten)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Verzorgt Opdrachten en de acties die apps aan Siri aanbieden.",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "siriknowledged"
+      },
+      "title": "Siri (kennis op het apparaat)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Beheert de informatie op het apparaat die Siri en Spotlight gebruiken voor suggesties.",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "duetexpertd"
+      },
+      "title": "Suggesties",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Leert welke apps je wanneer gebruikt, zodat macOS ze kan voorstellen. Draait op het apparaat en doet meestal niets."
+    },
+    {
+      "match": {
+        "name": "chronod"
+      },
+      "title": "Widgets",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Houdt de widgets op het bureaublad en in het berichtencentrum bij."
+    },
+    {
+      "match": {
+        "name": "NotificationCenter"
+      },
+      "title": "Berichtencentrum",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Toont meldingen en het paneel waarin ze verzameld worden."
+    },
+    {
+      "match": {
+        "name": "AppleSpell"
+      },
+      "title": "Spellingcontrole",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Controleert spelling en grammatica voor elke app die de systeemtekstvelden gebruikt."
+    },
+    {
+      "match": {
+        "name": "BackgroundShortcutRunner"
+      },
+      "title": "Opdrachten (achtergrond)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Voert opdrachten uit die automatisch starten in plaats van doordat jij de app opent."
+    },
+    {
+      "match": {
+        "name": "IntuneMdmDaemon"
+      },
+      "title": "Microsoft Intune",
+      "category": "security",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Past de instellingen en het beleid toe waarmee een werkgever deze Mac beheert. Staat op werkmachines."
+    },
+    {
+      "match": {
+        "name": "logioptionsplus_agent"
+      },
+      "title": "Logi Options+",
+      "category": "app",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "De software van Logitech voor hun muizen en toetsenborden, voor knoptoewijzingen en gebaren."
+    },
+    {
+      "match": {
+        "name": "LogiPluginService"
+      },
+      "title": "Logi Options+ (plug-ins)",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Het deel van Logi Options+ dat per app ander gedrag toevoegt voor ondersteunde applicaties.",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "com.apple.Virtualization.VirtualMachine"
+      },
+      "title": "Virtuele machine",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Een virtuele machine via Apple's Virtualization-framework, gebruikt door tools die een ander besturingssysteem draaien. Het verbruik is wat er binnenin draait."
+    },
+    {
+      "match": {
+        "name": "com.apple.SafariPlatformSupport.Helper"
+      },
+      "title": "Safari (platformondersteuning)",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Achtergrondhelpers die Safari gebruikt voor zaken als extensies en webapp-ondersteuning."
+    },
+    {
+      "match": {
+        "name": "WallpaperAerialsExtension"
+      },
+      "title": "Bureaubladachtergrond (luchtbeelden)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Speelt de bewegende luchtbeelden als achtergrond of schermbeveiliging af. Alleen druk zolang er een in beeld is."
     }
   ]
 }

@@ -54,6 +54,10 @@ struct WindowVisibilityAccessor: NSViewRepresentable {
         // The window is not attached yet during makeNSView.
         DispatchQueue.main.async {
             guard let window = view.window else { return }
+            // Every scene routes through here, so this is the one place that
+            // needs to know about it: a click in an unfocused window should do
+            // what it was aimed at rather than only bring the window forward.
+            FirstMouse.enable(on: window)
             configure?(window)
 
             let apply: (Bool) -> Void = { visible in

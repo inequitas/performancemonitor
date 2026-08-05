@@ -306,20 +306,11 @@ struct ProcessListView: View {
         let display = known?.title ?? proc.name
         return HStack(spacing: 6) {
             if isGroup {
-                Button {
-                    if expanded.contains(proc.id) { expanded.remove(proc.id) }
-                    else { expanded.insert(proc.id) }
-                } label: {
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 8, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                        .rotationEffect(.degrees(expanded.contains(proc.id) ? 90 : 0))
-                        .frame(width: 9)
-                }
-                .buttonStyle(.plain)
-                .help(expanded.contains(proc.id)
-                      ? String(localized: "Hide the individual processes")
-                      : String(localized: "Show the individual processes"))
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 8, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                    .rotationEffect(.degrees(expanded.contains(proc.id) ? 90 : 0))
+                    .frame(width: 9)
             }
             Text(display)
                 .font(.caption)
@@ -356,6 +347,19 @@ struct ProcessListView: View {
             }
         }
         .contentShape(Rectangle())
+        // The whole row, not just the chevron. A 9-point target for something
+        // this routine is a needless test of aim, and the buttons inside the row
+        // take their own taps first, so nothing is shadowed by this.
+        .onTapGesture {
+            guard isGroup else { return }
+            if expanded.contains(proc.id) { expanded.remove(proc.id) }
+            else { expanded.insert(proc.id) }
+        }
+        .help(isGroup
+              ? (expanded.contains(proc.id)
+                 ? String(localized: "Hide the individual processes")
+                 : String(localized: "Show the individual processes"))
+              : "")
         .contextMenu {
             if proc.pid > 0 {
                 Button(String(format: String(localized: "Quit %@"), display), role: .destructive) { pendingKill = proc }

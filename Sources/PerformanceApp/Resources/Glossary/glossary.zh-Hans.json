@@ -961,6 +961,211 @@
       "vendor": "Anthropic",
       "expectedHigh": false,
       "description": "在终端中运行的 Anthropic 编程助手。它与 Claude 桌面 App 是不同的程序，因此显示为两行。"
+    },
+    {
+      "match": {
+        "name": "MSTeams"
+      },
+      "title": "Microsoft Teams",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "微软的聊天与会议 App。每个窗口运行一个网页视图，通话另有独立进程，因此通常显示为一组。"
+    },
+    {
+      "match": {
+        "name": "Microsoft Teams WebView"
+      },
+      "title": "Microsoft Teams（窗口）",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "一个 Teams 窗口或面板。每个打开的视图各有一个，因此会同时出现多个。",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "Microsoft Teams ModuleHost"
+      },
+      "title": "Microsoft Teams（加载项）",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "运行 Teams 中单独加载的部分，例如会议加载项。",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "WhatsApp"
+      },
+      "title": "WhatsApp",
+      "category": "app",
+      "vendor": "Meta",
+      "expectedHigh": false,
+      "description": "WhatsApp 桌面应用。打开的聊天和媒体越多，占用的内存越大。"
+    },
+    {
+      "match": {
+        "name": "OneDrive"
+      },
+      "title": "OneDrive",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "微软的文件同步服务。上传或下载时忙碌，同步完成后就会安静下来。"
+    },
+    {
+      "match": {
+        "name": "com.apple.geod"
+      },
+      "title": "定位服务",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "确定 Mac 的位置，供请求定位的 App 以及时区、查找等功能使用。"
+    },
+    {
+      "match": {
+        "name": "Siri"
+      },
+      "title": "Siri",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Siri 及 macOS 建议功能背后的后台服务。它们在本机运行，只会短暂唤醒而非持续工作。"
+    },
+    {
+      "match": {
+        "name": "siriactionsd"
+      },
+      "title": "Siri（快捷指令）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "处理快捷指令，以及各 App 向 Siri 提供的操作。",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "siriknowledged"
+      },
+      "title": "Siri（本机知识）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "维护 Siri 和聚焦搜索用来给出建议的本机信息。",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "duetexpertd"
+      },
+      "title": "使用建议",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "学习你在什么时候使用哪些 App，以便 macOS 给出建议。在本机运行，多数时间处于空闲。"
+    },
+    {
+      "match": {
+        "name": "chronod"
+      },
+      "title": "小组件",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "让桌面和通知中心里的小组件保持最新。"
+    },
+    {
+      "match": {
+        "name": "NotificationCenter"
+      },
+      "title": "通知中心",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "显示通知，以及汇总通知的面板。"
+    },
+    {
+      "match": {
+        "name": "AppleSpell"
+      },
+      "title": "拼写检查",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "为所有使用系统文本框的 App 检查拼写和语法。"
+    },
+    {
+      "match": {
+        "name": "BackgroundShortcutRunner"
+      },
+      "title": "快捷指令（后台）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "运行自动触发的快捷指令，而非你手动打开 App 时运行的那些。"
+    },
+    {
+      "match": {
+        "name": "IntuneMdmDaemon"
+      },
+      "title": "Microsoft Intune",
+      "category": "security",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "应用雇主用来管理这台 Mac 的设置与策略，常见于工作用设备。"
+    },
+    {
+      "match": {
+        "name": "logioptionsplus_agent"
+      },
+      "title": "Logi Options+",
+      "category": "app",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "罗技为其鼠标和键盘提供的软件，负责按键分配与手势。"
+    },
+    {
+      "match": {
+        "name": "LogiPluginService"
+      },
+      "title": "Logi Options+（插件）",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Logi Options+ 中为受支持应用添加逐个 App 行为的部分。",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "com.apple.Virtualization.VirtualMachine"
+      },
+      "title": "虚拟机",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "通过 Apple 虚拟化框架运行的虚拟机，供运行其他操作系统的工具使用。它的占用取决于里面运行的内容。"
+    },
+    {
+      "match": {
+        "name": "com.apple.SafariPlatformSupport.Helper"
+      },
+      "title": "Safari（平台支持）",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Safari 用于扩展和网页 App 等功能的后台辅助进程。"
+    },
+    {
+      "match": {
+        "name": "WallpaperAerialsExtension"
+      },
+      "title": "墙纸（航拍动态）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "播放动态航拍墙纸和屏幕保护程序，只有在显示时才会忙碌。"
     }
   ]
 }

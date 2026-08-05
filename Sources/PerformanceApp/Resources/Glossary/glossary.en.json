@@ -961,6 +961,211 @@
       "vendor": "Anthropic",
       "expectedHigh": false,
       "description": "Anthropic's coding assistant running in a terminal. A different program from the Claude desktop app, which is why the two appear as separate rows."
+    },
+    {
+      "match": {
+        "name": "MSTeams"
+      },
+      "title": "Microsoft Teams",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Microsoft's chat and meeting app. It runs a web view per window and a separate process for calls, so it usually appears as a group of several."
+    },
+    {
+      "match": {
+        "name": "Microsoft Teams WebView"
+      },
+      "title": "Microsoft Teams (window)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "One Teams window or panel. Teams runs one of these per open view, which is why several appear at once.",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "Microsoft Teams ModuleHost"
+      },
+      "title": "Microsoft Teams (add-ins)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Runs the parts of Teams that load separately, such as meeting add-ins.",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "WhatsApp"
+      },
+      "title": "WhatsApp",
+      "category": "app",
+      "vendor": "Meta",
+      "expectedHigh": false,
+      "description": "The WhatsApp desktop app. Memory use grows with the number of chats and media kept open."
+    },
+    {
+      "match": {
+        "name": "OneDrive"
+      },
+      "title": "OneDrive",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Microsoft's file sync. Busy while uploading or downloading, and quiet once everything is in step."
+    },
+    {
+      "match": {
+        "name": "com.apple.geod"
+      },
+      "title": "Location Services",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Works out where the Mac is, for apps that ask and for things like time zone and Find My."
+    },
+    {
+      "match": {
+        "name": "Siri"
+      },
+      "title": "Siri",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "The background services behind Siri and the suggestions macOS makes. They run on device and wake briefly rather than working continuously."
+    },
+    {
+      "match": {
+        "name": "siriactionsd"
+      },
+      "title": "Siri (shortcuts)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Handles Shortcuts and the actions apps offer to Siri.",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "siriknowledged"
+      },
+      "title": "Siri (on-device knowledge)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Keeps the on-device information Siri and Spotlight use to make suggestions.",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "duetexpertd"
+      },
+      "title": "Suggestions",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Learns which apps you use when, so macOS can suggest them. Runs on device and is idle most of the time."
+    },
+    {
+      "match": {
+        "name": "chronod"
+      },
+      "title": "Widgets",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Keeps widgets on the desktop and in Notification Center up to date."
+    },
+    {
+      "match": {
+        "name": "NotificationCenter"
+      },
+      "title": "Notification Center",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Shows notifications and the panel they collect in."
+    },
+    {
+      "match": {
+        "name": "AppleSpell"
+      },
+      "title": "Spell checking",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Checks spelling and grammar for every app that uses the system text fields."
+    },
+    {
+      "match": {
+        "name": "BackgroundShortcutRunner"
+      },
+      "title": "Shortcuts (background)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Runs shortcuts that are triggered automatically rather than by you opening the app."
+    },
+    {
+      "match": {
+        "name": "IntuneMdmDaemon"
+      },
+      "title": "Microsoft Intune",
+      "category": "security",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Applies the settings and policies an employer manages this Mac with. Present on work machines."
+    },
+    {
+      "match": {
+        "name": "logioptionsplus_agent"
+      },
+      "title": "Logi Options+",
+      "category": "app",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Logitech's software for its mice and keyboards, handling button assignments and gestures."
+    },
+    {
+      "match": {
+        "name": "LogiPluginService"
+      },
+      "title": "Logi Options+ (plug-ins)",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "The part of Logi Options+ that adds per-app behaviour for supported applications.",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "com.apple.Virtualization.VirtualMachine"
+      },
+      "title": "Virtual machine",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "A virtual machine running through Apple's Virtualization framework, used by tools that run another operating system. Its usage is whatever is running inside it."
+    },
+    {
+      "match": {
+        "name": "com.apple.SafariPlatformSupport.Helper"
+      },
+      "title": "Safari (platform support)",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Background helpers Safari uses for features such as extensions and web app support."
+    },
+    {
+      "match": {
+        "name": "WallpaperAerialsExtension"
+      },
+      "title": "Wallpaper (aerials)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Plays the moving aerial wallpapers and screen savers. Only busy while one is on screen."
     }
   ]
 }

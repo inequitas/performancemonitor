@@ -961,6 +961,211 @@
       "vendor": "Anthropic",
       "expectedHigh": false,
       "description": "Anthropics Programmierassistent im Terminal. Ein anderes Programm als die Claude-Desktop-App, deshalb erscheinen beide als getrennte Zeilen."
+    },
+    {
+      "match": {
+        "name": "MSTeams"
+      },
+      "title": "Microsoft Teams",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Microsofts Chat- und Meeting-App. Sie startet je Fenster eine Webansicht und einen eigenen Prozess für Anrufe und erscheint deshalb meist als Gruppe."
+    },
+    {
+      "match": {
+        "name": "Microsoft Teams WebView"
+      },
+      "title": "Microsoft Teams (Fenster)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Ein Teams-Fenster oder -Bereich. Teams startet einen pro geöffneter Ansicht, daher erscheinen mehrere gleichzeitig.",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "Microsoft Teams ModuleHost"
+      },
+      "title": "Microsoft Teams (Add-ins)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Führt die separat geladenen Teile von Teams aus, etwa Besprechungs-Add-ins.",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "WhatsApp"
+      },
+      "title": "WhatsApp",
+      "category": "app",
+      "vendor": "Meta",
+      "expectedHigh": false,
+      "description": "Die WhatsApp-Desktop-App. Der Speicherbedarf wächst mit der Zahl offener Chats und Medien."
+    },
+    {
+      "match": {
+        "name": "OneDrive"
+      },
+      "title": "OneDrive",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Die Dateisynchronisierung von Microsoft. Aktiv beim Hoch- oder Herunterladen, danach ruhig."
+    },
+    {
+      "match": {
+        "name": "com.apple.geod"
+      },
+      "title": "Ortungsdienste",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Ermittelt den Standort des Mac, für Apps, die danach fragen, sowie für Zeitzone und Wo ist?."
+    },
+    {
+      "match": {
+        "name": "Siri"
+      },
+      "title": "Siri",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Die Hintergrunddienste hinter Siri und den Vorschlägen von macOS. Sie laufen auf dem Gerät und werden nur kurz aktiv."
+    },
+    {
+      "match": {
+        "name": "siriactionsd"
+      },
+      "title": "Siri (Kurzbefehle)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Verwaltet Kurzbefehle und die Aktionen, die Apps Siri anbieten.",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "siriknowledged"
+      },
+      "title": "Siri (Wissen auf dem Gerät)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Pflegt die Informationen auf dem Gerät, mit denen Siri und Spotlight Vorschläge machen.",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "duetexpertd"
+      },
+      "title": "Vorschläge",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Lernt, welche Apps Sie wann nutzen, damit macOS sie vorschlagen kann. Läuft auf dem Gerät und ist meist untätig."
+    },
+    {
+      "match": {
+        "name": "chronod"
+      },
+      "title": "Widgets",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Hält die Widgets auf dem Schreibtisch und in der Mitteilungszentrale aktuell."
+    },
+    {
+      "match": {
+        "name": "NotificationCenter"
+      },
+      "title": "Mitteilungszentrale",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Zeigt Mitteilungen und das Fenster, in dem sie gesammelt werden."
+    },
+    {
+      "match": {
+        "name": "AppleSpell"
+      },
+      "title": "Rechtschreibprüfung",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Prüft Rechtschreibung und Grammatik für jede App, die die Systemtextfelder nutzt."
+    },
+    {
+      "match": {
+        "name": "BackgroundShortcutRunner"
+      },
+      "title": "Kurzbefehle (Hintergrund)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Führt Kurzbefehle aus, die automatisch statt durch Öffnen der App gestartet werden."
+    },
+    {
+      "match": {
+        "name": "IntuneMdmDaemon"
+      },
+      "title": "Microsoft Intune",
+      "category": "security",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Wendet die Einstellungen und Richtlinien an, mit denen ein Arbeitgeber diesen Mac verwaltet. Auf Firmengeräten vorhanden."
+    },
+    {
+      "match": {
+        "name": "logioptionsplus_agent"
+      },
+      "title": "Logi Options+",
+      "category": "app",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Logitechs Software für Mäuse und Tastaturen, zuständig für Tastenbelegungen und Gesten."
+    },
+    {
+      "match": {
+        "name": "LogiPluginService"
+      },
+      "title": "Logi Options+ (Plug-ins)",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Der Teil von Logi Options+, der für unterstützte Programme app-spezifisches Verhalten ergänzt.",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "com.apple.Virtualization.VirtualMachine"
+      },
+      "title": "Virtuelle Maschine",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Eine virtuelle Maschine über Apples Virtualization-Framework, genutzt von Werkzeugen, die ein anderes Betriebssystem ausführen. Die Auslastung ist die dessen, was darin läuft."
+    },
+    {
+      "match": {
+        "name": "com.apple.SafariPlatformSupport.Helper"
+      },
+      "title": "Safari (Plattformunterstützung)",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Hintergrundhelfer, die Safari für Funktionen wie Erweiterungen und Web-Apps nutzt."
+    },
+    {
+      "match": {
+        "name": "WallpaperAerialsExtension"
+      },
+      "title": "Schreibtischhintergrund (Luftaufnahmen)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Spielt die bewegten Luftaufnahmen als Hintergrund oder Bildschirmschoner ab. Nur aktiv, solange eine zu sehen ist."
     }
   ]
 }
