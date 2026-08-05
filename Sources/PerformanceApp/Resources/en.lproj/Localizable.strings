@@ -197,6 +197,12 @@
 "Case" = "Case";
 "Resume live updates" = "Resume live updates";
 "Pause list" = "Pause list";
+/* Process groups: an app and its helpers shown as one row. */
+"%ld processes" = "%ld processes";
+"Show the individual processes" = "Show the individual processes";
+"Hide the individual processes" = "Hide the individual processes";
+"Quit %@ and its helpers" = "Quit %@ and its helpers";
+"This sends a quit signal to all %ld processes in this group. Unsaved work may be lost." = "This sends a quit signal to all %ld processes in this group. Unsaved work may be lost.";
 "No data captured." = "No data captured.";
 "Quit %@" = "Quit %@";
 "Quit %@?" = "Quit %@?";

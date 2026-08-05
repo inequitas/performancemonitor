@@ -212,6 +212,12 @@ private struct GlossaryButton: View {
 
 // MARK: - Process list
 
+/// A resource-usage list where an app and its helper processes appear as one
+/// row that can be opened to show the individual processes.
+///
+/// Grouping is done in Core (`ProcessGrouping`); a row with no members renders
+/// exactly as a plain process, so the disk and network lists, which have no
+/// parent information to group on, are unaffected.
 struct ProcessListView: View {
     let title: String
     let icon: String
@@ -223,6 +229,7 @@ struct ProcessListView: View {
     @State private var pendingKill: ProcessUsage?
     @State private var paused = false
     @State private var frozenList: [ProcessUsage] = []
+    @State private var expanded: Set<String> = []
 
     private var displayed: [ProcessUsage] { paused ? frozenList : processes }
 
@@ -250,32 +257,12 @@ struct ProcessListView: View {
                     .font(.caption).foregroundStyle(.secondary)
             } else {
                 ForEach(displayed.prefix(engine.settings.topProcessCount)) { proc in
-                    let known = GlossaryStore.shared.entry(for: proc.name)
-                    HStack(spacing: 6) {
-                        Text(proc.name)
-                            .font(.caption)
-                            .lineLimit(1)
-                        if let known {
-                            GlossaryButton(processName: proc.name, entry: known)
-                        }
-                        Spacer()
-                        Text(String(format: "%.1f%@", proc.value, unit))
-                            .font(.caption.monospacedDigit())
-                            .foregroundStyle(.secondary)
-                        if proc.pid > 0 {
-                            Button { pendingKill = proc } label: {
-                                Image(systemName: "xmark.circle")
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 3) {
+                        row(proc)
+                        if expanded.contains(proc.id) {
+                            ForEach(proc.members) { member in
+                                memberRow(member)
                             }
-                            .buttonStyle(.plain)
-                            .help(String(format: String(localized: "Quit %@"), proc.name))
-                        }
-                    }
-                    .contentShape(Rectangle())
-                    .contextMenu {
-                        if proc.pid > 0 {
-                            Button(String(format: String(localized: "Quit %@"), proc.name), role: .destructive) { pendingKill = proc }
                         }
                     }
                 }
@@ -288,12 +275,106 @@ struct ProcessListView: View {
         ) { proc in
             Button(String(localized: "Cancel"), role: .cancel) { }
             Button(String(localized: "Quit"), role: .destructive) {
-                engine.terminateProcess(pid: proc.pid)
+                // A group row stands for several processes, so quitting it has
+                // to reach all of them; quitting only the one whose pid the row
+                // carries would leave the helpers running and the row would
+                // barely move.
+                if proc.members.isEmpty {
+                    engine.terminateProcess(pid: proc.pid)
+                } else {
+                    for member in proc.members where member.pid > 0 {
+                        engine.terminateProcess(pid: member.pid)
+                    }
+                }
                 paused = false
             }
         } message: { proc in
-            Text(String(format: String(localized: "This sends a quit signal to the process (PID %ld). Unsaved work may be lost."), Int(proc.pid)))
+            Text(proc.members.isEmpty
+                 ? String(format: String(localized: "This sends a quit signal to the process (PID %ld). Unsaved work may be lost."), Int(proc.pid))
+                 : String(format: String(localized: "This sends a quit signal to all %ld processes in this group. Unsaved work may be lost."), proc.members.count))
         }
+    }
+
+    /// A top-level row: one process, or an app with its helpers folded in.
+    private func row(_ proc: ProcessUsage) -> some View {
+        let known = GlossaryStore.shared.entry(for: proc.name)
+        let isGroup = !proc.members.isEmpty
+        return HStack(spacing: 6) {
+            if isGroup {
+                Button {
+                    if expanded.contains(proc.id) { expanded.remove(proc.id) }
+                    else { expanded.insert(proc.id) }
+                } label: {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 8, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                        .rotationEffect(.degrees(expanded.contains(proc.id) ? 90 : 0))
+                        .frame(width: 9)
+                }
+                .buttonStyle(.plain)
+                .help(expanded.contains(proc.id)
+                      ? String(localized: "Hide the individual processes")
+                      : String(localized: "Show the individual processes"))
+            }
+            Text(proc.name)
+                .font(.caption)
+                .lineLimit(1)
+            if isGroup {
+                // The count is the whole justification for the row reading
+                // differently from the others, so it is stated rather than
+                // implied by the chevron alone.
+                Text(String(format: String(localized: "%ld processes"), proc.members.count))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 1)
+                    .background(Color.secondary.opacity(0.12), in: Capsule())
+            }
+            if let known {
+                GlossaryButton(processName: proc.name, entry: known)
+            }
+            Spacer()
+            Text(String(format: "%.1f%@", proc.value, unit))
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
+            if proc.pid > 0 {
+                Button { pendingKill = proc } label: {
+                    Image(systemName: "xmark.circle")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .help(isGroup
+                      ? String(format: String(localized: "Quit %@ and its helpers"), proc.name)
+                      : String(format: String(localized: "Quit %@"), proc.name))
+            }
+        }
+        .contentShape(Rectangle())
+        .contextMenu {
+            if proc.pid > 0 {
+                Button(String(format: String(localized: "Quit %@"), proc.name), role: .destructive) { pendingKill = proc }
+            }
+        }
+    }
+
+    /// One process inside an opened group. Indented, quieter, and showing its
+    /// pid, since the names within a group are often near-identical and the pid
+    /// is the only thing telling them apart.
+    private func memberRow(_ member: ProcessUsage) -> some View {
+        HStack(spacing: 6) {
+            Text(member.name)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            Text(verbatim: "\(member.pid)")
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(.tertiary)
+            Spacer()
+            Text(String(format: "%.1f%@", member.value, unit))
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.leading, 15)
     }
 }
 

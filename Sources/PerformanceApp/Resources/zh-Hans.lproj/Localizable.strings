@@ -196,6 +196,12 @@
 "Case" = "充电盒";
 "Resume live updates" = "恢复实时更新";
 "Pause list" = "暂停列表";
+/* Process groups: an app and its helpers shown as one row. */
+"%ld processes" = "%ld 个进程";
+"Show the individual processes" = "显示各个进程";
+"Hide the individual processes" = "隐藏各个进程";
+"Quit %@ and its helpers" = "退出 %@ 及其辅助进程";
+"This sends a quit signal to all %ld processes in this group. Unsaved work may be lost." = "这会向该组中的全部 %ld 个进程发送退出信号。未保存的工作可能会丢失。";
 "No data captured." = "未采集到数据。";
 "Quit %@" = "退出 %@";
 "Quit %@?" = "要退出 %@ 吗？";

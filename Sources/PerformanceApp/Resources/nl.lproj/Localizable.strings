@@ -197,6 +197,12 @@
 "Case" = "Hoesje";
 "Resume live updates" = "Live updates hervatten";
 "Pause list" = "Lijst pauzeren";
+/* Process groups: an app and its helpers shown as one row. */
+"%ld processes" = "%ld processen";
+"Show the individual processes" = "Toon de losse processen";
+"Hide the individual processes" = "Verberg de losse processen";
+"Quit %@ and its helpers" = "Stop %@ en de bijbehorende helpers";
+"This sends a quit signal to all %ld processes in this group. Unsaved work may be lost." = "Dit stuurt een stopsignaal naar alle %ld processen in deze groep. Niet-opgeslagen werk kan verloren gaan.";
 "No data captured." = "Geen data vastgelegd.";
 "Quit %@" = "%@ afsluiten";
 "Quit %@?" = "%@ afsluiten?";

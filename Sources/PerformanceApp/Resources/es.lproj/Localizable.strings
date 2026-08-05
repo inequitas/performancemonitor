@@ -197,6 +197,12 @@
 "Case" = "Estuche";
 "Resume live updates" = "Reanudar actualizaciones en vivo";
 "Pause list" = "Pausar lista";
+/* Process groups: an app and its helpers shown as one row. */
+"%ld processes" = "%ld procesos";
+"Show the individual processes" = "Mostrar los procesos individuales";
+"Hide the individual processes" = "Ocultar los procesos individuales";
+"Quit %@ and its helpers" = "Salir de %@ y sus procesos auxiliares";
+"This sends a quit signal to all %ld processes in this group. Unsaved work may be lost." = "Se enviará una señal de salida a los %ld procesos de este grupo. El trabajo no guardado puede perderse.";
 "No data captured." = "No se ha capturado ningún dato.";
 "Quit %@" = "Salir de %@";
 "Quit %@?" = "¿Salir de %@?";

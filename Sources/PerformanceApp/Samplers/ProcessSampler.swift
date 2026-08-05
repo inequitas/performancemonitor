@@ -52,8 +52,9 @@ final class ProcessSampler: ProcessSampling {
             task.executableURL = URL(fileURLWithPath: "/bin/ps")
             // `comm` must come last: ps fixes the width of every column except
             // the final one, so any other position truncates process names to
-            // 16 characters. See PSParser.
-            task.arguments = ["-arcwwwxo", "pid,%cpu,%mem,comm"]
+            // 16 characters. See PSParser. `ppid` rides along at no cost and is
+            // what lets an app's helpers be grouped into one row.
+            task.arguments = ["-arcwwwxo", "pid,ppid,%cpu,%mem,comm"]
             let outPipe = Pipe()
             task.standardOutput = outPipe
             task.standardError = Pipe()

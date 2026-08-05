@@ -1,10 +1,10 @@
 import Foundation
 
-/// Pure parser for the output of `ps -arcwwwxo pid,%cpu,%mem,comm`.
+/// Pure parser for the output of `ps -arcwwwxo pid,ppid,%cpu,%mem,comm`.
 ///
 /// The first line (the column header) is dropped; each remaining line is
-/// `pid %cpu %mem comm...`, where the command name may contain spaces and runs
-/// to the end of the line.
+/// `pid ppid %cpu %mem comm...`, where the command name may contain spaces and
+/// runs to the end of the line.
 ///
 /// The column order matters. `ps` gives every column except the last a fixed
 /// width, so asking for `comm` anywhere but last silently truncates process
@@ -12,8 +12,12 @@ import Foundation
 /// and three different WebKit helpers all arrive as "com.apple.WebKit". Putting
 /// it last lets it run to full length, which the process lists show and the
 /// glossary needs in order to tell those helpers apart.
+///
+/// `ppid` costs nothing extra: it comes from the same `ps` run, and it is what
+/// lets `ProcessGrouping` fold an app's helpers into one row.
 public enum PSParser {
-    /// Parses `ps` output into the top CPU and top memory consumers.
+    /// Parses `ps` output into the top CPU and top memory consumers, with each
+    /// app's helper processes grouped into a single row.
     ///
     /// - Parameters:
     ///   - output: Raw stdout of the `ps` invocation (including the header row).
@@ -21,7 +25,10 @@ public enum PSParser {
     ///   - logicalCPUs: Logical CPU count, used to rescale `ps`'s per-core `%cpu`
     ///     (a process pinning two cores reports 200%) into a share of total
     ///     system capacity. Clamped to `1...256`.
-    /// - Returns: The `topCount` highest CPU rows and `topCount` highest memory rows.
+    /// - Returns: The `topCount` heaviest CPU rows and memory rows. Grouping
+    ///   happens across every parsed line before the lists are trimmed, because
+    ///   a helper that falls outside the top on its own still counts towards the
+    ///   group it belongs to.
     public static func parse(_ output: String,
                              topCount: Int,
                              logicalCPUs: Double) -> (cpu: [ProcessUsage], memory: [ProcessUsage]) {
@@ -30,20 +37,22 @@ public enum PSParser {
 
         var cpuList: [ProcessUsage] = []
         var memList: [ProcessUsage] = []
+        var parents: [Int32: Int32] = [:]
         for line in lines {
             let parts = line.split(separator: " ", omittingEmptySubsequences: true)
-            guard parts.count >= 4,
+            guard parts.count >= 5,
                   let pid = Int32(parts[0]),
-                  let rawCPU = Double(parts[1]),
-                  let mem = Double(parts[2]) else { continue }
-            let name = parts[3...].joined(separator: " ")
+                  let ppid = Int32(parts[1]),
+                  let rawCPU = Double(parts[2]),
+                  let mem = Double(parts[3]) else { continue }
+            let name = parts[4...].joined(separator: " ")
             let cpu = (rawCPU / cpus * 10).rounded() / 10
+            parents[pid] = ppid
             cpuList.append(ProcessUsage(pid: pid, name: name, value: cpu))
             memList.append(ProcessUsage(pid: pid, name: name, value: mem))
         }
 
-        let topCPU = Array(cpuList.sorted { $0.value > $1.value }.prefix(topCount))
-        let topMem = Array(memList.sorted { $0.value > $1.value }.prefix(topCount))
-        return (topCPU, topMem)
+        return (ProcessGrouping.group(cpuList, parents: parents, topCount: topCount),
+                ProcessGrouping.group(memList, parents: parents, topCount: topCount))
     }
 }
