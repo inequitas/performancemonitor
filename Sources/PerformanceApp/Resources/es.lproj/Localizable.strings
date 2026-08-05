@@ -452,8 +452,15 @@
 "%@ is using %.0f%% of the CPU." = "%@ está usando el %.0f%% de la CPU.";
 "CPU is at %.0f%%, spread across several processes." = "La CPU está al %.0f%%, repartida entre varios procesos.";
 "Only %.1f GB left on the startup disk." = "Solo quedan %.1f GB en el disco de arranque.";
-"1 thing worth a look." = "1 cosa que conviene mirar.";
 "%ld things worth a look." = "%ld cosas que conviene mirar.";
+/* Advice: what the reader can do about each finding. */
+"Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface." = "Todo irá más lento hasta que se enfríe. Mira qué genera el calor y deja aire alrededor si está sobre una superficie blanda.";
+"Quitting apps you are not using will free memory. Top Memory shows which are holding the most." = "Cerrar las apps que no usas libera memoria. Top Memory muestra cuáles retienen más.";
+"%@ Being busy is normal for this one." = "%@ Que consuma mucho es normal en este caso.";
+"If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it." = "Si no lo iniciaste tú y sigue activo mientras no haces nada, puede estar bloqueado. Desde Top CPU puedes cerrarlo.";
+"No single process is responsible. Top CPU in the CPU window shows how it is divided." = "Ningún proceso concreto es el responsable. Top CPU en la ventana de CPU muestra el reparto.";
+"Not a problem by itself: macOS uses spare memory as cache and frees it when something needs it. It only matters once swap starts growing." = "No es un problema en sí: macOS usa la memoria libre como caché y la devuelve en cuanto hace falta. Solo importa cuando el swap empieza a crecer.";
+"macOS needs free space to work properly. Emptying the Bin and checking Storage in System Settings is the usual fix." = "macOS necesita espacio libre para funcionar bien. Vaciar la papelera y revisar Almacenamiento en Ajustes del Sistema suele bastar.";
 "Show details" = "Mostrar detalles";
 "Hide details" = "Ocultar detalles";
 "Open %@" = "Abrir %@";

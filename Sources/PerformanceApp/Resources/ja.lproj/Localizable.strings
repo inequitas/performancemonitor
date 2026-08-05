@@ -452,8 +452,15 @@
 "%@ is using %.0f%% of the CPU." = "%@ が CPU を %.0f%% 使用しています。";
 "CPU is at %.0f%%, spread across several processes." = "CPU 使用率は %.0f%% で、複数のプロセスに分散しています。";
 "Only %.1f GB left on the startup disk." = "起動ディスクの空き容量は %.1f GB のみです。";
-"1 thing worth a look." = "確認したい項目が 1 件あります。";
 "%ld things worth a look." = "確認したい項目が %ld 件あります。";
+/* Advice: what the reader can do about each finding. */
+"Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface." = "冷えるまでは全体的に動作が遅くなります。何が熱の原因かを確認し、柔らかい場所に置いている場合は風通しをよくしてください。";
+"Quitting apps you are not using will free memory. Top Memory shows which are holding the most." = "使っていない App を終了するとメモリが空きます。Top Memory でどれが多く使っているか分かります。";
+"%@ Being busy is normal for this one." = "%@ この処理では負荷が高いのは正常です。";
+"If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it." = "自分で起動していないのに、何もしていない間も動き続けている場合は停止している可能性があります。Top CPU から終了できます。";
+"No single process is responsible. Top CPU in the CPU window shows how it is divided." = "特定のプロセスが原因ではありません。CPU ウインドウの Top CPU で内訳を確認できます。";
+"Not a problem by itself: macOS uses spare memory as cache and frees it when something needs it. It only matters once swap starts growing." = "それ自体は問題ではありません。macOS は空きメモリをキャッシュとして使い、必要になれば解放します。注意が必要なのはスワップが増え始めたときです。";
+"macOS needs free space to work properly. Emptying the Bin and checking Storage in System Settings is the usual fix." = "macOS が正しく動くには空き容量が必要です。ゴミ箱を空にし、システム設定のストレージを確認するのが一般的な対処です。";
 "Show details" = "詳細を表示";
 "Hide details" = "詳細を非表示";
 "Open %@" = "%@ を開く";

@@ -452,8 +452,15 @@
 "%@ is using %.0f%% of the CPU." = "%@ nutzt %.0f%% der CPU.";
 "CPU is at %.0f%%, spread across several processes." = "CPU bei %.0f%%, verteilt auf mehrere Prozesse.";
 "Only %.1f GB left on the startup disk." = "Nur noch %.1f GB auf dem Startvolume frei.";
-"1 thing worth a look." = "1 Sache, die einen Blick wert ist.";
 "%ld things worth a look." = "%ld Dinge, die einen Blick wert sind.";
+/* Advice: what the reader can do about each finding. */
+"Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface." = "Bis zur Abkühlung läuft alles langsamer. Prüfen Sie, was die Wärme verursacht, und sorgen Sie für Luft, wenn das Gerät auf einer weichen Unterlage steht.";
+"Quitting apps you are not using will free memory. Top Memory shows which are holding the most." = "Nicht genutzte Apps zu beenden gibt Speicher frei. Top Memory zeigt, welche am meisten belegen.";
+"%@ Being busy is normal for this one." = "%@ Hohe Auslastung ist hier normal.";
+"If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it." = "Wenn Sie den Prozess nicht selbst gestartet haben und er auch im Leerlauf ausgelastet bleibt, hängt er womöglich. Über Top CPU können Sie ihn beenden.";
+"No single process is responsible. Top CPU in the CPU window shows how it is divided." = "Kein einzelner Prozess ist verantwortlich. Top CPU im CPU-Fenster zeigt die Verteilung.";
+"Not a problem by itself: macOS uses spare memory as cache and frees it when something needs it. It only matters once swap starts growing." = "Für sich genommen kein Problem: macOS nutzt freien Speicher als Cache und gibt ihn wieder frei, sobald er gebraucht wird. Wichtig wird es erst, wenn Swap wächst.";
+"macOS needs free space to work properly. Emptying the Bin and checking Storage in System Settings is the usual fix." = "macOS braucht freien Speicherplatz, um sauber zu arbeiten. Papierkorb leeren und Speicher in den Systemeinstellungen prüfen hilft meist.";
 "Show details" = "Details einblenden";
 "Hide details" = "Details ausblenden";
 "Open %@" = "%@ öffnen";

@@ -452,8 +452,15 @@
 "%@ is using %.0f%% of the CPU." = "%@ is using %.0f%% of the CPU.";
 "CPU is at %.0f%%, spread across several processes." = "CPU is at %.0f%%, spread across several processes.";
 "Only %.1f GB left on the startup disk." = "Only %.1f GB left on the startup disk.";
-"1 thing worth a look." = "1 thing worth a look.";
 "%ld things worth a look." = "%ld things worth a look.";
+/* Advice: what the reader can do about each finding. */
+"Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface." = "Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface.";
+"Quitting apps you are not using will free memory. Top Memory shows which are holding the most." = "Quitting apps you are not using will free memory. Top Memory shows which are holding the most.";
+"%@ Being busy is normal for this one." = "%@ Being busy is normal for this one.";
+"If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it." = "If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it.";
+"No single process is responsible. Top CPU in the CPU window shows how it is divided." = "No single process is responsible. Top CPU in the CPU window shows how it is divided.";
+"Not a problem by itself: macOS uses spare memory as cache and frees it when something needs it. It only matters once swap starts growing." = "Not a problem by itself: macOS uses spare memory as cache and frees it when something needs it. It only matters once swap starts growing.";
+"macOS needs free space to work properly. Emptying the Bin and checking Storage in System Settings is the usual fix." = "macOS needs free space to work properly. Emptying the Bin and checking Storage in System Settings is the usual fix.";
 "Show details" = "Show details";
 "Hide details" = "Hide details";
 "Open %@" = "Open %@";

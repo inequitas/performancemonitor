@@ -452,8 +452,15 @@
 "%@ is using %.0f%% of the CPU." = "%@ utilise %.0f%% du processeur.";
 "CPU is at %.0f%%, spread across several processes." = "Processeur à %.0f%%, réparti sur plusieurs processus.";
 "Only %.1f GB left on the startup disk." = "Il ne reste que %.1f Go sur le disque de démarrage.";
-"1 thing worth a look." = "1 point à regarder.";
 "%ld things worth a look." = "%ld points à regarder.";
+/* Advice: what the reader can do about each finding. */
+"Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface." = "Tout sera plus lent jusqu'au refroidissement. Regardez ce qui produit la chaleur, et dégagez l'appareil s'il repose sur une surface molle.";
+"Quitting apps you are not using will free memory. Top Memory shows which are holding the most." = "Quitter les apps inutilisées libère de la mémoire. Top Memory montre celles qui en retiennent le plus.";
+"%@ Being busy is normal for this one." = "%@ Une charge élevée est normale ici.";
+"If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it." = "Si vous ne l'avez pas lancé et qu'il reste actif alors que vous ne faites rien, il est peut-être bloqué. Top CPU permet de le quitter.";
+"No single process is responsible. Top CPU in the CPU window shows how it is divided." = "Aucun processus n'est seul en cause. Top CPU dans la fenêtre CPU montre la répartition.";
+"Not a problem by itself: macOS uses spare memory as cache and frees it when something needs it. It only matters once swap starts growing." = "Ce n'est pas un problème en soi : macOS utilise la mémoire libre comme cache et la restitue dès qu'elle est nécessaire. Cela compte seulement quand le swap augmente.";
+"macOS needs free space to work properly. Emptying the Bin and checking Storage in System Settings is the usual fix." = "macOS a besoin d'espace libre pour bien fonctionner. Vider la corbeille et regarder Stockage dans Réglages Système suffit en général.";
 "Show details" = "Afficher les détails";
 "Hide details" = "Masquer les détails";
 "Open %@" = "Ouvrir %@";

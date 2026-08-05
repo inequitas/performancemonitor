@@ -37,15 +37,23 @@ struct VerdictBanner: View {
     var body: some View {
         let found = findings
         VStack(alignment: .leading, spacing: 0) {
-            summaryRow(found)
-            if expanded, !found.isEmpty {
-                Divider().padding(.horizontal, 12)
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(found) { finding in
-                        findingRow(finding)
+            // A single finding is shown in full straight away. Hiding one line
+            // behind "1 thing worth a look" costs a click and tells the reader
+            // nothing they did not already see. Summarising only earns its keep
+            // once there are several.
+            if found.count == 1 {
+                findingRow(found[0])
+            } else {
+                summaryRow(found)
+                if expanded, !found.isEmpty {
+                    Divider().padding(.horizontal, 12)
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(found) { finding in
+                            findingRow(finding)
+                        }
                     }
+                    .padding(.vertical, 2)
                 }
-                .padding(.vertical, 2)
             }
         }
         .background(tint(for: found).opacity(found.isEmpty ? 0.06 : 0.12),
@@ -89,11 +97,10 @@ struct VerdictBanner: View {
     }
 
     private func summary(_ found: [SystemFinding]) -> String {
-        switch found.count {
-        case 0:  return String(localized: "All quiet.")
-        case 1:  return String(localized: "1 thing worth a look.")
-        default: return String(format: String(localized: "%ld things worth a look."), found.count)
-        }
+        // count == 1 never reaches here; that case is shown in full instead.
+        found.isEmpty
+            ? String(localized: "All quiet.")
+            : String(format: String(localized: "%ld things worth a look."), found.count)
     }
 
     // MARK: - Detail rows
@@ -109,11 +116,18 @@ struct VerdictBanner: View {
                     .frame(width: 13)
                     .padding(.top, 1)
                     .symbolEffectsRemoved()
-                Text(sentence(for: finding.kind))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(sentence(for: finding.kind))
+                        .font(.caption)
+                        .foregroundStyle(.primary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(advice(for: finding.kind))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 Spacer(minLength: 4)
                 Image(systemName: "arrow.up.forward.square")
                     .font(.system(size: 9))
@@ -121,7 +135,7 @@ struct VerdictBanner: View {
                     .padding(.top, 2)
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 6)
+            .padding(.vertical, 8)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -154,6 +168,39 @@ struct VerdictBanner: View {
 
         case let .diskAlmostFull(freeGB):
             return String(format: String(localized: "Only %.1f GB left on the startup disk."), freeGB)
+        }
+    }
+
+    /// What the reader can actually do about it. The statement above says
+    /// what is happening; without this the line is an observation they can do
+    /// nothing with.
+    private func advice(for kind: SystemFinding.Kind) -> String {
+        switch kind {
+        case .throttling:
+            return String(localized: "Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface.")
+
+        case .swapping:
+            return String(localized: "Quitting apps you are not using will free memory. Top Memory shows which are holding the most.")
+
+        case let .busyProcess(name, _):
+            // The glossary already knows what this process is and whether
+            // being busy is normal for it, which is exactly the question the
+            // reader has.
+            if let known = GlossaryStore.shared.entry(for: name) {
+                return known.expectedHigh
+                    ? String(format: String(localized: "%@ Being busy is normal for this one."), known.description)
+                    : known.description
+            }
+            return String(localized: "If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it.")
+
+        case .busy:
+            return String(localized: "No single process is responsible. Top CPU in the CPU window shows how it is divided.")
+
+        case .memoryTight:
+            return String(localized: "Not a problem by itself: macOS uses spare memory as cache and frees it when something needs it. It only matters once swap starts growing.")
+
+        case .diskAlmostFull:
+            return String(localized: "macOS needs free space to work properly. Emptying the Bin and checking Storage in System Settings is the usual fix.")
         }
     }
 
