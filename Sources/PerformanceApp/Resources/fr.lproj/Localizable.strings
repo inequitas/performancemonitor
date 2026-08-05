@@ -451,5 +451,10 @@
 "Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "Plus de mémoire disponible, donc %.1f Go sont passés sur le disque. C'est ce qui donne l'impression d'un Mac lent.";
 "%@ is using %.0f%% of the CPU." = "%@ utilise %.0f%% du processeur.";
 "CPU is at %.0f%%, spread across several processes." = "Processeur à %.0f%%, réparti sur plusieurs processus.";
-"Memory is %.0f%% full, but nothing has moved to disk yet." = "La mémoire est remplie à %.0f%%, mais rien n'est encore passé sur le disque.";
 "Only %.1f GB left on the startup disk." = "Il ne reste que %.1f Go sur le disque de démarrage.";
+"1 thing worth a look." = "1 point à regarder.";
+"%ld things worth a look." = "%ld points à regarder.";
+"Show details" = "Afficher les détails";
+"Hide details" = "Masquer les détails";
+"Open %@" = "Ouvrir %@";
+"Memory is %.0f%% full." = "La mémoire est remplie à %.0f%%.";

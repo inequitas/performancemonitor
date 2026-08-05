@@ -451,5 +451,10 @@
 "Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "メモリが不足し、%.1f GB がディスクに移動しました。Mac が遅く感じる原因です。";
 "%@ is using %.0f%% of the CPU." = "%@ が CPU を %.0f%% 使用しています。";
 "CPU is at %.0f%%, spread across several processes." = "CPU 使用率は %.0f%% で、複数のプロセスに分散しています。";
-"Memory is %.0f%% full, but nothing has moved to disk yet." = "メモリの使用率は %.0f%% ですが、まだディスクへの移動はありません。";
 "Only %.1f GB left on the startup disk." = "起動ディスクの空き容量は %.1f GB のみです。";
+"1 thing worth a look." = "確認したい項目が 1 件あります。";
+"%ld things worth a look." = "確認したい項目が %ld 件あります。";
+"Show details" = "詳細を表示";
+"Hide details" = "詳細を非表示";
+"Open %@" = "%@ を開く";
+"Memory is %.0f%% full." = "メモリの使用率は %.0f%% です。";

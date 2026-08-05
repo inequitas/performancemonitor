@@ -451,5 +451,10 @@
 "Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "Geheugen is op, dus %.1f GB staat nu op schijf. Dat is wat een Mac traag laat voelen.";
 "%@ is using %.0f%% of the CPU." = "%@ gebruikt %.0f%% van de CPU.";
 "CPU is at %.0f%%, spread across several processes." = "CPU staat op %.0f%%, verdeeld over meerdere processen.";
-"Memory is %.0f%% full, but nothing has moved to disk yet." = "Geheugen is %.0f%% vol, maar er staat nog niets op schijf.";
 "Only %.1f GB left on the startup disk." = "Nog %.1f GB vrij op de opstartschijf.";
+"1 thing worth a look." = "1 ding om naar te kijken.";
+"%ld things worth a look." = "%ld dingen om naar te kijken.";
+"Show details" = "Toon details";
+"Hide details" = "Verberg details";
+"Open %@" = "Open %@";
+"Memory is %.0f%% full." = "Geheugen is %.0f%% vol.";

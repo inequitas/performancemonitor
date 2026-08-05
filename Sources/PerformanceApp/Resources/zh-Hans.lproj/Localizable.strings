@@ -450,5 +450,10 @@
 "Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "内存已用尽，%.1f GB 已转移到磁盘。这正是 Mac 变慢的原因。";
 "%@ is using %.0f%% of the CPU." = "%@ 正在占用 %.0f%% 的 CPU。";
 "CPU is at %.0f%%, spread across several processes." = "CPU 占用 %.0f%%，分散在多个进程上。";
-"Memory is %.0f%% full, but nothing has moved to disk yet." = "内存已使用 %.0f%%，但尚未有内容转移到磁盘。";
 "Only %.1f GB left on the startup disk." = "启动磁盘仅剩 %.1f GB。";
+"1 thing worth a look." = "有 1 项值得关注。";
+"%ld things worth a look." = "有 %ld 项值得关注。";
+"Show details" = "显示详情";
+"Hide details" = "隐藏详情";
+"Open %@" = "打开%@";
+"Memory is %.0f%% full." = "内存已使用 %.0f%%。";

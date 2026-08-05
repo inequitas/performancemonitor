@@ -23,7 +23,7 @@ struct OverviewView: View {
                 .padding(.top, 12)
                 .padding(.horizontal, 14)
 
-            VerdictBanner(engine: engine)
+            VerdictBanner(engine: engine, openPanel: openDetail)
                 .padding(.horizontal, 14)
 
             VStack(spacing: 10) {
