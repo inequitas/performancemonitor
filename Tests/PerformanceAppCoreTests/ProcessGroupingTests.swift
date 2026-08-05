@@ -182,4 +182,70 @@ struct ProcessGroupingTests {
     @Test func nonPositiveTopCountYieldsNothing() {
         #expect(ProcessGrouping.group([usage(1, "Finder", 1)], parents: [:], topCount: 0).isEmpty)
     }
+
+    // MARK: - What the name cannot tell you
+
+    @Test func theGlossaryCanNameTheOwningApp() {
+        // plugin-container is Firefox, and nothing about either name says so.
+        let found = ProcessGrouping.group(
+            [usage(100, "firefox", 2), usage(101, "plugin-container", 5), usage(102, "plugin-container", 4)],
+            parents: [100: 1, 101: 100, 102: 100],
+            owners: ["firefox": "firefox", "plugin-container": "firefox"],
+            topCount: 10
+        )
+        #expect(found.count == 1)
+        #expect(found[0].name == "firefox")
+        #expect(found[0].value == 11)
+        #expect(found[0].members.count == 3)
+    }
+
+    @Test func aDeclaredOwnerNeedNotBeRunning() {
+        // The five Spotlight processes are started independently by launchd and
+        // there is no "Spotlight" process to hang them from, so the group name
+        // is one the glossary supplies rather than one that is running.
+        let found = ProcessGrouping.group(
+            [usage(1, "mds_stores", 3), usage(2, "mdworker_shared", 2), usage(3, "corespotlightd", 1)],
+            parents: [:],
+            owners: ["mds_stores": "Spotlight", "mdworker_shared": "Spotlight", "corespotlightd": "Spotlight"],
+            topCount: 10
+        )
+        #expect(found.count == 1)
+        #expect(found[0].name == "Spotlight")
+        #expect(found[0].value == 6)
+    }
+
+    @Test func ownershipAppliesAfterTheParentWalk() {
+        // A helper reaches its app by name first, and only that app's name is
+        // looked up, so one entry covers a whole family of helpers.
+        let found = ProcessGrouping.group(
+            [usage(100, "firefox", 1), usage(101, "firefox helper", 1), usage(102, "plugin-container", 1)],
+            parents: [100: 1, 101: 100, 102: 100],
+            owners: ["firefox": "Firefox", "plugin-container": "Firefox"],
+            topCount: 10
+        )
+        #expect(found.count == 1)
+        #expect(found[0].name == "Firefox")
+        #expect(found[0].members.count == 3)
+    }
+
+    @Test func anUndeclaredProcessIsLeftAlone() {
+        // WebKit's content processes serve several apps from one binary, so the
+        // glossary names no owner and they must stay out of any app's total.
+        let found = ProcessGrouping.group(
+            [usage(1, "Safari", 4), usage(2, "com.apple.WebKit.WebContent", 9)],
+            parents: [1: 1, 2: 1],
+            owners: ["plugin-container": "firefox"],
+            topCount: 10
+        )
+        #expect(found.count == 2)
+        #expect(found.first?.name == "com.apple.WebKit.WebContent")
+    }
+
+    @Test func anEmptyOwnerTableChangesNothing() {
+        let withTable = ProcessGrouping.group(
+            [usage(1, "Finder", 3), usage(2, "Dock", 1)], parents: [:], owners: [:], topCount: 10)
+        let without = ProcessGrouping.group(
+            [usage(1, "Finder", 3), usage(2, "Dock", 1)], parents: [:], topCount: 10)
+        #expect(withTable == without)
+    }
 }

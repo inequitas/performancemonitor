@@ -13,7 +13,7 @@ protocol ProcessSampling: AnyObject {
     /// Runs `ps` off the main thread and parses the top CPU/memory consumers.
     /// Returns `nil` while a previous run is still in flight, the launch failed,
     /// or the 3s cadence throttle blocks this call.
-    func sample(topCount: Int) async -> ProcessSnapshot?
+    func sample(topCount: Int, owners: [String: String]) async -> ProcessSnapshot?
     /// Clears the cadence throttle so the next `sample` call runs immediately.
     /// Called when a window showing process lists becomes visible, so the user
     /// doesn't see a stale/empty list while waiting for the next natural tick.
@@ -30,7 +30,7 @@ final class ProcessSampler: ProcessSampling {
     private var cacheDate: Date = .distantPast
     private static let interval: TimeInterval = 3
 
-    func sample(topCount: Int) async -> ProcessSnapshot? {
+    func sample(topCount: Int, owners: [String: String]) async -> ProcessSnapshot? {
         guard !inFlight else { return nil }
         let now = Date()
         guard now.timeIntervalSince(cacheDate) >= Self.interval else { return nil }
@@ -40,7 +40,8 @@ final class ProcessSampler: ProcessSampling {
 
         let logicalCPUs = Double(ProcessInfo.processInfo.processorCount)
         guard let output = await ProcessSampler.runPS() else { return nil }
-        let (cpu, mem) = PSParser.parse(output, topCount: topCount, logicalCPUs: logicalCPUs)
+        let (cpu, mem) = PSParser.parse(output, topCount: topCount,
+                                        logicalCPUs: logicalCPUs, owners: owners)
         return ProcessSnapshot(topCPU: cpu, topMemory: mem)
     }
 

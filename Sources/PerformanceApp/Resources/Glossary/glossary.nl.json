@@ -101,7 +101,8 @@
       "title": "Spotlight (indexserver)",
       "category": "background",
       "vendor": "Apple",
-      "description": "De Spotlight-indexserver. Dit proces coördineert het indexeren maar doet zelf weinig werk; het zware werk gebeurt in mds_stores en mdworker."
+      "description": "De Spotlight-indexserver. Dit proces coördineert het indexeren maar doet zelf weinig werk; het zware werk gebeurt in mds_stores en mdworker.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -111,7 +112,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Schrijft de Spotlight-index. Zwaar gebruik is normaal voor een tijdje na het kopiëren van veel bestanden, een migratie of een macOS-update, en het zakt vanzelf weer af. Zakt het nooit af, dan kan de index opnieuw worden opgebouwd."
+      "description": "Schrijft de Spotlight-index. Zwaar gebruik is normaal voor een tijdje na het kopiëren van veel bestanden, een migratie of een macOS-update, en het zakt vanzelf weer af. Zakt het nooit af, dan kan de index opnieuw worden opgebouwd.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -121,7 +123,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Leest individuele bestanden zodat Spotlight de inhoud kan indexeren. Veel kortlevende exemplaren hiervan zijn normaal."
+      "description": "Leest individuele bestanden zodat Spotlight de inhoud kan indexeren. Veel kortlevende exemplaren hiervan zijn normaal.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -131,7 +134,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Leest individuele bestanden voor de Spotlight-index. Kortlevend en wordt in groepjes gestart."
+      "description": "Leest individuele bestanden voor de Spotlight-index. Kortlevend en wordt in groepjes gestart.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -140,7 +144,8 @@
       "title": "Spotlight (app-data)",
       "category": "background",
       "vendor": "Apple",
-      "description": "Indexeert data die apps aan Spotlight doorgeven, zoals mail en berichten, in plaats van bestanden op de schijf."
+      "description": "Indexeert data die apps aan Spotlight doorgeven, zoals mail en berichten, in plaats van bestanden op de schijf.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -550,7 +555,8 @@
       "category": "developer",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Zorgt voor aanvulling en syntaxiscontrole binnen Xcode. Kan zwaar zijn in grote projecten."
+      "description": "Zorgt voor aanvulling en syntaxiscontrole binnen Xcode. Kan zwaar zijn in grote projecten.",
+      "group": "Xcode"
     },
     {
       "match": {
@@ -559,7 +565,8 @@
       "title": "Xcode (buildsysteem)",
       "category": "developer",
       "vendor": "Apple",
-      "description": "Coördineert Xcode-builds."
+      "description": "Coördineert Xcode-builds.",
+      "group": "Xcode"
     },
     {
       "match": {
@@ -595,7 +602,8 @@
       "title": "Safari (webpagina)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Rendert een webpagina voor Safari of een andere WebKit-app. Elk tabblad krijgt er een eigen, dus een zwaar tabblad verschijnt hier in plaats van bij Safari zelf."
+      "description": "Rendert een webpagina voor Safari of een andere WebKit-app. Elk tabblad krijgt er een eigen, dus een zwaar tabblad verschijnt hier in plaats van bij Safari zelf.",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -604,7 +612,8 @@
       "title": "Safari (netwerk)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Verwerkt netwerkverzoeken voor Safari en andere WebKit-apps."
+      "description": "Verwerkt netwerkverzoeken voor Safari en andere WebKit-apps.",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -613,7 +622,8 @@
       "title": "Safari (graphics)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Tekent pagina-inhoud voor Safari met de GPU."
+      "description": "Tekent pagina-inhoud voor Safari met de GPU.",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -631,7 +641,8 @@
       "title": "Microsoft Defender",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "De scanengine van Microsoft Defender. Aanhoudend hoog gebruik op een ontwikkelaarsmachine betekent meestal dat het build-output aan het scannen is; buildmappen uitsluiten is de gebruikelijke oplossing, en op beheerde Macs is dat een beslissing van IT."
+      "description": "De scanengine van Microsoft Defender. Aanhoudend hoog gebruik op een ontwikkelaarsmachine betekent meestal dat het build-output aan het scannen is; buildmappen uitsluiten is de gebruikelijke oplossing, en op beheerde Macs is dat een beslissing van IT.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -640,7 +651,8 @@
       "title": "Microsoft Defender (beheerd)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Het beheerde onderdeel van Microsoft Defender, geconfigureerd door je organisatie in plaats van door jou."
+      "description": "Het beheerde onderdeel van Microsoft Defender, geconfigureerd door je organisatie in plaats van door jou.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -649,7 +661,8 @@
       "title": "Microsoft Defender (scanner)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Het onderdeel van Microsoft Defender dat bestanden inspecteert zonder verhoogde rechten."
+      "description": "Het onderdeel van Microsoft Defender dat bestanden inspecteert zonder verhoogde rechten.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -703,7 +716,8 @@
       "title": "Firefox (pagina of plug-in)",
       "category": "helper",
       "vendor": "Mozilla",
-      "description": "Rendert een pagina of draait een plug-in voor Firefox. Meerdere tegelijk is normaal, en een zwaar tabblad verschijnt hier in plaats van onder Firefox."
+      "description": "Rendert een pagina of draait een plug-in voor Firefox. Meerdere tegelijk is normaal, en een zwaar tabblad verschijnt hier in plaats van onder Firefox.",
+      "group": "firefox"
     },
     {
       "match": {
@@ -712,7 +726,8 @@
       "title": "Firefox",
       "category": "app",
       "vendor": "Mozilla",
-      "description": "Firefox zelf. Losse pagina's draaien als plugin-container, dus een druk tabblad verschijnt daar."
+      "description": "Firefox zelf. Losse pagina's draaien als plugin-container, dus een druk tabblad verschijnt daar.",
+      "group": "firefox"
     },
     {
       "match": {
@@ -784,7 +799,8 @@
       "title": "Defender (netwerkextensie)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Het netwerkfilter van Microsoft Defender, geïnstalleerd als systeemextensie door je organisatie."
+      "description": "Het netwerkfilter van Microsoft Defender, geïnstalleerd als systeemextensie door je organisatie.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -793,7 +809,8 @@
       "title": "Defender (endpointbeveiliging)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "De endpointbeveiligingsextensie van Microsoft Defender, die proces- en bestandsactiviteit inspecteert terwijl die plaatsvindt."
+      "description": "De endpointbeveiligingsextensie van Microsoft Defender, die proces- en bestandsactiviteit inspecteert terwijl die plaatsvindt.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -893,6 +910,57 @@
       "category": "app",
       "vendor": "Apple",
       "description": "De Mail-app. Het ophalen en indexeren van een grote mailbox houdt de app na het instellen een tijdje bezig."
+    },
+    {
+      "match": {
+        "name": "Spotlight indexing"
+      },
+      "title": "Spotlight (indexeren)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "De achtergrondprocessen die samen de Spotlight-zoekindex opbouwen. Ze werken het hardst na een macOS-update of als er veel bestanden veranderen, en zakken vanzelf terug zodra de index bij is."
+    },
+    {
+      "match": {
+        "name": "WebKit"
+      },
+      "title": "WebKit (webpagina's)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "De processen waarmee macOS webpagina's toont. Safari gebruikt ze, maar Mail, Notities, de App Store en elke app met webinhoud ook, dus ze zijn niet aan één app toe te schrijven."
+    },
+    {
+      "match": {
+        "name": "Xcode"
+      },
+      "title": "Xcode",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Apple's ontwikkelomgeving, samen met de helpers die het draait voor bouwen en code-aanvulling. Zwaar CPU-gebruik tijdens een build of een indexeerronde hoort erbij."
+    },
+    {
+      "match": {
+        "name": "Claude"
+      },
+      "title": "Claude (desktop-app)",
+      "category": "app",
+      "vendor": "Anthropic",
+      "expectedHigh": false,
+      "description": "De Claude-desktopapplicatie van Anthropic. Zoals andere Electron-apps draait het een helperproces per venster en per achtergrondtaak, vandaar dat het als groep verschijnt.",
+      "group": "Claude"
+    },
+    {
+      "match": {
+        "name": "claude"
+      },
+      "title": "Claude Code (opdrachtregel)",
+      "category": "developer",
+      "vendor": "Anthropic",
+      "expectedHigh": false,
+      "description": "Anthropic's programmeerassistent die in een terminal draait. Een ander programma dan de Claude-desktop-app, daarom staan ze als aparte regels."
     }
   ]
 }

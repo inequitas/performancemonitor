@@ -101,7 +101,8 @@
       "title": "Spotlight (index server)",
       "category": "background",
       "vendor": "Apple",
-      "description": "The Spotlight index server. It coordinates indexing but does little work itself; the heavy lifting happens in mds_stores and mdworker."
+      "description": "The Spotlight index server. It coordinates indexing but does little work itself; the heavy lifting happens in mds_stores and mdworker.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -111,7 +112,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Writes the Spotlight index. Heavy use is normal for a while after a large file copy, a migration or a macOS update, and it settles by itself. If it never settles, the index can be rebuilt."
+      "description": "Writes the Spotlight index. Heavy use is normal for a while after a large file copy, a migration or a macOS update, and it settles by itself. If it never settles, the index can be rebuilt.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -121,7 +123,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Reads individual files so Spotlight can index their contents. Many short-lived copies of it are normal."
+      "description": "Reads individual files so Spotlight can index their contents. Many short-lived copies of it are normal.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -131,7 +134,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Reads individual files for the Spotlight index. Short-lived and started in batches."
+      "description": "Reads individual files for the Spotlight index. Short-lived and started in batches.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -140,7 +144,8 @@
       "title": "Spotlight (app data)",
       "category": "background",
       "vendor": "Apple",
-      "description": "Indexes data that apps hand to Spotlight, such as mail and messages, rather than files on disk."
+      "description": "Indexes data that apps hand to Spotlight, such as mail and messages, rather than files on disk.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -550,7 +555,8 @@
       "category": "developer",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Provides completion and syntax checking inside Xcode. Can be heavy in large projects."
+      "description": "Provides completion and syntax checking inside Xcode. Can be heavy in large projects.",
+      "group": "Xcode"
     },
     {
       "match": {
@@ -559,7 +565,8 @@
       "title": "Xcode (build system)",
       "category": "developer",
       "vendor": "Apple",
-      "description": "Coordinates Xcode builds."
+      "description": "Coordinates Xcode builds.",
+      "group": "Xcode"
     },
     {
       "match": {
@@ -595,7 +602,8 @@
       "title": "Safari (web page)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Renders one web page for Safari or another WebKit app. Each tab gets its own, so a heavy tab shows up here rather than as Safari itself."
+      "description": "Renders one web page for Safari or another WebKit app. Each tab gets its own, so a heavy tab shows up here rather than as Safari itself.",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -604,7 +612,8 @@
       "title": "Safari (networking)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Handles network requests for Safari and other WebKit apps."
+      "description": "Handles network requests for Safari and other WebKit apps.",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -613,7 +622,8 @@
       "title": "Safari (graphics)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Draws page content for Safari using the GPU."
+      "description": "Draws page content for Safari using the GPU.",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -631,7 +641,8 @@
       "title": "Microsoft Defender",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Microsoft Defender's scanning engine. Sustained high usage on a developer machine usually means it is scanning build output; excluding build directories is the normal fix and is an IT decision on managed Macs."
+      "description": "Microsoft Defender's scanning engine. Sustained high usage on a developer machine usually means it is scanning build output; excluding build directories is the normal fix and is an IT decision on managed Macs.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -640,7 +651,8 @@
       "title": "Microsoft Defender (managed)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "The managed component of Microsoft Defender, configured by your organisation rather than by you."
+      "description": "The managed component of Microsoft Defender, configured by your organisation rather than by you.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -649,7 +661,8 @@
       "title": "Microsoft Defender (scanner)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "The part of Microsoft Defender that inspects files without elevated privileges."
+      "description": "The part of Microsoft Defender that inspects files without elevated privileges.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -703,7 +716,8 @@
       "title": "Firefox (page or plug-in)",
       "category": "helper",
       "vendor": "Mozilla",
-      "description": "Renders one page or runs one plug-in for Firefox. Several are normal, and a heavy tab appears here rather than under Firefox."
+      "description": "Renders one page or runs one plug-in for Firefox. Several are normal, and a heavy tab appears here rather than under Firefox.",
+      "group": "firefox"
     },
     {
       "match": {
@@ -712,7 +726,8 @@
       "title": "Firefox",
       "category": "app",
       "vendor": "Mozilla",
-      "description": "Firefox itself. Individual pages run as plugin-container, so a busy tab shows up there."
+      "description": "Firefox itself. Individual pages run as plugin-container, so a busy tab shows up there.",
+      "group": "firefox"
     },
     {
       "match": {
@@ -784,7 +799,8 @@
       "title": "Defender (network extension)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Microsoft Defender's network filter, installed as a system extension by your organisation."
+      "description": "Microsoft Defender's network filter, installed as a system extension by your organisation.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -793,7 +809,8 @@
       "title": "Defender (endpoint security)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Microsoft Defender's endpoint security extension, which inspects process and file activity as it happens."
+      "description": "Microsoft Defender's endpoint security extension, which inspects process and file activity as it happens.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -893,6 +910,57 @@
       "category": "app",
       "vendor": "Apple",
       "description": "The Mail app. Fetching and indexing a large mailbox keeps it busy for a while after setup."
+    },
+    {
+      "match": {
+        "name": "Spotlight indexing"
+      },
+      "title": "Spotlight (indexing)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "The group of background processes that build the Spotlight search index. They work hardest after a macOS update or when a lot of files change, and settle down on their own once the index is up to date."
+    },
+    {
+      "match": {
+        "name": "WebKit"
+      },
+      "title": "WebKit (web pages)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "The processes macOS uses to display web pages. Safari uses them, but so do Mail, Notes, the App Store and any app showing web content, so they cannot be traced back to a single app."
+    },
+    {
+      "match": {
+        "name": "Xcode"
+      },
+      "title": "Xcode",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Apple's development environment, together with the helpers it runs for building and for code completion. Heavy CPU use while a build or an index pass is running is expected."
+    },
+    {
+      "match": {
+        "name": "Claude"
+      },
+      "title": "Claude (desktop app)",
+      "category": "app",
+      "vendor": "Anthropic",
+      "expectedHigh": false,
+      "description": "Anthropic's Claude desktop application. Like other Electron apps it runs a helper process per window and per background task, which is why it appears as a group.",
+      "group": "Claude"
+    },
+    {
+      "match": {
+        "name": "claude"
+      },
+      "title": "Claude Code (command line)",
+      "category": "developer",
+      "vendor": "Anthropic",
+      "expectedHigh": false,
+      "description": "Anthropic's coding assistant running in a terminal. A different program from the Claude desktop app, which is why the two appear as separate rows."
     }
   ]
 }

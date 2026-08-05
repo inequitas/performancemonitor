@@ -299,6 +299,11 @@ struct ProcessListView: View {
     private func row(_ proc: ProcessUsage) -> some View {
         let known = GlossaryStore.shared.entry(for: proc.name)
         let isGroup = !proc.members.isEmpty
+        // The glossary title, where there is one. "plugin-container" is Firefox
+        // and "mds_stores" is Spotlight; showing the raw name asks the reader to
+        // already know that, which is the opposite of what the glossary is for.
+        // The raw name is still one click away, in the glossary popover.
+        let display = known?.title ?? proc.name
         return HStack(spacing: 6) {
             if isGroup {
                 Button {
@@ -316,9 +321,10 @@ struct ProcessListView: View {
                       ? String(localized: "Hide the individual processes")
                       : String(localized: "Show the individual processes"))
             }
-            Text(proc.name)
+            Text(display)
                 .font(.caption)
                 .lineLimit(1)
+                .help(display == proc.name ? "" : proc.name)
             if isGroup {
                 // The count is the whole justification for the row reading
                 // differently from the others, so it is stated rather than
@@ -345,14 +351,14 @@ struct ProcessListView: View {
                 }
                 .buttonStyle(.plain)
                 .help(isGroup
-                      ? String(format: String(localized: "Quit %@ and its helpers"), proc.name)
-                      : String(format: String(localized: "Quit %@"), proc.name))
+                      ? String(format: String(localized: "Quit %@ and its helpers"), display)
+                      : String(format: String(localized: "Quit %@"), display))
             }
         }
         .contentShape(Rectangle())
         .contextMenu {
             if proc.pid > 0 {
-                Button(String(format: String(localized: "Quit %@"), proc.name), role: .destructive) { pendingKill = proc }
+                Button(String(format: String(localized: "Quit %@"), display), role: .destructive) { pendingKill = proc }
             }
         }
     }
@@ -362,7 +368,7 @@ struct ProcessListView: View {
     /// is the only thing telling them apart.
     private func memberRow(_ member: ProcessUsage) -> some View {
         HStack(spacing: 6) {
-            Text(member.name)
+            Text(GlossaryStore.shared.entry(for: member.name)?.title ?? member.name)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)

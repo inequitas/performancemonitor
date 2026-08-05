@@ -101,7 +101,8 @@
       "title": "Spotlight（索引服务器）",
       "category": "background",
       "vendor": "Apple",
-      "description": "Spotlight 的索引服务器。它负责协调索引编制工作,但自身做的事情很少;真正繁重的工作由 mds_stores 和 mdworker 完成。"
+      "description": "Spotlight 的索引服务器。它负责协调索引编制工作,但自身做的事情很少;真正繁重的工作由 mds_stores 和 mdworker 完成。",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -111,7 +112,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "写入 Spotlight 索引。在大量文件复制、迁移或 macOS 更新之后,短时间内占用较高是正常现象,之后会自行平息。如果一直不平息,可以重建索引。"
+      "description": "写入 Spotlight 索引。在大量文件复制、迁移或 macOS 更新之后,短时间内占用较高是正常现象,之后会自行平息。如果一直不平息,可以重建索引。",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -121,7 +123,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "逐个读取文件,以便 Spotlight 为其内容建立索引。同时出现多个生命周期很短的副本是正常现象。"
+      "description": "逐个读取文件,以便 Spotlight 为其内容建立索引。同时出现多个生命周期很短的副本是正常现象。",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -131,7 +134,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "为 Spotlight 索引读取单个文件。生命周期很短,并以批次方式启动。"
+      "description": "为 Spotlight 索引读取单个文件。生命周期很短,并以批次方式启动。",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -140,7 +144,8 @@
       "title": "Spotlight（应用数据）",
       "category": "background",
       "vendor": "Apple",
-      "description": "为应用交给 Spotlight 的数据建立索引,例如邮件和信息,而非磁盘上的文件。"
+      "description": "为应用交给 Spotlight 的数据建立索引,例如邮件和信息,而非磁盘上的文件。",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -550,7 +555,8 @@
       "category": "developer",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "在 Xcode 中提供自动完成和语法检查功能。在大型项目中可能占用较高。"
+      "description": "在 Xcode 中提供自动完成和语法检查功能。在大型项目中可能占用较高。",
+      "group": "Xcode"
     },
     {
       "match": {
@@ -559,7 +565,8 @@
       "title": "Xcode（构建系统）",
       "category": "developer",
       "vendor": "Apple",
-      "description": "协调 Xcode 的构建过程。"
+      "description": "协调 Xcode 的构建过程。",
+      "group": "Xcode"
     },
     {
       "match": {
@@ -595,7 +602,8 @@
       "title": "Safari（网页）",
       "category": "helper",
       "vendor": "Apple",
-      "description": "为 Safari 或其他基于 WebKit 的应用渲染一个网页。每个标签页都有自己的进程,因此占用较高的标签页会显示在这里,而不是显示为 Safari 本身。"
+      "description": "为 Safari 或其他基于 WebKit 的应用渲染一个网页。每个标签页都有自己的进程,因此占用较高的标签页会显示在这里,而不是显示为 Safari 本身。",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -604,7 +612,8 @@
       "title": "Safari（网络）",
       "category": "helper",
       "vendor": "Apple",
-      "description": "为 Safari 及其他 WebKit 应用处理网络请求。"
+      "description": "为 Safari 及其他 WebKit 应用处理网络请求。",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -613,7 +622,8 @@
       "title": "Safari（图形）",
       "category": "helper",
       "vendor": "Apple",
-      "description": "使用 GPU 为 Safari 绘制页面内容。"
+      "description": "使用 GPU 为 Safari 绘制页面内容。",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -631,7 +641,8 @@
       "title": "Microsoft Defender",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Microsoft Defender 的扫描引擎。在开发者机器上持续高占用,通常意味着它正在扫描构建输出;将构建目录排除在扫描范围之外是常见的解决办法,而在受管理的 Mac 上,这是 IT 部门需要做出的决定。"
+      "description": "Microsoft Defender 的扫描引擎。在开发者机器上持续高占用,通常意味着它正在扫描构建输出;将构建目录排除在扫描范围之外是常见的解决办法,而在受管理的 Mac 上,这是 IT 部门需要做出的决定。",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -640,7 +651,8 @@
       "title": "Microsoft Defender（受管理）",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Microsoft Defender 的受管理组件,由你所在的组织配置,而非由你本人配置。"
+      "description": "Microsoft Defender 的受管理组件,由你所在的组织配置,而非由你本人配置。",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -649,7 +661,8 @@
       "title": "Microsoft Defender（扫描程序）",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Microsoft Defender 中不需要提升权限即可检查文件的部分。"
+      "description": "Microsoft Defender 中不需要提升权限即可检查文件的部分。",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -703,7 +716,8 @@
       "title": "Firefox（页面或插件）",
       "category": "helper",
       "vendor": "Mozilla",
-      "description": "为 Firefox 渲染一个页面或运行一个插件。同时存在多个是正常现象,占用较高的标签页会显示在这里,而不是显示在 Firefox 下。"
+      "description": "为 Firefox 渲染一个页面或运行一个插件。同时存在多个是正常现象,占用较高的标签页会显示在这里,而不是显示在 Firefox 下。",
+      "group": "firefox"
     },
     {
       "match": {
@@ -712,7 +726,8 @@
       "title": "Firefox",
       "category": "app",
       "vendor": "Mozilla",
-      "description": "Firefox 本身。各个页面以 plugin-container 的形式运行,因此繁忙的标签页会显示在那里。"
+      "description": "Firefox 本身。各个页面以 plugin-container 的形式运行,因此繁忙的标签页会显示在那里。",
+      "group": "firefox"
     },
     {
       "match": {
@@ -784,7 +799,8 @@
       "title": "Defender（网络扩展）",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Microsoft Defender 的网络过滤器,由你所在的组织以系统扩展的形式安装。"
+      "description": "Microsoft Defender 的网络过滤器,由你所在的组织以系统扩展的形式安装。",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -793,7 +809,8 @@
       "title": "Defender（终端安全）",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Microsoft Defender 的终端安全扩展,实时检查进程和文件的活动。"
+      "description": "Microsoft Defender 的终端安全扩展,实时检查进程和文件的活动。",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -893,6 +910,57 @@
       "category": "app",
       "vendor": "Apple",
       "description": "“邮件”应用。在设置完成后,获取并为大型邮箱建立索引会使其忙碌一段时间。"
+    },
+    {
+      "match": {
+        "name": "Spotlight indexing"
+      },
+      "title": "聚焦搜索（建立索引）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "共同建立聚焦搜索索引的后台进程。在 macOS 更新后或大量文件变动时最繁忙，索引完成后会自行平静下来。"
+    },
+    {
+      "match": {
+        "name": "WebKit"
+      },
+      "title": "WebKit（网页）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "macOS 用来显示网页的进程。Safari 会用到它们，邮件、备忘录、App Store 以及任何显示网页内容的 App 也会，因此无法归到某一个 App。"
+    },
+    {
+      "match": {
+        "name": "Xcode"
+      },
+      "title": "Xcode",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Apple 的开发环境，以及它为编译和代码补全启动的辅助进程。编译或建立索引期间占用大量 CPU 属于正常。"
+    },
+    {
+      "match": {
+        "name": "Claude"
+      },
+      "title": "Claude（桌面 App）",
+      "category": "app",
+      "vendor": "Anthropic",
+      "expectedHigh": false,
+      "description": "Anthropic 的 Claude 桌面应用。与其他 Electron 应用一样，它为每个窗口和后台任务各运行一个辅助进程，因此显示为一组。",
+      "group": "Claude"
+    },
+    {
+      "match": {
+        "name": "claude"
+      },
+      "title": "Claude Code（命令行）",
+      "category": "developer",
+      "vendor": "Anthropic",
+      "expectedHigh": false,
+      "description": "在终端中运行的 Anthropic 编程助手。它与 Claude 桌面 App 是不同的程序，因此显示为两行。"
     }
   ]
 }

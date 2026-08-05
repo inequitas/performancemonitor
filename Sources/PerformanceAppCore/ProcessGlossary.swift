@@ -42,18 +42,31 @@ public struct GlossaryEntry: Equatable, Sendable {
     /// so someone hunting a runaway process should be told to look elsewhere.
     public let expectedHigh: Bool
     public let description: String
+    /// The application this process belongs to, when its name does not say so.
+    ///
+    /// `plugin-container` is Firefox and `mds_stores` is Spotlight, but nothing
+    /// in either name reveals it, so the process lists show them as separate
+    /// strangers next to the app they are part of. Grouping cannot infer this:
+    /// the name gives it away for "Google Chrome Helper" and not at all here.
+    ///
+    /// Left nil where the answer would be a guess. `com.apple.WebKit.WebContent`
+    /// serves Safari, Mail, Notes and the App Store from one binary, so naming
+    /// any single owner would be wrong.
+    public let group: String?
 
     public init(match: Match,
                 title: String,
                 category: Category,
                 vendor: String? = nil,
                 expectedHigh: Bool = false,
+                group: String? = nil,
                 description: String) {
         self.match = match
         self.title = title
         self.category = category
         self.vendor = vendor
         self.expectedHigh = expectedHigh
+        self.group = group
         self.description = description
     }
 }
@@ -74,6 +87,18 @@ public struct ProcessGlossary: Sendable {
     static let truncationLimit = 32
 
     private let entries: [GlossaryEntry]
+
+    /// Process name to the application it belongs to, for every entry that
+    /// declares one. Used by `ProcessGrouping`, which runs off the main actor
+    /// and so needs a plain value rather than a lookup call.
+    public var owners: [String: String] {
+        var map: [String: String] = [:]
+        for entry in entries {
+            guard let group = entry.group, case let .name(name) = entry.match else { continue }
+            map[name] = group
+        }
+        return map
+    }
 
     public init(entries: [GlossaryEntry]) {
         self.entries = entries

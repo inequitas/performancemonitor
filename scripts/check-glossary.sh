@@ -48,7 +48,7 @@ for code in languages:
         where = source["match"]
         if source["match"] != translated["match"]:
             problems.append(f"{code}: match changed for {where} -> {translated['match']}")
-        for field in ("category", "vendor", "expectedHigh"):
+        for field in ("category", "vendor", "expectedHigh", "group"):
             if source.get(field) != translated.get(field):
                 problems.append(f"{code}: {field} changed for {where}")
         for field in ("title", "description"):

@@ -733,7 +733,7 @@ final class MetricsEngine: ObservableObject {
         guard visiblePanels.contains(.cpu) || visiblePanels.contains(.memory) else { return }
         let count = settings.topProcessCount
         Task { @MainActor [weak self] in
-            guard let self, let snap = await self.processSampler.sample(topCount: count) else { return }
+            guard let self, let snap = await self.processSampler.sample(topCount: count, owners: GlossaryStore.shared.owners) else { return }
             self.topCPUProcesses = snap.topCPU
             self.topMemoryProcesses = snap.topMemory
         }

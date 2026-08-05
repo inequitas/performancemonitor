@@ -101,7 +101,8 @@
       "title": "Spotlight (serveur d'indexation)",
       "category": "background",
       "vendor": "Apple",
-      "description": "Le serveur d'indexation de Spotlight. Il coordonne l'indexation mais fait peu de travail lui-même ; le gros du travail se passe dans mds_stores et mdworker."
+      "description": "Le serveur d'indexation de Spotlight. Il coordonne l'indexation mais fait peu de travail lui-même ; le gros du travail se passe dans mds_stores et mdworker.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -111,7 +112,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Écrit l'index Spotlight. Une utilisation élevée est normale pendant un moment après une grosse copie de fichiers, une migration ou une mise à jour de macOS, et cela se calme tout seul. Si cela ne se calme jamais, l'index peut être reconstruit."
+      "description": "Écrit l'index Spotlight. Une utilisation élevée est normale pendant un moment après une grosse copie de fichiers, une migration ou une mise à jour de macOS, et cela se calme tout seul. Si cela ne se calme jamais, l'index peut être reconstruit.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -121,7 +123,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Lit des fichiers individuels pour que Spotlight puisse indexer leur contenu. Il est normal d'en voir de nombreuses copies de courte durée."
+      "description": "Lit des fichiers individuels pour que Spotlight puisse indexer leur contenu. Il est normal d'en voir de nombreuses copies de courte durée.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -131,7 +134,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Lit des fichiers individuels pour l'index Spotlight. De courte durée, démarré par lots."
+      "description": "Lit des fichiers individuels pour l'index Spotlight. De courte durée, démarré par lots.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -140,7 +144,8 @@
       "title": "Spotlight (données d'applications)",
       "category": "background",
       "vendor": "Apple",
-      "description": "Indexe les données que les applications transmettent à Spotlight, comme le courrier et les messages, plutôt que les fichiers sur le disque."
+      "description": "Indexe les données que les applications transmettent à Spotlight, comme le courrier et les messages, plutôt que les fichiers sur le disque.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -550,7 +555,8 @@
       "category": "developer",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Fournit l'autocomplétion et la vérification de syntaxe dans Xcode. Peut être gourmand dans les gros projets."
+      "description": "Fournit l'autocomplétion et la vérification de syntaxe dans Xcode. Peut être gourmand dans les gros projets.",
+      "group": "Xcode"
     },
     {
       "match": {
@@ -559,7 +565,8 @@
       "title": "Xcode (système de compilation)",
       "category": "developer",
       "vendor": "Apple",
-      "description": "Coordonne les compilations Xcode."
+      "description": "Coordonne les compilations Xcode.",
+      "group": "Xcode"
     },
     {
       "match": {
@@ -595,7 +602,8 @@
       "title": "Safari (page web)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Affiche une page web pour Safari ou une autre application WebKit. Chaque onglet a son propre processus, donc un onglet gourmand apparaît ici plutôt que sous Safari lui-même."
+      "description": "Affiche une page web pour Safari ou une autre application WebKit. Chaque onglet a son propre processus, donc un onglet gourmand apparaît ici plutôt que sous Safari lui-même.",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -604,7 +612,8 @@
       "title": "Safari (réseau)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Gère les requêtes réseau pour Safari et les autres applications WebKit."
+      "description": "Gère les requêtes réseau pour Safari et les autres applications WebKit.",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -613,7 +622,8 @@
       "title": "Safari (graphismes)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Dessine le contenu des pages pour Safari en utilisant le GPU."
+      "description": "Dessine le contenu des pages pour Safari en utilisant le GPU.",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -631,7 +641,8 @@
       "title": "Microsoft Defender",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Le moteur d'analyse de Microsoft Defender. Une utilisation élevée et soutenue sur une machine de développement signifie généralement qu'il analyse les fichiers générés par la compilation ; exclure les dossiers de compilation est la solution habituelle, et c'est une décision qui revient au service informatique sur les Mac gérés."
+      "description": "Le moteur d'analyse de Microsoft Defender. Une utilisation élevée et soutenue sur une machine de développement signifie généralement qu'il analyse les fichiers générés par la compilation ; exclure les dossiers de compilation est la solution habituelle, et c'est une décision qui revient au service informatique sur les Mac gérés.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -640,7 +651,8 @@
       "title": "Microsoft Defender (géré)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Le composant géré de Microsoft Defender, configuré par ton organisation plutôt que par toi."
+      "description": "Le composant géré de Microsoft Defender, configuré par ton organisation plutôt que par toi.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -649,7 +661,8 @@
       "title": "Microsoft Defender (analyseur)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "La partie de Microsoft Defender qui inspecte les fichiers sans privilèges élevés."
+      "description": "La partie de Microsoft Defender qui inspecte les fichiers sans privilèges élevés.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -703,7 +716,8 @@
       "title": "Firefox (page ou plug-in)",
       "category": "helper",
       "vendor": "Mozilla",
-      "description": "Affiche une page ou exécute un plug-in pour Firefox. Il est normal d'en voir plusieurs, et un onglet gourmand apparaît ici plutôt que sous Firefox."
+      "description": "Affiche une page ou exécute un plug-in pour Firefox. Il est normal d'en voir plusieurs, et un onglet gourmand apparaît ici plutôt que sous Firefox.",
+      "group": "firefox"
     },
     {
       "match": {
@@ -712,7 +726,8 @@
       "title": "Firefox",
       "category": "app",
       "vendor": "Mozilla",
-      "description": "Firefox lui-même. Chaque page s'exécute en tant que plugin-container, donc un onglet chargé apparaît là-bas."
+      "description": "Firefox lui-même. Chaque page s'exécute en tant que plugin-container, donc un onglet chargé apparaît là-bas.",
+      "group": "firefox"
     },
     {
       "match": {
@@ -784,7 +799,8 @@
       "title": "Defender (extension réseau)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Le filtre réseau de Microsoft Defender, installé comme extension système par ton organisation."
+      "description": "Le filtre réseau de Microsoft Defender, installé comme extension système par ton organisation.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -793,7 +809,8 @@
       "title": "Defender (sécurité des terminaux)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "L'extension de sécurité des terminaux de Microsoft Defender, qui inspecte l'activité des processus et des fichiers en temps réel."
+      "description": "L'extension de sécurité des terminaux de Microsoft Defender, qui inspecte l'activité des processus et des fichiers en temps réel.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -893,6 +910,57 @@
       "category": "app",
       "vendor": "Apple",
       "description": "L'application Mail. La récupération et l'indexation d'une grande boîte mail la maintiennent active pendant un moment après la configuration."
+    },
+    {
+      "match": {
+        "name": "Spotlight indexing"
+      },
+      "title": "Spotlight (indexation)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Les processus d'arrière-plan qui construisent l'index de recherche Spotlight. Ils travaillent surtout après une mise à jour de macOS ou quand beaucoup de fichiers changent, puis se calment d'eux-mêmes."
+    },
+    {
+      "match": {
+        "name": "WebKit"
+      },
+      "title": "WebKit (pages web)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Les processus avec lesquels macOS affiche les pages web. Safari les utilise, mais aussi Mail, Notes, l'App Store et toute app affichant du contenu web : impossible de les rattacher à une seule app."
+    },
+    {
+      "match": {
+        "name": "Xcode"
+      },
+      "title": "Xcode",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "L'environnement de développement d'Apple, avec les processus auxiliaires pour la compilation et la complétion de code. Une forte charge CPU pendant une compilation ou une indexation est normale."
+    },
+    {
+      "match": {
+        "name": "Claude"
+      },
+      "title": "Claude (app de bureau)",
+      "category": "app",
+      "vendor": "Anthropic",
+      "expectedHigh": false,
+      "description": "L'application de bureau Claude d'Anthropic. Comme les autres apps Electron, elle lance un processus auxiliaire par fenêtre et par tâche de fond, d'où son affichage en groupe.",
+      "group": "Claude"
+    },
+    {
+      "match": {
+        "name": "claude"
+      },
+      "title": "Claude Code (ligne de commande)",
+      "category": "developer",
+      "vendor": "Anthropic",
+      "expectedHigh": false,
+      "description": "L'assistant de programmation d'Anthropic dans un terminal. C'est un programme distinct de l'app de bureau Claude, d'où deux lignes séparées."
     }
   ]
 }

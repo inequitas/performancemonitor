@@ -27,11 +27,18 @@ import Foundation
 /// counted together; for a list whose purpose is "what is using my machine",
 /// that reads better than seven identical rows.
 ///
-/// Deliberately *not* grouped: XPC services such as `com.apple.WebKit.WebContent`
-/// are children of `launchd`, not of the app that asked for them, and the same
-/// binary serves Safari, Mail and Notes alike. macOS knows the responsible
-/// process, but only through private API, so attributing them to an app would be
-/// a guess. They group with each other under their own name instead.
+/// ## What the name cannot tell you
+///
+/// `plugin-container` is Firefox and `mds_stores` is Spotlight, and no rule
+/// could work that out: the names have nothing in common with the app they
+/// belong to. Those are named in the glossary, which `owners` passes in here, so
+/// the knowledge sits in data a person can read and correct rather than in
+/// pattern matching that would have to guess.
+///
+/// Deliberately absent from that data: `com.apple.WebKit.WebContent` and its
+/// siblings serve Safari, Mail, Notes and the App Store from one binary. macOS
+/// knows which app is responsible, but only through private API, so they are
+/// grouped under WebKit rather than attributed to any one app.
 ///
 /// Pure, so the rules can be tested without running `ps`.
 public enum ProcessGrouping {
@@ -44,12 +51,16 @@ public enum ProcessGrouping {
     ///     members that individually fall outside the top would be lost.
     ///   - parents: pid to parent pid. A pid missing here has no known parent
     ///     and is treated as its own root.
+    ///   - owners: Process name to the application it belongs to, for the cases
+    ///     no rule could infer. Applied after the parent walk, and only one step
+    ///     deep, so the table cannot form a cycle.
     ///   - topCount: How many rows to return.
     /// - Returns: One entry per group. A group of one is returned as a plain
     ///   process with no members, so callers cannot tell it apart from an
     ///   ungrouped list.
     public static func group(_ processes: [ProcessUsage],
                              parents: [Int32: Int32],
+                             owners: [String: String] = [:],
                              topCount: Int) -> [ProcessUsage] {
         guard topCount > 0 else { return [] }
         var names: [Int32: String] = [:]
@@ -62,7 +73,8 @@ public enum ProcessGrouping {
         var rootPIDs: [String: Int32] = [:]
         for process in processes {
             let root = self.root(of: process.pid, names: names, parents: parents)
-            let key = names[root] ?? process.name
+            let rootName = names[root] ?? process.name
+            let key = owners[rootName] ?? rootName
             buckets[key, default: []].append(process)
             // Lowest pid wins, so the identity of a row does not jump between
             // ticks as the values move around.

@@ -101,7 +101,8 @@
       "title": "Spotlight (インデックスサーバー)",
       "category": "background",
       "vendor": "Apple",
-      "description": "Spotlightのインデックスサーバーです。インデックス作成を統括しますが、それ自体が行う作業はわずかで、実際の重い処理はmds_storesとmdworkerが担っています。"
+      "description": "Spotlightのインデックスサーバーです。インデックス作成を統括しますが、それ自体が行う作業はわずかで、実際の重い処理はmds_storesとmdworkerが担っています。",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -111,7 +112,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Spotlightのインデックスを書き込みます。大量のファイルコピー、移行、macOSのアップデートの後にしばらく高負荷になるのは正常で、自然に落ち着きます。落ち着かない場合は、インデックスを再構築できます。"
+      "description": "Spotlightのインデックスを書き込みます。大量のファイルコピー、移行、macOSのアップデートの後にしばらく高負荷になるのは正常で、自然に落ち着きます。落ち着かない場合は、インデックスを再構築できます。",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -121,7 +123,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Spotlightがファイルの内容をインデックスできるよう、個々のファイルを読み取ります。短時間で終了するプロセスが多数現れるのは正常です。"
+      "description": "Spotlightがファイルの内容をインデックスできるよう、個々のファイルを読み取ります。短時間で終了するプロセスが多数現れるのは正常です。",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -131,7 +134,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Spotlightのインデックスのために個々のファイルを読み取ります。短時間で終了し、まとまって起動します。"
+      "description": "Spotlightのインデックスのために個々のファイルを読み取ります。短時間で終了し、まとまって起動します。",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -140,7 +144,8 @@
       "title": "Spotlight (アプリデータ)",
       "category": "background",
       "vendor": "Apple",
-      "description": "ディスク上のファイルではなく、メールやメッセージなどアプリがSpotlightに渡すデータをインデックスします。"
+      "description": "ディスク上のファイルではなく、メールやメッセージなどアプリがSpotlightに渡すデータをインデックスします。",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -550,7 +555,8 @@
       "category": "developer",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Xcode内で補完と構文チェックを提供します。大規模なプロジェクトでは負荷が高くなることがあります。"
+      "description": "Xcode内で補完と構文チェックを提供します。大規模なプロジェクトでは負荷が高くなることがあります。",
+      "group": "Xcode"
     },
     {
       "match": {
@@ -559,7 +565,8 @@
       "title": "Xcode (ビルドシステム)",
       "category": "developer",
       "vendor": "Apple",
-      "description": "Xcodeのビルドを統括します。"
+      "description": "Xcodeのビルドを統括します。",
+      "group": "Xcode"
     },
     {
       "match": {
@@ -595,7 +602,8 @@
       "title": "Safari (Webページ)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "SafariまたはほかのWebKitベースのアプリのために、1つのWebページを描画します。タブごとに専用のプロセスが割り当てられるため、負荷の高いタブはSafari自体ではなくここに表示されます。"
+      "description": "SafariまたはほかのWebKitベースのアプリのために、1つのWebページを描画します。タブごとに専用のプロセスが割り当てられるため、負荷の高いタブはSafari自体ではなくここに表示されます。",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -604,7 +612,8 @@
       "title": "Safari (ネットワーク)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "SafariやほかのWebKitアプリのネットワークリクエストを処理します。"
+      "description": "SafariやほかのWebKitアプリのネットワークリクエストを処理します。",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -613,7 +622,8 @@
       "title": "Safari (グラフィックス)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "GPUを使ってSafariのページコンテンツを描画します。"
+      "description": "GPUを使ってSafariのページコンテンツを描画します。",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -631,7 +641,8 @@
       "title": "Microsoft Defender",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Microsoft Defenderのスキャンエンジンです。開発機での継続的な高負荷は、通常ビルド出力をスキャンしていることを意味し、ビルドディレクトリを除外するのが一般的な対処法ですが、管理対象Macではこれは組織のIT部門の判断事項です。"
+      "description": "Microsoft Defenderのスキャンエンジンです。開発機での継続的な高負荷は、通常ビルド出力をスキャンしていることを意味し、ビルドディレクトリを除外するのが一般的な対処法ですが、管理対象Macではこれは組織のIT部門の判断事項です。",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -640,7 +651,8 @@
       "title": "Microsoft Defender (管理対象)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Microsoft Defenderの管理対象コンポーネントで、利用者本人ではなく組織によって構成されます。"
+      "description": "Microsoft Defenderの管理対象コンポーネントで、利用者本人ではなく組織によって構成されます。",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -649,7 +661,8 @@
       "title": "Microsoft Defender (スキャナー)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "権限を昇格せずにファイルを検査する、Microsoft Defenderの一部です。"
+      "description": "権限を昇格せずにファイルを検査する、Microsoft Defenderの一部です。",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -703,7 +716,8 @@
       "title": "Firefox (ページまたはプラグイン)",
       "category": "helper",
       "vendor": "Mozilla",
-      "description": "Firefoxのために1つのページを描画するか、1つのプラグインを実行します。複数存在するのは正常で、負荷の高いタブはFirefox自体ではなくここに表示されます。"
+      "description": "Firefoxのために1つのページを描画するか、1つのプラグインを実行します。複数存在するのは正常で、負荷の高いタブはFirefox自体ではなくここに表示されます。",
+      "group": "firefox"
     },
     {
       "match": {
@@ -712,7 +726,8 @@
       "title": "Firefox",
       "category": "app",
       "vendor": "Mozilla",
-      "description": "Firefox自体です。個々のページはplugin-containerとして動作するため、負荷の高いタブはそちらに表示されます。"
+      "description": "Firefox自体です。個々のページはplugin-containerとして動作するため、負荷の高いタブはそちらに表示されます。",
+      "group": "firefox"
     },
     {
       "match": {
@@ -784,7 +799,8 @@
       "title": "Defender (ネットワーク拡張機能)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Microsoft Defenderのネットワークフィルターで、組織によってシステム拡張機能としてインストールされます。"
+      "description": "Microsoft Defenderのネットワークフィルターで、組織によってシステム拡張機能としてインストールされます。",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -793,7 +809,8 @@
       "title": "Defender (エンドポイントセキュリティ)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "Microsoft Defenderのエンドポイントセキュリティ拡張機能で、プロセスとファイルの活動をリアルタイムで検査します。"
+      "description": "Microsoft Defenderのエンドポイントセキュリティ拡張機能で、プロセスとファイルの活動をリアルタイムで検査します。",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -893,6 +910,57 @@
       "category": "app",
       "vendor": "Apple",
       "description": "メールアプリです。大きなメールボックスの取得とインデックス作成のため、設定後しばらくは動作が続きます。"
+    },
+    {
+      "match": {
+        "name": "Spotlight indexing"
+      },
+      "title": "Spotlight（インデックス作成）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Spotlight の検索インデックスを作る一連のバックグラウンドプロセスです。macOS のアップデート後や多数のファイルが変わったときに最も活発になり、完了すれば自然に落ち着きます。"
+    },
+    {
+      "match": {
+        "name": "WebKit"
+      },
+      "title": "WebKit（Web ページ）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "macOS が Web ページを表示するために使うプロセスです。Safari だけでなくメール、メモ、App Store など Web 内容を表示するすべての App が使うため、特定の App には結び付けられません。"
+    },
+    {
+      "match": {
+        "name": "Xcode"
+      },
+      "title": "Xcode",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Apple の開発環境と、ビルドやコード補完のために起動される補助プロセスです。ビルド中やインデックス作成中に CPU を多く使うのは正常です。"
+    },
+    {
+      "match": {
+        "name": "Claude"
+      },
+      "title": "Claude（デスクトップ App）",
+      "category": "app",
+      "vendor": "Anthropic",
+      "expectedHigh": false,
+      "description": "Anthropic の Claude デスクトップアプリです。他の Electron アプリと同じくウインドウごと・バックグラウンド処理ごとに補助プロセスを起動するため、グループとして表示されます。",
+      "group": "Claude"
+    },
+    {
+      "match": {
+        "name": "claude"
+      },
+      "title": "Claude Code（コマンドライン）",
+      "category": "developer",
+      "vendor": "Anthropic",
+      "expectedHigh": false,
+      "description": "ターミナルで動く Anthropic のコーディング支援ツールです。Claude デスクトップ App とは別のプログラムのため、行が分かれます。"
     }
   ]
 }

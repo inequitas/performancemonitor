@@ -16,6 +16,7 @@ final class GlossaryStore {
     static let shared = GlossaryStore()
 
     private var loaded: ProcessGlossary?
+    private var cachedOwners: [String: String]?
 
     private init() {}
 
@@ -28,6 +29,19 @@ final class GlossaryStore {
 
     func entry(for name: String) -> GlossaryEntry? {
         glossary.lookup(name: name)
+    }
+
+    /// Process name to the application it belongs to, for the helpers whose name
+    /// gives no clue: `plugin-container` to Firefox, `mds_stores` to Spotlight.
+    ///
+    /// A plain dictionary rather than a lookup call, because the grouping runs
+    /// off the main actor while this store does not. Built once; the glossary
+    /// does not change while the app is running.
+    var owners: [String: String] {
+        if let cachedOwners { return cachedOwners }
+        let map = glossary.owners
+        cachedOwners = map
+        return map
     }
 
     // MARK: - Loading
@@ -47,6 +61,7 @@ final class GlossaryStore {
             let category: String
             let vendor: String?
             let expectedHigh: Bool?
+            let group: String?
             let description: String
         }
         let version: Int
@@ -92,6 +107,7 @@ final class GlossaryStore {
                              category: category,
                              vendor: e.vendor,
                              expectedHigh: e.expectedHigh ?? false,
+                             group: e.group,
                              description: e.description)
     }
 }

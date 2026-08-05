@@ -25,13 +25,16 @@ public enum PSParser {
     ///   - logicalCPUs: Logical CPU count, used to rescale `ps`'s per-core `%cpu`
     ///     (a process pinning two cores reports 200%) into a share of total
     ///     system capacity. Clamped to `1...256`.
+    ///   - owners: Process name to owning application, from the glossary, for
+    ///     helpers whose name does not reveal what they belong to.
     /// - Returns: The `topCount` heaviest CPU rows and memory rows. Grouping
     ///   happens across every parsed line before the lists are trimmed, because
     ///   a helper that falls outside the top on its own still counts towards the
     ///   group it belongs to.
     public static func parse(_ output: String,
                              topCount: Int,
-                             logicalCPUs: Double) -> (cpu: [ProcessUsage], memory: [ProcessUsage]) {
+                             logicalCPUs: Double,
+                             owners: [String: String] = [:]) -> (cpu: [ProcessUsage], memory: [ProcessUsage]) {
         let lines = output.split(separator: "\n").dropFirst()
         let cpus = Swift.min(Swift.max(logicalCPUs, 1), 256)
 
@@ -52,7 +55,7 @@ public enum PSParser {
             memList.append(ProcessUsage(pid: pid, name: name, value: mem))
         }
 
-        return (ProcessGrouping.group(cpuList, parents: parents, topCount: topCount),
-                ProcessGrouping.group(memList, parents: parents, topCount: topCount))
+        return (ProcessGrouping.group(cpuList, parents: parents, owners: owners, topCount: topCount),
+                ProcessGrouping.group(memList, parents: parents, owners: owners, topCount: topCount))
     }
 }

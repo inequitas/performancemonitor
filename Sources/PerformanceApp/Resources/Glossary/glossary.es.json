@@ -101,7 +101,8 @@
       "title": "Spotlight (servidor de índice)",
       "category": "background",
       "vendor": "Apple",
-      "description": "El servidor de índice de Spotlight. Coordina la indexación pero hace poco trabajo por sí mismo; el trabajo pesado ocurre en mds_stores y mdworker."
+      "description": "El servidor de índice de Spotlight. Coordina la indexación pero hace poco trabajo por sí mismo; el trabajo pesado ocurre en mds_stores y mdworker.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -111,7 +112,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Escribe el índice de Spotlight. Un uso intenso es normal durante un tiempo después de copiar muchos archivos, una migración o una actualización de macOS, y se calma por sí solo. Si nunca se calma, el índice se puede reconstruir."
+      "description": "Escribe el índice de Spotlight. Un uso intenso es normal durante un tiempo después de copiar muchos archivos, una migración o una actualización de macOS, y se calma por sí solo. Si nunca se calma, el índice se puede reconstruir.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -121,7 +123,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Lee archivos individuales para que Spotlight pueda indexar su contenido. Es normal ver muchas copias de corta duración de este proceso."
+      "description": "Lee archivos individuales para que Spotlight pueda indexar su contenido. Es normal ver muchas copias de corta duración de este proceso.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -131,7 +134,8 @@
       "category": "background",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Lee archivos individuales para el índice de Spotlight. De corta duración y se inicia en lotes."
+      "description": "Lee archivos individuales para el índice de Spotlight. De corta duración y se inicia en lotes.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -140,7 +144,8 @@
       "title": "Spotlight (datos de apps)",
       "category": "background",
       "vendor": "Apple",
-      "description": "Indexa datos que las apps entregan a Spotlight, como el correo y los mensajes, en lugar de archivos del disco."
+      "description": "Indexa datos que las apps entregan a Spotlight, como el correo y los mensajes, en lugar de archivos del disco.",
+      "group": "Spotlight indexing"
     },
     {
       "match": {
@@ -550,7 +555,8 @@
       "category": "developer",
       "vendor": "Apple",
       "expectedHigh": true,
-      "description": "Proporciona autocompletado y comprobación de sintaxis dentro de Xcode. Puede ser intenso en proyectos grandes."
+      "description": "Proporciona autocompletado y comprobación de sintaxis dentro de Xcode. Puede ser intenso en proyectos grandes.",
+      "group": "Xcode"
     },
     {
       "match": {
@@ -559,7 +565,8 @@
       "title": "Xcode (sistema de compilación)",
       "category": "developer",
       "vendor": "Apple",
-      "description": "Coordina las compilaciones de Xcode."
+      "description": "Coordina las compilaciones de Xcode.",
+      "group": "Xcode"
     },
     {
       "match": {
@@ -595,7 +602,8 @@
       "title": "Safari (página web)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Renderiza una página web para Safari u otra app basada en WebKit. Cada pestaña tiene la suya propia, así que una pestaña pesada aparece aquí en lugar de bajo Safari."
+      "description": "Renderiza una página web para Safari u otra app basada en WebKit. Cada pestaña tiene la suya propia, así que una pestaña pesada aparece aquí en lugar de bajo Safari.",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -604,7 +612,8 @@
       "title": "Safari (red)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Gestiona las solicitudes de red para Safari y otras apps basadas en WebKit."
+      "description": "Gestiona las solicitudes de red para Safari y otras apps basadas en WebKit.",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -613,7 +622,8 @@
       "title": "Safari (gráficos)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Dibuja el contenido de las páginas para Safari usando la GPU."
+      "description": "Dibuja el contenido de las páginas para Safari usando la GPU.",
+      "group": "WebKit"
     },
     {
       "match": {
@@ -631,7 +641,8 @@
       "title": "Microsoft Defender",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "El motor de análisis de Microsoft Defender. Un uso alto y sostenido en un equipo de desarrollo suele significar que está analizando los archivos generados por la compilación; excluir los directorios de compilación es la solución habitual y es una decisión de TI en los Mac gestionados."
+      "description": "El motor de análisis de Microsoft Defender. Un uso alto y sostenido en un equipo de desarrollo suele significar que está analizando los archivos generados por la compilación; excluir los directorios de compilación es la solución habitual y es una decisión de TI en los Mac gestionados.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -640,7 +651,8 @@
       "title": "Microsoft Defender (gestionado)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "El componente gestionado de Microsoft Defender, configurado por tu organización y no por ti."
+      "description": "El componente gestionado de Microsoft Defender, configurado por tu organización y no por ti.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -649,7 +661,8 @@
       "title": "Microsoft Defender (analizador)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "La parte de Microsoft Defender que inspecciona archivos sin privilegios elevados."
+      "description": "La parte de Microsoft Defender que inspecciona archivos sin privilegios elevados.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -703,7 +716,8 @@
       "title": "Firefox (página o complemento)",
       "category": "helper",
       "vendor": "Mozilla",
-      "description": "Renderiza una página o ejecuta un complemento para Firefox. Es normal ver varios, y una pestaña pesada aparece aquí en lugar de bajo Firefox."
+      "description": "Renderiza una página o ejecuta un complemento para Firefox. Es normal ver varios, y una pestaña pesada aparece aquí en lugar de bajo Firefox.",
+      "group": "firefox"
     },
     {
       "match": {
@@ -712,7 +726,8 @@
       "title": "Firefox",
       "category": "app",
       "vendor": "Mozilla",
-      "description": "Firefox en sí. Las páginas individuales se ejecutan como plugin-container, así que una pestaña ocupada aparece ahí."
+      "description": "Firefox en sí. Las páginas individuales se ejecutan como plugin-container, así que una pestaña ocupada aparece ahí.",
+      "group": "firefox"
     },
     {
       "match": {
@@ -784,7 +799,8 @@
       "title": "Defender (extensión de red)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "El filtro de red de Microsoft Defender, instalado como una extensión del sistema por tu organización."
+      "description": "El filtro de red de Microsoft Defender, instalado como una extensión del sistema por tu organización.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -793,7 +809,8 @@
       "title": "Defender (seguridad de endpoints)",
       "category": "security",
       "vendor": "Microsoft",
-      "description": "La extensión de seguridad de endpoints de Microsoft Defender, que inspecciona la actividad de procesos y archivos a medida que ocurre."
+      "description": "La extensión de seguridad de endpoints de Microsoft Defender, que inspecciona la actividad de procesos y archivos a medida que ocurre.",
+      "group": "wdavdaemon"
     },
     {
       "match": {
@@ -893,6 +910,57 @@
       "category": "app",
       "vendor": "Apple",
       "description": "La app Mail. Descargar e indexar un buzón grande la mantiene ocupada durante un tiempo después de configurarla."
+    },
+    {
+      "match": {
+        "name": "Spotlight indexing"
+      },
+      "title": "Spotlight (indexación)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Los procesos en segundo plano que construyen el índice de búsqueda de Spotlight. Trabajan más tras una actualización de macOS o cuando cambian muchos archivos, y se calman solos al terminar."
+    },
+    {
+      "match": {
+        "name": "WebKit"
+      },
+      "title": "WebKit (páginas web)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Los procesos con los que macOS muestra páginas web. Los usa Safari, pero también Mail, Notas, la App Store y cualquier app con contenido web, así que no se pueden atribuir a una sola."
+    },
+    {
+      "match": {
+        "name": "Xcode"
+      },
+      "title": "Xcode",
+      "category": "developer",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "El entorno de desarrollo de Apple, junto con los procesos auxiliares de compilación y autocompletado. Un uso alto de CPU durante una compilación o indexación es normal."
+    },
+    {
+      "match": {
+        "name": "Claude"
+      },
+      "title": "Claude (app de escritorio)",
+      "category": "app",
+      "vendor": "Anthropic",
+      "expectedHigh": false,
+      "description": "La aplicación de escritorio Claude de Anthropic. Como otras apps de Electron, ejecuta un proceso auxiliar por ventana y por tarea en segundo plano, por eso aparece como grupo.",
+      "group": "Claude"
+    },
+    {
+      "match": {
+        "name": "claude"
+      },
+      "title": "Claude Code (línea de comandos)",
+      "category": "developer",
+      "vendor": "Anthropic",
+      "expectedHigh": false,
+      "description": "El asistente de programación de Anthropic en una terminal. Es un programa distinto de la app de escritorio Claude, por eso aparecen en filas separadas."
     }
   ]
 }
