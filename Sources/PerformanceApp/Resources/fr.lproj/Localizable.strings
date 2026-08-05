@@ -443,3 +443,13 @@
 /* MARK: - Process glossary */
 "What is %@?" = "Qu'est-ce que %@ ?";
 "High usage is normal for this one." = "Une utilisation élevée est normale ici.";
+
+/* MARK: - Verdict banner */
+"All quiet." = "Tout est calme.";
+"Running hot, so macOS is slowing things down to cool off." = "Ça chauffe, donc macOS ralentit le système pour refroidir.";
+"Warm enough that macOS has started slowing things down." = "Assez chaud pour que macOS ait commencé à ralentir le système.";
+"Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "Plus de mémoire disponible, donc %.1f Go sont passés sur le disque. C'est ce qui donne l'impression d'un Mac lent.";
+"%@ is using %.0f%% of the CPU." = "%@ utilise %.0f%% du processeur.";
+"CPU is at %.0f%%, spread across several processes." = "Processeur à %.0f%%, réparti sur plusieurs processus.";
+"Memory is %.0f%% full, but nothing has moved to disk yet." = "La mémoire est remplie à %.0f%%, mais rien n'est encore passé sur le disque.";
+"Only %.1f GB left on the startup disk." = "Il ne reste que %.1f Go sur le disque de démarrage.";

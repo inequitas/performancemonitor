@@ -443,3 +443,13 @@
 /* MARK: - Process glossary */
 "What is %@?" = "What is %@?";
 "High usage is normal for this one." = "High usage is normal for this one.";
+
+/* MARK: - Verdict banner */
+"All quiet." = "All quiet.";
+"Running hot, so macOS is slowing things down to cool off." = "Running hot, so macOS is slowing things down to cool off.";
+"Warm enough that macOS has started slowing things down." = "Warm enough that macOS has started slowing things down.";
+"Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow.";
+"%@ is using %.0f%% of the CPU." = "%@ is using %.0f%% of the CPU.";
+"CPU is at %.0f%%, spread across several processes." = "CPU is at %.0f%%, spread across several processes.";
+"Memory is %.0f%% full, but nothing has moved to disk yet." = "Memory is %.0f%% full, but nothing has moved to disk yet.";
+"Only %.1f GB left on the startup disk." = "Only %.1f GB left on the startup disk.";

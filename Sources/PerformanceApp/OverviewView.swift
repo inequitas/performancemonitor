@@ -23,6 +23,9 @@ struct OverviewView: View {
                 .padding(.top, 12)
                 .padding(.horizontal, 14)
 
+            VerdictBanner(engine: engine)
+                .padding(.horizontal, 14)
+
             VStack(spacing: 10) {
                 ForEach(MetricsEngine.panelLayout(visiblePanels)) { row in
                     if let full = row.full {

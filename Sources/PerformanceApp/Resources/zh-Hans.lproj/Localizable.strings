@@ -442,3 +442,13 @@
 /* MARK: - Process glossary */
 "What is %@?" = "%@ 是什么？";
 "High usage is normal for this one." = "此进程占用较高属于正常。";
+
+/* MARK: - Verdict banner */
+"All quiet." = "一切正常。";
+"Running hot, so macOS is slowing things down to cool off." = "温度偏高，macOS 正在降速以散热。";
+"Warm enough that macOS has started slowing things down." = "温度已足够高，macOS 已开始降速。";
+"Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "内存已用尽，%.1f GB 已转移到磁盘。这正是 Mac 变慢的原因。";
+"%@ is using %.0f%% of the CPU." = "%@ 正在占用 %.0f%% 的 CPU。";
+"CPU is at %.0f%%, spread across several processes." = "CPU 占用 %.0f%%，分散在多个进程上。";
+"Memory is %.0f%% full, but nothing has moved to disk yet." = "内存已使用 %.0f%%，但尚未有内容转移到磁盘。";
+"Only %.1f GB left on the startup disk." = "启动磁盘仅剩 %.1f GB。";
