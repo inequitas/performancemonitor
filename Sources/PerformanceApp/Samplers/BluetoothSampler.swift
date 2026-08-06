@@ -25,6 +25,14 @@ final class BluetoothSampler {
     private var bleBatteryReader: BLEBatteryReader?
     private var btDevicesCacheDate: Date = .distantPast
 
+    /// Drops the read throttles so the next `update` reads immediately. Called
+    /// when the popover or the Bluetooth window appears, so neither has to wait
+    /// out an interval that was measured for the background case.
+    func resetThrottle() {
+        btDevicesCacheDate = .distantPast
+        btBatteryCacheDate = .distantPast
+    }
+
     func requestAccess() {
         guard btDelegate == nil else { return }
         let delegate = BluetoothAuthDelegate { [weak self] auth in
@@ -38,9 +46,15 @@ final class BluetoothSampler {
         btAuthManager = CBCentralManager(delegate: delegate, queue: .main)
     }
 
-    func update() {
+    /// - Parameter readDevices: Whether anything is on screen that shows the
+    ///   device list or their battery levels. When nothing is, the paired-device
+    ///   read and the `system_profiler` call behind the battery levels are both
+    ///   skipped. That call costs 0.05s of CPU and ran every 25 seconds
+    ///   regardless, which was 0.2% of a machine doing nothing.
+    func update(readDevices: Bool) {
         let auth = CBCentralManager.authorization
         onAuth?(auth)
+        guard readDevices else { return }
         switch auth {
         case .allowedAlways:
             // Ensure CBCentralManager exists — needed for BLE disconnect.
@@ -110,8 +124,12 @@ final class BluetoothSampler {
             proc.standardOutput = pipe
             proc.standardError = Pipe()
             guard (try? proc.run()) != nil else { return }
-            proc.waitUntilExit()
+            // Read before waiting. system_profiler's output is small enough
+            // today that the other order happens to work, but a process that
+            // fills the pipe buffer blocks writing while we wait for it to
+            // exit, and nothing would ever break the tie.
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            proc.waitUntilExit()
             guard let captured = BTDeviceParser.parse(data) else { return }
             await MainActor.run { [weak self] in self?.btBatteryCache = captured }
         }

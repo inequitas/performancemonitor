@@ -310,6 +310,21 @@ final class MetricsEngine: ObservableObject {
 
     /// Called by `DetailWindow` (via `WindowFloatAccessor`) whenever one of its
     /// windows becomes visible or invisible (open/close, occlusion, miniaturize).
+    /// Whether the popover is on screen. It shows Bluetooth devices, so the
+    /// reads behind that are gated on it in the same way window panels are.
+    private var popoverVisible = false
+
+    /// True when something that shows Bluetooth devices is on screen.
+    private var bluetoothIsOnScreen: Bool {
+        popoverVisible || visiblePanels.contains(.bluetooth)
+    }
+
+    func setPopoverVisible(_ visible: Bool) {
+        guard visible != popoverVisible else { return }
+        popoverVisible = visible
+        if visible { bluetoothSampler.resetThrottle() }
+    }
+
     func setPanelVisible(_ visible: Bool, for kind: Panel) {
         let changed = visible ? visiblePanels.insert(kind).inserted : visiblePanels.remove(kind) != nil
         guard changed else { return }
@@ -344,6 +359,8 @@ final class MetricsEngine: ObservableObject {
                 // visible sample starts fresh.
                 diskProcessSampler.invalidateBaseline()
             }
+        case .bluetooth:
+            if visible { bluetoothSampler.resetThrottle() }
         case .thermal:
             // Only the Thermal window needs the full per-sensor set. Force an
             // immediate full read on open so it never shows a blank/stale grid
@@ -737,7 +754,7 @@ final class MetricsEngine: ObservableObject {
         updatePorts()
         await applyBattery()
         applyWiFi()
-        bluetoothSampler.update()
+        bluetoothSampler.update(readDevices: bluetoothIsOnScreen)
         await applyGPU()
         updateSMC()
         updatePower()

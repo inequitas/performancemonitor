@@ -334,12 +334,14 @@ final class ExtraMenuBarController: NSObject {
         let host = NSHostingController(rootView: OverviewView(engine: engine))
         host.view.layoutSubtreeIfNeeded()
         popover.contentViewController = host
+        engine.setPopoverVisible(true)
     }
 
     /// Releases the SwiftUI tree once the close animation has finished, so
     /// nothing observes the engine while the popover is hidden.
     func popoverDidClose(_ notification: Notification) {
         sharedPopover?.contentViewController = nil
+        engine?.setPopoverVisible(false)
     }
 
     private func syncPopoverAppearance() {
