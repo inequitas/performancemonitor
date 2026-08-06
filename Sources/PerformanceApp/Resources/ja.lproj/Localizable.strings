@@ -452,6 +452,7 @@
 
 /* MARK: - Verdict banner */
 "All quiet." = "問題ありません。";
+"Nothing worth a look. All quiet." = "気にすべきことはありません。すべて順調です。";
 "Running hot, so macOS is slowing things down to cool off." = "温度が高いため、macOS が冷却のため速度を下げています。";
 "Warm enough that macOS has started slowing things down." = "温度が上がり、macOS が速度を下げ始めました。";
 "Memory is short, so the Mac is shuffling %.1f GB between memory and disk." = "メモリが不足しているため、Mac が %.1f GB をメモリとディスクの間で行き来させています。";

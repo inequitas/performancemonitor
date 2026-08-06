@@ -452,6 +452,7 @@
 
 /* MARK: - Verdict banner */
 "All quiet." = "Alles rustig.";
+"Nothing worth a look. All quiet." = "Niets dat aandacht vraagt. Alles rustig.";
 "Running hot, so macOS is slowing things down to cool off." = "Het wordt heet, dus macOS knijpt af om af te koelen.";
 "Warm enough that macOS has started slowing things down." = "Warm genoeg dat macOS is begonnen met afknijpen.";
 "Memory is short, so the Mac is shuffling %.1f GB between memory and disk." = "Er is geheugen tekort, dus de Mac schuift %.1f GB heen en weer tussen geheugen en schijf.";

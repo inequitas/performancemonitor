@@ -17,8 +17,58 @@ BUILD_DIR=".build/release"
 BUNDLE_DIR=".build/bundle"
 VERSION="$(cat VERSION | tr -d '[:space:]')"
 
+# Shortcuts support. App Intents are only discoverable if the bundle carries a
+# Metadata.appintents directory, which Xcode's build system produces and SwiftPM
+# does not. We drive the same two tools by hand: the compiler emits constant
+# values for the AppIntents protocols, and appintentsmetadataprocessor turns
+# those into the metadata the system reads.
+#
+# Both ship with a full Xcode install. A Command Line Tools-only machine can
+# still build and run the app; it simply produces one without Shortcuts actions,
+# which is why nothing here is fatal.
+APPINTENTS_METADATA=""
+TOOLCHAIN_DIR="$(xcode-select -p 2>/dev/null)/Toolchains/XcodeDefault.xctoolchain"
+METADATA_TOOL="${TOOLCHAIN_DIR}/usr/bin/appintentsmetadataprocessor"
+PROTOCOLS_SRC="${TOOLCHAIN_DIR}/usr/share/swift/SwiftConstantValues/AppIntents.json"
+CONST_DIR=".build/appintents"
+
 echo "Building release binary (arm64-only)..."
-swift build -c release --arch arm64
+if [ -x "${METADATA_TOOL}" ] && [ -f "${PROTOCOLS_SRC}" ]; then
+    mkdir -p "${CONST_DIR}"
+    # The compiler wants a bare array of protocol names; the file Xcode ships
+    # wraps that array in an object and is rejected as malformed.
+    /usr/bin/python3 -c 'import json,sys; json.dump(json.load(open(sys.argv[1]))["constValueProtocols"], open(sys.argv[2],"w"))' \
+        "${PROTOCOLS_SRC}" "${CONST_DIR}/protocols.json"
+    swift build -c release --arch arm64 \
+        -Xswiftc -emit-const-values-path -Xswiftc "${PWD}/${CONST_DIR}/PerformanceApp.swiftconstvalues" \
+        -Xswiftc -Xfrontend -Xswiftc -const-gather-protocols-file \
+        -Xswiftc -Xfrontend -Xswiftc "${PWD}/${CONST_DIR}/protocols.json"
+
+    find "${PWD}/Sources/PerformanceApp" -name '*.swift' > "${CONST_DIR}/sources.txt"
+    echo "${PWD}/${CONST_DIR}/PerformanceApp.swiftconstvalues" > "${CONST_DIR}/constvals.txt"
+    rm -rf "${CONST_DIR}/Metadata.appintents"
+    if "${METADATA_TOOL}" \
+        --output "${CONST_DIR}" \
+        --toolchain-dir "${TOOLCHAIN_DIR}" \
+        --module-name PerformanceApp \
+        --sdk-root "$(xcrun --show-sdk-path)" \
+        --xcode-version "$(xcodebuild -version | tail -1 | awk '{print $3}')" \
+        --platform-family macOS \
+        --deployment-target 14.0 \
+        --target-triple arm64-apple-macos14.0 \
+        --source-file-list "${CONST_DIR}/sources.txt" \
+        --swift-const-vals-list "${CONST_DIR}/constvals.txt" \
+        --force >/dev/null 2>&1 && [ -d "${CONST_DIR}/Metadata.appintents" ]; then
+        APPINTENTS_METADATA="${CONST_DIR}/Metadata.appintents"
+        echo "  App Intents metadata generated (Shortcuts actions available)."
+    else
+        echo "  WARNING: App Intents metadata generation failed; Shortcuts actions will be missing."
+        swift build -c release --arch arm64
+    fi
+else
+    echo "  Note: full Xcode not found; building without Shortcuts actions."
+    swift build -c release --arch arm64
+fi
 
 # This app targets Apple Silicon exclusively (no Intel fallback, no dependencies
 # that need a universal slice). Guard against an accidental universal/x86_64
@@ -124,6 +174,12 @@ assemble_variant() {
 </dict>
 </plist>
 PLIST
+
+    # Must land before codesign: the metadata is part of what gets sealed, and
+    # a bundle whose seal does not cover it is treated as damaged.
+    if [ -n "${APPINTENTS_METADATA}" ]; then
+        cp -R "${APPINTENTS_METADATA}" "${app_dir}/Contents/Resources/Metadata.appintents"
+    fi
 
     echo "Code signing (ad-hoc, no Developer ID available)..."
     codesign --force --deep --sign - "${app_dir}"

@@ -17,6 +17,15 @@ import PerformanceAppCore
 
 @MainActor
 final class MetricsEngine: ObservableObject {
+    /// The live engine, for App Intents to read.
+    ///
+    /// Shortcuts runs an intent inside this process but hands it no reference to
+    /// the object graph the app built, and the engine is deliberately not a
+    /// singleton: `AppContainer` owns it so the scene never observes it. This is
+    /// the one seam between the two. Weak, so it claims nothing about lifetime,
+    /// and only ever read on the main actor.
+    private(set) static weak var current: MetricsEngine?
+
     @Published var cpuUsagePercent: Double = 0
     @Published var cpuUserPercent: Double = 0
     @Published var cpuSystemPercent: Double = 0
@@ -341,6 +350,52 @@ final class MetricsEngine: ObservableObject {
         }
     }
 
+    /// Everything `SystemVerdict` needs, in one place.
+    ///
+    /// Both the popover banner and the Shortcuts action read this, so the two
+    /// can never disagree about what the machine is doing.
+    var verdictInput: SystemVerdict.Input {
+        SystemVerdict.Input(
+            cpuPercent: cpuUsagePercent,
+            memoryUsedGB: memoryUsedGB,
+            memoryTotalGB: memoryTotalGB,
+            swapUsedGB: swapUsedGB,
+            memoryPressureLevel: memoryPressureLevel,
+            swapPagesPerSecond: swapPagesPerSecond,
+            diskFreeGB: diskFreeGB,
+            thermalLevel: Self.verdictThermalLevel(thermalState),
+            // The process list is gated on a window being open, so most of the
+            // time this is nil and the wording falls back to the unattributed
+            // form rather than reaching for a fresh sample.
+            topProcess: topCPUProcesses.first.map { ($0.name, $0.value) }
+        )
+    }
+
+    static func verdictThermalLevel(_ state: ProcessInfo.ThermalState) -> Int {
+        switch state {
+        case .nominal:  return 0
+        case .fair:     return 1
+        case .serious:  return 2
+        case .critical: return 3
+        @unknown default: return 0
+        }
+    }
+
+    /// Takes one process sample outside the usual visibility gating, for a
+    /// Shortcuts action that needs a list no open window has produced.
+    ///
+    /// Deliberately a single sample rather than opening the gate: nothing is
+    /// left running once the action has answered.
+    func sampleProcessesOnce() async {
+        processSampler.resetThrottle()
+        guard let snapshot = await processSampler.sample(
+            topCount: settings.topProcessCount,
+            owners: GlossaryStore.shared.owners
+        ) else { return }
+        topCPUProcesses = snapshot.topCPU
+        topMemoryProcesses = snapshot.topMemory
+    }
+
     func sparklineHistory(for metric: MenuBarMetric) -> [Double] {
         switch metric {
         case .cpu:     return Array(cpuHistory.suffix(30))
@@ -421,6 +476,7 @@ final class MetricsEngine: ObservableObject {
 
     init() {
         thermalState = ProcessInfo.processInfo.thermalState
+        MetricsEngine.current = self
         thermalObserver = NotificationCenter.default.addObserver(
             forName: ProcessInfo.thermalStateDidChangeNotification,
             object: nil, queue: .main

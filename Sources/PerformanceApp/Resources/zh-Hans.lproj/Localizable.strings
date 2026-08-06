@@ -451,6 +451,7 @@
 
 /* MARK: - Verdict banner */
 "All quiet." = "一切正常。";
+"Nothing worth a look. All quiet." = "没有需要关注的事项，一切正常。";
 "Running hot, so macOS is slowing things down to cool off." = "温度偏高，macOS 正在降速以散热。";
 "Warm enough that macOS has started slowing things down." = "温度已足够高，macOS 已开始降速。";
 "Memory is short, so the Mac is shuffling %.1f GB between memory and disk." = "内存吃紧，Mac 正在内存与磁盘之间来回搬运 %.1f GB。";

@@ -18,22 +18,9 @@ struct VerdictBanner: View {
     @State private var expanded = false
 
     private var findings: [SystemFinding] {
-        SystemVerdict.evaluate(
-            SystemVerdict.Input(
-                cpuPercent: engine.cpuUsagePercent,
-                memoryUsedGB: engine.memoryUsedGB,
-                memoryTotalGB: engine.memoryTotalGB,
-                swapUsedGB: engine.swapUsedGB,
-                memoryPressureLevel: engine.memoryPressureLevel,
-                swapPagesPerSecond: engine.swapPagesPerSecond,
-                diskFreeGB: engine.diskFreeGB,
-                thermalLevel: Self.level(engine.thermalState),
-                // The CPU list is gated on a window being open, so most of the
-                // time this is nil and the wording falls back to the
-                // unattributed form rather than reaching for a fresh sample.
-                topProcess: engine.topCPUProcesses.first.map { ($0.name, $0.value) }
-            )
-        )
+        // The same input the Shortcuts action reads, so the popover and an
+        // automation can never tell different stories about the same machine.
+        SystemVerdict.evaluate(engine.verdictInput)
     }
 
     var body: some View {
@@ -177,13 +164,4 @@ struct VerdictBanner: View {
         }
     }
 
-    private static func level(_ state: ProcessInfo.ThermalState) -> Int {
-        switch state {
-        case .nominal:  return 0
-        case .fair:     return 1
-        case .serious:  return 2
-        case .critical: return 3
-        @unknown default: return 0
-        }
-    }
 }

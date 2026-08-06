@@ -452,6 +452,7 @@
 
 /* MARK: - Verdict banner */
 "All quiet." = "Alles ruhig.";
+"Nothing worth a look. All quiet." = "Nichts, was Aufmerksamkeit braucht. Alles ruhig.";
 "Running hot, so macOS is slowing things down to cool off." = "Es wird heiß, daher drosselt macOS zum Abkühlen.";
 "Warm enough that macOS has started slowing things down." = "Warm genug, dass macOS begonnen hat zu drosseln.";
 "Memory is short, so the Mac is shuffling %.1f GB between memory and disk." = "Der Speicher ist knapp, daher verschiebt der Mac %.1f GB zwischen Arbeitsspeicher und Festplatte hin und her.";
