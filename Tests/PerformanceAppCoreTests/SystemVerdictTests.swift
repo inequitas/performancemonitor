@@ -10,12 +10,16 @@ struct SystemVerdictTests {
         usedGB: Double = 8,
         totalGB: Double = 32,
         swapGB: Double = 0,
+        pressure: Int = 1,
+        swapPages: Double = 0,
         diskFreeGB: Double = 400,
         thermal: Int = 0,
         top: (name: String, percent: Double)? = nil
     ) -> SystemVerdict.Input {
         SystemVerdict.Input(cpuPercent: cpu, memoryUsedGB: usedGB, memoryTotalGB: totalGB,
-                            swapUsedGB: swapGB, diskFreeGB: diskFreeGB,
+                            swapUsedGB: swapGB,
+                            memoryPressureLevel: pressure, swapPagesPerSecond: swapPages,
+                            diskFreeGB: diskFreeGB,
                             thermalLevel: thermal, topProcess: top)
     }
 
@@ -41,7 +45,7 @@ struct SystemVerdictTests {
     @Test func everythingApplicableIsReported() {
         // The whole point of the rework: one urgent finding used to hide the
         // rest, which is what made a lone swap figure hard to interpret.
-        let busy = calm(cpu: 95, usedGB: 30, totalGB: 32, swapGB: 6,
+        let busy = calm(cpu: 95, usedGB: 30, totalGB: 32, swapGB: 6, pressure: 2,
                         diskFreeGB: 3, thermal: 3, top: ("swift-frontend", 90))
         let found = SystemVerdict.evaluate(busy)
         #expect(found.count == 5)
@@ -62,14 +66,44 @@ struct SystemVerdictTests {
 
     @Test func swappingAndTightMemoryAppearTogether() {
         // Either half alone invites the wrong conclusion.
-        let found = kinds(calm(usedGB: 30, totalGB: 32, swapGB: 4))
+        let found = kinds(calm(usedGB: 30, totalGB: 32, swapGB: 4, pressure: 2))
         #expect(found.contains(.swapping(gb: 4)))
         #expect(found.contains { if case .memoryTight = $0 { return true }; return false })
     }
 
     @Test func smallSwapIsNotReported() {
         // macOS keeps a little swap around even when memory is plentiful.
-        #expect(SystemVerdict.evaluate(calm(swapGB: 1.2)).isEmpty)
+        #expect(SystemVerdict.evaluate(calm(swapGB: 1.2, pressure: 2)).isEmpty)
+    }
+
+    @Test func swapSittingOnDiskWithNoPressureIsNotReported() {
+        // Reported from the beta: "Out of memory" on a machine using 12.5 of
+        // 18 GB. `vm.swapusage` is a standing total, not a rate. macOS never
+        // proactively takes swap back, so pages written out during one busy
+        // moment sit there indefinitely at no cost. Two thirds of memory free
+        // and macOS reporting normal pressure is not a machine out of memory.
+        #expect(SystemVerdict.evaluate(
+            calm(usedGB: 12.5, totalGB: 18, swapGB: 2.1, pressure: 1, swapPages: 0)).isEmpty)
+    }
+
+    @Test func pagingRightNowIsReportedEvenBeforeMacOSRaisesPressure() {
+        // The rate is the half that describes what the machine is doing, and it
+        // moves before the pressure level does.
+        let found = kinds(calm(swapGB: 3, pressure: 1, swapPages: 400))
+        #expect(found == [.swapping(gb: 3)])
+    }
+
+    @Test func aTrickleOfPagingIsOrdinaryHousekeeping() {
+        #expect(SystemVerdict.evaluate(calm(swapGB: 3, pressure: 1, swapPages: 5)).isEmpty)
+    }
+
+    @Test func macOSReportingPressureIsTheMoreSeriousOfTheTwo() {
+        // Paging alone is worth mentioning; macOS itself saying memory is short
+        // is a warning.
+        let paging = SystemVerdict.evaluate(calm(swapGB: 3, pressure: 1, swapPages: 400))
+        let pressured = SystemVerdict.evaluate(calm(swapGB: 3, pressure: 2))
+        #expect(paging.first?.severity == .notable)
+        #expect(pressured.first?.severity == .warning)
     }
 
     @Test func dominantProcessIsNamed() {
@@ -117,12 +151,12 @@ struct SystemVerdictTests {
 
     @Test func thresholdsAreInclusive() {
         #expect(kinds(calm(cpu: 80)) == [.busy(percent: 80)])
-        #expect(kinds(calm(swapGB: 2)) == [.swapping(gb: 2)])
+        #expect(kinds(calm(swapGB: 2, pressure: 2)) == [.swapping(gb: 2)])
     }
 
     @Test func eachFindingCarriesTheTopicThatExplainsIt() {
         #expect(SystemVerdict.evaluate(calm(thermal: 3)).first?.topic == .thermal)
-        #expect(SystemVerdict.evaluate(calm(swapGB: 5)).first?.topic == .memory)
+        #expect(SystemVerdict.evaluate(calm(swapGB: 5, pressure: 2)).first?.topic == .memory)
         #expect(SystemVerdict.evaluate(calm(cpu: 95)).first?.topic == .cpu)
         #expect(SystemVerdict.evaluate(calm(diskFreeGB: 2)).first?.topic == .disk)
     }

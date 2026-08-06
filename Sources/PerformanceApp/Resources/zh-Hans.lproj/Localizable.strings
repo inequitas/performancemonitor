@@ -453,14 +453,14 @@
 "All quiet." = "一切正常。";
 "Running hot, so macOS is slowing things down to cool off." = "温度偏高，macOS 正在降速以散热。";
 "Warm enough that macOS has started slowing things down." = "温度已足够高，macOS 已开始降速。";
-"Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "内存已用尽，%.1f GB 已转移到磁盘。这正是 Mac 变慢的原因。";
+"Memory is short, so the Mac is shuffling %.1f GB between memory and disk." = "内存吃紧，Mac 正在内存与磁盘之间来回搬运 %.1f GB。";
 "%@ is using %.0f%% of the CPU." = "%@ 正在占用 %.0f%% 的 CPU。";
 "CPU is at %.0f%%, spread across several processes." = "CPU 占用 %.0f%%，分散在多个进程上。";
 "Only %.1f GB left on the startup disk." = "启动磁盘仅剩 %.1f GB。";
 "%ld things worth a look." = "有 %ld 项值得关注。";
 /* Advice: what the reader can do about each finding. */
 "Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface." = "降温之前一切都会变慢。看看是什么产生了热量；如果机器放在柔软表面上，请让它通风。";
-"Quitting apps you are not using will free memory. Top Memory shows which are holding the most." = "退出不用的 App 可以释放内存。Top Memory 会显示哪些占用最多。";
+"That shuffling is what makes a Mac feel slow. Quitting apps you are not using will free memory; Top Memory shows which are holding the most." = "这种来回搬运正是让 Mac 变慢的原因。退出不用的 App 可以释放内存；Top Memory 会显示哪些占用最多。";
 "%@ Being busy is normal for this one." = "%@ 占用较高对它来说是正常的。";
 "If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it." = "如果不是你启动的，而且在你什么都不做时仍然繁忙，它可能已经卡住。可以在 Top CPU 中退出它。";
 "No single process is responsible. Top CPU in the CPU window shows how it is divided." = "没有单独某个进程是主因。CPU 窗口中的 Top CPU 会显示占用分布。";

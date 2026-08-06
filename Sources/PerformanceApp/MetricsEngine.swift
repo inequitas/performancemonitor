@@ -26,6 +26,13 @@ final class MetricsEngine: ObservableObject {
     @Published var memoryUsedGB: Double = 0
     @Published var memoryTotalGB: Double = 0
     @Published var swapUsedGB: Double = 0
+    /// What macOS reports about memory pressure right now: 1 normal, 2 warning,
+    /// 4 critical. Unlike `swapUsedGB`, which is a standing total left over from
+    /// whenever memory was last tight, this describes the present.
+    @Published var memoryPressureLevel: Int = 1
+    /// Pages moving between memory and disk per second. Non-zero means paging is
+    /// happening now, which is the part that makes a machine feel slow.
+    @Published var swapPagesPerSecond: Double = 0
     @Published var memoryAppGB: Double = 0
     @Published var memoryWiredGB: Double = 0
     @Published var memoryCompressedGB: Double = 0
@@ -682,6 +689,8 @@ final class MetricsEngine: ObservableObject {
         memoryWiredGB = s.wiredGB
         memoryCompressedGB = s.compressedGB
         if let swap = s.swapUsedGB { swapUsedGB = swap }
+        memoryPressureLevel = s.pressureLevel
+        swapPagesPerSecond = s.swapPagesPerSecond
         appendCapped(memoryUsedGB, to: &memoryHistory)
     }
 

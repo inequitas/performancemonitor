@@ -454,14 +454,14 @@
 "All quiet." = "Todo tranquilo.";
 "Running hot, so macOS is slowing things down to cool off." = "Se está calentando, así que macOS ralentiza el sistema para enfriarlo.";
 "Warm enough that macOS has started slowing things down." = "Lo bastante caliente como para que macOS haya empezado a ralentizar el sistema.";
-"Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "Sin memoria disponible, así que %.1f GB han pasado al disco. Eso es lo que hace que un Mac parezca lento.";
+"Memory is short, so the Mac is shuffling %.1f GB between memory and disk." = "Falta memoria, así que el Mac está moviendo %.1f GB entre la memoria y el disco.";
 "%@ is using %.0f%% of the CPU." = "%@ está usando el %.0f%% de la CPU.";
 "CPU is at %.0f%%, spread across several processes." = "La CPU está al %.0f%%, repartida entre varios procesos.";
 "Only %.1f GB left on the startup disk." = "Solo quedan %.1f GB en el disco de arranque.";
 "%ld things worth a look." = "%ld cosas que conviene mirar.";
 /* Advice: what the reader can do about each finding. */
 "Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface." = "Todo irá más lento hasta que se enfríe. Mira qué genera el calor y deja aire alrededor si está sobre una superficie blanda.";
-"Quitting apps you are not using will free memory. Top Memory shows which are holding the most." = "Cerrar las apps que no usas libera memoria. Top Memory muestra cuáles retienen más.";
+"That shuffling is what makes a Mac feel slow. Quitting apps you are not using will free memory; Top Memory shows which are holding the most." = "Ese vaivén es lo que hace que un Mac se sienta lento. Cerrar las apps que no usas libera memoria; Top Memory muestra cuáles retienen más.";
 "%@ Being busy is normal for this one." = "%@ Que consuma mucho es normal en este caso.";
 "If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it." = "Si no lo iniciaste tú y sigue activo mientras no haces nada, puede estar bloqueado. Desde Top CPU puedes cerrarlo.";
 "No single process is responsible. Top CPU in the CPU window shows how it is divided." = "Ningún proceso concreto es el responsable. Top CPU en la ventana de CPU muestra el reparto.";

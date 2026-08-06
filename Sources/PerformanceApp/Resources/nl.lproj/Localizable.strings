@@ -454,14 +454,14 @@
 "All quiet." = "Alles rustig.";
 "Running hot, so macOS is slowing things down to cool off." = "Het wordt heet, dus macOS knijpt af om af te koelen.";
 "Warm enough that macOS has started slowing things down." = "Warm genoeg dat macOS is begonnen met afknijpen.";
-"Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "Geheugen is op, dus %.1f GB staat nu op schijf. Dat is wat een Mac traag laat voelen.";
+"Memory is short, so the Mac is shuffling %.1f GB between memory and disk." = "Er is geheugen tekort, dus de Mac schuift %.1f GB heen en weer tussen geheugen en schijf.";
 "%@ is using %.0f%% of the CPU." = "%@ gebruikt %.0f%% van de CPU.";
 "CPU is at %.0f%%, spread across several processes." = "CPU staat op %.0f%%, verdeeld over meerdere processen.";
 "Only %.1f GB left on the startup disk." = "Nog %.1f GB vrij op de opstartschijf.";
 "%ld things worth a look." = "%ld dingen om naar te kijken.";
 /* Advice: what the reader can do about each finding. */
 "Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface." = "Alles wordt trager tot de Mac is afgekoeld. Kijk waar de warmte vandaan komt, en geef het apparaat lucht als het op een zachte ondergrond ligt.";
-"Quitting apps you are not using will free memory. Top Memory shows which are holding the most." = "Apps sluiten die je niet gebruikt maakt geheugen vrij. Top Memory laat zien welke het meeste vasthouden.";
+"That shuffling is what makes a Mac feel slow. Quitting apps you are not using will free memory; Top Memory shows which are holding the most." = "Dat heen en weer schuiven is wat een Mac traag laat aanvoelen. Apps sluiten die je niet gebruikt maakt geheugen vrij; Top Memory laat zien welke het meeste vasthouden.";
 "%@ Being busy is normal for this one." = "%@ Druk zijn is normaal voor dit proces.";
 "If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it." = "Als je het zelf niet gestart hebt en het blijft druk terwijl je niets doet, kan het vastzitten. Via Top CPU kun je het stoppen.";
 "No single process is responsible. Top CPU in the CPU window shows how it is divided." = "Geen enkel proces is de oorzaak. Top CPU in het CPU-venster laat zien hoe het verdeeld is.";

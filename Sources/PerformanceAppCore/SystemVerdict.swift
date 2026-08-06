@@ -8,7 +8,7 @@ public struct SystemFinding: Equatable, Sendable, Identifiable {
     public enum Kind: Equatable, Sendable {
         /// Thermal throttling is active.
         case throttling(serious: Bool)
-        /// Memory ran out and the machine is paging to disk.
+        /// Memory is short right now and pages are moving to and from disk.
         case swapping(gb: Double)
         /// One process accounts for most of the CPU load.
         case busyProcess(name: String, percent: Double)
@@ -68,6 +68,10 @@ public enum SystemVerdict {
         public var memoryUsedGB: Double
         public var memoryTotalGB: Double
         public var swapUsedGB: Double
+        /// macOS's own pressure reading: 1 normal, 2 warning, 4 critical.
+        public var memoryPressureLevel: Int
+        /// Pages moving between memory and disk per second.
+        public var swapPagesPerSecond: Double
         public var diskFreeGB: Double
         /// 0 nominal, 1 fair, 2 serious, 3 critical, mirroring
         /// `ProcessInfo.ThermalState` without importing it into Core.
@@ -79,6 +83,8 @@ public enum SystemVerdict {
                     memoryUsedGB: Double,
                     memoryTotalGB: Double,
                     swapUsedGB: Double,
+                    memoryPressureLevel: Int = 1,
+                    swapPagesPerSecond: Double = 0,
                     diskFreeGB: Double,
                     thermalLevel: Int,
                     topProcess: (name: String, percent: Double)? = nil) {
@@ -86,6 +92,8 @@ public enum SystemVerdict {
             self.memoryUsedGB = memoryUsedGB
             self.memoryTotalGB = memoryTotalGB
             self.swapUsedGB = swapUsedGB
+            self.memoryPressureLevel = memoryPressureLevel
+            self.swapPagesPerSecond = swapPagesPerSecond
             self.diskFreeGB = diskFreeGB
             self.thermalLevel = thermalLevel
             self.topProcess = topProcess
@@ -94,6 +102,8 @@ public enum SystemVerdict {
         public static func == (a: Input, b: Input) -> Bool {
             a.cpuPercent == b.cpuPercent && a.memoryUsedGB == b.memoryUsedGB
                 && a.memoryTotalGB == b.memoryTotalGB && a.swapUsedGB == b.swapUsedGB
+                && a.memoryPressureLevel == b.memoryPressureLevel
+                && a.swapPagesPerSecond == b.swapPagesPerSecond
                 && a.diskFreeGB == b.diskFreeGB && a.thermalLevel == b.thermalLevel
                 && a.topProcess?.name == b.topProcess?.name
                 && a.topProcess?.percent == b.topProcess?.percent
@@ -106,6 +116,12 @@ public enum SystemVerdict {
         /// around even on an idle machine, and reporting it would be a false
         /// alarm.
         public static let swapGB = 2.0
+        /// Pages per second that count as the machine actually paging.
+        ///
+        /// A handful of pages moving is ordinary housekeeping. This is set well
+        /// above that but far below the thousands per second seen when memory is
+        /// genuinely short.
+        public static let swapPagesPerSecond = 50.0
         public static let memoryPercent = 85.0
         public static let cpuPercent = 80.0
         /// A process must account for most of the load before it is named,
@@ -131,9 +147,21 @@ public enum SystemVerdict {
                                        topic: .thermal))
         }
 
-        if input.swapUsedGB >= Threshold.swapGB {
+        // Swap in use is not by itself a problem, and reporting it as one was a
+        // real bug: `vm.swapusage` is a standing total, not a rate. macOS never
+        // proactively takes swap back, so a page written out during one busy
+        // moment sits on disk indefinitely, costing nothing. A machine with
+        // 2 GB of swap and two thirds of its memory free is not short of
+        // memory, and saying so trains people to ignore the line.
+        //
+        // So the amount only decides the wording. Whether to say anything at all
+        // comes from the two signals that describe now: what macOS itself
+        // reports about pressure, and whether pages are actually moving.
+        let underPressure = input.memoryPressureLevel >= 2
+        let paging = input.swapPagesPerSecond >= Threshold.swapPagesPerSecond
+        if input.swapUsedGB >= Threshold.swapGB, underPressure || paging {
             found.append(SystemFinding(kind: .swapping(gb: input.swapUsedGB),
-                                       severity: .warning,
+                                       severity: underPressure ? .warning : .notable,
                                        topic: .memory))
         }
 

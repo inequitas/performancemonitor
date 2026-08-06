@@ -454,14 +454,14 @@
 "All quiet." = "All quiet.";
 "Running hot, so macOS is slowing things down to cool off." = "Running hot, so macOS is slowing things down to cool off.";
 "Warm enough that macOS has started slowing things down." = "Warm enough that macOS has started slowing things down.";
-"Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow.";
+"Memory is short, so the Mac is shuffling %.1f GB between memory and disk." = "Memory is short, so the Mac is shuffling %.1f GB between memory and disk.";
 "%@ is using %.0f%% of the CPU." = "%@ is using %.0f%% of the CPU.";
 "CPU is at %.0f%%, spread across several processes." = "CPU is at %.0f%%, spread across several processes.";
 "Only %.1f GB left on the startup disk." = "Only %.1f GB left on the startup disk.";
 "%ld things worth a look." = "%ld things worth a look.";
 /* Advice: what the reader can do about each finding. */
 "Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface." = "Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface.";
-"Quitting apps you are not using will free memory. Top Memory shows which are holding the most." = "Quitting apps you are not using will free memory. Top Memory shows which are holding the most.";
+"That shuffling is what makes a Mac feel slow. Quitting apps you are not using will free memory; Top Memory shows which are holding the most." = "That shuffling is what makes a Mac feel slow. Quitting apps you are not using will free memory; Top Memory shows which are holding the most.";
 "%@ Being busy is normal for this one." = "%@ Being busy is normal for this one.";
 "If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it." = "If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it.";
 "No single process is responsible. Top CPU in the CPU window shows how it is divided." = "No single process is responsible. Top CPU in the CPU window shows how it is divided.";

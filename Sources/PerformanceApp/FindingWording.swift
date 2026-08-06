@@ -21,7 +21,7 @@ enum FindingWording {
                 : String(localized: "Warm enough that macOS has started slowing things down.")
 
         case let .swapping(gb):
-            return String(format: String(localized: "Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow."), gb)
+            return String(format: String(localized: "Memory is short, so the Mac is shuffling %.1f GB between memory and disk."), gb)
 
         case let .busyProcess(name, percent):
             // Through the glossary, so this reads "Spotlight (indexing)" rather
@@ -49,7 +49,7 @@ enum FindingWording {
             return String(localized: "Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface.")
 
         case .swapping:
-            return String(localized: "Quitting apps you are not using will free memory. Top Memory shows which are holding the most.")
+            return String(localized: "That shuffling is what makes a Mac feel slow. Quitting apps you are not using will free memory; Top Memory shows which are holding the most.")
 
         case let .busyProcess(name, _):
             // The glossary already knows what this process is and whether

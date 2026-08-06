@@ -454,14 +454,14 @@
 "All quiet." = "問題ありません。";
 "Running hot, so macOS is slowing things down to cool off." = "温度が高いため、macOS が冷却のため速度を下げています。";
 "Warm enough that macOS has started slowing things down." = "温度が上がり、macOS が速度を下げ始めました。";
-"Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "メモリが不足し、%.1f GB がディスクに移動しました。Mac が遅く感じる原因です。";
+"Memory is short, so the Mac is shuffling %.1f GB between memory and disk." = "メモリが不足しているため、Mac が %.1f GB をメモリとディスクの間で行き来させています。";
 "%@ is using %.0f%% of the CPU." = "%@ が CPU を %.0f%% 使用しています。";
 "CPU is at %.0f%%, spread across several processes." = "CPU 使用率は %.0f%% で、複数のプロセスに分散しています。";
 "Only %.1f GB left on the startup disk." = "起動ディスクの空き容量は %.1f GB のみです。";
 "%ld things worth a look." = "確認したい項目が %ld 件あります。";
 /* Advice: what the reader can do about each finding. */
 "Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface." = "冷えるまでは全体的に動作が遅くなります。何が熱の原因かを確認し、柔らかい場所に置いている場合は風通しをよくしてください。";
-"Quitting apps you are not using will free memory. Top Memory shows which are holding the most." = "使っていない App を終了するとメモリが空きます。Top Memory でどれが多く使っているか分かります。";
+"That shuffling is what makes a Mac feel slow. Quitting apps you are not using will free memory; Top Memory shows which are holding the most." = "この行き来が Mac を遅く感じさせます。使っていない App を終了するとメモリが空きます。Top Memory でどれが多く使っているか分かります。";
 "%@ Being busy is normal for this one." = "%@ この処理では負荷が高いのは正常です。";
 "If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it." = "自分で起動していないのに、何もしていない間も動き続けている場合は停止している可能性があります。Top CPU から終了できます。";
 "No single process is responsible. Top CPU in the CPU window shows how it is divided." = "特定のプロセスが原因ではありません。CPU ウインドウの Top CPU で内訳を確認できます。";

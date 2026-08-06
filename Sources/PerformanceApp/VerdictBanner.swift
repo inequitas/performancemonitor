@@ -24,6 +24,8 @@ struct VerdictBanner: View {
                 memoryUsedGB: engine.memoryUsedGB,
                 memoryTotalGB: engine.memoryTotalGB,
                 swapUsedGB: engine.swapUsedGB,
+                memoryPressureLevel: engine.memoryPressureLevel,
+                swapPagesPerSecond: engine.swapPagesPerSecond,
                 diskFreeGB: engine.diskFreeGB,
                 thermalLevel: Self.level(engine.thermalState),
                 // The CPU list is gated on a window being open, so most of the

@@ -454,14 +454,14 @@
 "All quiet." = "Alles ruhig.";
 "Running hot, so macOS is slowing things down to cool off." = "Es wird heiß, daher drosselt macOS zum Abkühlen.";
 "Warm enough that macOS has started slowing things down." = "Warm genug, dass macOS begonnen hat zu drosseln.";
-"Out of memory, so %.1f GB has moved to disk. That is what makes a Mac feel slow." = "Der Arbeitsspeicher ist voll, daher liegen %.1f GB auf der Festplatte. Das lässt einen Mac langsam wirken.";
+"Memory is short, so the Mac is shuffling %.1f GB between memory and disk." = "Der Speicher ist knapp, daher verschiebt der Mac %.1f GB zwischen Arbeitsspeicher und Festplatte hin und her.";
 "%@ is using %.0f%% of the CPU." = "%@ nutzt %.0f%% der CPU.";
 "CPU is at %.0f%%, spread across several processes." = "CPU bei %.0f%%, verteilt auf mehrere Prozesse.";
 "Only %.1f GB left on the startup disk." = "Nur noch %.1f GB auf dem Startvolume frei.";
 "%ld things worth a look." = "%ld Dinge, die einen Blick wert sind.";
 /* Advice: what the reader can do about each finding. */
 "Everything will run slower until it cools down. Check what is driving the heat, and give the machine some air if it is on a soft surface." = "Bis zur Abkühlung läuft alles langsamer. Prüfen Sie, was die Wärme verursacht, und sorgen Sie für Luft, wenn das Gerät auf einer weichen Unterlage steht.";
-"Quitting apps you are not using will free memory. Top Memory shows which are holding the most." = "Nicht genutzte Apps zu beenden gibt Speicher frei. Top Memory zeigt, welche am meisten belegen.";
+"That shuffling is what makes a Mac feel slow. Quitting apps you are not using will free memory; Top Memory shows which are holding the most." = "Dieses Hin und Her lässt einen Mac träge wirken. Nicht genutzte Apps zu beenden gibt Speicher frei; Top Memory zeigt, welche am meisten belegen.";
 "%@ Being busy is normal for this one." = "%@ Hohe Auslastung ist hier normal.";
 "If you did not start it and it stays busy while you are doing nothing, it may be stuck. Top CPU lets you quit it." = "Wenn Sie den Prozess nicht selbst gestartet haben und er auch im Leerlauf ausgelastet bleibt, hängt er womöglich. Über Top CPU können Sie ihn beenden.";
 "No single process is responsible. Top CPU in the CPU window shows how it is divided." = "Kein einzelner Prozess ist verantwortlich. Top CPU im CPU-Fenster zeigt die Verteilung.";
