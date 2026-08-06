@@ -319,10 +319,20 @@ final class MetricsEngine: ObservableObject {
         popoverVisible || visiblePanels.contains(.bluetooth)
     }
 
+    /// True when something shows the interface list, gateways or DNS servers.
+    private var networkDetailIsOnScreen: Bool {
+        popoverVisible || visiblePanels.contains(.network)
+    }
+
     func setPopoverVisible(_ visible: Bool) {
         guard visible != popoverVisible else { return }
         popoverVisible = visible
-        if visible { bluetoothSampler.resetThrottle() }
+        guard visible else { return }
+        bluetoothSampler.resetThrottle()
+        // The popover shows the local address and the VPN state, which are only
+        // read while something displays them. Without this the first open would
+        // show last session's values until the next tick.
+        applyNetwork()
     }
 
     func setPanelVisible(_ visible: Bool, for kind: Panel) {
@@ -337,6 +347,7 @@ final class MetricsEngine: ObservableObject {
             }
         case .network:
             if visible {
+                applyNetwork()
                 networkProcessSampler.resetThrottle()
                 updateNetworkProcesses()
                 portSampler.resetThrottle()
@@ -352,6 +363,7 @@ final class MetricsEngine: ObservableObject {
             }
         case .disk:
             if visible {
+                updateVolumes()
                 diskProcessSampler.resetThrottle()
                 updateDiskProcesses()
             } else {
@@ -798,7 +810,7 @@ final class MetricsEngine: ObservableObject {
     private func applyMemory() async {
         guard let s = await memorySampler.sample() else { return }
         memoryUsedGB = s.usedGB
-        memoryTotalGB = s.totalGB
+        if memoryTotalGB != s.totalGB { memoryTotalGB = s.totalGB }
         memoryAppGB = s.appGB
         memoryWiredGB = s.wiredGB
         memoryCompressedGB = s.compressedGB
@@ -811,13 +823,18 @@ final class MetricsEngine: ObservableObject {
     // MARK: - Network
 
     private func applyNetwork() {
-        guard let s = networkSampler.sample(connectionType: connectionType) else { return }
+        guard let s = networkSampler.sample(connectionType: connectionType, detailed: networkDetailIsOnScreen) else { return }
         downloadSpeedKBps = s.downloadKBps
         uploadSpeedKBps = s.uploadKBps
-        localInterfaces = s.interfaces
-        dnsServers = s.dnsServers
-        isVPNActive = s.isVPNActive
-        vpnIsFortiClient = s.vpnIsFortiClient
+        // Assign only what moved. Every @Published write fires
+        // objectWillChange whether or not the value changed, and most of what
+        // is republished each tick is identical to last tick's: the interface
+        // list, the DNS servers, the volumes, the battery's cycle count. With a
+        // window open that also makes SwiftUI diff a list that did not change.
+        if localInterfaces != s.interfaces { localInterfaces = s.interfaces }
+        if dnsServers != s.dnsServers { dnsServers = s.dnsServers }
+        if isVPNActive != s.isVPNActive { isVPNActive = s.isVPNActive }
+        if vpnIsFortiClient != s.vpnIsFortiClient { vpnIsFortiClient = s.vpnIsFortiClient }
         appendCapped(downloadSpeedKBps, to: &downloadHistory)
         appendCapped(uploadSpeedKBps, to: &uploadHistory)
         dataUsage.record(physicalBytesReceived: s.physicalBytesReceived, physicalBytesSent: s.physicalBytesSent)
@@ -827,7 +844,7 @@ final class MetricsEngine: ObservableObject {
 
     private func applyDisk() async {
         guard let s = await diskSampler.sample() else { return }
-        diskTotalGB = s.totalGB
+        if diskTotalGB != s.totalGB { diskTotalGB = s.totalGB }
         diskFreeGB = s.freeGB
         guard let io = s.io else { return }
         diskReadKBps = io.readKBps
@@ -845,7 +862,11 @@ final class MetricsEngine: ObservableObject {
     }
 
     private func updateVolumes() {
-        volumes = diskSampler.volumes()
+        // Only the Disk window lists volumes, and enumerating them touches the
+        // filesystem for every mount. Nothing else reads this.
+        guard visiblePanels.contains(.disk) else { return }
+        let currentVolumes = diskSampler.volumes()
+        if volumes != currentVolumes { volumes = currentVolumes }
     }
 
     // MARK: - Top processes
@@ -946,10 +967,10 @@ final class MetricsEngine: ObservableObject {
             batteryPercent = nil
             powerSourceName = "No battery"
         case let .present(percent, isCharging, timeRemaining, powerSourceName, health):
-            batteryPercent = percent
-            batteryIsCharging = isCharging
-            batteryTimeRemainingMinutes = timeRemaining
-            self.powerSourceName = powerSourceName
+            if batteryPercent != percent { batteryPercent = percent }
+            if batteryIsCharging != isCharging { batteryIsCharging = isCharging }
+            if batteryTimeRemainingMinutes != timeRemaining { batteryTimeRemainingMinutes = timeRemaining }
+            if self.powerSourceName != powerSourceName { self.powerSourceName = powerSourceName }
             applyBatteryHealth(health)
         }
     }
@@ -960,10 +981,10 @@ final class MetricsEngine: ObservableObject {
         case .unavailable:
             batteryCycleCount = nil
         case let .values(cycleCount, designCycleCount, healthPercent, temperatureC, voltage, amperage, condition):
-            batteryCycleCount = cycleCount
-            batteryDesignCycleCount = designCycleCount
-            batteryHealthPercent = healthPercent
-            batteryAmperage = amperage
+            if batteryCycleCount != cycleCount { batteryCycleCount = cycleCount }
+            if batteryDesignCycleCount != designCycleCount { batteryDesignCycleCount = designCycleCount }
+            if batteryHealthPercent != healthPercent { batteryHealthPercent = healthPercent }
+            if batteryAmperage != amperage { batteryAmperage = amperage }
             if let temperatureC { batteryTemperatureC = temperatureC }
             if let voltage { batteryVoltage = voltage }
             if let condition { batteryCondition = condition }
@@ -1029,8 +1050,8 @@ final class MetricsEngine: ObservableObject {
         case .throttled:
             break
         case let .value(ssid, rssi):
-            wifiSSID = ssid
-            wifiRSSI = rssi
+            if wifiSSID != ssid { wifiSSID = ssid }
+            if wifiRSSI != rssi { wifiRSSI = rssi }
         }
     }
 

@@ -26,7 +26,11 @@ protocol NetworkSampling: AnyObject {
     /// and detects VPNs. Returns `nil` if `getifaddrs` fails (engine leaves
     /// network state untouched). `connectionType` is the primary link kind as
     /// reported by the engine's path monitor ("Wi-Fi"/"Ethernet"/…).
-    func sample(connectionType: String) -> NetworkSnapshot?
+    /// - Parameter detailed: Whether anything on screen shows the interface
+    ///   list, gateways or DNS servers. When nothing does, those lookups are
+    ///   skipped: the byte counters the menu bar needs come from the same walk,
+    ///   but each interface otherwise costs two `SCDynamicStore` round trips.
+    func sample(connectionType: String, detailed: Bool) -> NetworkSnapshot?
 }
 
 /// Owns the previous byte counters and the `SCDynamicStore` handle used for
@@ -34,9 +38,11 @@ protocol NetworkSampling: AnyObject {
 final class NetworkSampler: NetworkSampling {
     private var previousBytes: (received: UInt64, sent: UInt64)?
     private var previousTimestamp: Date?
+    /// Last reported rates, reused when two samples land too close together.
+    private var previousRates: (download: Double, upload: Double) = (0, 0)
     private let dynStore: SCDynamicStore? = SCDynamicStoreCreate(nil, "PerformanceApp" as CFString, nil, nil)
 
-    func sample(connectionType: String) -> NetworkSnapshot? {
+    func sample(connectionType: String, detailed: Bool) -> NetworkSnapshot? {
         var ifaddrPtr: UnsafeMutablePointer<ifaddrs>?
         guard getifaddrs(&ifaddrPtr) == 0, let firstAddr = ifaddrPtr else { return nil }
         defer { freeifaddrs(ifaddrPtr) }
@@ -93,7 +99,7 @@ final class NetworkSampler: NetworkSampling {
                         let net = UInt32(bigEndian: addrIn.sin_addr.s_addr) & maskBits
                         netAddr = "\(net >> 24).\((net >> 16) & 0xFF).\((net >> 8) & 0xFF).\(net & 0xFF)"
                     }
-                    if !isVPN {
+                    if !isVPN, detailed {
                         var gw: String? = nil
                         if let store = dynStore {
                             // Per-interface key (present when DHCP assigns the route)
@@ -127,7 +133,7 @@ final class NetworkSampler: NetworkSampling {
             .sorted { $0.isPrimary && !$1.isPrimary }
 
         var vpnIsFortiClient = false
-        if vpnDetected {
+        if vpnDetected, detailed {
             vpnIsFortiClient = NSWorkspace.shared.runningApplications.contains {
                 let id = $0.bundleIdentifier?.lowercased() ?? ""
                 let name = $0.localizedName?.lowercased() ?? ""
@@ -138,21 +144,35 @@ final class NetworkSampler: NetworkSampling {
         var downloadKBps: Double = 0
         var uploadKBps: Double = 0
         let now = Date()
+        // An extra sample taken right after the last one, to fill the popover
+        // the moment it opens, would otherwise divide a handful of bytes by a
+        // few milliseconds and report a spike that never happened. Below this
+        // gap the previous rates stand and the baseline is left alone, so the
+        // next scheduled tick still measures a full interval.
+        let minimumInterval: TimeInterval = 0.25
+        var keepBaseline = false
         if let prev = previousBytes, let prevTime = previousTimestamp {
             let elapsed = now.timeIntervalSince(prevTime)
-            if elapsed > 0 {
+            if elapsed >= minimumInterval {
                 let receivedDelta = Double(totalReceived &- prev.received)
                 let sentDelta = Double(totalSent &- prev.sent)
                 downloadKBps = max(receivedDelta, 0) / elapsed / 1024
                 uploadKBps = max(sentDelta, 0) / elapsed / 1024
+            } else {
+                downloadKBps = previousRates.download
+                uploadKBps = previousRates.upload
+                keepBaseline = true
             }
         }
-        previousBytes = (totalReceived, totalSent)
-        previousTimestamp = now
+        if !keepBaseline {
+            previousBytes = (totalReceived, totalSent)
+            previousTimestamp = now
+        }
+        previousRates = (downloadKBps, uploadKBps)
 
         // Read active DNS servers from the system dynamic store.
         var dnsServers: [String] = []
-        if let store = dynStore,
+        if detailed, let store = dynStore,
            let dict = SCDynamicStoreCopyValue(store, "State:/Network/Global/DNS" as CFString) as? [String: Any],
            let servers = dict["ServerAddresses"] as? [String] {
             dnsServers = servers.filter { !$0.contains(":") }

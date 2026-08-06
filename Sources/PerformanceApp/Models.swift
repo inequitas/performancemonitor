@@ -21,7 +21,7 @@ struct DisplayInfo: Identifiable {
     var connectionType: String = ""
 }
 
-struct VolumeInfo: Identifiable {
+struct VolumeInfo: Identifiable, Equatable {
     let name: String
     let totalGB: Double
     let freeGB: Double

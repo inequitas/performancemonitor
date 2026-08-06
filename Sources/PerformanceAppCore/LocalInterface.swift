@@ -5,7 +5,7 @@ import Foundation
 /// Pure value type — no AppKit/SwiftUI dependencies. `icon` returns SF Symbol
 /// names as plain strings so this can live in Core and be unit tested without
 /// SwiftUI. Extracted from `MetricsEngine` in the Part-A decomposition.
-public struct LocalInterface: Identifiable {
+public struct LocalInterface: Identifiable, Equatable {
     public enum Kind { case wifi, ethernet, vpn, other }
 
     public let name: String
