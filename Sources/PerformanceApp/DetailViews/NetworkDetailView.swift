@@ -163,6 +163,65 @@ struct NetworkDetailView: View {
                 }
             }
             SectionCard {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Label(String(localized: "Listening Ports"), systemImage: "lock.open")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(MetricTheme.networkDown)
+                        Spacer()
+                        InfoButton(text: String(localized: "Ports this Mac is accepting connections on. This reports only; it does not block anything, which is a firewall's job.\n\nWithout an administrator password macOS does not reveal the open files of processes owned by other users, so system services run by root are missing. This is the same limit `lsof` has without `sudo`, and it shows the same ports."))
+                    }
+                    if engine.listeningPorts.isEmpty {
+                        Text(String(localized: "Nothing is listening.")).font(.caption).foregroundStyle(.secondary)
+                    } else {
+                        ForEach(engine.listeningPorts) { port in
+                            HStack(spacing: 6) {
+                                Text(verbatim: "\(port.port)")
+                                    .font(.caption.monospacedDigit().weight(.medium))
+                                    .frame(width: 46, alignment: .leading)
+                                Text(GlossaryStore.shared.entry(for: port.processName)?.title ?? port.processName)
+                                    .font(.caption).lineLimit(1)
+                                if let use = ListeningPortList.wellKnownUse(port.port) {
+                                    Text(use)
+                                        .font(.caption2)
+                                        .foregroundStyle(.secondary)
+                                        .padding(.horizontal, 4).padding(.vertical, 1)
+                                        .background(Color.secondary.opacity(0.12), in: Capsule())
+                                }
+                                Spacer()
+                                // Almost every port is open on both families;
+                                // saying so once beats two identical rows.
+                                Text(verbatim: port.bothFamilies ? "IPv4/6" : "IPv4")
+                                    .font(.caption2.monospacedDigit())
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                    }
+                }
+            }
+
+            SectionCard {
+                VStack(alignment: .leading, spacing: 6) {
+                    Label(String(localized: "Open Connections"), systemImage: "arrow.left.arrow.right")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(MetricTheme.networkDown)
+                    if engine.connectionCounts.isEmpty {
+                        Text(String(localized: "No open connections.")).font(.caption).foregroundStyle(.secondary)
+                    } else {
+                        ForEach(engine.connectionCounts) { proc in
+                            HStack {
+                                Text(GlossaryStore.shared.entry(for: proc.name)?.title ?? proc.name)
+                                    .font(.caption).lineLimit(1)
+                                Spacer()
+                                Text(String(format: String(localized: "%ld connections"), Int(proc.value)))
+                                    .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+
+            SectionCard {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
                         Label(String(localized: "Data Usage"), systemImage: "chart.bar.doc.horizontal")

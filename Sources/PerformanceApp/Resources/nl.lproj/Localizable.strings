@@ -308,6 +308,13 @@
 "Timeout" = "Time-out";
 "Ping latency history" = "Ping-latentiegeschiedenis";
 "Top Network Usage" = "Topnetwerkgebruik";
+/* Listening ports and open connections. */
+"Listening Ports" = "Luisterende poorten";
+"Nothing is listening." = "Er luistert niets.";
+"Open Connections" = "Open verbindingen";
+"No open connections." = "Geen open verbindingen.";
+"%ld connections" = "%ld verbindingen";
+"Ports this Mac is accepting connections on. This reports only; it does not block anything, which is a firewall's job.\n\nWithout an administrator password macOS does not reveal the open files of processes owned by other users, so system services run by root are missing. This is the same limit `lsof` has without `sudo`, and it shows the same ports." = "Poorten waarop deze Mac verbindingen accepteert. Dit rapporteert alleen; het blokkeert niets, dat is het werk van een firewall.\n\nZonder beheerderswachtwoord toont macOS de geopende bestanden van processen van andere gebruikers niet, dus systeemdiensten die als root draaien ontbreken. Dat is dezelfde beperking die `lsof` zonder `sudo` heeft, en het toont dezelfde poorten.";
 "Measuring…" = "Meten…";
 "primary connection" = "primaire verbinding";
 "Subnet" = "Subnet";

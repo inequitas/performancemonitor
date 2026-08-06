@@ -307,6 +307,13 @@
 "Timeout" = "超时";
 "Ping latency history" = "Ping 延迟历史记录";
 "Top Network Usage" = "网络占用最高";
+/* Listening ports and open connections. */
+"Listening Ports" = "正在监听的端口";
+"Nothing is listening." = "没有任何端口在监听。";
+"Open Connections" = "已建立的连接";
+"No open connections." = "没有已建立的连接。";
+"%ld connections" = "%ld 个连接";
+"Ports this Mac is accepting connections on. This reports only; it does not block anything, which is a firewall's job.\n\nWithout an administrator password macOS does not reveal the open files of processes owned by other users, so system services run by root are missing. This is the same limit `lsof` has without `sudo`, and it shows the same ports." = "这台 Mac 正在接受连接的端口。此处只做报告，不会拦截任何内容，拦截是防火墙的职责。\n\n没有管理员密码时，macOS 不会显示其他用户所属进程打开的文件，因此以 root 运行的系统服务不会出现。这与 `lsof` 在不加 `sudo` 时的限制相同，显示的端口也一样。";
 "Measuring…" = "正在测量…";
 "primary connection" = "主连接";
 "Subnet" = "子网";

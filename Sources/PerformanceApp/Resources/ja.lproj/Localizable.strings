@@ -308,6 +308,13 @@
 "Timeout" = "タイムアウト";
 "Ping latency history" = "Ping遅延の履歴";
 "Top Network Usage" = "ネットワーク使用量トップ";
+/* Listening ports and open connections. */
+"Listening Ports" = "待ち受け中のポート";
+"Nothing is listening." = "待ち受けているものはありません。";
+"Open Connections" = "確立中の接続";
+"No open connections." = "確立中の接続はありません。";
+"%ld connections" = "%ld 件の接続";
+"Ports this Mac is accepting connections on. This reports only; it does not block anything, which is a firewall's job.\n\nWithout an administrator password macOS does not reveal the open files of processes owned by other users, so system services run by root are missing. This is the same limit `lsof` has without `sudo`, and it shows the same ports." = "この Mac が接続を受け付けているポートです。ここでは報告のみを行い、遮断はしません。遮断はファイアウォールの役割です。\n\n管理者パスワードなしでは、macOS は他のユーザが所有するプロセスの開いているファイルを見せないため、root で動くシステムサービスは表示されません。これは `sudo` なしの `lsof` と同じ制限で、表示されるポートも同じです。";
 "Measuring…" = "測定中…";
 "primary connection" = "メイン接続";
 "Subnet" = "サブネット";

@@ -77,6 +77,11 @@ final class MetricsEngine: ObservableObject {
     @Published var topNetworkProcesses: [ProcessUsage] = []
     @Published var topDiskProcesses: [ProcessUsage] = []
 
+    /// Ports this Mac is accepting connections on, and open connections per
+    /// app. Only sampled while the Network window is visible.
+    @Published var listeningPorts: [ListeningPort] = []
+    @Published var connectionCounts: [ProcessUsage] = []
+
     @Published var localInterfaces: [LocalInterface] = []
     @Published var dnsServers: [String] = []
     @Published var isVPNActive: Bool = false
@@ -180,6 +185,7 @@ final class MetricsEngine: ObservableObject {
     private let smcSampler: SMCSampling = SMCSampler()
     private let snapshotWriter = SnapshotWriter()
     private let systemEventSampler: SystemEventSampling = SystemEventSampler()
+    private let portSampler: PortSampling = PortSampler()
     private let powerSampler: PowerSampling = PowerSampler()
     private let bluetoothSampler = BluetoothSampler()
 
@@ -318,6 +324,8 @@ final class MetricsEngine: ObservableObject {
             if visible {
                 networkProcessSampler.resetThrottle()
                 updateNetworkProcesses()
+                portSampler.resetThrottle()
+                updatePorts()
                 // Latency is only ever displayed by the Network detail window,
                 // so the probe only runs while that window is on screen.
                 startPingTimer()
@@ -726,6 +734,7 @@ final class MetricsEngine: ObservableObject {
         updateProcesses()
         updateNetworkProcesses()
         updateDiskProcesses()
+        updatePorts()
         await applyBattery()
         applyWiFi()
         bluetoothSampler.update()
@@ -1035,6 +1044,17 @@ final class MetricsEngine: ObservableObject {
             self.extendedTemperatures   = s.extendedTemperatures
             self.unknownSMCTemperatures = s.unknownSMCTemperatures
             self.systemPowerWatts       = s.systemPowerWatts
+        }
+    }
+
+    private func updatePorts() {
+        guard visiblePanels.contains(.network) else { return }
+        Task { @MainActor [weak self] in
+            guard let self,
+                  let snapshot = await self.portSampler.sample(owners: GlossaryStore.shared.owners)
+            else { return }
+            self.listeningPorts = snapshot.listening
+            self.connectionCounts = snapshot.connections
         }
     }
 

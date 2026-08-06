@@ -308,6 +308,13 @@
 "Timeout" = "Zeitüberschreitung";
 "Ping latency history" = "Ping-Latenzverlauf";
 "Top Network Usage" = "Top-Netzwerknutzung";
+/* Listening ports and open connections. */
+"Listening Ports" = "Lauschende Ports";
+"Nothing is listening." = "Nichts lauscht.";
+"Open Connections" = "Offene Verbindungen";
+"No open connections." = "Keine offenen Verbindungen.";
+"%ld connections" = "%ld Verbindungen";
+"Ports this Mac is accepting connections on. This reports only; it does not block anything, which is a firewall's job.\n\nWithout an administrator password macOS does not reveal the open files of processes owned by other users, so system services run by root are missing. This is the same limit `lsof` has without `sudo`, and it shows the same ports." = "Ports, auf denen dieser Mac Verbindungen annimmt. Dies meldet nur; es blockiert nichts, das ist Aufgabe einer Firewall.\n\nOhne Administratorkennwort zeigt macOS die geöffneten Dateien von Prozessen anderer Benutzer nicht an, daher fehlen als root laufende Systemdienste. Das ist dieselbe Grenze, die `lsof` ohne `sudo` hat, und es zeigt dieselben Ports.";
 "Measuring…" = "Wird gemessen…";
 "primary connection" = "primäre Verbindung";
 "Subnet" = "Subnetz";
