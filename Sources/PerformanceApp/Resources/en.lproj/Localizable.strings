@@ -454,6 +454,16 @@
 
 /* MARK: - Verdict banner */
 "All quiet." = "All quiet.";
+/* History: what happened to the machine, marked on the graphs. */
+"Went to sleep, %@" = "Went to sleep, %@";
+"Woke up, %@" = "Woke up, %@";
+"Woke up because %1$@, %2$@" = "Woke up because %1$@, %2$@";
+"Started throttling, %@" = "Started throttling, %@";
+"the lid was opened" = "the lid was opened";
+"the keyboard or trackpad was used" = "the keyboard or trackpad was used";
+"the power button was pressed" = "the power button was pressed";
+"network activity" = "network activity";
+"a scheduled task" = "a scheduled task";
 "Nothing worth a look. All quiet." = "Nothing worth a look. All quiet.";
 "Running hot, so macOS is slowing things down to cool off." = "Running hot, so macOS is slowing things down to cool off.";
 "Warm enough that macOS has started slowing things down." = "Warm enough that macOS has started slowing things down.";

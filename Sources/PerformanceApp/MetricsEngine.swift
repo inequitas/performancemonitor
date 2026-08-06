@@ -66,6 +66,10 @@ final class MetricsEngine: ObservableObject {
     @Published var gpuMetricsAvailable: Bool = false
     @Published var volumes: [VolumeInfo] = []
 
+    /// Sleep and wake read from the system log, plus throttling this app saw
+    /// happen, newest first. Only populated while the History window is open.
+    @Published var systemEvents: [SystemEvent] = []
+
     @Published var thermalState: ProcessInfo.ThermalState = .nominal
 
     @Published var topCPUProcesses: [ProcessUsage] = []
@@ -175,6 +179,7 @@ final class MetricsEngine: ObservableObject {
     private let gpuSampler: GPUSampling = GPUSampler()
     private let smcSampler: SMCSampling = SMCSampler()
     private let snapshotWriter = SnapshotWriter()
+    private let systemEventSampler: SystemEventSampling = SystemEventSampler()
     private let powerSampler: PowerSampling = PowerSampler()
     private let bluetoothSampler = BluetoothSampler()
 
@@ -397,6 +402,25 @@ final class MetricsEngine: ObservableObject {
         topMemoryProcesses = snapshot.topMemory
     }
 
+    /// Loads sleep and wake events. Called when the History window opens; the
+    /// sampler throttles the actual work to once every ten minutes.
+    func refreshSystemEvents() async {
+        guard let events = await systemEventSampler.sample() else { return }
+        // Throttling this app watched happen is kept: it is not in any log, so
+        // dropping it would lose the only record there is.
+        let observed = systemEvents.filter { $0.kind == .throttling }
+        systemEvents = (events + observed).sorted { $0.date > $1.date }
+    }
+
+    /// Records that throttling began. macOS keeps no log of this, so if the app
+    /// does not write it down as it happens, nothing can show it later.
+    private func recordThrottlingIfStarted(from previous: ProcessInfo.ThermalState) {
+        let wasThrottling = Self.verdictThermalLevel(previous) >= 2
+        let isThrottling = Self.verdictThermalLevel(thermalState) >= 2
+        guard isThrottling, !wasThrottling else { return }
+        systemEvents.insert(SystemEvent(kind: .throttling, date: Date()), at: 0)
+    }
+
     func sparklineHistory(for metric: MenuBarMetric) -> [Double] {
         switch metric {
         case .cpu:     return Array(cpuHistory.suffix(30))
@@ -483,7 +507,10 @@ final class MetricsEngine: ObservableObject {
             object: nil, queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                self?.thermalState = ProcessInfo.processInfo.thermalState
+                guard let self else { return }
+                let previous = self.thermalState
+                self.thermalState = ProcessInfo.processInfo.thermalState
+                self.recordThrottlingIfStarted(from: previous)
             }
         }
         NotificationCenter.default.addObserver(

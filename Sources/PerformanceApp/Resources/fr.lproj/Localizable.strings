@@ -454,6 +454,16 @@
 
 /* MARK: - Verdict banner */
 "All quiet." = "Tout est calme.";
+/* History: what happened to the machine, marked on the graphs. */
+"Went to sleep, %@" = "Mise en veille, %@";
+"Woke up, %@" = "Réveil, %@";
+"Woke up because %1$@, %2$@" = "Réveil parce que %1$@, %2$@";
+"Started throttling, %@" = "Début de bridage, %@";
+"the lid was opened" = "l'écran a été ouvert";
+"the keyboard or trackpad was used" = "le clavier ou le trackpad a été utilisé";
+"the power button was pressed" = "le bouton d'alimentation a été pressé";
+"network activity" = "il y a eu de l'activité réseau";
+"a scheduled task" = "une tâche planifiée";
 "Nothing worth a look. All quiet." = "Rien à signaler. Tout est calme.";
 "Running hot, so macOS is slowing things down to cool off." = "Ça chauffe, donc macOS ralentit le système pour refroidir.";
 "Warm enough that macOS has started slowing things down." = "Assez chaud pour que macOS ait commencé à ralentir le système.";

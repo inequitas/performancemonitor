@@ -453,6 +453,16 @@
 
 /* MARK: - Verdict banner */
 "All quiet." = "一切正常。";
+/* History: what happened to the machine, marked on the graphs. */
+"Went to sleep, %@" = "进入睡眠，%@";
+"Woke up, %@" = "唤醒，%@";
+"Woke up because %1$@, %2$@" = "因%1$@而唤醒，%2$@";
+"Started throttling, %@" = "开始降频，%@";
+"the lid was opened" = "掀开上盖";
+"the keyboard or trackpad was used" = "使用了键盘或触控板";
+"the power button was pressed" = "按下了电源键";
+"network activity" = "有网络活动";
+"a scheduled task" = "计划任务";
 "Nothing worth a look. All quiet." = "没有需要关注的事项，一切正常。";
 "Running hot, so macOS is slowing things down to cool off." = "温度偏高，macOS 正在降速以散热。";
 "Warm enough that macOS has started slowing things down." = "温度已足够高，macOS 已开始降速。";

@@ -32,6 +32,14 @@ struct HistoryWindow: View {
 
     private var hasAnyData: Bool { samplesByMetric.values.contains { !$0.isEmpty } }
 
+    /// Events inside the period on screen. A machine that has been alive for
+    /// years has thousands of these, and one outside the axis would either be
+    /// clipped or stretch the axis to fit it.
+    private var visibleEvents: [SystemEvent] {
+        let cutoff = Date().addingTimeInterval(-period.duration)
+        return engine.systemEvents.filter { $0.date >= cutoff }
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Unmounted while the window is off screen: SwiftUI keeps this
@@ -54,6 +62,7 @@ struct HistoryWindow: View {
         .preferredColorScheme(engine.settings.preferredColorScheme)
         // `id:` includes visibility so closing the window cancels the reload
         // loop instead of leaving it querying the database forever.
+        .task { await engine.refreshSystemEvents() }
         .task(id: LoadKey(period: period,
                           enabled: engine.settings.persistHistoryEnabled,
                           visible: isContentVisible)) {
@@ -82,7 +91,9 @@ struct HistoryWindow: View {
                 VStack(spacing: 12) {
                     WeeklySummaryCard(metricSummaries: weeklyMetricSummaries, dataUsage: weeklyDataUsage)
                     ForEach(historyMetrics) { info in
-                        HistoryChartCard(info: info, period: period, samples: samplesByMetric[info.metric] ?? [])
+                        HistoryChartCard(info: info, period: period,
+                                         samples: samplesByMetric[info.metric] ?? [],
+                                         events: visibleEvents)
                     }
                 }
                 .padding(14)
@@ -210,6 +221,50 @@ enum HistoryPeriod: String, CaseIterable, Identifiable {
 
 // MARK: - Metric metadata
 
+extension HistoryChartCard {
+    static func symbol(for kind: SystemEvent.Kind) -> String {
+        switch kind {
+        case .sleep:      return "moon.fill"
+        case .wake:       return "sun.max.fill"
+        case .throttling: return "thermometer.high"
+        }
+    }
+
+    static func tint(for kind: SystemEvent.Kind) -> Color {
+        switch kind {
+        case .sleep:      return .secondary
+        case .wake:       return .blue
+        case .throttling: return .orange
+        }
+    }
+
+    /// The tooltip. The wake reason is only named when the log actually said
+    /// something recognisable; a driver code translated into a story would be
+    /// worse than no reason at all.
+    static func label(for event: SystemEvent) -> String {
+        let time = event.date.formatted(date: .abbreviated, time: .shortened)
+        switch event.kind {
+        case .sleep:
+            return String(format: String(localized: "Went to sleep, %@"), time)
+        case .throttling:
+            return String(format: String(localized: "Started throttling, %@"), time)
+        case let .wake(reason):
+            let why: String? = {
+                switch reason {
+                case .lid:       return String(localized: "the lid was opened")
+                case .keyboard:  return String(localized: "the keyboard or trackpad was used")
+                case .power:     return String(localized: "the power button was pressed")
+                case .network:   return String(localized: "network activity")
+                case .scheduled: return String(localized: "a scheduled task")
+                case .unknown:   return nil
+                }
+            }()
+            guard let why else { return String(format: String(localized: "Woke up, %@"), time) }
+            return String(format: String(localized: "Woke up because %1$@, %2$@"), why, time)
+        }
+    }
+}
+
 private struct HistoryMetricInfo: Identifiable {
     let metric: HistoryMetric
     let title: String
@@ -303,6 +358,8 @@ private struct HistoryChartCard: View {
     let info: HistoryMetricInfo
     let period: HistoryPeriod
     let samples: [HistorySampleRow]
+    /// Sleep, wake and throttling, already trimmed to the visible period.
+    let events: [SystemEvent]
 
     private var latest: Double? { samples.last?.avg }
 
@@ -340,6 +397,21 @@ private struct HistoryChartCard: View {
                         )
                         .foregroundStyle(info.color)
                         .interpolationMethod(.monotone)
+
+                        // Drawn after the line so the marks sit on top of it.
+                        // A graph showing an hour of high CPU does not say why;
+                        // "the lid was shut here" turns a shape into an answer.
+                        ForEach(events) { event in
+                            RuleMark(x: .value("Time", event.date))
+                                .foregroundStyle(Self.tint(for: event.kind).opacity(0.55))
+                                .lineStyle(StrokeStyle(lineWidth: 1, dash: [3, 2]))
+                                .annotation(position: .top, spacing: 0) {
+                                    Image(systemName: Self.symbol(for: event.kind))
+                                        .font(.system(size: 8))
+                                        .foregroundStyle(Self.tint(for: event.kind))
+                                        .help(Self.label(for: event))
+                                }
+                        }
                     }
                     .chartXAxis {
                         AxisMarks(values: .automatic(desiredCount: 4)) { _ in

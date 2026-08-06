@@ -454,6 +454,16 @@
 
 /* MARK: - Verdict banner */
 "All quiet." = "Alles rustig.";
+/* History: what happened to the machine, marked on the graphs. */
+"Went to sleep, %@" = "Ging slapen, %@";
+"Woke up, %@" = "Werd wakker, %@";
+"Woke up because %1$@, %2$@" = "Werd wakker doordat %1$@, %2$@";
+"Started throttling, %@" = "Begon te throttlen, %@";
+"the lid was opened" = "het deksel werd geopend";
+"the keyboard or trackpad was used" = "het toetsenbord of trackpad werd gebruikt";
+"the power button was pressed" = "de aan-uitknop werd ingedrukt";
+"network activity" = "er netwerkactiviteit was";
+"a scheduled task" = "een geplande taak";
 "Nothing worth a look. All quiet." = "Niets dat aandacht vraagt. Alles rustig.";
 "Running hot, so macOS is slowing things down to cool off." = "Het wordt heet, dus macOS knijpt af om af te koelen.";
 "Warm enough that macOS has started slowing things down." = "Warm genoeg dat macOS is begonnen met afknijpen.";
