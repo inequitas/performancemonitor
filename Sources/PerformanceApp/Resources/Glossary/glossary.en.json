@@ -599,30 +599,30 @@
       "match": {
         "name": "com.apple.WebKit.WebContent"
       },
-      "title": "Safari (web page)",
+      "title": "Web page (WebKit)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Renders one web page for Safari or another WebKit app. Each tab gets its own, so a heavy tab shows up here rather than as Safari itself.",
+      "description": "One web page, in the process macOS isolates it in. Safari uses these, but so do Mail, Notes, the App Store and any app showing web content, so this does not tell you which app it belongs to.",
       "group": "WebKit"
     },
     {
       "match": {
         "name": "com.apple.WebKit.Networking"
       },
-      "title": "Safari (networking)",
+      "title": "Web networking (WebKit)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Handles network requests for Safari and other WebKit apps.",
+      "description": "Fetches the network traffic for web content, on behalf of whichever apps are showing it.",
       "group": "WebKit"
     },
     {
       "match": {
         "name": "com.apple.WebKit.GPU"
       },
-      "title": "Safari (graphics)",
+      "title": "Web graphics (WebKit)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Draws page content for Safari using the GPU.",
+      "description": "Draws web content using the graphics chip, shared by every app showing a web view.",
       "group": "WebKit"
     },
     {
@@ -1166,6 +1166,327 @@
       "vendor": "Apple",
       "expectedHigh": false,
       "description": "Plays the moving aerial wallpapers and screen savers. Only busy while one is on screen."
+    },
+    {
+      "match": {
+        "name": "Bitwarden"
+      },
+      "title": "Bitwarden",
+      "category": "app",
+      "vendor": "Bitwarden",
+      "expectedHigh": false,
+      "description": "A password manager. Like other Electron apps it runs several processes, and holds your vault decrypted in memory while unlocked."
+    },
+    {
+      "match": {
+        "name": "MTLCompilerService"
+      },
+      "title": "Metal shader compiler",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Compiles graphics code for apps and games as they need it. Busy in bursts when something starts or loads a new scene, then gone."
+    },
+    {
+      "match": {
+        "name": "usernoted"
+      },
+      "title": "Notifications (delivery)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Delivers notifications and keeps the banners and badges in step with what apps have sent."
+    },
+    {
+      "match": {
+        "name": "softwareupdated"
+      },
+      "title": "Software Update",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Checks for and downloads macOS updates in the background. Heavy only while an update is downloading."
+    },
+    {
+      "match": {
+        "name": "appstoreagent"
+      },
+      "title": "App Store (background)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Checks for app updates and handles purchases without the App Store window being open."
+    },
+    {
+      "match": {
+        "name": "dataaccessd"
+      },
+      "title": "Account sync",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Syncs Mail, Contacts and Calendar with the accounts you have added. Busy after a long time offline or when an account is first set up."
+    },
+    {
+      "match": {
+        "name": "proactived"
+      },
+      "title": "Suggestions (on device)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Works out what macOS should suggest next, from how you use the Mac. Runs on device and is idle most of the time."
+    },
+    {
+      "match": {
+        "name": "QuickLookUIService"
+      },
+      "title": "Quick Look",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Draws the preview you get when you press Space on a file. Appears while a preview is open and goes away after."
+    },
+    {
+      "match": {
+        "name": "extensionkitservice"
+      },
+      "title": "App extension host",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Runs an extension an app provides, such as a share option or a widget, in its own process."
+    },
+    {
+      "match": {
+        "name": "AirDrop"
+      },
+      "title": "AirDrop",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Finds nearby devices and transfers files to them. Active while the share sheet is open or a transfer is running."
+    },
+    {
+      "match": {
+        "name": "generativeexperiencesd"
+      },
+      "title": "Apple Intelligence",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Runs the on-device part of Apple's writing and summarising features. Busy while one of them is working, idle otherwise."
+    },
+    {
+      "match": {
+        "name": "TGOnDeviceInferenceProviderService"
+      },
+      "title": "On-device model",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Runs a machine learning model locally, for features that work without sending anything to a server."
+    },
+    {
+      "match": {
+        "name": "managedcorespotlightd"
+      },
+      "title": "Spotlight (managed data)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Indexes app content that an employer's device management allows to be searched.",
+      "group": "Spotlight indexing"
+    },
+    {
+      "match": {
+        "name": "AMPLibraryAgent"
+      },
+      "title": "Music library",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Keeps the Music and TV libraries in order and in sync. Busy after importing or a large library change."
+    },
+    {
+      "match": {
+        "name": "weatherd"
+      },
+      "title": "Weather",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Fetches forecasts for the Weather app, its widget and the menu bar."
+    },
+    {
+      "match": {
+        "name": "com.apple.weather.menu"
+      },
+      "title": "Weather (menu bar)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "The weather item in the menu bar.",
+      "group": "weatherd"
+    },
+    {
+      "match": {
+        "name": "WeatherWidget"
+      },
+      "title": "Weather (widget)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "The weather widget on the desktop or in Notification Center.",
+      "group": "weatherd"
+    },
+    {
+      "match": {
+        "name": "com.apple.Safari.SafeBrowsing.Service"
+      },
+      "title": "Safari (fraud warning)",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Checks pages against Apple's list of known fraudulent sites, without sending Apple the page you are on.",
+      "group": "Safari"
+    },
+    {
+      "match": {
+        "name": "nbagent"
+      },
+      "title": "Notes (background)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Handles Notes syncing and its share extension when the app itself is closed."
+    },
+    {
+      "match": {
+        "name": "OneDrive Sync Service"
+      },
+      "title": "OneDrive (sync)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "The part of OneDrive that does the actual uploading and downloading.",
+      "group": "OneDrive"
+    },
+    {
+      "match": {
+        "name": "com.microsoft.teams2.notificationcenter"
+      },
+      "title": "Microsoft Teams (notifications)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Shows Teams notifications, including while the main window is closed.",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "Citrix Workspace"
+      },
+      "title": "Citrix Workspace",
+      "category": "app",
+      "vendor": "Citrix",
+      "expectedHigh": false,
+      "description": "Connects to applications and desktops hosted by an employer. Uses more CPU while a remote session is on screen."
+    },
+    {
+      "match": {
+        "name": "FortiTray"
+      },
+      "title": "FortiClient",
+      "category": "security",
+      "vendor": "Fortinet",
+      "expectedHigh": false,
+      "description": "The menu bar part of Fortinet's VPN and security client, usually installed by an employer."
+    },
+    {
+      "match": {
+        "name": "DisplayLinkUserAgent"
+      },
+      "title": "DisplayLink",
+      "category": "app",
+      "vendor": "DisplayLink",
+      "expectedHigh": true,
+      "description": "Drives extra monitors connected through a dock rather than a video port. Uses real CPU because it compresses the screen image itself."
+    },
+    {
+      "match": {
+        "name": "Performance Monitor Beta"
+      },
+      "title": "Performance Monitor (beta)",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "The test version of this app, running alongside or instead of the released one.",
+      "group": "Performance Monitor"
+    },
+    {
+      "match": {
+        "name": "PowerChime"
+      },
+      "title": "Charging chime",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Plays the sound and shows the flash when you plug in power. Runs for a moment and stops."
+    },
+    {
+      "match": {
+        "name": "Firefox GPU Helper"
+      },
+      "title": "Firefox (graphics)",
+      "category": "helper",
+      "vendor": "Mozilla",
+      "expectedHigh": false,
+      "description": "Draws Firefox's pages using the graphics chip. Named differently enough from firefox that only the glossary can connect the two.",
+      "group": "firefox"
+    },
+    {
+      "match": {
+        "name": "LogiPluginServiceExt"
+      },
+      "title": "Logi Options+ (plug-in host)",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Runs one of the per-app plug-ins Logi Options+ provides.",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "LogiPluginServiceNative"
+      },
+      "title": "Logi Options+ (device link)",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Talks to the connected Logitech mouse or keyboard.",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "telemetryd_v2"
+      },
+      "title": "Microsoft Defender (reporting)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Sends Defender's health and detection reports to whoever manages this Mac.",
+      "group": "wdavdaemon"
+    },
+    {
+      "match": {
+        "name": "eapolclient"
+      },
+      "title": "Network sign-in (802.1X)",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Signs the Mac in to a network that asks for credentials, as company and university Wi-Fi usually do."
     }
   ]
 }

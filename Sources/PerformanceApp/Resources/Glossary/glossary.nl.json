@@ -599,30 +599,30 @@
       "match": {
         "name": "com.apple.WebKit.WebContent"
       },
-      "title": "Safari (webpagina)",
+      "title": "Webpagina (WebKit)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Rendert een webpagina voor Safari of een andere WebKit-app. Elk tabblad krijgt er een eigen, dus een zwaar tabblad verschijnt hier in plaats van bij Safari zelf.",
+      "description": "Eén webpagina, in het proces waarin macOS hem afschermt. Safari gebruikt deze, maar Mail, Notities, de App Store en elke app met webinhoud ook, dus dit zegt niet bij welke app hij hoort.",
       "group": "WebKit"
     },
     {
       "match": {
         "name": "com.apple.WebKit.Networking"
       },
-      "title": "Safari (netwerk)",
+      "title": "Webnetwerk (WebKit)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Verwerkt netwerkverzoeken voor Safari en andere WebKit-apps.",
+      "description": "Haalt het netwerkverkeer op voor webinhoud, namens welke apps die ook tonen.",
       "group": "WebKit"
     },
     {
       "match": {
         "name": "com.apple.WebKit.GPU"
       },
-      "title": "Safari (graphics)",
+      "title": "Webgraphics (WebKit)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Tekent pagina-inhoud voor Safari met de GPU.",
+      "description": "Tekent webinhoud met de grafische chip, gedeeld door elke app die een webweergave toont.",
       "group": "WebKit"
     },
     {
@@ -1166,6 +1166,327 @@
       "vendor": "Apple",
       "expectedHigh": false,
       "description": "Speelt de bewegende luchtbeelden als achtergrond of schermbeveiliging af. Alleen druk zolang er een in beeld is."
+    },
+    {
+      "match": {
+        "name": "Bitwarden"
+      },
+      "title": "Bitwarden",
+      "category": "app",
+      "vendor": "Bitwarden",
+      "expectedHigh": false,
+      "description": "Een wachtwoordmanager. Draait zoals andere Electron-apps meerdere processen, en houdt je kluis ontsleuteld in het geheugen zolang die ontgrendeld is."
+    },
+    {
+      "match": {
+        "name": "MTLCompilerService"
+      },
+      "title": "Metal-shadercompiler",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Compileert grafische code voor apps en games zodra die nodig is. Kort druk als iets start of een nieuw beeld laadt, daarna weg."
+    },
+    {
+      "match": {
+        "name": "usernoted"
+      },
+      "title": "Meldingen (bezorging)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Bezorgt meldingen en houdt de banners en badges gelijk met wat apps hebben gestuurd."
+    },
+    {
+      "match": {
+        "name": "softwareupdated"
+      },
+      "title": "Software-update",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Zoekt en downloadt macOS-updates op de achtergrond. Alleen zwaar terwijl een update binnenkomt."
+    },
+    {
+      "match": {
+        "name": "appstoreagent"
+      },
+      "title": "App Store (achtergrond)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Controleert op app-updates en handelt aankopen af zonder dat het App Store-venster open staat."
+    },
+    {
+      "match": {
+        "name": "dataaccessd"
+      },
+      "title": "Accountsynchronisatie",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Synchroniseert Mail, Contacten en Agenda met de accounts die je hebt toegevoegd. Druk na lang offline zijn of bij een nieuw account."
+    },
+    {
+      "match": {
+        "name": "proactived"
+      },
+      "title": "Suggesties (op het apparaat)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Bepaalt wat macOS je zou moeten voorstellen, op basis van hoe je de Mac gebruikt. Draait lokaal en doet meestal niets."
+    },
+    {
+      "match": {
+        "name": "QuickLookUIService"
+      },
+      "title": "Quick Look",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Tekent het voorbeeld dat je krijgt als je op de spatiebalk drukt bij een bestand. Verschijnt zolang een voorbeeld open staat en verdwijnt daarna."
+    },
+    {
+      "match": {
+        "name": "extensionkitservice"
+      },
+      "title": "App-extensiehost",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Draait een extensie die een app aanbiedt, zoals een deel-optie of een widget, in een eigen proces."
+    },
+    {
+      "match": {
+        "name": "AirDrop"
+      },
+      "title": "AirDrop",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Vindt apparaten in de buurt en stuurt er bestanden naartoe. Actief zolang het deelvenster open staat of er een overdracht loopt."
+    },
+    {
+      "match": {
+        "name": "generativeexperiencesd"
+      },
+      "title": "Apple Intelligence",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Draait het deel van Apple's schrijf- en samenvatfuncties dat op het apparaat zelf gebeurt. Druk terwijl er een aan het werk is, verder stil."
+    },
+    {
+      "match": {
+        "name": "TGOnDeviceInferenceProviderService"
+      },
+      "title": "Model op het apparaat",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Draait een machine-learningmodel lokaal, voor functies die werken zonder iets naar een server te sturen."
+    },
+    {
+      "match": {
+        "name": "managedcorespotlightd"
+      },
+      "title": "Spotlight (beheerde gegevens)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Indexeert app-inhoud die het apparaatbeheer van een werkgever doorzoekbaar maakt.",
+      "group": "Spotlight indexing"
+    },
+    {
+      "match": {
+        "name": "AMPLibraryAgent"
+      },
+      "title": "Muziekbibliotheek",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Houdt de bibliotheken van Muziek en TV op orde en gesynchroniseerd. Druk na importeren of een grote wijziging."
+    },
+    {
+      "match": {
+        "name": "weatherd"
+      },
+      "title": "Weer",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Haalt voorspellingen op voor de Weer-app, de widget en de menubalk."
+    },
+    {
+      "match": {
+        "name": "com.apple.weather.menu"
+      },
+      "title": "Weer (menubalk)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Het weeronderdeel in de menubalk.",
+      "group": "weatherd"
+    },
+    {
+      "match": {
+        "name": "WeatherWidget"
+      },
+      "title": "Weer (widget)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "De weerwidget op het bureaublad of in het berichtencentrum.",
+      "group": "weatherd"
+    },
+    {
+      "match": {
+        "name": "com.apple.Safari.SafeBrowsing.Service"
+      },
+      "title": "Safari (fraudewaarschuwing)",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Controleert pagina's tegen Apple's lijst van bekende frauduleuze sites, zonder Apple te vertellen welke pagina je bekijkt.",
+      "group": "Safari"
+    },
+    {
+      "match": {
+        "name": "nbagent"
+      },
+      "title": "Notities (achtergrond)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Verzorgt het synchroniseren van Notities en de deel-extensie als de app zelf dicht is."
+    },
+    {
+      "match": {
+        "name": "OneDrive Sync Service"
+      },
+      "title": "OneDrive (synchronisatie)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Het deel van OneDrive dat het daadwerkelijke up- en downloaden doet.",
+      "group": "OneDrive"
+    },
+    {
+      "match": {
+        "name": "com.microsoft.teams2.notificationcenter"
+      },
+      "title": "Microsoft Teams (meldingen)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Toont Teams-meldingen, ook als het hoofdvenster gesloten is.",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "Citrix Workspace"
+      },
+      "title": "Citrix Workspace",
+      "category": "app",
+      "vendor": "Citrix",
+      "expectedHigh": false,
+      "description": "Maakt verbinding met applicaties en desktops die een werkgever host. Gebruikt meer CPU zolang er een sessie in beeld is."
+    },
+    {
+      "match": {
+        "name": "FortiTray"
+      },
+      "title": "FortiClient",
+      "category": "security",
+      "vendor": "Fortinet",
+      "expectedHigh": false,
+      "description": "Het menubalkdeel van Fortinets VPN- en beveiligingsclient, meestal geïnstalleerd door een werkgever."
+    },
+    {
+      "match": {
+        "name": "DisplayLinkUserAgent"
+      },
+      "title": "DisplayLink",
+      "category": "app",
+      "vendor": "DisplayLink",
+      "expectedHigh": true,
+      "description": "Stuurt extra schermen aan die via een dock in plaats van een videopoort zijn aangesloten. Kost echt CPU, want het comprimeert het schermbeeld zelf."
+    },
+    {
+      "match": {
+        "name": "Performance Monitor Beta"
+      },
+      "title": "Performance Monitor (beta)",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "De testversie van deze app, die naast of in plaats van de uitgebrachte versie draait.",
+      "group": "Performance Monitor"
+    },
+    {
+      "match": {
+        "name": "PowerChime"
+      },
+      "title": "Oplaadgeluid",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Speelt het geluid en toont de flits als je de voeding aansluit. Draait even en stopt weer."
+    },
+    {
+      "match": {
+        "name": "Firefox GPU Helper"
+      },
+      "title": "Firefox (graphics)",
+      "category": "helper",
+      "vendor": "Mozilla",
+      "expectedHigh": false,
+      "description": "Tekent de pagina's van Firefox met de grafische chip. Heet net anders genoeg dan firefox dat alleen de woordenlijst de twee kan verbinden.",
+      "group": "firefox"
+    },
+    {
+      "match": {
+        "name": "LogiPluginServiceExt"
+      },
+      "title": "Logi Options+ (plug-inhost)",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Draait een van de per-app plug-ins die Logi Options+ levert.",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "LogiPluginServiceNative"
+      },
+      "title": "Logi Options+ (apparaatverbinding)",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Praat met de aangesloten Logitech-muis of het toetsenbord.",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "telemetryd_v2"
+      },
+      "title": "Microsoft Defender (rapportage)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Stuurt de status- en detectierapporten van Defender naar wie deze Mac beheert.",
+      "group": "wdavdaemon"
+    },
+    {
+      "match": {
+        "name": "eapolclient"
+      },
+      "title": "Netwerkaanmelding (802.1X)",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Meldt de Mac aan bij een netwerk dat om inloggegevens vraagt, zoals bedrijfs- en universiteits-wifi meestal doen."
     }
   ]
 }

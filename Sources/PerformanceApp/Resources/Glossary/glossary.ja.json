@@ -599,30 +599,30 @@
       "match": {
         "name": "com.apple.WebKit.WebContent"
       },
-      "title": "Safari (Webページ)",
+      "title": "Web ページ（WebKit）",
       "category": "helper",
       "vendor": "Apple",
-      "description": "SafariまたはほかのWebKitベースのアプリのために、1つのWebページを描画します。タブごとに専用のプロセスが割り当てられるため、負荷の高いタブはSafari自体ではなくここに表示されます。",
+      "description": "macOS がページを隔離するためのプロセス 1 つ分です。Safari のほかメール、メモ、App Store など Web を表示する App も使うため、どの App のものかはこれでは分かりません。",
       "group": "WebKit"
     },
     {
       "match": {
         "name": "com.apple.WebKit.Networking"
       },
-      "title": "Safari (ネットワーク)",
+      "title": "Web 通信（WebKit）",
       "category": "helper",
       "vendor": "Apple",
-      "description": "SafariやほかのWebKitアプリのネットワークリクエストを処理します。",
+      "description": "Web コンテンツを表示している App に代わって、その通信を担当します。",
       "group": "WebKit"
     },
     {
       "match": {
         "name": "com.apple.WebKit.GPU"
       },
-      "title": "Safari (グラフィックス)",
+      "title": "Web 描画（WebKit）",
       "category": "helper",
       "vendor": "Apple",
-      "description": "GPUを使ってSafariのページコンテンツを描画します。",
+      "description": "グラフィックスチップで Web コンテンツを描画します。Web ビューを表示するすべての App が共用します。",
       "group": "WebKit"
     },
     {
@@ -1166,6 +1166,327 @@
       "vendor": "Apple",
       "expectedHigh": false,
       "description": "動く空撮の壁紙やスクリーンセーバを再生します。表示中だけ動作します。"
+    },
+    {
+      "match": {
+        "name": "Bitwarden"
+      },
+      "title": "Bitwarden",
+      "category": "app",
+      "vendor": "Bitwarden",
+      "expectedHigh": false,
+      "description": "パスワード管理アプリです。他の Electron アプリ同様に複数のプロセスを使い、ロック解除中は保管庫を復号した状態でメモリに保持します。"
+    },
+    {
+      "match": {
+        "name": "MTLCompilerService"
+      },
+      "title": "Metal シェーダコンパイラ",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "App やゲームのグラフィックスコードを必要に応じてコンパイルします。起動時や新しい場面の読み込み時に短く動き、その後消えます。"
+    },
+    {
+      "match": {
+        "name": "usernoted"
+      },
+      "title": "通知（配信）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "通知を配信し、バナーやバッジを App が送った内容と一致させ続けます。"
+    },
+    {
+      "match": {
+        "name": "softwareupdated"
+      },
+      "title": "ソフトウェア・アップデート",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "macOS のアップデートをバックグラウンドで確認・ダウンロードします。負荷が高いのはダウンロード中だけです。"
+    },
+    {
+      "match": {
+        "name": "appstoreagent"
+      },
+      "title": "App Store（バックグラウンド）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "App Store のウインドウを開かなくても、アップデートの確認や購入処理を行います。"
+    },
+    {
+      "match": {
+        "name": "dataaccessd"
+      },
+      "title": "アカウント同期",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "メール、連絡先、カレンダーを追加済みのアカウントと同期します。長くオフラインだった後や新規追加時に活発になります。"
+    },
+    {
+      "match": {
+        "name": "proactived"
+      },
+      "title": "提案（デバイス上）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "使い方をもとに、macOS が次に何を提案すべきかを判断します。デバイス上で動き、ほとんどの時間は待機しています。"
+    },
+    {
+      "match": {
+        "name": "QuickLookUIService"
+      },
+      "title": "クイックルック",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "ファイル選択中にスペースキーを押すと出るプレビューを描画します。プレビューを開いている間だけ存在します。"
+    },
+    {
+      "match": {
+        "name": "extensionkitservice"
+      },
+      "title": "App 機能拡張ホスト",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "共有オプションやウィジェットなど、App が提供する機能拡張を独立したプロセスで動かします。"
+    },
+    {
+      "match": {
+        "name": "AirDrop"
+      },
+      "title": "AirDrop",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "近くのデバイスを見つけてファイルを転送します。共有シートを開いている間や転送中に動作します。"
+    },
+    {
+      "match": {
+        "name": "generativeexperiencesd"
+      },
+      "title": "Apple Intelligence",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Apple の作文・要約機能のうち、デバイス上で動く部分を担当します。動作中だけ負荷が上がります。"
+    },
+    {
+      "match": {
+        "name": "TGOnDeviceInferenceProviderService"
+      },
+      "title": "デバイス上のモデル",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "機械学習モデルをローカルで動かします。サーバに何も送らずに動く機能で使われます。"
+    },
+    {
+      "match": {
+        "name": "managedcorespotlightd"
+      },
+      "title": "Spotlight（管理対象データ）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "勤務先のデバイス管理が検索を許可した App の内容をインデックスします。",
+      "group": "Spotlight indexing"
+    },
+    {
+      "match": {
+        "name": "AMPLibraryAgent"
+      },
+      "title": "ミュージックライブラリ",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "ミュージックと TV のライブラリを整理・同期します。読み込み後や大きな変更後に活発になります。"
+    },
+    {
+      "match": {
+        "name": "weatherd"
+      },
+      "title": "天気",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "天気 App、そのウィジェット、メニューバー用の予報を取得します。"
+    },
+    {
+      "match": {
+        "name": "com.apple.weather.menu"
+      },
+      "title": "天気（メニューバー）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "メニューバーの天気項目です。",
+      "group": "weatherd"
+    },
+    {
+      "match": {
+        "name": "WeatherWidget"
+      },
+      "title": "天気（ウィジェット）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "デスクトップまたは通知センターの天気ウィジェットです。",
+      "group": "weatherd"
+    },
+    {
+      "match": {
+        "name": "com.apple.Safari.SafeBrowsing.Service"
+      },
+      "title": "Safari（詐欺サイト警告）",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Apple の既知の詐欺サイト一覧と照合します。閲覧中のページを Apple に送ることはありません。",
+      "group": "Safari"
+    },
+    {
+      "match": {
+        "name": "nbagent"
+      },
+      "title": "メモ（バックグラウンド）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "App を閉じていてもメモの同期と共有機能拡張を処理します。"
+    },
+    {
+      "match": {
+        "name": "OneDrive Sync Service"
+      },
+      "title": "OneDrive（同期）",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "実際のアップロードとダウンロードを行う OneDrive の部分です。",
+      "group": "OneDrive"
+    },
+    {
+      "match": {
+        "name": "com.microsoft.teams2.notificationcenter"
+      },
+      "title": "Microsoft Teams（通知）",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "メインウインドウを閉じていても Teams の通知を表示します。",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "Citrix Workspace"
+      },
+      "title": "Citrix Workspace",
+      "category": "app",
+      "vendor": "Citrix",
+      "expectedHigh": false,
+      "description": "勤務先がホストするアプリやデスクトップに接続します。リモートセッション表示中は CPU 使用率が上がります。"
+    },
+    {
+      "match": {
+        "name": "FortiTray"
+      },
+      "title": "FortiClient",
+      "category": "security",
+      "vendor": "Fortinet",
+      "expectedHigh": false,
+      "description": "Fortinet の VPN・セキュリティクライアントのメニューバー部分です。多くは勤務先が導入します。"
+    },
+    {
+      "match": {
+        "name": "DisplayLinkUserAgent"
+      },
+      "title": "DisplayLink",
+      "category": "app",
+      "vendor": "DisplayLink",
+      "expectedHigh": true,
+      "description": "映像端子ではなくドック経由で接続した追加ディスプレイを駆動します。画面を自前で圧縮するため CPU を実際に使います。"
+    },
+    {
+      "match": {
+        "name": "Performance Monitor Beta"
+      },
+      "title": "Performance Monitor（ベータ）",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "この App のテスト版です。公開版と並行して、またはその代わりに動作します。",
+      "group": "Performance Monitor"
+    },
+    {
+      "match": {
+        "name": "PowerChime"
+      },
+      "title": "充電音",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "電源を接続したときに音を鳴らし、稲妻マークを表示します。ごく短時間だけ動きます。"
+    },
+    {
+      "match": {
+        "name": "Firefox GPU Helper"
+      },
+      "title": "Firefox（描画）",
+      "category": "helper",
+      "vendor": "Mozilla",
+      "expectedHigh": false,
+      "description": "グラフィックスチップで Firefox のページを描画します。firefox とは名前が離れているため、用語集だけが両者を結び付けられます。",
+      "group": "firefox"
+    },
+    {
+      "match": {
+        "name": "LogiPluginServiceExt"
+      },
+      "title": "Logi Options+（プラグインホスト）",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Logi Options+ が提供するアプリ別プラグインの 1 つを動かします。",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "LogiPluginServiceNative"
+      },
+      "title": "Logi Options+（デバイス通信）",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "接続中のロジクール製マウスやキーボードと通信します。",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "telemetryd_v2"
+      },
+      "title": "Microsoft Defender（レポート）",
+      "category": "security",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Defender の稼働状況と検出結果を、この Mac の管理者に送信します。",
+      "group": "wdavdaemon"
+    },
+    {
+      "match": {
+        "name": "eapolclient"
+      },
+      "title": "ネットワーク認証（802.1X）",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "資格情報を求めるネットワークに Mac をサインインさせます。企業や大学の Wi-Fi で一般的です。"
     }
   ]
 }

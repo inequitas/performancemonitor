@@ -599,30 +599,30 @@
       "match": {
         "name": "com.apple.WebKit.WebContent"
       },
-      "title": "Safari（网页）",
+      "title": "网页（WebKit）",
       "category": "helper",
       "vendor": "Apple",
-      "description": "为 Safari 或其他基于 WebKit 的应用渲染一个网页。每个标签页都有自己的进程,因此占用较高的标签页会显示在这里,而不是显示为 Safari 本身。",
+      "description": "一个网页，运行在 macOS 用来隔离它的进程中。Safari 会用到，邮件、备忘录、App Store 及任何显示网页的 App 也会，因此无法据此判断属于哪个 App。",
       "group": "WebKit"
     },
     {
       "match": {
         "name": "com.apple.WebKit.Networking"
       },
-      "title": "Safari（网络）",
+      "title": "网页网络（WebKit）",
       "category": "helper",
       "vendor": "Apple",
-      "description": "为 Safari 及其他 WebKit 应用处理网络请求。",
+      "description": "代表正在显示网页内容的 App 处理其网络流量。",
       "group": "WebKit"
     },
     {
       "match": {
         "name": "com.apple.WebKit.GPU"
       },
-      "title": "Safari（图形）",
+      "title": "网页图形（WebKit）",
       "category": "helper",
       "vendor": "Apple",
-      "description": "使用 GPU 为 Safari 绘制页面内容。",
+      "description": "使用图形芯片绘制网页内容，由所有显示网页视图的 App 共用。",
       "group": "WebKit"
     },
     {
@@ -1166,6 +1166,327 @@
       "vendor": "Apple",
       "expectedHigh": false,
       "description": "播放动态航拍墙纸和屏幕保护程序，只有在显示时才会忙碌。"
+    },
+    {
+      "match": {
+        "name": "Bitwarden"
+      },
+      "title": "Bitwarden",
+      "category": "app",
+      "vendor": "Bitwarden",
+      "expectedHigh": false,
+      "description": "密码管理器。与其他 Electron 应用一样会运行多个进程，解锁期间密码库以解密状态保存在内存中。"
+    },
+    {
+      "match": {
+        "name": "MTLCompilerService"
+      },
+      "title": "Metal 着色器编译器",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "按需为 App 和游戏编译图形代码。启动或加载新场景时会短暂繁忙，随后消失。"
+    },
+    {
+      "match": {
+        "name": "usernoted"
+      },
+      "title": "通知（投递）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "投递通知，并让横幅和标记与各 App 发送的内容保持一致。"
+    },
+    {
+      "match": {
+        "name": "softwareupdated"
+      },
+      "title": "软件更新",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "在后台检查并下载 macOS 更新，只有下载期间才会占用较多资源。"
+    },
+    {
+      "match": {
+        "name": "appstoreagent"
+      },
+      "title": "App Store（后台）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "在不打开 App Store 窗口的情况下检查更新并处理购买。"
+    },
+    {
+      "match": {
+        "name": "dataaccessd"
+      },
+      "title": "账户同步",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "将邮件、通讯录和日历与你添加的账户同步。长时间离线后或新增账户时较为繁忙。"
+    },
+    {
+      "match": {
+        "name": "proactived"
+      },
+      "title": "使用建议（本机）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "根据你的使用方式判断 macOS 接下来该建议什么。在本机运行，多数时间空闲。"
+    },
+    {
+      "match": {
+        "name": "QuickLookUIService"
+      },
+      "title": "快速查看",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "显示在文件上按空格键时出现的预览，仅在预览打开期间存在。"
+    },
+    {
+      "match": {
+        "name": "extensionkitservice"
+      },
+      "title": "App 扩展宿主",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "在独立进程中运行某个 App 提供的扩展，例如共享选项或小组件。"
+    },
+    {
+      "match": {
+        "name": "AirDrop"
+      },
+      "title": "隔空投送",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "查找附近设备并向其传输文件。共享面板打开或正在传输时活跃。"
+    },
+    {
+      "match": {
+        "name": "generativeexperiencesd"
+      },
+      "title": "Apple 智能",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "运行 Apple 写作与摘要功能中在本机执行的部分，只有相关功能工作时才繁忙。"
+    },
+    {
+      "match": {
+        "name": "TGOnDeviceInferenceProviderService"
+      },
+      "title": "本机模型",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "在本地运行机器学习模型，供无需向服务器发送数据的功能使用。"
+    },
+    {
+      "match": {
+        "name": "managedcorespotlightd"
+      },
+      "title": "聚焦搜索（受管数据）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "为雇主设备管理允许被搜索的 App 内容建立索引。",
+      "group": "Spotlight indexing"
+    },
+    {
+      "match": {
+        "name": "AMPLibraryAgent"
+      },
+      "title": "音乐资料库",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "维护并同步“音乐”和“TV”的资料库。导入或资料库大幅变动后较为繁忙。"
+    },
+    {
+      "match": {
+        "name": "weatherd"
+      },
+      "title": "天气",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "为“天气” App、其小组件和菜单栏获取预报数据。"
+    },
+    {
+      "match": {
+        "name": "com.apple.weather.menu"
+      },
+      "title": "天气（菜单栏）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "菜单栏中的天气项目。",
+      "group": "weatherd"
+    },
+    {
+      "match": {
+        "name": "WeatherWidget"
+      },
+      "title": "天气（小组件）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "桌面或通知中心里的天气小组件。",
+      "group": "weatherd"
+    },
+    {
+      "match": {
+        "name": "com.apple.Safari.SafeBrowsing.Service"
+      },
+      "title": "Safari（欺诈网站警告）",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "将网页与 Apple 的已知欺诈网站列表比对，且不会把你访问的页面告知 Apple。",
+      "group": "Safari"
+    },
+    {
+      "match": {
+        "name": "nbagent"
+      },
+      "title": "备忘录（后台）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "在 App 关闭时处理备忘录的同步及其共享扩展。"
+    },
+    {
+      "match": {
+        "name": "OneDrive Sync Service"
+      },
+      "title": "OneDrive（同步）",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "OneDrive 中真正执行上传和下载的部分。",
+      "group": "OneDrive"
+    },
+    {
+      "match": {
+        "name": "com.microsoft.teams2.notificationcenter"
+      },
+      "title": "Microsoft Teams（通知）",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "显示 Teams 通知，主窗口关闭时也会运行。",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "Citrix Workspace"
+      },
+      "title": "Citrix Workspace",
+      "category": "app",
+      "vendor": "Citrix",
+      "expectedHigh": false,
+      "description": "连接雇主托管的应用和桌面。远程会话显示期间 CPU 占用较高。"
+    },
+    {
+      "match": {
+        "name": "FortiTray"
+      },
+      "title": "FortiClient",
+      "category": "security",
+      "vendor": "Fortinet",
+      "expectedHigh": false,
+      "description": "Fortinet VPN 与安全客户端的菜单栏部分，通常由雇主安装。"
+    },
+    {
+      "match": {
+        "name": "DisplayLinkUserAgent"
+      },
+      "title": "DisplayLink",
+      "category": "app",
+      "vendor": "DisplayLink",
+      "expectedHigh": true,
+      "description": "驱动通过扩展坞而非视频接口连接的额外显示器。因为要自行压缩画面，会实际占用 CPU。"
+    },
+    {
+      "match": {
+        "name": "Performance Monitor Beta"
+      },
+      "title": "Performance Monitor（测试版）",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "本 App 的测试版本，与正式版并行或替代其运行。",
+      "group": "Performance Monitor"
+    },
+    {
+      "match": {
+        "name": "PowerChime"
+      },
+      "title": "充电提示音",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "插入电源时播放提示音并显示闪电标志，只运行片刻。"
+    },
+    {
+      "match": {
+        "name": "Firefox GPU Helper"
+      },
+      "title": "Firefox（图形）",
+      "category": "helper",
+      "vendor": "Mozilla",
+      "expectedHigh": false,
+      "description": "使用图形芯片绘制 Firefox 的页面。名称与 firefox 差别较大，只有词汇表能把两者关联起来。",
+      "group": "firefox"
+    },
+    {
+      "match": {
+        "name": "LogiPluginServiceExt"
+      },
+      "title": "Logi Options+（插件宿主）",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "运行 Logi Options+ 提供的某个逐 App 插件。",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "LogiPluginServiceNative"
+      },
+      "title": "Logi Options+（设备通信）",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "与已连接的罗技鼠标或键盘通信。",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "telemetryd_v2"
+      },
+      "title": "Microsoft Defender（上报）",
+      "category": "security",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "将 Defender 的健康状态与检测报告发送给管理这台 Mac 的一方。",
+      "group": "wdavdaemon"
+    },
+    {
+      "match": {
+        "name": "eapolclient"
+      },
+      "title": "网络登录（802.1X）",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "在需要凭据的网络上完成 Mac 的登录认证，公司和校园 Wi-Fi 通常如此。"
     }
   ]
 }

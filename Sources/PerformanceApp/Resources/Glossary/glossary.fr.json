@@ -599,30 +599,30 @@
       "match": {
         "name": "com.apple.WebKit.WebContent"
       },
-      "title": "Safari (page web)",
+      "title": "Page web (WebKit)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Affiche une page web pour Safari ou une autre application WebKit. Chaque onglet a son propre processus, donc un onglet gourmand apparaît ici plutôt que sous Safari lui-même.",
+      "description": "Une page web, dans le processus où macOS l'isole. Safari s'en sert, mais Mail, Notes, l'App Store et toute app affichant du web aussi : cela n'indique donc pas à quelle app elle appartient.",
       "group": "WebKit"
     },
     {
       "match": {
         "name": "com.apple.WebKit.Networking"
       },
-      "title": "Safari (réseau)",
+      "title": "Réseau web (WebKit)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Gère les requêtes réseau pour Safari et les autres applications WebKit.",
+      "description": "Récupère le trafic réseau du contenu web, pour le compte des apps qui l'affichent.",
       "group": "WebKit"
     },
     {
       "match": {
         "name": "com.apple.WebKit.GPU"
       },
-      "title": "Safari (graphismes)",
+      "title": "Graphismes web (WebKit)",
       "category": "helper",
       "vendor": "Apple",
-      "description": "Dessine le contenu des pages pour Safari en utilisant le GPU.",
+      "description": "Dessine le contenu web via la puce graphique, partagé par toutes les apps affichant une vue web.",
       "group": "WebKit"
     },
     {
@@ -1166,6 +1166,327 @@
       "vendor": "Apple",
       "expectedHigh": false,
       "description": "Diffuse les fonds d'écran et économiseurs aériens animés. Actif seulement quand l'un d'eux est affiché."
+    },
+    {
+      "match": {
+        "name": "Bitwarden"
+      },
+      "title": "Bitwarden",
+      "category": "app",
+      "vendor": "Bitwarden",
+      "expectedHigh": false,
+      "description": "Un gestionnaire de mots de passe. Comme les autres apps Electron il lance plusieurs processus, et garde votre coffre déchiffré en mémoire tant qu'il est déverrouillé."
+    },
+    {
+      "match": {
+        "name": "MTLCompilerService"
+      },
+      "title": "Compilateur de shaders Metal",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Compile le code graphique des apps et des jeux au moment voulu. Actif par à-coups au démarrage ou au chargement d'une scène, puis disparaît."
+    },
+    {
+      "match": {
+        "name": "usernoted"
+      },
+      "title": "Notifications (livraison)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Distribue les notifications et garde bannières et pastilles en accord avec ce que les apps ont envoyé."
+    },
+    {
+      "match": {
+        "name": "softwareupdated"
+      },
+      "title": "Mise à jour logicielle",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Recherche et télécharge les mises à jour de macOS en arrière-plan. Lourd uniquement pendant un téléchargement."
+    },
+    {
+      "match": {
+        "name": "appstoreagent"
+      },
+      "title": "App Store (arrière-plan)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Vérifie les mises à jour et gère les achats sans que la fenêtre de l'App Store soit ouverte."
+    },
+    {
+      "match": {
+        "name": "dataaccessd"
+      },
+      "title": "Synchronisation des comptes",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Synchronise Mail, Contacts et Calendrier avec vos comptes. Actif après une longue période hors ligne ou lors de l'ajout d'un compte."
+    },
+    {
+      "match": {
+        "name": "proactived"
+      },
+      "title": "Suggestions (sur l'appareil)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Détermine ce que macOS devrait suggérer, d'après votre usage. Tourne localement et reste inactif la plupart du temps."
+    },
+    {
+      "match": {
+        "name": "QuickLookUIService"
+      },
+      "title": "Coup d'œil (Quick Look)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Affiche l'aperçu obtenu en appuyant sur Espace sur un fichier. Présent tant qu'un aperçu est ouvert."
+    },
+    {
+      "match": {
+        "name": "extensionkitservice"
+      },
+      "title": "Hôte d'extension",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Exécute une extension fournie par une app, comme une option de partage ou un widget, dans son propre processus."
+    },
+    {
+      "match": {
+        "name": "AirDrop"
+      },
+      "title": "AirDrop",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Repère les appareils à proximité et leur transfère des fichiers. Actif quand la feuille de partage est ouverte ou pendant un transfert."
+    },
+    {
+      "match": {
+        "name": "generativeexperiencesd"
+      },
+      "title": "Apple Intelligence",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Exécute la partie locale des fonctions d'écriture et de résumé d'Apple. Actif quand l'une d'elles travaille."
+    },
+    {
+      "match": {
+        "name": "TGOnDeviceInferenceProviderService"
+      },
+      "title": "Modèle sur l'appareil",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Exécute localement un modèle d'apprentissage automatique, pour des fonctions qui n'envoient rien à un serveur."
+    },
+    {
+      "match": {
+        "name": "managedcorespotlightd"
+      },
+      "title": "Spotlight (données gérées)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Indexe le contenu d'apps que la gestion d'appareils d'un employeur autorise à rechercher.",
+      "group": "Spotlight indexing"
+    },
+    {
+      "match": {
+        "name": "AMPLibraryAgent"
+      },
+      "title": "Bibliothèque musicale",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Tient à jour et synchronise les bibliothèques Musique et TV. Actif après un import ou une grosse modification."
+    },
+    {
+      "match": {
+        "name": "weatherd"
+      },
+      "title": "Météo",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Récupère les prévisions pour l'app Météo, son widget et la barre des menus."
+    },
+    {
+      "match": {
+        "name": "com.apple.weather.menu"
+      },
+      "title": "Météo (barre des menus)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "L'élément météo de la barre des menus.",
+      "group": "weatherd"
+    },
+    {
+      "match": {
+        "name": "WeatherWidget"
+      },
+      "title": "Météo (widget)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Le widget météo du bureau ou du centre de notifications.",
+      "group": "weatherd"
+    },
+    {
+      "match": {
+        "name": "com.apple.Safari.SafeBrowsing.Service"
+      },
+      "title": "Safari (avertissement de fraude)",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Compare les pages à la liste Apple des sites frauduleux connus, sans transmettre à Apple la page consultée.",
+      "group": "Safari"
+    },
+    {
+      "match": {
+        "name": "nbagent"
+      },
+      "title": "Notes (arrière-plan)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Gère la synchronisation de Notes et son extension de partage même app fermée."
+    },
+    {
+      "match": {
+        "name": "OneDrive Sync Service"
+      },
+      "title": "OneDrive (synchronisation)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "La partie de OneDrive qui effectue les transferts.",
+      "group": "OneDrive"
+    },
+    {
+      "match": {
+        "name": "com.microsoft.teams2.notificationcenter"
+      },
+      "title": "Microsoft Teams (notifications)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Affiche les notifications Teams, même fenêtre principale fermée.",
+      "group": "MSTeams"
+    },
+    {
+      "match": {
+        "name": "Citrix Workspace"
+      },
+      "title": "Citrix Workspace",
+      "category": "app",
+      "vendor": "Citrix",
+      "expectedHigh": false,
+      "description": "Se connecte aux applications et bureaux hébergés par un employeur. Consomme plus de CPU quand une session est affichée."
+    },
+    {
+      "match": {
+        "name": "FortiTray"
+      },
+      "title": "FortiClient",
+      "category": "security",
+      "vendor": "Fortinet",
+      "expectedHigh": false,
+      "description": "La partie barre des menus du client VPN et sécurité de Fortinet, généralement installé par un employeur."
+    },
+    {
+      "match": {
+        "name": "DisplayLinkUserAgent"
+      },
+      "title": "DisplayLink",
+      "category": "app",
+      "vendor": "DisplayLink",
+      "expectedHigh": true,
+      "description": "Pilote les écrans supplémentaires branchés via une station d'accueil plutôt qu'un port vidéo. Consomme réellement du CPU car il compresse lui-même l'image."
+    },
+    {
+      "match": {
+        "name": "Performance Monitor Beta"
+      },
+      "title": "Performance Monitor (bêta)",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "La version de test de cette app, exécutée à côté ou à la place de la version publiée.",
+      "group": "Performance Monitor"
+    },
+    {
+      "match": {
+        "name": "PowerChime"
+      },
+      "title": "Son de charge",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Joue le son et affiche l'éclair quand vous branchez l'alimentation. Ne tourne qu'un instant."
+    },
+    {
+      "match": {
+        "name": "Firefox GPU Helper"
+      },
+      "title": "Firefox (graphismes)",
+      "category": "helper",
+      "vendor": "Mozilla",
+      "expectedHigh": false,
+      "description": "Dessine les pages de Firefox via la puce graphique. Son nom diffère assez de firefox pour que seul le glossaire fasse le lien.",
+      "group": "firefox"
+    },
+    {
+      "match": {
+        "name": "LogiPluginServiceExt"
+      },
+      "title": "Logi Options+ (hôte de module)",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Exécute l'un des modules par application fournis par Logi Options+.",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "LogiPluginServiceNative"
+      },
+      "title": "Logi Options+ (liaison appareil)",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Communique avec la souris ou le clavier Logitech connecté.",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "telemetryd_v2"
+      },
+      "title": "Microsoft Defender (rapports)",
+      "category": "security",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Envoie les rapports d'état et de détection de Defender à qui gère ce Mac.",
+      "group": "wdavdaemon"
+    },
+    {
+      "match": {
+        "name": "eapolclient"
+      },
+      "title": "Connexion réseau (802.1X)",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Authentifie le Mac auprès d'un réseau demandant des identifiants, comme les Wi-Fi d'entreprise et d'université."
     }
   ]
 }
