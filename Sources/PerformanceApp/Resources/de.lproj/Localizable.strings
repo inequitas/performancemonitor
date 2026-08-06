@@ -137,6 +137,8 @@
 
 /* MARK: - SettingsView: Tab Verlauf */
 "Save history to disk" = "Verlauf auf Festplatte speichern";
+"Write readings to a JSON file" = "Messwerte in eine JSON-Datei schreiben";
+"For status bar tools such as SwiftBar, xbar and SketchyBar. Updated every 5 seconds while the app runs, and deleted when you turn this off." = "Für Menüleisten-Tools wie SwiftBar, xbar und SketchyBar. Wird alle 5 Sekunden aktualisiert, solange die App läuft, und gelöscht, sobald Sie dies ausschalten.";
 "Open History Window" = "Verlaufsfenster öffnen";
 "Export" = "Exportieren";
 "Export CSV…" = "CSV exportieren…";

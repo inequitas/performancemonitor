@@ -137,6 +137,8 @@
 
 /* MARK: - SettingsView: pestaña Historial */
 "Save history to disk" = "Guardar historial en disco";
+"Write readings to a JSON file" = "Escribir las mediciones en un archivo JSON";
+"For status bar tools such as SwiftBar, xbar and SketchyBar. Updated every 5 seconds while the app runs, and deleted when you turn this off." = "Para herramientas de barra de menús como SwiftBar, xbar y SketchyBar. Se actualiza cada 5 segundos mientras la app funciona, y se borra al desactivar esta opción.";
 "Open History Window" = "Abrir ventana de historial";
 "Export" = "Exportar";
 "Export CSV…" = "Exportar CSV…";

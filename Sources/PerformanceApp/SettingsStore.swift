@@ -59,6 +59,14 @@ final class SettingsStore: ObservableObject {
         didSet { UserDefaults.standard.set(persistHistoryEnabled, forKey: Pref.persistHistoryEnabled) }
     }
 
+    /// Writes the current readings to a JSON file for status-bar tools like
+    /// SwiftBar and SketchyBar. Off by default: it puts a file in someone's home
+    /// directory and writes on a timer, neither of which should follow from
+    /// merely installing the app. See `SnapshotWriter`.
+    @Published var jsonSnapshotEnabled: Bool = false {
+        didSet { UserDefaults.standard.set(jsonSnapshotEnabled, forKey: Pref.jsonSnapshotEnabled) }
+    }
+
     @Published var publicIPEnabled: Bool = true {
         didSet {
             guard !isLoadingPreferences else { return }
@@ -194,6 +202,7 @@ final class SettingsStore: ObservableObject {
         static let topProcessCount          = "topProcessCount"
         static let showRemovableVolumes     = "showRemovableVolumes"
         static let persistHistoryEnabled    = "persistHistoryEnabled"
+        static let jsonSnapshotEnabled      = "jsonSnapshotEnabled"
         static let publicIPEnabled          = "publicIPEnabled"
         static let menuBarMetric            = "menuBarMetric"
         static let menuBarStyle             = "menuBarStyle"
@@ -222,6 +231,7 @@ final class SettingsStore: ObservableObject {
         if let v = bool(Pref.publicIPEnabled)           { publicIPEnabled = v }
         if let v = bool(Pref.showRemovableVolumes)      { showRemovableVolumes = v }
         if let v = bool(Pref.persistHistoryEnabled)     { persistHistoryEnabled = v }
+        if let v = bool(Pref.jsonSnapshotEnabled)       { jsonSnapshotEnabled = v }
         if let v = dbl(Pref.refreshInterval)            { refreshInterval = v }
         if let v = int_(Pref.topProcessCount)           { topProcessCount = v }
         if let v = ud.string(forKey: Pref.pingServer)     { pingServer = MetricsEngine.PingServer(rawValue: v) ?? .apple }

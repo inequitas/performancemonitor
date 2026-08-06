@@ -136,6 +136,8 @@
 
 /* MARK: - SettingsView：历史记录标签页 */
 "Save history to disk" = "将历史记录保存到磁盘";
+"Write readings to a JSON file" = "将读数写入 JSON 文件";
+"For status bar tools such as SwiftBar, xbar and SketchyBar. Updated every 5 seconds while the app runs, and deleted when you turn this off." = "供 SwiftBar、xbar、SketchyBar 等菜单栏工具使用。App 运行期间每 5 秒更新一次，关闭此项时会删除该文件。";
 "Open History Window" = "打开历史记录窗口";
 "Export" = "导出";
 "Export CSV…" = "导出 CSV…";

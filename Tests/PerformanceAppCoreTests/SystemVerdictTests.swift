@@ -45,7 +45,7 @@ struct SystemVerdictTests {
     @Test func everythingApplicableIsReported() {
         // The whole point of the rework: one urgent finding used to hide the
         // rest, which is what made a lone swap figure hard to interpret.
-        let busy = calm(cpu: 95, usedGB: 30, totalGB: 32, swapGB: 6, pressure: 2,
+        let busy = calm(cpu: 95, usedGB: 30, totalGB: 32, swapGB: 6, pressure: 4,
                         diskFreeGB: 3, thermal: 3, top: ("swift-frontend", 90))
         let found = SystemVerdict.evaluate(busy)
         #expect(found.count == 5)
@@ -66,14 +66,14 @@ struct SystemVerdictTests {
 
     @Test func swappingAndTightMemoryAppearTogether() {
         // Either half alone invites the wrong conclusion.
-        let found = kinds(calm(usedGB: 30, totalGB: 32, swapGB: 4, pressure: 2))
+        let found = kinds(calm(usedGB: 30, totalGB: 32, swapGB: 4, pressure: 4))
         #expect(found.contains(.swapping(gb: 4)))
         #expect(found.contains { if case .memoryTight = $0 { return true }; return false })
     }
 
     @Test func smallSwapIsNotReported() {
         // macOS keeps a little swap around even when memory is plentiful.
-        #expect(SystemVerdict.evaluate(calm(swapGB: 1.2, pressure: 2)).isEmpty)
+        #expect(SystemVerdict.evaluate(calm(swapGB: 1.2, pressure: 4)).isEmpty)
     }
 
     @Test func swapSittingOnDiskWithNoPressureIsNotReported() {
@@ -97,11 +97,18 @@ struct SystemVerdictTests {
         #expect(SystemVerdict.evaluate(calm(swapGB: 3, pressure: 1, swapPages: 5)).isEmpty)
     }
 
+    @Test func warningLevelPressureAloneSaysNothing() {
+        // Measured on a real machine: level 2 sat there steadily with 10 GB of
+        // 18 in use and almost no swap. It does not track memory use, so it
+        // cannot carry an alarm on its own.
+        #expect(SystemVerdict.evaluate(calm(swapGB: 3, pressure: 2, swapPages: 0)).isEmpty)
+    }
+
     @Test func macOSReportingPressureIsTheMoreSeriousOfTheTwo() {
-        // Paging alone is worth mentioning; macOS itself saying memory is short
-        // is a warning.
+        // Paging alone is worth mentioning; macOS reporting critical is a
+        // warning.
         let paging = SystemVerdict.evaluate(calm(swapGB: 3, pressure: 1, swapPages: 400))
-        let pressured = SystemVerdict.evaluate(calm(swapGB: 3, pressure: 2))
+        let pressured = SystemVerdict.evaluate(calm(swapGB: 3, pressure: 4))
         #expect(paging.first?.severity == .notable)
         #expect(pressured.first?.severity == .warning)
     }
@@ -151,12 +158,12 @@ struct SystemVerdictTests {
 
     @Test func thresholdsAreInclusive() {
         #expect(kinds(calm(cpu: 80)) == [.busy(percent: 80)])
-        #expect(kinds(calm(swapGB: 2, pressure: 2)) == [.swapping(gb: 2)])
+        #expect(kinds(calm(swapGB: 2, pressure: 4)) == [.swapping(gb: 2)])
     }
 
     @Test func eachFindingCarriesTheTopicThatExplainsIt() {
         #expect(SystemVerdict.evaluate(calm(thermal: 3)).first?.topic == .thermal)
-        #expect(SystemVerdict.evaluate(calm(swapGB: 5, pressure: 2)).first?.topic == .memory)
+        #expect(SystemVerdict.evaluate(calm(swapGB: 5, pressure: 4)).first?.topic == .memory)
         #expect(SystemVerdict.evaluate(calm(cpu: 95)).first?.topic == .cpu)
         #expect(SystemVerdict.evaluate(calm(diskFreeGB: 2)).first?.topic == .disk)
     }

@@ -1098,6 +1098,34 @@ private struct HistoryTab: View {
                             .controlSize(.small)
                     }
                 }
+                Divider().padding(.vertical, 4)
+                SettingsRow(label: String(localized: "Write readings to a JSON file")) {
+                    Toggle("", isOn: $settings.jsonSnapshotEnabled).labelsHidden()
+                }
+                if settings.jsonSnapshotEnabled {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(String(localized: "For status bar tools such as SwiftBar, xbar and SketchyBar. Updated every 5 seconds while the app runs, and deleted when you turn this off."))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                        HStack(spacing: 6) {
+                            Text(verbatim: SnapshotWriter.url.path)
+                                .font(.caption2.monospaced())
+                                .foregroundStyle(.tertiary)
+                                .lineLimit(1)
+                                .truncationMode(.head)
+                            Button {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(SnapshotWriter.url.path, forType: .string)
+                            } label: {
+                                Image(systemName: "doc.on.doc").font(.caption2)
+                            }
+                            .buttonStyle(.plain)
+                            .help(String(localized: "Copy path"))
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
         }
         .padding(16)

@@ -68,7 +68,8 @@ public enum SystemVerdict {
         public var memoryUsedGB: Double
         public var memoryTotalGB: Double
         public var swapUsedGB: Double
-        /// macOS's own pressure reading: 1 normal, 2 warning, 4 critical.
+        /// macOS's own pressure reading: 1 normal, 2 warning, 4 critical. Only
+        /// critical is acted on; see `evaluate`.
         public var memoryPressureLevel: Int
         /// Pages moving between memory and disk per second.
         public var swapPagesPerSecond: Double
@@ -155,9 +156,15 @@ public enum SystemVerdict {
         // memory, and saying so trains people to ignore the line.
         //
         // So the amount only decides the wording. Whether to say anything at all
-        // comes from the two signals that describe now: what macOS itself
-        // reports about pressure, and whether pages are actually moving.
-        let underPressure = input.memoryPressureLevel >= 2
+        // comes from pages actually moving, which is measurable and unambiguous.
+        //
+        // macOS's own pressure level is the second signal, but only at critical.
+        // Measured on a real machine it sat steadily at warning with 10 GB of 18
+        // in use and 300 MB of swap, having read normal the day before at 12.5
+        // GB. It does not track how much memory is in use, so treating warning
+        // as an alarm would have swapped one false alarm for another. Critical
+        // is rare enough to mean something.
+        let underPressure = input.memoryPressureLevel >= 4
         let paging = input.swapPagesPerSecond >= Threshold.swapPagesPerSecond
         if input.swapUsedGB >= Threshold.swapGB, underPressure || paging {
             found.append(SystemFinding(kind: .swapping(gb: input.swapUsedGB),

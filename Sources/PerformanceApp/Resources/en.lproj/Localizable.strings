@@ -137,6 +137,8 @@
 
 /* MARK: - SettingsView: History tab */
 "Save history to disk" = "Save history to disk";
+"Write readings to a JSON file" = "Write readings to a JSON file";
+"For status bar tools such as SwiftBar, xbar and SketchyBar. Updated every 5 seconds while the app runs, and deleted when you turn this off." = "For status bar tools such as SwiftBar, xbar and SketchyBar. Updated every 5 seconds while the app runs, and deleted when you turn this off.";
 "Open History Window" = "Open History Window";
 "Export" = "Export";
 "Export CSV…" = "Export CSV…";

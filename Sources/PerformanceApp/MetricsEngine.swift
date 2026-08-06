@@ -174,6 +174,7 @@ final class MetricsEngine: ObservableObject {
     private let wifiSampler: WiFiSampling = WiFiSampler()
     private let gpuSampler: GPUSampling = GPUSampler()
     private let smcSampler: SMCSampling = SMCSampler()
+    private let snapshotWriter = SnapshotWriter()
     private let powerSampler: PowerSampling = PowerSampler()
     private let bluetoothSampler = BluetoothSampler()
 
@@ -705,6 +706,10 @@ final class MetricsEngine: ObservableObject {
         updateSMC()
         updatePower()
         checkAlerts()
+        // Throttled to once every five seconds inside the writer, and a no-op
+        // when the setting is off, so this costs a comparison on the tick.
+        snapshotWriter.write(SnapshotWriter.Snapshot(engine: self),
+                             enabled: settings.jsonSnapshotEnabled)
         history.append(enabled: settings.persistHistoryEnabled,
                        cpu: cpuUsagePercent,
                        memory: memoryUsedGB,

@@ -137,6 +137,8 @@
 
 /* MARK: - SettingsView: History tab */
 "Save history to disk" = "履歴をディスクに保存";
+"Write readings to a JSON file" = "計測値を JSON ファイルに書き出す";
+"For status bar tools such as SwiftBar, xbar and SketchyBar. Updated every 5 seconds while the app runs, and deleted when you turn this off." = "SwiftBar、xbar、SketchyBar などのメニューバーツール向けです。App の実行中は 5 秒ごとに更新され、これをオフにすると削除されます。";
 "Open History Window" = "履歴ウィンドウを開く";
 "Export" = "書き出す";
 "Export CSV…" = "CSVを書き出す…";
