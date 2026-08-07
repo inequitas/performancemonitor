@@ -55,6 +55,14 @@ struct OverviewView: View {
                 }
                 .buttonStyle(.plain)
                 Spacer()
+                Button {
+                    engine.floatingDashboard?.toggle()
+                } label: {
+                    Label(String(localized: "Floating panel"), systemImage: "macwindow.on.rectangle")
+                }
+                .buttonStyle(.plain)
+                .help(String(localized: "A small always-on-top readout, visible over full-screen apps"))
+                Spacer()
                 Button { NSApplication.shared.terminate(nil) } label: {
                     Label(String(localized: "Quit"), systemImage: "power")
                 }

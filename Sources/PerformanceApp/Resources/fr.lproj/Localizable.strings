@@ -33,6 +33,9 @@
 "Disk" = "Disque";
 "GPU" = "GPU";
 "Power" = "Puissance";
+"Floating panel" = "Panneau flottant";
+"A small always-on-top readout, visible over full-screen apps" = "Un petit affichage toujours au premier plan, visible par-dessus les apps en plein écran";
+"Hide the floating panel" = "Masquer le panneau flottant";
 "PWR n/a" = "PWR n/d";
 "Sparkline" = "Sparkline";
 "Text only" = "Texte seul";

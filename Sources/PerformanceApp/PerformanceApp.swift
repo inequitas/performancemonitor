@@ -13,6 +13,19 @@ import AppKit
 final class AppContainer: ObservableObject {
     let engine = MetricsEngine()
     let updater = UpdateChecker()
+    /// Created once and kept for the app's life. It shows nothing and observes
+    /// nothing until asked, so an unused one costs a pointer.
+    private(set) lazy var floatingDashboard: FloatingDashboardController = {
+        let controller = FloatingDashboardController(engine: engine)
+        engine.floatingDashboard = controller
+        return controller
+    }()
+
+    init() {
+        // Touch it so a panel left open at quit comes back on launch. The
+        // controller defers the actual showing; see its init.
+        _ = floatingDashboard
+    }
 }
 
 @main

@@ -33,6 +33,9 @@
 "Disk" = "Schijf";
 "GPU" = "GPU";
 "Power" = "Vermogen";
+"Floating panel" = "Zwevend paneel";
+"A small always-on-top readout, visible over full-screen apps" = "Een kleine altijd-bovenop weergave, ook zichtbaar over schermvullende apps";
+"Hide the floating panel" = "Zwevend paneel verbergen";
 "PWR n/a" = "PWR n.v.t.";
 "Sparkline" = "Sparkline";
 "Text only" = "Alleen tekst";

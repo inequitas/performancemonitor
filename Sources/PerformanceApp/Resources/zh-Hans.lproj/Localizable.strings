@@ -32,6 +32,9 @@
 "Disk" = "磁盘";
 "GPU" = "GPU";
 "Power" = "功耗";
+"Floating panel" = "浮动面板";
+"A small always-on-top readout, visible over full-screen apps" = "始终置顶的小型读数面板，在全屏 App 上方也可见";
+"Hide the floating panel" = "隐藏浮动面板";
 "PWR n/a" = "PWR 无";
 "Sparkline" = "迷你图";
 "Text only" = "仅文本";

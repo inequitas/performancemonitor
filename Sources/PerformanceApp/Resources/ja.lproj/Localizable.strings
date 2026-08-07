@@ -33,6 +33,9 @@
 "Disk" = "ディスク";
 "GPU" = "GPU";
 "Power" = "電力";
+"Floating panel" = "フローティングパネル";
+"A small always-on-top readout, visible over full-screen apps" = "常に最前面に出る小さな表示です。フルスクリーンの App の上にも表示されます";
+"Hide the floating panel" = "フローティングパネルを隠す";
 "PWR n/a" = "PWR なし";
 "Sparkline" = "スパークライン";
 "Text only" = "テキストのみ";

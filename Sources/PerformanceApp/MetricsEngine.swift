@@ -26,6 +26,11 @@ final class MetricsEngine: ObservableObject {
     /// and only ever read on the main actor.
     private(set) static weak var current: MetricsEngine?
 
+    /// The floating readout, when one has been created. Held here so the
+    /// popover and the panel's own close button can reach it; it holds no
+    /// SwiftUI tree while hidden, so this costs nothing when unused.
+    weak var floatingDashboard: FloatingDashboardController?
+
     @Published var cpuUsagePercent: Double = 0
     @Published var cpuUserPercent: Double = 0
     @Published var cpuSystemPercent: Double = 0

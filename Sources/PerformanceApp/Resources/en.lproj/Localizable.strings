@@ -33,6 +33,9 @@
 "Disk" = "Disk";
 "GPU" = "GPU";
 "Power" = "Power";
+"Floating panel" = "Floating panel";
+"A small always-on-top readout, visible over full-screen apps" = "A small always-on-top readout, visible over full-screen apps";
+"Hide the floating panel" = "Hide the floating panel";
 "PWR n/a" = "PWR n/a";
 "Sparkline" = "Sparkline";
 "Text only" = "Text only";

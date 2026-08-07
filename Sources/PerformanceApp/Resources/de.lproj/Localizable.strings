@@ -33,6 +33,9 @@
 "Disk" = "Speicherplatz";
 "GPU" = "GPU";
 "Power" = "Leistung";
+"Floating panel" = "Schwebendes Fenster";
+"A small always-on-top readout, visible over full-screen apps" = "Eine kleine Anzeige immer im Vordergrund, auch über Vollbild-Apps";
+"Hide the floating panel" = "Schwebendes Fenster ausblenden";
 "PWR n/a" = "PWR k.A.";
 "Sparkline" = "Sparkline";
 "Text only" = "Nur Text";
