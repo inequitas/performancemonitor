@@ -32,6 +32,8 @@
 "Network" = "Netzwerk";
 "Disk" = "Speicherplatz";
 "GPU" = "GPU";
+"Power" = "Leistung";
+"PWR n/a" = "PWR k.A.";
 "Sparkline" = "Sparkline";
 "Text only" = "Nur Text";
 "System" = "System";
@@ -137,6 +139,10 @@
 
 /* MARK: - SettingsView: Tab Verlauf */
 "Save history to disk" = "Verlauf auf Festplatte speichern";
+"Send a weekly summary on Monday morning" = "Montagmorgens eine Wochenübersicht senden";
+"Your week on this Mac" = "Ihre Woche auf diesem Mac";
+"CPU averaged %.0f%%, peaking at %.0f%%." = "CPU im Mittel %.0f%%, Spitze %.0f%%.";
+"Memory averaged %.0f%%, peaking at %.0f%%." = "Speicher im Mittel %.0f%%, Spitze %.0f%%.";
 "Write readings to a JSON file" = "Messwerte in eine JSON-Datei schreiben";
 "For status bar tools such as SwiftBar, xbar and SketchyBar. Updated every 5 seconds while the app runs, and deleted when you turn this off." = "Für Menüleisten-Tools wie SwiftBar, xbar und SketchyBar. Wird alle 5 Sekunden aktualisiert, solange die App läuft, und gelöscht, sobald Sie dies ausschalten.";
 "Open History Window" = "Verlaufsfenster öffnen";

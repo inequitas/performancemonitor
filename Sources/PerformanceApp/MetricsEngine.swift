@@ -132,6 +132,8 @@ final class MetricsEngine: ObservableObject {
     @Published var extendedTemperatures: [TempReading] = []
     @Published var unknownSMCTemperatures: [TempReading] = []
     @Published var systemPowerWatts: Double?
+    /// Only filled while the menu bar is showing watts; see `updateSMC`.
+    @Published var powerHistory: [Double] = []
 
     // Per-domain power from IOReport's "Energy Model" group (Apple Silicon).
     // Nil when unavailable or while the Thermal window (the only consumer) is
@@ -465,6 +467,7 @@ final class MetricsEngine: ObservableObject {
         case .network: return Array((settings.networkSparklineUpload ? uploadHistory : downloadHistory).suffix(30))
         case .disk:    return Array((settings.diskSparklineWrite ? diskWriteHistory : diskReadHistory).suffix(30))
         case .gpu:     return Array(gpuHistory.suffix(30))
+        case .power:   return Array(powerHistory.suffix(30))
         }
     }
 
@@ -479,6 +482,7 @@ final class MetricsEngine: ObservableObject {
         case .network: return formatNetSpeed(settings.networkSparklineUpload ? uploadSpeedKBps : downloadSpeedKBps)
         case .disk:    return String(format: "%.0fK", settings.diskSparklineWrite ? diskWriteKBps : diskReadKBps)
         case .gpu:     return String(format: "%.0f%%", gpuUsagePercent)
+        case .power:   return systemPowerWatts.map { String(format: "%.0fW", $0) } ?? "—"
         }
     }
 
@@ -491,6 +495,7 @@ final class MetricsEngine: ObservableObject {
                            ? String(format: "R %.0fK W %.0fK", diskReadKBps, diskWriteKBps)
                            : String(format: "DSK %.1fG", diskFreeGB)
         case .gpu:     return String(format: "GPU %.0f%%", gpuUsagePercent)
+        case .power:   return systemPowerWatts.map { String(format: "PWR %.0fW", $0) } ?? String(localized: "PWR n/a")
         }
     }
 
@@ -513,6 +518,10 @@ final class MetricsEngine: ObservableObject {
             }
         }
         switch metric {
+        // No alert threshold is configured for watts, so it is never coloured,
+        // the same as network.
+        case .power:
+            return (.normal, nil)
         case .cpu:
             let threshold = alerts.cpuEnabled ? alerts.cpuThreshold : nil
             let severity = ThresholdSeverityMapper.severity(value: cpuUsagePercent, threshold: threshold, direction: .highIsBad)
@@ -771,6 +780,7 @@ final class MetricsEngine: ObservableObject {
         updateSMC()
         updatePower()
         checkAlerts()
+        checkWeeklyDigest()
         // Throttled to once every five seconds inside the writer, and a no-op
         // when the setting is off, so this costs a comparison on the tick.
         snapshotWriter.write(SnapshotWriter.Snapshot(engine: self),
@@ -1073,10 +1083,18 @@ final class MetricsEngine: ObservableObject {
     // the Thermal window opens, before the next scheduled tick.
     private func updateSMC(forceExtended: Bool = false) {
         let extended = forceExtended || visiblePanels.contains(.thermal)
+        // One extra SMC key, and only for whoever put watts in their menu bar.
+        let includePower = settings.isEnabled(.power)
         Task { @MainActor [weak self] in
-            guard let self, let s = await self.smcSampler.sample(extended: extended) else { return }
+            guard let self,
+                  let s = await self.smcSampler.sample(extended: extended, includePower: includePower)
+            else { return }
             self.cpuTemperatureC        = s.cpuTemperatureC
             self.gpuTemperatureC        = s.gpuTemperatureC
+            if includePower || extended, let watts = s.systemPowerWatts {
+                self.systemPowerWatts = watts
+                self.appendCapped(watts, to: &self.powerHistory)
+            }
             guard extended else { return }
             self.fans                   = s.fans
             self.extendedTemperatures   = s.extendedTemperatures
@@ -1094,6 +1112,50 @@ final class MetricsEngine: ObservableObject {
             self.listeningPorts = snapshot.listening
             self.connectionCounts = snapshot.connections
         }
+    }
+
+    /// Sends a summary of last week, once on Monday morning.
+    ///
+    /// Asked on the tick rather than scheduled with a calendar trigger, because
+    /// a Mac asleep at nine on Monday would miss the trigger entirely and one
+    /// shut for a fortnight would be handed a backlog. See
+    /// `WeeklyDigestSchedule`.
+    private func checkWeeklyDigest() {
+        guard settings.weeklyDigestEnabled,
+              WeeklyDigestSchedule.isDue(now: Date(), lastSent: settings.weeklyDigestLastSent)
+        else { return }
+        // Claim the slot before the summary is built. Reading a week of history
+        // is asynchronous, and without this a slow read would let the next tick
+        // decide it is due as well.
+        settings.weeklyDigestLastSent = Date()
+
+        Task { @MainActor [weak self] in
+            guard let self, let body = await self.weeklyDigestBody() else { return }
+            self.alerts.post(title: String(localized: "Your week on this Mac"), body: body)
+        }
+    }
+
+    /// One line per metric that has data, or nil when the week is empty, so a
+    /// Mac that was off all week says nothing rather than reporting zeroes.
+    private func weeklyDigestBody() async -> String? {
+        let now = Date()
+        let from = now.addingTimeInterval(-7 * 24 * 3600)
+        var lines: [String] = []
+
+        func aggregates(_ metric: HistoryMetric) async -> [HistoryAggregate] {
+            await historyDB.samples(metric: metric, from: from, to: now)
+                .map { HistoryAggregate(bucketStart: $0.date, min: $0.min, avg: $0.avg, max: $0.max) }
+        }
+
+        if let summary = WeeklySummary.metricSummary(await aggregates(.cpuUsagePercent)) {
+            lines.append(String(format: String(localized: "CPU averaged %.0f%%, peaking at %.0f%%."),
+                                summary.average, summary.peak))
+        }
+        if let summary = WeeklySummary.metricSummary(await aggregates(.memoryUsedPercent)) {
+            lines.append(String(format: String(localized: "Memory averaged %.0f%%, peaking at %.0f%%."),
+                                summary.average, summary.peak))
+        }
+        return lines.isEmpty ? nil : lines.joined(separator: " ")
     }
 
     // MARK: - Per-domain power (IOReport Energy Model)

@@ -94,6 +94,18 @@ final class AlertService: ObservableObject {
         }
     }
 
+    /// Posts a notification that is not one of the threshold alerts, so it
+    /// bypasses the cooldown those share. Used for the weekly summary, which is
+    /// scheduled rather than triggered.
+    func post(title: String, body: String) {
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body  = body
+        let req = UNNotificationRequest(identifier: "digest-\(Date().timeIntervalSince1970)",
+                                        content: content, trigger: nil)
+        UNUserNotificationCenter.current().add(req)
+    }
+
     private func fire(_ key: String, _ title: String, _ body: String, now: Date) {
         if let last = lastFired[key], now.timeIntervalSince(last) < cooldown { return }
         lastFired[key] = now

@@ -32,6 +32,8 @@
 "Network" = "ネットワーク";
 "Disk" = "ディスク";
 "GPU" = "GPU";
+"Power" = "電力";
+"PWR n/a" = "PWR なし";
 "Sparkline" = "スパークライン";
 "Text only" = "テキストのみ";
 "System" = "システム";
@@ -137,6 +139,10 @@
 
 /* MARK: - SettingsView: History tab */
 "Save history to disk" = "履歴をディスクに保存";
+"Send a weekly summary on Monday morning" = "月曜の朝に週次サマリーを送る";
+"Your week on this Mac" = "この Mac の 1 週間";
+"CPU averaged %.0f%%, peaking at %.0f%%." = "CPU 平均 %.0f%%、ピーク %.0f%%。";
+"Memory averaged %.0f%%, peaking at %.0f%%." = "メモリ平均 %.0f%%、ピーク %.0f%%。";
 "Write readings to a JSON file" = "計測値を JSON ファイルに書き出す";
 "For status bar tools such as SwiftBar, xbar and SketchyBar. Updated every 5 seconds while the app runs, and deleted when you turn this off." = "SwiftBar、xbar、SketchyBar などのメニューバーツール向けです。App の実行中は 5 秒ごとに更新され、これをオフにすると削除されます。";
 "Open History Window" = "履歴ウィンドウを開く";

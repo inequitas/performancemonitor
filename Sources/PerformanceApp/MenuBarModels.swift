@@ -11,6 +11,10 @@ enum MenuBarMetric: String, CaseIterable, Identifiable, Codable, Transferable {
     case network = "Network"
     case disk = "Disk"
     case gpu = "GPU"
+    /// Total system power draw. Off by default: it is the only metric that
+    /// costs an extra SMC read on every tick, so nobody pays for it unless
+    /// they ask.
+    case power = "Power"
     var id: String { rawValue }
     // Display-only localized label. `rawValue` stays the fixed English form
     // used for persistence (UserDefaults) and must never be localized.
@@ -21,6 +25,7 @@ enum MenuBarMetric: String, CaseIterable, Identifiable, Codable, Transferable {
         case .network: return String(localized: "Network")
         case .disk:    return String(localized: "Disk")
         case .gpu:     return String(localized: "GPU")
+        case .power:   return String(localized: "Power")
         }
     }
     var icon: String {
@@ -30,6 +35,7 @@ enum MenuBarMetric: String, CaseIterable, Identifiable, Codable, Transferable {
         case .network: return "network"
         case .disk:    return "internaldrive"
         case .gpu:     return "rectangle.3.group"
+        case .power:   return "bolt"
         }
     }
     var color: Color {
@@ -39,6 +45,7 @@ enum MenuBarMetric: String, CaseIterable, Identifiable, Codable, Transferable {
         case .network: return MetricTheme.networkDown
         case .disk:    return MetricTheme.disk
         case .gpu:     return MetricTheme.gpu
+        case .power:   return MetricTheme.networkUp
         }
     }
     static var transferRepresentation: some TransferRepresentation {

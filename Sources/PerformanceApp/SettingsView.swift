@@ -1099,6 +1099,10 @@ private struct HistoryTab: View {
                     }
                 }
                 Divider().padding(.vertical, 4)
+                SettingsRow(label: String(localized: "Send a weekly summary on Monday morning")) {
+                    Toggle("", isOn: $settings.weeklyDigestEnabled).labelsHidden()
+                }
+                Divider().padding(.vertical, 4)
                 SettingsRow(label: String(localized: "Write readings to a JSON file")) {
                     Toggle("", isOn: $settings.jsonSnapshotEnabled).labelsHidden()
                 }

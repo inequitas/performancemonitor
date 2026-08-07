@@ -32,6 +32,8 @@
 "Network" = "Réseau";
 "Disk" = "Disque";
 "GPU" = "GPU";
+"Power" = "Puissance";
+"PWR n/a" = "PWR n/d";
 "Sparkline" = "Sparkline";
 "Text only" = "Texte seul";
 "System" = "Système";
@@ -137,6 +139,10 @@
 
 /* MARK: - SettingsView : onglet Historique */
 "Save history to disk" = "Enregistrer l'historique sur le disque";
+"Send a weekly summary on Monday morning" = "Envoyer un résumé hebdomadaire le lundi matin";
+"Your week on this Mac" = "Votre semaine sur ce Mac";
+"CPU averaged %.0f%%, peaking at %.0f%%." = "CPU en moyenne %.0f%%, pic à %.0f%%.";
+"Memory averaged %.0f%%, peaking at %.0f%%." = "Mémoire en moyenne %.0f%%, pic à %.0f%%.";
 "Write readings to a JSON file" = "Écrire les mesures dans un fichier JSON";
 "For status bar tools such as SwiftBar, xbar and SketchyBar. Updated every 5 seconds while the app runs, and deleted when you turn this off." = "Pour les outils de barre de menus comme SwiftBar, xbar et SketchyBar. Mis à jour toutes les 5 secondes tant que l'app tourne, et supprimé dès que vous désactivez ceci.";
 "Open History Window" = "Ouvrir la fenêtre d'historique";

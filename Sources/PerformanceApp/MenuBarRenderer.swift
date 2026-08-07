@@ -18,11 +18,13 @@ enum MenuBarRenderer {
     // Widest string each metric/style combo will ever produce, used to fix slot widths.
     private static let maxTextLabel: [MenuBarMetric: String] = [
         .cpu: "CPU 100%", .memory: "MEM 16.0G",
-        .network: "↓9.9m ↑9.9m", .disk: "R 9999K W 9999K", .gpu: "GPU 100%"
+        .network: "↓9.9m ↑9.9m", .disk: "R 9999K W 9999K", .gpu: "GPU 100%",
+        .power: "PWR 199W"
     ]
     private static let maxTextLabelDiskSpace = "DSK 16.0G"
     private static let maxSparkLabel: [MenuBarMetric: String] = [
-        .cpu: "100%", .memory: "16.0G", .network: "9.9m", .disk: "16.0G", .gpu: "100%"
+        .cpu: "100%", .memory: "16.0G", .network: "9.9m", .disk: "16.0G", .gpu: "100%",
+        .power: "199W"
     ]
 
     /// Pre-measured widths so NSString.size() is never called at render time.

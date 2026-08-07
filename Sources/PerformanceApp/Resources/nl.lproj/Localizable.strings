@@ -32,6 +32,8 @@
 "Network" = "Netwerk";
 "Disk" = "Schijf";
 "GPU" = "GPU";
+"Power" = "Vermogen";
+"PWR n/a" = "PWR n.v.t.";
 "Sparkline" = "Sparkline";
 "Text only" = "Alleen tekst";
 "System" = "Systeem";
@@ -137,6 +139,10 @@
 
 /* MARK: - SettingsView: tabblad Geschiedenis */
 "Save history to disk" = "Geschiedenis opslaan op schijf";
+"Send a weekly summary on Monday morning" = "Maandagochtend een weeksamenvatting sturen";
+"Your week on this Mac" = "Jouw week op deze Mac";
+"CPU averaged %.0f%%, peaking at %.0f%%." = "CPU gemiddeld %.0f%%, piek %.0f%%.";
+"Memory averaged %.0f%%, peaking at %.0f%%." = "Geheugen gemiddeld %.0f%%, piek %.0f%%.";
 "Write readings to a JSON file" = "Metingen naar een JSON-bestand schrijven";
 "For status bar tools such as SwiftBar, xbar and SketchyBar. Updated every 5 seconds while the app runs, and deleted when you turn this off." = "Voor menubalk-tools zoals SwiftBar, xbar en SketchyBar. Wordt elke 5 seconden bijgewerkt zolang de app draait, en verwijderd zodra je dit uitzet.";
 "Open History Window" = "Historievenster openen";

@@ -63,6 +63,19 @@ final class SettingsStore: ObservableObject {
     /// SwiftBar and SketchyBar. Off by default: it puts a file in someone's home
     /// directory and writes on a timer, neither of which should follow from
     /// merely installing the app. See `SnapshotWriter`.
+    /// A summary of last week, once on Monday morning. Off by default: an app
+    /// should not start sending notifications because it was installed.
+    @Published var weeklyDigestEnabled: Bool = false {
+        didSet { UserDefaults.standard.set(weeklyDigestEnabled, forKey: Pref.weeklyDigestEnabled) }
+    }
+
+    /// When the weekly summary was last sent, so it goes out once a week even
+    /// if the Mac was asleep on Monday.
+    var weeklyDigestLastSent: Date? {
+        get { UserDefaults.standard.object(forKey: "weeklyDigestLastSent") as? Date }
+        set { UserDefaults.standard.set(newValue, forKey: "weeklyDigestLastSent") }
+    }
+
     @Published var jsonSnapshotEnabled: Bool = false {
         didSet { UserDefaults.standard.set(jsonSnapshotEnabled, forKey: Pref.jsonSnapshotEnabled) }
     }
@@ -203,6 +216,7 @@ final class SettingsStore: ObservableObject {
         static let showRemovableVolumes     = "showRemovableVolumes"
         static let persistHistoryEnabled    = "persistHistoryEnabled"
         static let jsonSnapshotEnabled      = "jsonSnapshotEnabled"
+        static let weeklyDigestEnabled      = "weeklyDigestEnabled"
         static let publicIPEnabled          = "publicIPEnabled"
         static let menuBarMetric            = "menuBarMetric"
         static let menuBarStyle             = "menuBarStyle"
@@ -232,6 +246,7 @@ final class SettingsStore: ObservableObject {
         if let v = bool(Pref.showRemovableVolumes)      { showRemovableVolumes = v }
         if let v = bool(Pref.persistHistoryEnabled)     { persistHistoryEnabled = v }
         if let v = bool(Pref.jsonSnapshotEnabled)       { jsonSnapshotEnabled = v }
+        if let v = bool(Pref.weeklyDigestEnabled)       { weeklyDigestEnabled = v }
         if let v = dbl(Pref.refreshInterval)            { refreshInterval = v }
         if let v = int_(Pref.topProcessCount)           { topProcessCount = v }
         if let v = ud.string(forKey: Pref.pingServer)     { pingServer = MetricsEngine.PingServer(rawValue: v) ?? .apple }

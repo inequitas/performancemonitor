@@ -21,7 +21,10 @@ struct SMCSnapshot {
     /// Thermal detail window — and leaves the fan/extended/power fields empty.
     /// When `extended` is true (Thermal window visible), reads the full sensor
     /// set, fans, and system power.
-    func sample(extended: Bool) async -> SMCSnapshot?
+    /// - Parameter includePower: Reads the single `PSTR` key alongside the
+    ///   temperatures. Needed when the menu bar shows watts, and one key is far
+    ///   from the full sensor enumeration the extended path does.
+    func sample(extended: Bool, includePower: Bool) async -> SMCSnapshot?
 
     /// Clears the 2s throttle so the next `sample` reads immediately. Used when
     /// the Thermal window opens, so it shows the full sensor set at once.
@@ -38,7 +41,7 @@ final class SMCSampler: SMCSampling {
 
     func resetThrottle() { cacheDate = .distantPast }
 
-    func sample(extended: Bool) async -> SMCSnapshot? {
+    func sample(extended: Bool, includePower: Bool) async -> SMCSnapshot? {
         guard smc.isOpen else { return nil }
         let now = Date()
         guard now.timeIntervalSince(cacheDate) > 2 else { return nil }
@@ -56,7 +59,7 @@ final class SMCSampler: SMCSampling {
                                    fans: [],
                                    extendedTemperatures: [],
                                    unknownSMCTemperatures: [],
-                                   systemPowerWatts: nil)
+                                   systemPowerWatts: includePower ? reader.systemPowerWatts() : nil)
             }.value
         }
 
