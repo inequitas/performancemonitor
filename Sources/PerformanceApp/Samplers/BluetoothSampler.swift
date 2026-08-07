@@ -54,15 +54,20 @@ final class BluetoothSampler {
     func update(readDevices: Bool) {
         let auth = CBCentralManager.authorization
         onAuth?(auth)
-        guard readDevices else { return }
         switch auth {
         case .allowedAlways:
             // Ensure CBCentralManager exists — needed for BLE disconnect.
             // If already authorised at launch, requestAccess() is never called by
             // the notDetermined path, leaving btAuthManager nil.
             if btAuthManager == nil { requestAccess() }
+            guard readDevices else { return }
             readBluetoothDevices()
         case .notDetermined:
+            // Asking is deliberately not gated on anything being on screen.
+            // Only the reads are expensive; the prompt is what decides whether
+            // this app can ever show Bluetooth at all, and holding it back until
+            // someone happens to open the popover makes the first launch look
+            // like the feature is missing rather than unasked for.
             requestAccess()
         default:
             break
