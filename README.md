@@ -25,15 +25,19 @@ A lightweight macOS menu bar app that gives you real-time system metrics at a gl
 
 ---
 
-## What's new in v1.2.0
+## What's new in v1.3.0
 
-- **Per-component power draw**: CPU, GPU, Neural Engine and memory wattage read separately, on top of the total system power that 1.1.0 added
-- **Per-process disk I/O**: a "Top Disk Usage" list in the Disk window, for processes running under your own user account
-- **Guided tour**: a five-step walkthrough on first launch, with a live preview of the menu bar. Reachable again from Settings → About
-- **Steadier menu bar**: fixed-width values so items stop jittering, plus a compact mode that combines every metric into one item
-- **Lighter again**: closed windows now tear their content down instead of quietly carrying on. A detail window that had been opened once kept re-rendering for the rest of the session
+- **A process glossary**: 231 entries in seven languages explaining what a process actually is. `oahd` reads as Rosetta, `ecosystemd` as Continuity, `wdavdaemon_unprivileged` as Microsoft Defender
+- **An app and its helpers are one row**: Firefox with 17 processes reads as one row, not seventeen. Open a row to see the individual processes
+- **A plain-language verdict** at the top of the overview: not just what is happening, but what it means and what you can do about it
+- **Shortcuts actions**: read a metric, ask how the Mac is doing in words, or name the busiest app
+- **Listening ports and open connections** in the Network window. Read-only; blocking is a firewall's job
+- **Sleep, wake and throttling marked on the history graphs**, so an hour of high CPU has an explanation next to it
+- **A floating panel** that stays visible over full-screen apps
+- **A JSON file of the current readings** for SwiftBar, xbar and SketchyBar, off by default
+- **Lighter again**: idle CPU from 2.29% to 1.86% on an M3 Pro, with the spread between runs down from 1.20 to 0.08 points
 
-That last one is worth more than a bullet point: [what a system monitor costs](https://perfmon.knhome.nl/benchmark.html) is the write-up of how it was measured, what it turned out to be, and the two ways I measured it wrong first.
+How the idle cost is measured, and the three ways I measured it wrong first, is written up in [what a system monitor costs](https://perfmon.knhome.nl/benchmark.html).
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
@@ -44,6 +48,8 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 ### CPU
 - Overall usage percentage updated every second
 - Per-process breakdown (Top CPU) with usage normalized across all logical cores
+- An app and its helper processes shown as one row, expandable to the individual processes
+- A readable name and a one-line explanation for 231 known processes, in every supported language
 - Performance and Efficiency core counts (Apple Silicon)
 - Historical usage chart
 
@@ -60,6 +66,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 - Local IP address (tap to copy)
 - Public IP address (tap to copy)
 - Wi-Fi SSID and signal strength in dBm with visual bar indicator
+- Listening ports and open connections per app, read-only (same coverage as `lsof` without `sudo`)
 - Historical speed chart
 
 ### Disk
@@ -85,6 +92,24 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 - Battery percentage per device:
   - **AirPods**: Left, Right, and Case shown separately
   - **BLE devices** (e.g. Logitech MX Master): battery read via GATT Battery Service
+
+---
+
+### Automation
+
+- **Shortcuts actions**: read one metric, ask how this Mac is doing in words, or get the busiest app. Every value comes from what the app has already sampled, so no action starts a measurement of its own
+- **JSON snapshot**: optionally writes the current readings to `~/Library/Application Support/PerformanceApp/snapshot.json` every five seconds, for status bar tools such as SwiftBar, xbar and SketchyBar. Off by default, and deleted when you turn it off
+
+### History
+
+- Tiered storage: one second, one minute and one hour resolutions, kept for one hour, 48 hours and 90 days
+- Sleep, wake and thermal throttling marked on the graphs, with the wake reason where the system log gives one that means something
+- A weekly summary notification on Monday morning, off by default
+
+### Floating panel
+
+- A small always-on-top readout that stays visible over full-screen apps, for watching temperature during a game or a render
+- Remembers where you put it; holds nothing at all while hidden
 
 ---
 

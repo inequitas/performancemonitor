@@ -1,5 +1,35 @@
 # Changelog
 
+## v1.3.0: Names, not numbers *(2026-08-07)*
+
+**Knowing what you are looking at**
+
+- **A process glossary.** 231 entries explaining what a process actually is, in all seven languages. `oahd` reads as Rosetta, `ecosystemd` as Continuity, `mds_stores` as Spotlight indexing, `wdavdaemon_unprivileged` as Microsoft Defender. Each row shows the readable name, with a tap for the full explanation and the raw name. Chosen by measuring what a real machine runs rather than by guessing: 20 of the top 20 processes in the CPU list are now named, and 40 of 40 in the memory list.
+- **An app and its helpers are one row.** Chrome, Electron apps and Xcode spawn a helper per tab, window or compile job, and each looks unremarkable while together they account for most of the machine. Firefox with 17 processes is one row adding up to 8.6% rather than seventeen rows of nothing much. Rows open to show the individual processes, and quitting a group reaches all of them.
+- **A plain-language verdict**, at the top of the overview. Not just what is happening but what it means and what you can do: high memory use is normal and only matters once the machine starts paging, and the line says so.
+
+**New windows on the machine**
+
+- **Shortcuts actions.** Read one metric, ask how the Mac is doing in words, or name the busiest app. Enough to build the automations people ask for without this app growing a scheduler.
+- **A JSON file of the current readings**, for SwiftBar, xbar and SketchyBar. Off by default, written at most every five seconds, deleted when you turn it off.
+- **Listening ports and open connections** in the Network window. Read-only; blocking is a firewall's job.
+- **Sleep, wake and throttling marked on the history graphs**, so an hour of high CPU has an explanation next to it. Wake reasons are named only where the system log says something you can check.
+- **A floating panel** that stays visible over full-screen apps, for watching temperature during a game or a render.
+- **Watts in the menu bar**, and **a weekly summary on Monday morning**. Both off by default.
+
+**Lighter, and measured**
+
+- GPU utilisation was copying the accelerator's entire property dictionary to read one key. Asking for just that key is 64 times cheaper.
+- Bluetooth was running `system_profiler` every 25 seconds whether or not anything showed Bluetooth.
+- Idle CPU went from 2.29% to 1.86% on an M3 Pro, measured back to back. The spread between runs went from 1.20 to 0.08 points, which matters as much as the average: what was removed was the bursty work.
+
+**Fixes**
+
+- The first click in an unfocused window now does what it was aimed at, instead of only bringing the window forward.
+- "Out of memory" no longer appears on a Mac with a third of its memory free. Swap in use is a standing total left over from whenever memory was last tight, not a description of now; the machine has to actually be paging.
+- `ps` was truncating process names to 16 characters, which turned three different WebKit helpers into one name.
+- Bluetooth permission is asked for at launch again, not when the overview is first opened.
+
 ## v1.2.0: Deeper into the chip, lighter than ever *(2026-07-30)*
 
 **Deeper into the chip**
