@@ -305,13 +305,15 @@ struct ProcessListView: View {
         // The raw name is still one click away, in the glossary popover.
         let display = known?.title ?? proc.name
         return HStack(spacing: 6) {
-            if isGroup {
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 8, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                    .rotationEffect(.degrees(expanded.contains(proc.id) ? 90 : 0))
-                    .frame(width: 9)
-            }
+            // The space is reserved whether or not there is a chevron, so a
+            // single process lines up with the groups around it instead of
+            // starting a few points to their left.
+            Image(systemName: "chevron.right")
+                .font(.system(size: 8, weight: .semibold))
+                .foregroundStyle(.secondary)
+                .rotationEffect(.degrees(expanded.contains(proc.id) ? 90 : 0))
+                .frame(width: 9)
+                .opacity(isGroup ? 1 : 0)
             Text(display)
                 .font(.caption)
                 .lineLimit(1)
