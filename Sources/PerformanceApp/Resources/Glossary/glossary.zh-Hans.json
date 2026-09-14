@@ -1487,6 +1487,794 @@
       "vendor": "Apple",
       "expectedHigh": false,
       "description": "在需要凭据的网络上完成 Mac 的登录认证，公司和校园 Wi-Fi 通常如此。"
+    },
+    {
+      "match": {
+        "name": "Spotify"
+      },
+      "title": "Spotify",
+      "category": "app",
+      "vendor": "Spotify",
+      "expectedHigh": false,
+      "description": "Spotify 音乐播放器。与其他 Electron 应用一样，会为界面和播放运行多个辅助进程。"
+    },
+    {
+      "match": {
+        "name": "Microsoft Outlook"
+      },
+      "title": "Microsoft Outlook",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "微软的邮件与日历 App。邮箱越多、本地缓存越大，占用的内存越多。"
+    },
+    {
+      "match": {
+        "name": "AdobeAcrobat"
+      },
+      "title": "Adobe Acrobat",
+      "category": "app",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "Adobe 的 PDF 阅读与编辑软件，以及它用于渲染和内置浏览器的辅助进程。"
+    },
+    {
+      "match": {
+        "name": "AcroCEF"
+      },
+      "title": "Adobe Acrobat（网页视图）",
+      "category": "helper",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "Acrobat 用于登录、文档云和应用内页面的内嵌浏览器。",
+      "group": "AdobeAcrobat"
+    },
+    {
+      "match": {
+        "name": "AdobeResourceSynchronizer"
+      },
+      "title": "Adobe Acrobat（同步）",
+      "category": "helper",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "在后台同步 Acrobat 的字体、设置和云端文档。",
+      "group": "AdobeAcrobat"
+    },
+    {
+      "match": {
+        "name": "Acrobat Updater"
+      },
+      "title": "Adobe Acrobat（更新程序）",
+      "category": "helper",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "检查并安装 Acrobat 的更新。",
+      "group": "AdobeAcrobat"
+    },
+    {
+      "match": {
+        "name": "Microsoft AutoUpdate"
+      },
+      "title": "Microsoft AutoUpdate",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "负责更新 Office、Teams、Edge 和 Defender，仅在检查或下载时才忙碌。"
+    },
+    {
+      "match": {
+        "name": "Microsoft Update Assistant"
+      },
+      "title": "Microsoft AutoUpdate（助理）",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Microsoft AutoUpdate 中负责留意新版本的后台部分。",
+      "group": "Microsoft AutoUpdate"
+    },
+    {
+      "match": {
+        "name": "Windows App"
+      },
+      "title": "Windows App",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "微软的远程桌面客户端（原 Remote Desktop）。会话显示期间 CPU 占用较高。"
+    },
+    {
+      "match": {
+        "name": "RemoteDesktopManager"
+      },
+      "title": "Remote Desktop Manager",
+      "category": "app",
+      "vendor": "Devolutions",
+      "expectedHigh": false,
+      "description": "Devolutions 用于管理远程连接与凭据的工具。"
+    },
+    {
+      "match": {
+        "name": "RoyalTSX"
+      },
+      "title": "Royal TSX",
+      "category": "app",
+      "vendor": "Royal Apps",
+      "expectedHigh": false,
+      "description": "用于管理远程桌面、SSH 和 VNC 连接的工具。"
+    },
+    {
+      "match": {
+        "name": "Messages"
+      },
+      "title": "信息",
+      "category": "app",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Apple 的“信息” App。同步较长的对话记录或加载附件时会比较忙碌。"
+    },
+    {
+      "match": {
+        "name": "boringNotch"
+      },
+      "title": "boringNotch",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "第三方 App，把刘海区域变成媒体与控制条。"
+    },
+    {
+      "match": {
+        "name": "DockDoor"
+      },
+      "title": "DockDoor",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "第三方 App，在鼠标悬停程序坞时显示窗口预览。"
+    },
+    {
+      "match": {
+        "name": "logioptionsplus_updater"
+      },
+      "title": "Logi Options+（更新程序）",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "检查罗技鼠标与键盘软件的更新。",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "system_profiler"
+      },
+      "title": "系统信息",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "macOS 用来收集硬件与软件信息的命令。App 会短暂调用它，例如读取蓝牙设备电量，之后即退出。"
+    },
+    {
+      "match": {
+        "name": "ditto"
+      },
+      "title": "文件复制",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "macOS 用来复制文件夹并保留权限和元数据的命令。安装程序和备份工具会调用它，复制完成后即退出。"
+    },
+    {
+      "match": {
+        "name": "oahd"
+      },
+      "title": "Rosetta",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "把 Intel 应用翻译成可在 Apple 芯片上运行。仅当此类应用打开时存在，首次启动时较忙。"
+    },
+    {
+      "match": {
+        "name": "ecosystemd"
+      },
+      "title": "接力与连续互通",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "让这台 Mac 与 iPhone、iPad 协同工作：接力、通用剪贴板、电话与信息。"
+    },
+    {
+      "match": {
+        "name": "ecosystemanalyticsd"
+      },
+      "title": "连续互通（诊断）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "在设备本机记录连续互通功能的运行情况。",
+      "group": "ecosystemd"
+    },
+    {
+      "match": {
+        "name": "iconservicesagent"
+      },
+      "title": "App 图标",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "绘制并缓存 App 在程序坞、访达和菜单中使用的图标。"
+    },
+    {
+      "match": {
+        "name": "sharedfilelistd"
+      },
+      "title": "最近使用的项目",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "维护程序坞和访达显示的最近文稿、个人收藏和登录项列表。"
+    },
+    {
+      "match": {
+        "name": "akd"
+      },
+      "title": "Apple 账户",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "处理 Apple 账户登录及相关的安全密钥。"
+    },
+    {
+      "match": {
+        "name": "coreauthd"
+      },
+      "title": "触控 ID 与密码提示",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "显示要求触控 ID、密码或 Apple Watch 的对话框。"
+    },
+    {
+      "match": {
+        "name": "suggestd"
+      },
+      "title": "Siri（学习）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "从你输入和打开的内容中学习，以便聚焦搜索和 Siri 给出建议。数据保留在本机。",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "secinitd"
+      },
+      "title": "App 沙盒准备",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "为每个 App 准备运行所需的沙盒环境，App 启动时短暂出现。"
+    },
+    {
+      "match": {
+        "name": "storekitagent"
+      },
+      "title": "App 内购买",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "处理在 App 内进行的购买与订阅。"
+    },
+    {
+      "match": {
+        "name": "PerfPowerServices"
+      },
+      "title": "电池与性能记录",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "记录电池健康度和性能数据，供 Apple 诊断和“电池”设置使用。"
+    },
+    {
+      "match": {
+        "name": "systemsoundserverd"
+      },
+      "title": "系统声音",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "播放提示音和界面音效。"
+    },
+    {
+      "match": {
+        "name": "avatarsd"
+      },
+      "title": "联系人图片",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "准备在信息、邮件和通讯录中显示的联系人照片与 Memoji。"
+    },
+    {
+      "match": {
+        "name": "pkd"
+      },
+      "title": "扩展注册表",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "记录各 App 提供的扩展，例如共享选项、小组件和访达操作。"
+    },
+    {
+      "match": {
+        "name": "passd"
+      },
+      "title": "钱包",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "管理“钱包”中的卡片与通行证，以及 Apple Pay。"
+    },
+    {
+      "match": {
+        "name": "frauddefensed"
+      },
+      "title": "Apple Pay 欺诈检查",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "按 Apple 的反欺诈机制核验支付请求。"
+    },
+    {
+      "match": {
+        "name": "maild"
+      },
+      "title": "邮件（后台）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "在“邮件” App 关闭时仍收取邮件并建立索引。"
+    },
+    {
+      "match": {
+        "name": "bluetoothuserd"
+      },
+      "title": "蓝牙（当前用户）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "蓝牙中属于当前登录用户的部分，处理配对请求和设备访问。"
+    },
+    {
+      "match": {
+        "name": "VTEncoderXPCService"
+      },
+      "title": "视频编码",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "为屏幕录制、屏幕共享、FaceTime 和视频导出压缩视频，期间占用较高属正常。"
+    },
+    {
+      "match": {
+        "name": "XProtectBridgeService"
+      },
+      "title": "恶意软件扫描",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "macOS 内置恶意软件防护 XProtect 的一部分，在打开或下载新内容时运行。"
+    },
+    {
+      "match": {
+        "name": "replicatord"
+      },
+      "title": "iCloud 同步",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "通过 iCloud 在这台 Mac 与你的其他设备之间同步更改。"
+    },
+    {
+      "match": {
+        "name": "ShareSheetUI"
+      },
+      "title": "共享面板",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "共享内容时出现的面板，仅在打开期间存在。"
+    },
+    {
+      "match": {
+        "name": "TextThumbnailExtension"
+      },
+      "title": "文本预览",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "绘制访达和快速查看中文本文稿的缩略预览。"
+    },
+    {
+      "match": {
+        "name": "Downloader"
+      },
+      "title": "App 更新下载（Sparkle）",
+      "category": "helper",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "为使用 Sparkle 更新框架的 App 下载更新。多个 App 共用这个名称，因此无法据此判断是哪一个。"
+    },
+    {
+      "match": {
+        "name": "universalAccessAuthWarn"
+      },
+      "title": "辅助功能权限提示",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "询问某个 App 是否可以通过辅助功能控制这台 Mac 的对话框，仅在有请求时出现。"
+    },
+    {
+      "match": {
+        "name": "managedappdistributiond"
+      },
+      "title": "受管 App 安装",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "安装并更新由雇主设备管理推送到这台 Mac 的 App。"
+    },
+    {
+      "match": {
+        "name": "systemmigrationd"
+      },
+      "title": "迁移助理",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "从另一台 Mac 或备份中复制账户、App 和文件。仅在迁移期间存在，且占用很高。"
+    },
+    {
+      "match": {
+        "name": "voicebankingd"
+      },
+      "title": "个人语音",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "根据“个人语音”辅助功能录制的内容生成合成语音，仅在 Mac 空闲且接通电源时运行。"
+    },
+    {
+      "match": {
+        "name": "CloudTelemetryService"
+      },
+      "title": "Apple 诊断上传",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "发送你同意与 Apple 共享的诊断报告；若未开启共享，则不会发送任何内容。"
+    },
+    {
+      "match": {
+        "name": "EAUpdaterService"
+      },
+      "title": "配件固件更新",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "更新已连接配件的固件，例如 AirPods 和 Apple 键盘。"
+    },
+    {
+      "match": {
+        "name": "com.apple.DriverKit.AppleUserECM"
+      },
+      "title": "USB 网络驱动",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "驱动通过 USB 连接的网络适配器，包括来自 iPhone 的个人热点共享。"
+    },
+    {
+      "match": {
+        "name": "amsengagementd"
+      },
+      "title": "App Store 推广",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "处理 App Store 显示的优惠和订阅提醒。"
+    },
+    {
+      "match": {
+        "name": "amsondevicestoraged"
+      },
+      "title": "App Store 推广（本机）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "在本机保存 App Store 的推广数据，无需访问服务器即可决定展示内容。",
+      "group": "amsengagementd"
+    },
+    {
+      "match": {
+        "name": "promotedcontentd"
+      },
+      "title": "App Store 广告隐私",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "将 App Store 的广告衡量保留在本机，不向广告商暴露你的身份。"
+    },
+    {
+      "match": {
+        "name": "adprivacyd"
+      },
+      "title": "广告隐私",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "管理个性化广告设置，并将所用标识符保留在本机。"
+    },
+    {
+      "match": {
+        "name": "homeenergyd"
+      },
+      "title": "家庭（用电）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "为“家庭” App 收集 HomeKit 配件的用电数据。"
+    },
+    {
+      "match": {
+        "name": "AccessibilityVisualsAgent"
+      },
+      "title": "辅助功能（视觉）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "应用视觉类辅助功能设置，例如减弱动态效果、提高对比度和指针大小。"
+    },
+    {
+      "match": {
+        "name": "FeatureAccessAgent"
+      },
+      "title": "功能可用性",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "判断哪些 macOS 功能在你的地区、语言和账户下可用。"
+    },
+    {
+      "match": {
+        "name": "assistant_cdmd"
+      },
+      "title": "Siri（数据处理）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "管理 Siri 在本机保留的内容以及允许发送的内容。",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "com.apple.sbd"
+      },
+      "title": "iCloud 钥匙串恢复",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "保管用于在新设备上恢复 iCloud 钥匙串的托管数据。"
+    },
+    {
+      "match": {
+        "name": "contactsdonationagent"
+      },
+      "title": "通讯录建议",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "从邮件和信息中识别姓名与地址，以便通讯录给出建议。数据保留在本机。"
+    },
+    {
+      "match": {
+        "name": "swcd"
+      },
+      "title": "App 与网站关联",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "检查网站授权了哪些 App，用于共享密码以及可直接在 App 中打开的链接。"
+    },
+    {
+      "match": {
+        "name": "itunescloudd"
+      },
+      "title": "音乐（云端资料库）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "让“音乐”资料库与 iCloud 及 Apple Music 保持同步。"
+    },
+    {
+      "match": {
+        "name": "parsecd"
+      },
+      "title": "聚焦搜索（网络结果）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "获取聚焦搜索和 Safari 搜索栏显示的网络建议，仅在输入搜索时活跃。"
+    },
+    {
+      "match": {
+        "name": "AppPredictionIntentsHelperService"
+      },
+      "title": "App 建议",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "根据你的使用习惯判断接下来该建议哪个 App 或快捷指令。"
+    },
+    {
+      "match": {
+        "name": "transparencyd"
+      },
+      "title": "证书透明度",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "核验网站出示的证书是否已公开记录，伪造证书由此被发现。"
+    },
+    {
+      "match": {
+        "name": "findmydeviced"
+      },
+      "title": "查找",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "让这台 Mac 可被查找，并帮助定位你的其他设备和 AirTag。"
+    },
+    {
+      "match": {
+        "name": "UsageTrackingAgent"
+      },
+      "title": "屏幕使用时间（记录）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "记录 App 和网站的使用时长，供屏幕使用时间报告使用。",
+      "group": "ScreenTimeAgent"
+    },
+    {
+      "match": {
+        "name": "ScreenTimeAgent"
+      },
+      "title": "屏幕使用时间",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "执行你设定的使用限额与停用时间，并在设备间同步。"
+    },
+    {
+      "match": {
+        "name": "Messages Assistant Extension"
+      },
+      "title": "信息（Siri）",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "让 Siri 代你朗读和发送信息。",
+      "group": "Messages"
+    },
+    {
+      "match": {
+        "name": "IMDPersistenceAgent"
+      },
+      "title": "信息（存储）",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "维护磁盘上的信息数据库，包括附件和搜索。",
+      "group": "Messages"
+    },
+    {
+      "match": {
+        "name": "facetimemessagestored"
+      },
+      "title": "FaceTime 与信息（存储）",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "保存 FaceTime 与信息共用的通话记录和信息数据。",
+      "group": "Messages"
+    },
+    {
+      "match": {
+        "name": "managedappdistributionagent"
+      },
+      "title": "受管 App 安装（当前用户）",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "受管 App 安装的用户侧部分，负责显示进度和提示。",
+      "group": "managedappdistributiond"
+    },
+    {
+      "match": {
+        "name": "postersyncd"
+      },
+      "title": "锁定屏幕海报",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "准备并同步锁定屏幕和联系人海报图片。"
+    },
+    {
+      "match": {
+        "name": "BackgroundTaskManagementAgent"
+      },
+      "title": "登录项（当前用户）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "当某个 App 把自己加入登录项或后台项时显示通知。",
+      "group": "backgroundtaskmanagementd"
+    },
+    {
+      "match": {
+        "name": "backgroundtaskmanagementd"
+      },
+      "title": "登录与后台项目",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "维护允许在登录时启动或在后台运行的 App 列表，即系统设置中显示的那份。"
+    },
+    {
+      "match": {
+        "name": "GamePolicyAgent"
+      },
+      "title": "游戏模式",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "决定何时开启游戏模式，让游戏在 CPU 和 GPU 上获得优先级。"
+    },
+    {
+      "match": {
+        "name": "coreautha"
+      },
+      "title": "触控 ID 提示（当前用户）",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "触控 ID 与密码对话框的用户侧部分。",
+      "group": "coreauthd"
+    },
+    {
+      "match": {
+        "name": "DockHelper"
+      },
+      "title": "程序坞（辅助）",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "负责程序坞的部分工作，例如拖放和窗口预览。",
+      "group": "Dock"
+    },
+    {
+      "match": {
+        "name": "com.apple.Notes.SpotlightIndexExtension"
+      },
+      "title": "聚焦搜索（备忘录）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "为备忘录内容建立索引，使其可在聚焦搜索中被找到。",
+      "group": "Spotlight indexing"
     }
   ]
 }

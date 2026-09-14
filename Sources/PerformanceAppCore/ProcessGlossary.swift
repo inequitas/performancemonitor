@@ -86,6 +86,12 @@ public struct ProcessGlossary: Sendable {
     /// truncated and allowed to match an entry it is a prefix of.
     static let truncationLimit = 32
 
+    /// Strips the parentheses `ps` puts around an exiting process's name.
+    static func unbracketed(_ name: String) -> String {
+        guard name.count > 2, name.hasPrefix("("), name.hasSuffix(")") else { return name }
+        return String(name.dropFirst().dropLast())
+    }
+
     private let entries: [GlossaryEntry]
 
     /// Process name to the application it belongs to, for every entry that
@@ -115,6 +121,12 @@ public struct ProcessGlossary: Sendable {
     ///   - bundleID: bundle identifier, when the caller knows it.
     ///   - path: executable path, when the caller knows it.
     public func lookup(name: String, bundleID: String? = nil, path: String? = nil) -> GlossaryEntry? {
+        // `ps` wraps the name in parentheses for a process that is exiting or
+        // whose arguments it could not read: "(system_profiler)". Those would
+        // otherwise never match their own entry, and a short-lived process is
+        // exactly the one someone cannot identify by watching it.
+        let name = Self.unbracketed(name)
+
         // Exact name first: the overwhelmingly common case, and the only one
         // that never produces a surprising match.
         if let hit = entries.first(where: { entry in

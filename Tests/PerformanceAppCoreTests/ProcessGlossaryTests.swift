@@ -129,4 +129,25 @@ struct ProcessGlossaryTests {
         #expect(g.count == 0)
         #expect(g.lookup(name: "anything") == nil)
     }
+
+    // MARK: - Names as ps reports them
+
+    @Test func aNameInParenthesesStillMatches() {
+        // ps brackets the name of a process that is exiting or whose arguments
+        // it could not read: "(system_profiler)". A short-lived process is
+        // exactly the one nobody can identify by watching it, so it has to
+        // reach its own entry.
+        let glossary = ProcessGlossary(entries: [
+            GlossaryEntry(match: .name("system_profiler"), title: "System information",
+                          category: .system, description: "Gathers hardware details.")
+        ])
+        #expect(glossary.lookup(name: "(system_profiler)")?.title == "System information")
+    }
+
+    @Test func bracketsAreNotStrippedFromSomethingThatIsNotBracketed() {
+        #expect(ProcessGlossary.unbracketed("system_profiler") == "system_profiler")
+        #expect(ProcessGlossary.unbracketed("(") == "(")
+        #expect(ProcessGlossary.unbracketed("()") == "()")
+        #expect(ProcessGlossary.unbracketed("foo(1)") == "foo(1)")
+    }
 }

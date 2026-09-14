@@ -1487,6 +1487,794 @@
       "vendor": "Apple",
       "expectedHigh": false,
       "description": "資格情報を求めるネットワークに Mac をサインインさせます。企業や大学の Wi-Fi で一般的です。"
+    },
+    {
+      "match": {
+        "name": "Spotify"
+      },
+      "title": "Spotify",
+      "category": "app",
+      "vendor": "Spotify",
+      "expectedHigh": false,
+      "description": "Spotify の音楽プレーヤーです。他の Electron アプリ同様、画面表示と再生のために複数の補助プロセスを使います。"
+    },
+    {
+      "match": {
+        "name": "Microsoft Outlook"
+      },
+      "title": "Microsoft Outlook",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Microsoft のメール・カレンダー App です。メールボックスの数とローカルキャッシュの大きさに応じてメモリが増えます。"
+    },
+    {
+      "match": {
+        "name": "AdobeAcrobat"
+      },
+      "title": "Adobe Acrobat",
+      "category": "app",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "Adobe の PDF 閲覧・編集ソフトと、描画や内蔵ブラウザ用の補助プロセスです。"
+    },
+    {
+      "match": {
+        "name": "AcroCEF"
+      },
+      "title": "Adobe Acrobat（Web ビュー）",
+      "category": "helper",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "サインインやドキュメントクラウド、アプリ内ページに使う Acrobat の内蔵ブラウザです。",
+      "group": "AdobeAcrobat"
+    },
+    {
+      "match": {
+        "name": "AdobeResourceSynchronizer"
+      },
+      "title": "Adobe Acrobat（同期）",
+      "category": "helper",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "Acrobat のフォント、設定、クラウド文書をバックグラウンドで同期します。",
+      "group": "AdobeAcrobat"
+    },
+    {
+      "match": {
+        "name": "Acrobat Updater"
+      },
+      "title": "Adobe Acrobat（アップデータ）",
+      "category": "helper",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "Acrobat のアップデートを確認してインストールします。",
+      "group": "AdobeAcrobat"
+    },
+    {
+      "match": {
+        "name": "Microsoft AutoUpdate"
+      },
+      "title": "Microsoft AutoUpdate",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Office、Teams、Edge、Defender を最新に保ちます。確認中やダウンロード中だけ動きます。"
+    },
+    {
+      "match": {
+        "name": "Microsoft Update Assistant"
+      },
+      "title": "Microsoft AutoUpdate（アシスタント）",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "新しいバージョンを監視する Microsoft AutoUpdate のバックグラウンド部分です。",
+      "group": "Microsoft AutoUpdate"
+    },
+    {
+      "match": {
+        "name": "Windows App"
+      },
+      "title": "Windows App",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Microsoft のリモートデスクトップクライアント（旧 Remote Desktop）です。セッション表示中は CPU 使用率が上がります。"
+    },
+    {
+      "match": {
+        "name": "RemoteDesktopManager"
+      },
+      "title": "Remote Desktop Manager",
+      "category": "app",
+      "vendor": "Devolutions",
+      "expectedHigh": false,
+      "description": "リモート接続と資格情報を管理する Devolutions のツールです。"
+    },
+    {
+      "match": {
+        "name": "RoyalTSX"
+      },
+      "title": "Royal TSX",
+      "category": "app",
+      "vendor": "Royal Apps",
+      "expectedHigh": false,
+      "description": "リモートデスクトップ、SSH、VNC 接続を管理するツールです。"
+    },
+    {
+      "match": {
+        "name": "Messages"
+      },
+      "title": "メッセージ",
+      "category": "app",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Apple のメッセージ App です。長い履歴の同期中や添付の読み込み中に活発になります。"
+    },
+    {
+      "match": {
+        "name": "boringNotch"
+      },
+      "title": "boringNotch",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "ノッチ周辺をメディアや操作パネルに変える他社製 App です。"
+    },
+    {
+      "match": {
+        "name": "DockDoor"
+      },
+      "title": "DockDoor",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "Dock にポインタを重ねるとウインドウのプレビューを表示する他社製 App です。"
+    },
+    {
+      "match": {
+        "name": "logioptionsplus_updater"
+      },
+      "title": "Logi Options+（アップデータ）",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "ロジクールのマウス・キーボード用ソフトの更新を確認します。",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "system_profiler"
+      },
+      "title": "システム情報",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "macOS がハードウェアとソフトウェアの情報を集めるコマンドです。App が Bluetooth の電池残量取得などのために一時的に実行します。"
+    },
+    {
+      "match": {
+        "name": "ditto"
+      },
+      "title": "ファイルコピー",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "アクセス権やメタデータを保ったままフォルダをコピーする macOS のコマンドです。インストーラやバックアップツールが使い、完了すると終了します。"
+    },
+    {
+      "match": {
+        "name": "oahd"
+      },
+      "title": "Rosetta",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Intel 向け App を Apple シリコンで動かすために変換します。該当 App を開いているときだけ存在し、初回起動時に活発です。"
+    },
+    {
+      "match": {
+        "name": "ecosystemd"
+      },
+      "title": "連係機能",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "この Mac と iPhone・iPad の連携を担当します。Handoff、ユニバーサルクリップボード、通話やメッセージなどです。"
+    },
+    {
+      "match": {
+        "name": "ecosystemanalyticsd"
+      },
+      "title": "連係機能（診断）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "連係機能の動作状況をデバイス上で記録します。",
+      "group": "ecosystemd"
+    },
+    {
+      "match": {
+        "name": "iconservicesagent"
+      },
+      "title": "App アイコン",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Dock、Finder、メニューで使うアイコンを描画してキャッシュします。"
+    },
+    {
+      "match": {
+        "name": "sharedfilelistd"
+      },
+      "title": "最近使用した項目",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Dock や Finder が表示する最近の書類、よく使う項目、ログイン項目の一覧を管理します。"
+    },
+    {
+      "match": {
+        "name": "akd"
+      },
+      "title": "Apple アカウント",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Apple アカウントへのサインインと、それを保護する鍵を扱います。"
+    },
+    {
+      "match": {
+        "name": "coreauthd"
+      },
+      "title": "Touch ID・パスワードの確認",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Touch ID、パスワード、Apple Watch を求めるダイアログを表示します。"
+    },
+    {
+      "match": {
+        "name": "suggestd"
+      },
+      "title": "Siri（学習）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "入力内容や開いた項目から学習し、Spotlight や Siri の提案に使います。データはデバイス内に留まります。",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "secinitd"
+      },
+      "title": "App サンドボックス準備",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "各 App が動くサンドボックスを用意します。App の起動時に短時間だけ現れます。"
+    },
+    {
+      "match": {
+        "name": "storekitagent"
+      },
+      "title": "App 内課金",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "App 内での購入やサブスクリプションを処理します。"
+    },
+    {
+      "match": {
+        "name": "PerfPowerServices"
+      },
+      "title": "バッテリー・性能の記録",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "バッテリーの状態と性能値を記録し、Apple の診断やバッテリー設定で使われます。"
+    },
+    {
+      "match": {
+        "name": "systemsoundserverd"
+      },
+      "title": "システムサウンド",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "警告音やインターフェイスの効果音を鳴らします。"
+    },
+    {
+      "match": {
+        "name": "avatarsd"
+      },
+      "title": "連絡先の画像",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "メッセージ、メール、連絡先に表示される写真やミー文字を用意します。"
+    },
+    {
+      "match": {
+        "name": "pkd"
+      },
+      "title": "機能拡張の登録",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "共有オプション、ウィジェット、Finder 機能拡張など、App が提供する拡張を管理します。"
+    },
+    {
+      "match": {
+        "name": "passd"
+      },
+      "title": "ウォレット",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "ウォレット内のカードやパス、Apple Pay を管理します。"
+    },
+    {
+      "match": {
+        "name": "frauddefensed"
+      },
+      "title": "Apple Pay の不正防止",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "支払い要求を Apple の不正防止の仕組みと照合します。"
+    },
+    {
+      "match": {
+        "name": "maild"
+      },
+      "title": "メール（バックグラウンド）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "メール App を閉じていてもメールの受信とインデックス作成を行います。"
+    },
+    {
+      "match": {
+        "name": "bluetoothuserd"
+      },
+      "title": "Bluetooth（ログイン中のユーザ）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "ペアリング要求やデバイスへのアクセスなど、ログイン中のユーザに属する Bluetooth の部分です。"
+    },
+    {
+      "match": {
+        "name": "VTEncoderXPCService"
+      },
+      "title": "ビデオエンコード",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "画面収録、画面共有、FaceTime、書き出しのために動画を圧縮します。その間の高負荷は正常です。"
+    },
+    {
+      "match": {
+        "name": "XProtectBridgeService"
+      },
+      "title": "マルウェア検査",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "macOS 内蔵のマルウェア対策 XProtect の一部です。新しいものを開いたりダウンロードしたときに動きます。"
+    },
+    {
+      "match": {
+        "name": "replicatord"
+      },
+      "title": "iCloud 同期",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "iCloud 経由で、この Mac と他のデバイス間の変更をやり取りします。"
+    },
+    {
+      "match": {
+        "name": "ShareSheetUI"
+      },
+      "title": "共有シート",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "何かを共有するときに出るパネルです。開いている間だけ存在します。"
+    },
+    {
+      "match": {
+        "name": "TextThumbnailExtension"
+      },
+      "title": "テキストのプレビュー",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Finder やクイックルックに出るテキスト書類のサムネールを描画します。"
+    },
+    {
+      "match": {
+        "name": "Downloader"
+      },
+      "title": "App アップデートのダウンロード（Sparkle）",
+      "category": "helper",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "Sparkle 更新フレームワークを使う App の更新を取得します。複数の App が同じ名前を使うため、どの App かは分かりません。"
+    },
+    {
+      "match": {
+        "name": "universalAccessAuthWarn"
+      },
+      "title": "アクセシビリティ許可の確認",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "App がアクセシビリティ経由で Mac を操作してよいか尋ねるダイアログです。要求があったときだけ現れます。"
+    },
+    {
+      "match": {
+        "name": "managedappdistributiond"
+      },
+      "title": "管理対象 App のインストール",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "勤務先のデバイス管理が配布する App のインストールと更新を行います。"
+    },
+    {
+      "match": {
+        "name": "systemmigrationd"
+      },
+      "title": "移行アシスタント",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "別の Mac やバックアップからアカウント、App、ファイルを移します。移行中だけ存在し、その間は高負荷です。"
+    },
+    {
+      "match": {
+        "name": "voicebankingd"
+      },
+      "title": "パーソナルボイス",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "アクセシビリティ機能「パーソナルボイス」で録音した音声から合成音声を作ります。Mac が待機中かつ電源接続中のみ動きます。"
+    },
+    {
+      "match": {
+        "name": "CloudTelemetryService"
+      },
+      "title": "Apple への診断送信",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "共有に同意した診断レポートを送信します。共有がオフなら何も送られません。"
+    },
+    {
+      "match": {
+        "name": "EAUpdaterService"
+      },
+      "title": "アクセサリのファームウェア更新",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "AirPods や Apple 製キーボードなど、接続中のアクセサリのファームウェアを更新します。"
+    },
+    {
+      "match": {
+        "name": "com.apple.DriverKit.AppleUserECM"
+      },
+      "title": "USB ネットワークドライバ",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "USB 接続のネットワークアダプタを制御します。iPhone のテザリングも含みます。"
+    },
+    {
+      "match": {
+        "name": "amsengagementd"
+      },
+      "title": "App Store の案内",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "App Store が表示する特典やサブスクリプションの通知を扱います。"
+    },
+    {
+      "match": {
+        "name": "amsondevicestoraged"
+      },
+      "title": "App Store の案内（デバイス上）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "App Store の案内データをローカルに保存し、表示内容の判断をサーバなしで行います。",
+      "group": "amsengagementd"
+    },
+    {
+      "match": {
+        "name": "promotedcontentd"
+      },
+      "title": "App Store 広告のプライバシー",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "App Store の広告計測をデバイス内で行い、広告主にあなたを identify させません。"
+    },
+    {
+      "match": {
+        "name": "adprivacyd"
+      },
+      "title": "広告のプライバシー",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "パーソナライズ広告の設定を管理し、使用する識別子をローカルに保ちます。"
+    },
+    {
+      "match": {
+        "name": "homeenergyd"
+      },
+      "title": "ホーム（電力）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "ホーム App 用に HomeKit アクセサリの電力データを集めます。"
+    },
+    {
+      "match": {
+        "name": "AccessibilityVisualsAgent"
+      },
+      "title": "アクセシビリティ（視覚）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "視差効果を減らす、コントラストを上げる、ポインタサイズなどの視覚設定を適用します。"
+    },
+    {
+      "match": {
+        "name": "FeatureAccessAgent"
+      },
+      "title": "機能の利用可否",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "地域・言語・アカウントに応じて、利用できる macOS 機能を判断します。"
+    },
+    {
+      "match": {
+        "name": "assistant_cdmd"
+      },
+      "title": "Siri（データ管理）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Siri がデバイス上に保持する内容と、送信が許される内容を管理します。",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "com.apple.sbd"
+      },
+      "title": "iCloud キーチェーンの復元",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "新しいデバイスで iCloud キーチェーンを復元するための預託情報を保持します。"
+    },
+    {
+      "match": {
+        "name": "contactsdonationagent"
+      },
+      "title": "連絡先の候補",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "メールやメッセージ内の名前や住所を見つけ、連絡先が候補として提示できるようにします。データはデバイス内に留まります。"
+    },
+    {
+      "match": {
+        "name": "swcd"
+      },
+      "title": "App と Web サイトの関連付け",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Web サイトが許可している App を確認します。パスワード共有や App で開くリンクに使われます。"
+    },
+    {
+      "match": {
+        "name": "itunescloudd"
+      },
+      "title": "ミュージック（クラウドライブラリ）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "ミュージックのライブラリを iCloud と Apple Music と同期させます。"
+    },
+    {
+      "match": {
+        "name": "parsecd"
+      },
+      "title": "Spotlight（Web 検索候補）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Spotlight や Safari の検索欄に出る Web 候補を取得します。入力中だけ動作します。"
+    },
+    {
+      "match": {
+        "name": "AppPredictionIntentsHelperService"
+      },
+      "title": "App の候補",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "使い方をもとに、次に提案する App やショートカットを判断します。"
+    },
+    {
+      "match": {
+        "name": "transparencyd"
+      },
+      "title": "証明書の透明性",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Web サイトが提示する証明書が公開ログに記録されているかを確認します。偽造の検出手段です。"
+    },
+    {
+      "match": {
+        "name": "findmydeviced"
+      },
+      "title": "探す",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "この Mac を探せる状態に保ち、他のデバイスや AirTag の位置特定を助けます。"
+    },
+    {
+      "match": {
+        "name": "UsageTrackingAgent"
+      },
+      "title": "スクリーンタイム（利用記録）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "App や Web サイトの利用時間を記録し、スクリーンタイムのレポートに使います。",
+      "group": "ScreenTimeAgent"
+    },
+    {
+      "match": {
+        "name": "ScreenTimeAgent"
+      },
+      "title": "スクリーンタイム",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "設定した使用制限や休止時間を適用し、デバイス間で同期します。"
+    },
+    {
+      "match": {
+        "name": "Messages Assistant Extension"
+      },
+      "title": "メッセージ（Siri）",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Siri がメッセージを読み上げたり、代わりに送信できるようにします。",
+      "group": "Messages"
+    },
+    {
+      "match": {
+        "name": "IMDPersistenceAgent"
+      },
+      "title": "メッセージ（保存）",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "添付ファイルや検索を含む、ディスク上のメッセージデータベースを管理します。",
+      "group": "Messages"
+    },
+    {
+      "match": {
+        "name": "facetimemessagestored"
+      },
+      "title": "FaceTime とメッセージ（保存）",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "FaceTime とメッセージが共有する通話履歴やメッセージデータを保存します。",
+      "group": "Messages"
+    },
+    {
+      "match": {
+        "name": "managedappdistributionagent"
+      },
+      "title": "管理対象 App のインストール（ユーザ側）",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "進行状況や確認を表示する、管理対象 App インストールのユーザ側部分です。",
+      "group": "managedappdistributiond"
+    },
+    {
+      "match": {
+        "name": "postersyncd"
+      },
+      "title": "ロック画面ポスター",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "ロック画面や連絡先ポスターの画像を用意し、同期します。"
+    },
+    {
+      "match": {
+        "name": "BackgroundTaskManagementAgent"
+      },
+      "title": "ログイン項目（ユーザ側）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "App が自分をログイン項目やバックグラウンド項目に追加したときの通知を表示します。",
+      "group": "backgroundtaskmanagementd"
+    },
+    {
+      "match": {
+        "name": "backgroundtaskmanagementd"
+      },
+      "title": "ログイン項目とバックグラウンド項目",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "ログイン時に起動、またはバックグラウンドで動作を許可された App の一覧を管理します。"
+    },
+    {
+      "match": {
+        "name": "GamePolicyAgent"
+      },
+      "title": "ゲームモード",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "ゲームに CPU と GPU の優先度を与えるゲームモードを、いつ有効にするか判断します。"
+    },
+    {
+      "match": {
+        "name": "coreautha"
+      },
+      "title": "Touch ID の確認（ユーザ側）",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Touch ID とパスワードのダイアログのユーザ側部分です。",
+      "group": "coreauthd"
+    },
+    {
+      "match": {
+        "name": "DockHelper"
+      },
+      "title": "Dock（補助）",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "ドラッグ＆ドロップやウインドウのプレビューなど、Dock の処理の一部を担います。",
+      "group": "Dock"
+    },
+    {
+      "match": {
+        "name": "com.apple.Notes.SpotlightIndexExtension"
+      },
+      "title": "Spotlight（メモ）",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "メモの内容をインデックスし、Spotlight で検索できるようにします。",
+      "group": "Spotlight indexing"
     }
   ]
 }

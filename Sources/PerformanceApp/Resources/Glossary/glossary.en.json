@@ -1487,6 +1487,794 @@
       "vendor": "Apple",
       "expectedHigh": false,
       "description": "Signs the Mac in to a network that asks for credentials, as company and university Wi-Fi usually do."
+    },
+    {
+      "match": {
+        "name": "Spotify"
+      },
+      "title": "Spotify",
+      "category": "app",
+      "vendor": "Spotify",
+      "expectedHigh": false,
+      "description": "The Spotify music player. Like other Electron apps it runs several helper processes for its interface and playback."
+    },
+    {
+      "match": {
+        "name": "Microsoft Outlook"
+      },
+      "title": "Microsoft Outlook",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Microsoft's mail and calendar app. Memory grows with the number of mailboxes and the size of the local cache."
+    },
+    {
+      "match": {
+        "name": "AdobeAcrobat"
+      },
+      "title": "Adobe Acrobat",
+      "category": "app",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "Adobe's PDF reader and editor, together with the helper processes it runs for rendering and for its built-in browser."
+    },
+    {
+      "match": {
+        "name": "AcroCEF"
+      },
+      "title": "Adobe Acrobat (web view)",
+      "category": "helper",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "The embedded browser Acrobat uses for its sign-in, document cloud and in-app pages.",
+      "group": "AdobeAcrobat"
+    },
+    {
+      "match": {
+        "name": "AdobeResourceSynchronizer"
+      },
+      "title": "Adobe Acrobat (sync)",
+      "category": "helper",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "Keeps Acrobat's fonts, settings and cloud documents in step in the background.",
+      "group": "AdobeAcrobat"
+    },
+    {
+      "match": {
+        "name": "Acrobat Updater"
+      },
+      "title": "Adobe Acrobat (updater)",
+      "category": "helper",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "Checks for and installs Acrobat updates.",
+      "group": "AdobeAcrobat"
+    },
+    {
+      "match": {
+        "name": "Microsoft AutoUpdate"
+      },
+      "title": "Microsoft AutoUpdate",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Keeps Office, Teams, Edge and Defender up to date. Busy only while checking or downloading."
+    },
+    {
+      "match": {
+        "name": "Microsoft Update Assistant"
+      },
+      "title": "Microsoft AutoUpdate (assistant)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "The background part of Microsoft AutoUpdate that watches for new versions.",
+      "group": "Microsoft AutoUpdate"
+    },
+    {
+      "match": {
+        "name": "Windows App"
+      },
+      "title": "Windows App",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Microsoft's remote desktop client, formerly Remote Desktop. Uses more CPU while a session is on screen."
+    },
+    {
+      "match": {
+        "name": "RemoteDesktopManager"
+      },
+      "title": "Remote Desktop Manager",
+      "category": "app",
+      "vendor": "Devolutions",
+      "expectedHigh": false,
+      "description": "Devolutions' tool for managing remote connections and credentials."
+    },
+    {
+      "match": {
+        "name": "RoyalTSX"
+      },
+      "title": "Royal TSX",
+      "category": "app",
+      "vendor": "Royal Apps",
+      "expectedHigh": false,
+      "description": "A manager for remote desktop, SSH and VNC connections."
+    },
+    {
+      "match": {
+        "name": "Messages"
+      },
+      "title": "Messages",
+      "category": "app",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Apple's Messages app. Busy while syncing a long conversation history or loading attachments."
+    },
+    {
+      "match": {
+        "name": "boringNotch"
+      },
+      "title": "boringNotch",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "A third-party app that turns the notch area into a media and controls strip."
+    },
+    {
+      "match": {
+        "name": "DockDoor"
+      },
+      "title": "DockDoor",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "A third-party app that shows window previews when you hover the Dock."
+    },
+    {
+      "match": {
+        "name": "logioptionsplus_updater"
+      },
+      "title": "Logi Options+ (updater)",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Checks for updates to Logitech's mouse and keyboard software.",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "system_profiler"
+      },
+      "title": "System information",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "The command macOS uses to gather hardware and software details. Apps run it briefly to read things like Bluetooth battery levels, and it disappears again."
+    },
+    {
+      "match": {
+        "name": "ditto"
+      },
+      "title": "File copy",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "The command macOS uses to copy folders while preserving permissions and metadata. Installers and backup tools run it; it exits when the copy is done."
+    },
+    {
+      "match": {
+        "name": "oahd"
+      },
+      "title": "Rosetta",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Translates Intel apps so they run on Apple Silicon. Present only when such an app is open, and busy the first time each one starts."
+    },
+    {
+      "match": {
+        "name": "ecosystemd"
+      },
+      "title": "Continuity",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Keeps this Mac working together with your iPhone and iPad: Handoff, universal clipboard, phone calls and messages."
+    },
+    {
+      "match": {
+        "name": "ecosystemanalyticsd"
+      },
+      "title": "Continuity (diagnostics)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Records how well the Continuity features are working, on the device itself.",
+      "group": "ecosystemd"
+    },
+    {
+      "match": {
+        "name": "iconservicesagent"
+      },
+      "title": "App icons",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Draws and caches the icons apps use in the Dock, Finder and menus."
+    },
+    {
+      "match": {
+        "name": "sharedfilelistd"
+      },
+      "title": "Recent items",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Keeps the lists of recent documents, favourites and login items that the Dock and Finder show."
+    },
+    {
+      "match": {
+        "name": "akd"
+      },
+      "title": "Apple Account",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Handles signing in to your Apple Account and the keys that keep it secure."
+    },
+    {
+      "match": {
+        "name": "coreauthd"
+      },
+      "title": "Touch ID and password prompts",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Shows the dialogs that ask for Touch ID, your password or your Apple Watch."
+    },
+    {
+      "match": {
+        "name": "suggestd"
+      },
+      "title": "Siri (learning)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Learns from what you type and open so Spotlight and Siri can suggest things. Stays on the device.",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "secinitd"
+      },
+      "title": "App sandbox setup",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Prepares the sandbox each app runs inside. Appears briefly whenever an app launches."
+    },
+    {
+      "match": {
+        "name": "storekitagent"
+      },
+      "title": "In-app purchases",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Handles purchases and subscriptions made inside apps."
+    },
+    {
+      "match": {
+        "name": "PerfPowerServices"
+      },
+      "title": "Battery and performance logging",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Records battery health and performance figures for Apple's diagnostics and the Battery settings."
+    },
+    {
+      "match": {
+        "name": "systemsoundserverd"
+      },
+      "title": "System sounds",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Plays alert sounds and interface effects."
+    },
+    {
+      "match": {
+        "name": "avatarsd"
+      },
+      "title": "Contact pictures",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Prepares the photos and Memoji shown for contacts in Messages, Mail and Contacts."
+    },
+    {
+      "match": {
+        "name": "pkd"
+      },
+      "title": "Extension registry",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Keeps track of the extensions apps provide, such as share options, widgets and Finder actions."
+    },
+    {
+      "match": {
+        "name": "passd"
+      },
+      "title": "Wallet",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Manages the cards and passes in Wallet, and Apple Pay."
+    },
+    {
+      "match": {
+        "name": "frauddefensed"
+      },
+      "title": "Apple Pay fraud checks",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Checks payment requests against Apple's fraud protections."
+    },
+    {
+      "match": {
+        "name": "maild"
+      },
+      "title": "Mail (background)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Fetches and indexes mail while the Mail app itself is closed."
+    },
+    {
+      "match": {
+        "name": "bluetoothuserd"
+      },
+      "title": "Bluetooth (your session)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "The part of Bluetooth that belongs to the logged-in user, handling pairing prompts and device access."
+    },
+    {
+      "match": {
+        "name": "VTEncoderXPCService"
+      },
+      "title": "Video encoding",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Compresses video for screen recording, screen sharing, FaceTime and video export. Heavy use is expected while any of those are running."
+    },
+    {
+      "match": {
+        "name": "XProtectBridgeService"
+      },
+      "title": "Malware scanning",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Part of XProtect, the malware checking built into macOS. Runs when something new is opened or downloaded."
+    },
+    {
+      "match": {
+        "name": "replicatord"
+      },
+      "title": "iCloud sync",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Copies changes between this Mac and your other devices through iCloud."
+    },
+    {
+      "match": {
+        "name": "ShareSheetUI"
+      },
+      "title": "Share sheet",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "The panel that appears when you share something. Exists only while it is open."
+    },
+    {
+      "match": {
+        "name": "TextThumbnailExtension"
+      },
+      "title": "Text previews",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Draws the little previews of text documents shown in Finder and Quick Look."
+    },
+    {
+      "match": {
+        "name": "Downloader"
+      },
+      "title": "App update download (Sparkle)",
+      "category": "helper",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "Downloads an update for an app that uses the Sparkle update framework. Several apps share this name, so it does not say which one."
+    },
+    {
+      "match": {
+        "name": "universalAccessAuthWarn"
+      },
+      "title": "Accessibility permission prompt",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "The dialog asking whether an app may control your Mac through Accessibility. Appears only when something requests it."
+    },
+    {
+      "match": {
+        "name": "managedappdistributiond"
+      },
+      "title": "Managed app installs",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Installs and updates the apps an employer's device management pushes to this Mac."
+    },
+    {
+      "match": {
+        "name": "systemmigrationd"
+      },
+      "title": "Migration Assistant",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Copies accounts, apps and files from another Mac or a backup. Only present during a migration, and heavy while it runs."
+    },
+    {
+      "match": {
+        "name": "voicebankingd"
+      },
+      "title": "Personal Voice",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Builds the synthetic voice recorded in the Personal Voice accessibility feature. Runs only while the Mac is idle and plugged in."
+    },
+    {
+      "match": {
+        "name": "CloudTelemetryService"
+      },
+      "title": "Apple diagnostics upload",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Sends the diagnostic reports you agreed to share with Apple, if you did. Nothing is sent when sharing is off."
+    },
+    {
+      "match": {
+        "name": "EAUpdaterService"
+      },
+      "title": "Accessory firmware updates",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Updates the firmware of connected accessories such as AirPods and Apple keyboards."
+    },
+    {
+      "match": {
+        "name": "com.apple.DriverKit.AppleUserECM"
+      },
+      "title": "USB network driver",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Drives a network adapter connected over USB, including tethering from an iPhone."
+    },
+    {
+      "match": {
+        "name": "amsengagementd"
+      },
+      "title": "App Store offers",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Handles the offers and subscription reminders the App Store shows."
+    },
+    {
+      "match": {
+        "name": "amsondevicestoraged"
+      },
+      "title": "App Store offers (on device)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Stores the App Store's offer data locally so choosing what to show needs no server.",
+      "group": "amsengagementd"
+    },
+    {
+      "match": {
+        "name": "promotedcontentd"
+      },
+      "title": "App Store ads privacy",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Keeps App Store ad measurement on the device, without identifying you to advertisers."
+    },
+    {
+      "match": {
+        "name": "adprivacyd"
+      },
+      "title": "Advertising privacy",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Manages the personalised-advertising setting and keeps the identifiers it uses local."
+    },
+    {
+      "match": {
+        "name": "homeenergyd"
+      },
+      "title": "Home (energy)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Collects energy readings from HomeKit accessories for the Home app."
+    },
+    {
+      "match": {
+        "name": "AccessibilityVisualsAgent"
+      },
+      "title": "Accessibility visuals",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Applies visual accessibility settings such as reduced motion, increased contrast and pointer size."
+    },
+    {
+      "match": {
+        "name": "FeatureAccessAgent"
+      },
+      "title": "Feature availability",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Works out which macOS features are available for your region, language and account."
+    },
+    {
+      "match": {
+        "name": "assistant_cdmd"
+      },
+      "title": "Siri (data handling)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Manages what Siri keeps on the device and what it is allowed to send.",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "com.apple.sbd"
+      },
+      "title": "iCloud Keychain recovery",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Holds the escrow that lets you recover your iCloud Keychain on a new device."
+    },
+    {
+      "match": {
+        "name": "contactsdonationagent"
+      },
+      "title": "Contacts suggestions",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Notices names and addresses in your mail and messages so Contacts can suggest them. Stays on the device."
+    },
+    {
+      "match": {
+        "name": "swcd"
+      },
+      "title": "App and website links",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Checks which apps a website has authorised, for shared passwords and links that open in an app."
+    },
+    {
+      "match": {
+        "name": "itunescloudd"
+      },
+      "title": "Music (cloud library)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Keeps your Music library in step with iCloud and Apple Music."
+    },
+    {
+      "match": {
+        "name": "parsecd"
+      },
+      "title": "Spotlight (web results)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Fetches the web suggestions Spotlight and Safari's search field show. Only active while you are typing a search."
+    },
+    {
+      "match": {
+        "name": "AppPredictionIntentsHelperService"
+      },
+      "title": "App suggestions",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Works out which app or shortcut to suggest next, from how you use the Mac."
+    },
+    {
+      "match": {
+        "name": "transparencyd"
+      },
+      "title": "Certificate transparency",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Checks that the certificates websites present have been publicly logged, which is how forged ones are caught."
+    },
+    {
+      "match": {
+        "name": "findmydeviced"
+      },
+      "title": "Find My",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Keeps this Mac findable and helps locate your other devices and AirTags."
+    },
+    {
+      "match": {
+        "name": "UsageTrackingAgent"
+      },
+      "title": "Screen Time (usage)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Records how long apps and websites are used, for the Screen Time reports.",
+      "group": "ScreenTimeAgent"
+    },
+    {
+      "match": {
+        "name": "ScreenTimeAgent"
+      },
+      "title": "Screen Time",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Applies the Screen Time limits and downtime you have set, and syncs them across your devices."
+    },
+    {
+      "match": {
+        "name": "Messages Assistant Extension"
+      },
+      "title": "Messages (Siri)",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Lets Siri read and send messages on your behalf.",
+      "group": "Messages"
+    },
+    {
+      "match": {
+        "name": "IMDPersistenceAgent"
+      },
+      "title": "Messages (storage)",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Keeps the message database on disk, including attachments and search.",
+      "group": "Messages"
+    },
+    {
+      "match": {
+        "name": "facetimemessagestored"
+      },
+      "title": "FaceTime and Messages (storage)",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Stores call history and message data shared between FaceTime and Messages.",
+      "group": "Messages"
+    },
+    {
+      "match": {
+        "name": "managedappdistributionagent"
+      },
+      "title": "Managed app installs (your session)",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "The user-side half of managed app installation, which shows progress and prompts.",
+      "group": "managedappdistributiond"
+    },
+    {
+      "match": {
+        "name": "postersyncd"
+      },
+      "title": "Lock screen posters",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Prepares and syncs the lock screen and contact poster images."
+    },
+    {
+      "match": {
+        "name": "BackgroundTaskManagementAgent"
+      },
+      "title": "Login items (your session)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Shows the notice when an app adds itself to your login or background items.",
+      "group": "backgroundtaskmanagementd"
+    },
+    {
+      "match": {
+        "name": "backgroundtaskmanagementd"
+      },
+      "title": "Login and background items",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Keeps the list of apps allowed to start at login or run in the background, as shown in System Settings."
+    },
+    {
+      "match": {
+        "name": "GamePolicyAgent"
+      },
+      "title": "Game Mode",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Decides when Game Mode turns on, which gives a game priority on the CPU and GPU."
+    },
+    {
+      "match": {
+        "name": "coreautha"
+      },
+      "title": "Touch ID prompts (your session)",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "The user-side half of the Touch ID and password dialogs.",
+      "group": "coreauthd"
+    },
+    {
+      "match": {
+        "name": "DockHelper"
+      },
+      "title": "Dock (helper)",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Handles part of the Dock's work, such as drag and drop and window previews.",
+      "group": "Dock"
+    },
+    {
+      "match": {
+        "name": "com.apple.Notes.SpotlightIndexExtension"
+      },
+      "title": "Spotlight (Notes)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Indexes the contents of Notes so they can be found in Spotlight.",
+      "group": "Spotlight indexing"
     }
   ]
 }

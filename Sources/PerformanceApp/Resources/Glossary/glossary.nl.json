@@ -1487,6 +1487,794 @@
       "vendor": "Apple",
       "expectedHigh": false,
       "description": "Meldt de Mac aan bij een netwerk dat om inloggegevens vraagt, zoals bedrijfs- en universiteits-wifi meestal doen."
+    },
+    {
+      "match": {
+        "name": "Spotify"
+      },
+      "title": "Spotify",
+      "category": "app",
+      "vendor": "Spotify",
+      "expectedHigh": false,
+      "description": "De muziekspeler van Spotify. Draait zoals andere Electron-apps meerdere helperprocessen voor de interface en het afspelen."
+    },
+    {
+      "match": {
+        "name": "Microsoft Outlook"
+      },
+      "title": "Microsoft Outlook",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "De mail- en agenda-app van Microsoft. Het geheugengebruik groeit met het aantal postbussen en de lokale cache."
+    },
+    {
+      "match": {
+        "name": "AdobeAcrobat"
+      },
+      "title": "Adobe Acrobat",
+      "category": "app",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "De pdf-lezer en -editor van Adobe, samen met de helperprocessen voor het renderen en de ingebouwde browser."
+    },
+    {
+      "match": {
+        "name": "AcroCEF"
+      },
+      "title": "Adobe Acrobat (webweergave)",
+      "category": "helper",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "De ingebouwde browser die Acrobat gebruikt voor inloggen, document cloud en pagina's in de app.",
+      "group": "AdobeAcrobat"
+    },
+    {
+      "match": {
+        "name": "AdobeResourceSynchronizer"
+      },
+      "title": "Adobe Acrobat (synchronisatie)",
+      "category": "helper",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "Houdt de lettertypen, instellingen en clouddocumenten van Acrobat op de achtergrond bij.",
+      "group": "AdobeAcrobat"
+    },
+    {
+      "match": {
+        "name": "Acrobat Updater"
+      },
+      "title": "Adobe Acrobat (updater)",
+      "category": "helper",
+      "vendor": "Adobe",
+      "expectedHigh": false,
+      "description": "Zoekt en installeert updates voor Acrobat.",
+      "group": "AdobeAcrobat"
+    },
+    {
+      "match": {
+        "name": "Microsoft AutoUpdate"
+      },
+      "title": "Microsoft AutoUpdate",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Houdt Office, Teams, Edge en Defender bij. Alleen actief tijdens controleren of downloaden."
+    },
+    {
+      "match": {
+        "name": "Microsoft Update Assistant"
+      },
+      "title": "Microsoft AutoUpdate (assistent)",
+      "category": "helper",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "Het achtergronddeel van Microsoft AutoUpdate dat op nieuwe versies let.",
+      "group": "Microsoft AutoUpdate"
+    },
+    {
+      "match": {
+        "name": "Windows App"
+      },
+      "title": "Windows App",
+      "category": "app",
+      "vendor": "Microsoft",
+      "expectedHigh": false,
+      "description": "De remote-desktopclient van Microsoft, voorheen Remote Desktop. Gebruikt meer CPU zolang er een sessie in beeld is."
+    },
+    {
+      "match": {
+        "name": "RemoteDesktopManager"
+      },
+      "title": "Remote Desktop Manager",
+      "category": "app",
+      "vendor": "Devolutions",
+      "expectedHigh": false,
+      "description": "De tool van Devolutions voor het beheren van externe verbindingen en inloggegevens."
+    },
+    {
+      "match": {
+        "name": "RoyalTSX"
+      },
+      "title": "Royal TSX",
+      "category": "app",
+      "vendor": "Royal Apps",
+      "expectedHigh": false,
+      "description": "Een beheerprogramma voor remote desktop-, SSH- en VNC-verbindingen."
+    },
+    {
+      "match": {
+        "name": "Messages"
+      },
+      "title": "Messages",
+      "category": "app",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "De Berichten-app van Apple. Druk tijdens het synchroniseren van een lange gespreksgeschiedenis of het laden van bijlagen."
+    },
+    {
+      "match": {
+        "name": "boringNotch"
+      },
+      "title": "boringNotch",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "Een app van derden die het notch-gebied omtovert tot een strook met media en bediening."
+    },
+    {
+      "match": {
+        "name": "DockDoor"
+      },
+      "title": "DockDoor",
+      "category": "app",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "Een app van derden die venstervoorbeelden toont als je over het Dock zweeft."
+    },
+    {
+      "match": {
+        "name": "logioptionsplus_updater"
+      },
+      "title": "Logi Options+ (updater)",
+      "category": "helper",
+      "vendor": "Logitech",
+      "expectedHigh": false,
+      "description": "Zoekt updates voor de muis- en toetsenbordsoftware van Logitech.",
+      "group": "logioptionsplus_agent"
+    },
+    {
+      "match": {
+        "name": "system_profiler"
+      },
+      "title": "Systeeminformatie",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "De opdracht waarmee macOS hardware- en softwaregegevens verzamelt. Apps starten hem kort om bijvoorbeeld Bluetooth-accupercentages te lezen, daarna verdwijnt hij weer."
+    },
+    {
+      "match": {
+        "name": "ditto"
+      },
+      "title": "Bestandskopie",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "De opdracht waarmee macOS mappen kopieert met behoud van rechten en metadata. Installatieprogramma's en backuptools gebruiken hem; hij stopt zodra het kopiëren klaar is."
+    },
+    {
+      "match": {
+        "name": "oahd"
+      },
+      "title": "Rosetta",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Vertaalt Intel-apps zodat ze op Apple Silicon draaien. Alleen aanwezig als zo'n app open staat, en druk bij de eerste start ervan."
+    },
+    {
+      "match": {
+        "name": "ecosystemd"
+      },
+      "title": "Continuïteit",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Laat deze Mac samenwerken met je iPhone en iPad: Handoff, universeel klembord, telefoongesprekken en berichten."
+    },
+    {
+      "match": {
+        "name": "ecosystemanalyticsd"
+      },
+      "title": "Continuïteit (diagnostiek)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Houdt op het apparaat zelf bij hoe goed de continuïteitsfuncties werken.",
+      "group": "ecosystemd"
+    },
+    {
+      "match": {
+        "name": "iconservicesagent"
+      },
+      "title": "App-pictogrammen",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Tekent en bewaart de pictogrammen die apps gebruiken in het Dock, de Finder en menu's."
+    },
+    {
+      "match": {
+        "name": "sharedfilelistd"
+      },
+      "title": "Recente onderdelen",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Beheert de lijsten met recente documenten, favorieten en inlogonderdelen die het Dock en de Finder tonen."
+    },
+    {
+      "match": {
+        "name": "akd"
+      },
+      "title": "Apple Account",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Verzorgt het inloggen op je Apple Account en de sleutels die dat beveiligen."
+    },
+    {
+      "match": {
+        "name": "coreauthd"
+      },
+      "title": "Touch ID- en wachtwoordvensters",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Toont de vensters die om Touch ID, je wachtwoord of je Apple Watch vragen."
+    },
+    {
+      "match": {
+        "name": "suggestd"
+      },
+      "title": "Siri (leren)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Leert van wat je typt en opent, zodat Spotlight en Siri suggesties kunnen doen. Blijft op het apparaat.",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "secinitd"
+      },
+      "title": "App-sandbox instellen",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Zet de sandbox klaar waarin elke app draait. Verschijnt kort bij elke app-start."
+    },
+    {
+      "match": {
+        "name": "storekitagent"
+      },
+      "title": "In-app-aankopen",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Verzorgt aankopen en abonnementen die binnen apps worden gedaan."
+    },
+    {
+      "match": {
+        "name": "PerfPowerServices"
+      },
+      "title": "Accu- en prestatielogboek",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Legt accugezondheid en prestatiecijfers vast voor Apple's diagnostiek en de Batterij-instellingen."
+    },
+    {
+      "match": {
+        "name": "systemsoundserverd"
+      },
+      "title": "Systeemgeluiden",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Speelt waarschuwingsgeluiden en interface-effecten af."
+    },
+    {
+      "match": {
+        "name": "avatarsd"
+      },
+      "title": "Contactafbeeldingen",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Maakt de foto's en Memoji klaar die bij contacten worden getoond in Berichten, Mail en Contacten."
+    },
+    {
+      "match": {
+        "name": "pkd"
+      },
+      "title": "Extensieregister",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Houdt bij welke extensies apps aanbieden, zoals deel-opties, widgets en Finder-acties."
+    },
+    {
+      "match": {
+        "name": "passd"
+      },
+      "title": "Wallet",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Beheert de kaarten en passen in Wallet, en Apple Pay."
+    },
+    {
+      "match": {
+        "name": "frauddefensed"
+      },
+      "title": "Apple Pay-fraudecontrole",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Controleert betaalverzoeken tegen Apple's fraudebescherming."
+    },
+    {
+      "match": {
+        "name": "maild"
+      },
+      "title": "Mail (achtergrond)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Haalt en indexeert e-mail terwijl de Mail-app zelf gesloten is."
+    },
+    {
+      "match": {
+        "name": "bluetoothuserd"
+      },
+      "title": "Bluetooth (jouw sessie)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Het deel van Bluetooth dat bij de ingelogde gebruiker hoort: koppelverzoeken en toegang tot apparaten."
+    },
+    {
+      "match": {
+        "name": "VTEncoderXPCService"
+      },
+      "title": "Video-encodering",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Comprimeert video voor schermopnamen, schermdelen, FaceTime en video-export. Zwaar gebruik hoort erbij zolang een daarvan loopt."
+    },
+    {
+      "match": {
+        "name": "XProtectBridgeService"
+      },
+      "title": "Malwarecontrole",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Onderdeel van XProtect, de malwarecontrole die in macOS zit. Draait als er iets nieuws wordt geopend of gedownload."
+    },
+    {
+      "match": {
+        "name": "replicatord"
+      },
+      "title": "iCloud-synchronisatie",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Kopieert wijzigingen tussen deze Mac en je andere apparaten via iCloud."
+    },
+    {
+      "match": {
+        "name": "ShareSheetUI"
+      },
+      "title": "Deelvenster",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Het paneel dat verschijnt als je iets deelt. Bestaat alleen zolang het open staat."
+    },
+    {
+      "match": {
+        "name": "TextThumbnailExtension"
+      },
+      "title": "Tekstvoorbeelden",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Tekent de kleine voorbeelden van tekstdocumenten in de Finder en Quick Look."
+    },
+    {
+      "match": {
+        "name": "Downloader"
+      },
+      "title": "App-update downloaden (Sparkle)",
+      "category": "helper",
+      "vendor": null,
+      "expectedHigh": false,
+      "description": "Downloadt een update voor een app die het Sparkle-updateframework gebruikt. Meerdere apps delen deze naam, dus welke het is zegt dit niet."
+    },
+    {
+      "match": {
+        "name": "universalAccessAuthWarn"
+      },
+      "title": "Toegankelijkheidsverzoek",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Het venster dat vraagt of een app je Mac mag bedienen via Toegankelijkheid. Verschijnt alleen als iets erom vraagt."
+    },
+    {
+      "match": {
+        "name": "managedappdistributiond"
+      },
+      "title": "Beheerde app-installaties",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Installeert en werkt de apps bij die het apparaatbeheer van een werkgever naar deze Mac stuurt."
+    },
+    {
+      "match": {
+        "name": "systemmigrationd"
+      },
+      "title": "Migratie-assistent",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Kopieert accounts, apps en bestanden van een andere Mac of een backup. Alleen aanwezig tijdens een migratie, en dan zwaar."
+    },
+    {
+      "match": {
+        "name": "voicebankingd"
+      },
+      "title": "Persoonlijke Stem",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": true,
+      "description": "Bouwt de synthetische stem die is opgenomen met de toegankelijkheidsfunctie Persoonlijke Stem. Draait alleen als de Mac stilstaat en aan de stroom ligt."
+    },
+    {
+      "match": {
+        "name": "CloudTelemetryService"
+      },
+      "title": "Apple-diagnostiek versturen",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Stuurt de diagnostische rapporten die je met Apple wilde delen, als je dat hebt aangezet. Staat het uit, dan wordt er niets verstuurd."
+    },
+    {
+      "match": {
+        "name": "EAUpdaterService"
+      },
+      "title": "Firmware-updates voor accessoires",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Werkt de firmware bij van aangesloten accessoires zoals AirPods en Apple-toetsenborden."
+    },
+    {
+      "match": {
+        "name": "com.apple.DriverKit.AppleUserECM"
+      },
+      "title": "USB-netwerkstuurprogramma",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Bestuurt een netwerkadapter via USB, inclusief tethering vanaf een iPhone."
+    },
+    {
+      "match": {
+        "name": "amsengagementd"
+      },
+      "title": "App Store-aanbiedingen",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Verzorgt de aanbiedingen en abonnementsherinneringen die de App Store toont."
+    },
+    {
+      "match": {
+        "name": "amsondevicestoraged"
+      },
+      "title": "App Store-aanbiedingen (lokaal)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Bewaart de aanbiedingsgegevens van de App Store lokaal, zodat kiezen wat te tonen geen server nodig heeft.",
+      "group": "amsengagementd"
+    },
+    {
+      "match": {
+        "name": "promotedcontentd"
+      },
+      "title": "App Store-advertentieprivacy",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Houdt advertentiemetingen van de App Store op het apparaat, zonder je aan adverteerders te identificeren."
+    },
+    {
+      "match": {
+        "name": "adprivacyd"
+      },
+      "title": "Advertentieprivacy",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Beheert de instelling voor gepersonaliseerde advertenties en houdt de gebruikte identificatiegegevens lokaal."
+    },
+    {
+      "match": {
+        "name": "homeenergyd"
+      },
+      "title": "Woning (energie)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Verzamelt energiegegevens van HomeKit-accessoires voor de Woning-app."
+    },
+    {
+      "match": {
+        "name": "AccessibilityVisualsAgent"
+      },
+      "title": "Toegankelijkheidsweergave",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Past visuele toegankelijkheidsinstellingen toe, zoals minder beweging, meer contrast en aanwijzergrootte."
+    },
+    {
+      "match": {
+        "name": "FeatureAccessAgent"
+      },
+      "title": "Functiebeschikbaarheid",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Bepaalt welke macOS-functies beschikbaar zijn voor je regio, taal en account."
+    },
+    {
+      "match": {
+        "name": "assistant_cdmd"
+      },
+      "title": "Siri (gegevensbeheer)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Beheert wat Siri op het apparaat bewaart en wat verstuurd mag worden.",
+      "group": "Siri"
+    },
+    {
+      "match": {
+        "name": "com.apple.sbd"
+      },
+      "title": "iCloud-sleutelhangerherstel",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Bewaart de escrow waarmee je je iCloud-sleutelhanger op een nieuw apparaat kunt herstellen."
+    },
+    {
+      "match": {
+        "name": "contactsdonationagent"
+      },
+      "title": "Contactsuggesties",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Merkt namen en adressen in je mail en berichten op, zodat Contacten ze kan voorstellen. Blijft op het apparaat."
+    },
+    {
+      "match": {
+        "name": "swcd"
+      },
+      "title": "App- en websitekoppelingen",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Controleert welke apps een website heeft geautoriseerd, voor gedeelde wachtwoorden en links die in een app openen."
+    },
+    {
+      "match": {
+        "name": "itunescloudd"
+      },
+      "title": "Muziek (cloudbibliotheek)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Houdt je Muziek-bibliotheek gelijk met iCloud en Apple Music."
+    },
+    {
+      "match": {
+        "name": "parsecd"
+      },
+      "title": "Spotlight (webresultaten)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Haalt de websuggesties op die Spotlight en het zoekveld van Safari tonen. Alleen actief terwijl je zoekt."
+    },
+    {
+      "match": {
+        "name": "AppPredictionIntentsHelperService"
+      },
+      "title": "App-suggesties",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Bepaalt welke app of opdracht als volgende voorgesteld wordt, op basis van hoe je de Mac gebruikt."
+    },
+    {
+      "match": {
+        "name": "transparencyd"
+      },
+      "title": "Certificaattransparantie",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Controleert of de certificaten die websites tonen publiek zijn gelogd, waarmee valse certificaten opvallen."
+    },
+    {
+      "match": {
+        "name": "findmydeviced"
+      },
+      "title": "Zoek mijn",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Houdt deze Mac vindbaar en helpt je andere apparaten en AirTags te lokaliseren."
+    },
+    {
+      "match": {
+        "name": "UsageTrackingAgent"
+      },
+      "title": "Schermtijd (gebruik)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Legt vast hoe lang apps en websites gebruikt worden, voor de Schermtijd-rapporten.",
+      "group": "ScreenTimeAgent"
+    },
+    {
+      "match": {
+        "name": "ScreenTimeAgent"
+      },
+      "title": "Schermtijd",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Past de ingestelde Schermtijd-limieten en rusttijd toe, en synchroniseert ze tussen je apparaten."
+    },
+    {
+      "match": {
+        "name": "Messages Assistant Extension"
+      },
+      "title": "Berichten (Siri)",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Laat Siri berichten voorlezen en namens jou versturen.",
+      "group": "Messages"
+    },
+    {
+      "match": {
+        "name": "IMDPersistenceAgent"
+      },
+      "title": "Berichten (opslag)",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Beheert de berichtendatabase op schijf, inclusief bijlagen en zoeken.",
+      "group": "Messages"
+    },
+    {
+      "match": {
+        "name": "facetimemessagestored"
+      },
+      "title": "FaceTime en Berichten (opslag)",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Bewaart gespreksgeschiedenis en berichtgegevens die FaceTime en Berichten delen.",
+      "group": "Messages"
+    },
+    {
+      "match": {
+        "name": "managedappdistributionagent"
+      },
+      "title": "Beheerde app-installaties (jouw sessie)",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "De gebruikerskant van beheerde app-installatie, die voortgang en meldingen toont.",
+      "group": "managedappdistributiond"
+    },
+    {
+      "match": {
+        "name": "postersyncd"
+      },
+      "title": "Vergrendelschermposters",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Maakt de afbeeldingen voor het vergrendelscherm en contactposters klaar en synchroniseert ze."
+    },
+    {
+      "match": {
+        "name": "BackgroundTaskManagementAgent"
+      },
+      "title": "Inlogonderdelen (jouw sessie)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Toont de melding als een app zichzelf toevoegt aan je inlog- of achtergrondonderdelen.",
+      "group": "backgroundtaskmanagementd"
+    },
+    {
+      "match": {
+        "name": "backgroundtaskmanagementd"
+      },
+      "title": "Inlog- en achtergrondonderdelen",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Beheert de lijst apps die bij inloggen mogen starten of op de achtergrond mogen draaien, zoals in Systeeminstellingen."
+    },
+    {
+      "match": {
+        "name": "GamePolicyAgent"
+      },
+      "title": "Gamemodus",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Bepaalt wanneer de gamemodus aangaat, die een game voorrang geeft op de CPU en GPU."
+    },
+    {
+      "match": {
+        "name": "coreautha"
+      },
+      "title": "Touch ID-vensters (jouw sessie)",
+      "category": "security",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "De gebruikerskant van de Touch ID- en wachtwoordvensters.",
+      "group": "coreauthd"
+    },
+    {
+      "match": {
+        "name": "DockHelper"
+      },
+      "title": "Dock (helper)",
+      "category": "helper",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Verzorgt een deel van het werk van het Dock, zoals slepen-en-neerzetten en venstervoorbeelden.",
+      "group": "Dock"
+    },
+    {
+      "match": {
+        "name": "com.apple.Notes.SpotlightIndexExtension"
+      },
+      "title": "Spotlight (Notities)",
+      "category": "system",
+      "vendor": "Apple",
+      "expectedHigh": false,
+      "description": "Indexeert de inhoud van Notities zodat die via Spotlight te vinden is.",
+      "group": "Spotlight indexing"
     }
   ]
 }
