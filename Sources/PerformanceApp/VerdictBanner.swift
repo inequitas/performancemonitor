@@ -18,8 +18,8 @@ struct VerdictBanner: View {
     @State private var expanded = false
 
     private var findings: [SystemFinding] {
-        // The same input the Shortcuts action reads, so the popover and an
-        // automation can never tell different stories about the same machine.
+        // The same input the JSON snapshot reads, so the popover and a script
+        // can never tell different stories about the same machine.
         SystemVerdict.evaluate(engine.verdictInput)
     }
 

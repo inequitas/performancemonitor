@@ -30,7 +30,6 @@ A lightweight macOS menu bar app that gives you real-time system metrics at a gl
 - **A process glossary**: 231 entries in seven languages explaining what a process actually is. `oahd` reads as Rosetta, `ecosystemd` as Continuity, `wdavdaemon_unprivileged` as Microsoft Defender
 - **An app and its helpers are one row**: Firefox with 17 processes reads as one row, not seventeen. Open a row to see the individual processes
 - **A plain-language verdict** at the top of the overview: not just what is happening, but what it means and what you can do about it
-- **Shortcuts actions**: read a metric, ask how the Mac is doing in words, or name the busiest app
 - **Listening ports and open connections** in the Network window. Read-only; blocking is a firewall's job
 - **Sleep, wake and throttling marked on the history graphs**, so an hour of high CPU has an explanation next to it
 - **A floating panel** that stays visible over full-screen apps
@@ -97,7 +96,6 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
 ### Automation
 
-- **Shortcuts actions**: read one metric, ask how this Mac is doing in words, or get the busiest app. Every value comes from what the app has already sampled, so no action starts a measurement of its own
 - **JSON snapshot**: optionally writes the current readings to `~/Library/Application Support/PerformanceApp/snapshot.json` every five seconds, for status bar tools such as SwiftBar, xbar and SketchyBar. Off by default, and deleted when you turn it off
 
 ### History

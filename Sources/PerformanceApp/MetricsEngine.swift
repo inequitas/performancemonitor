@@ -17,15 +17,6 @@ import PerformanceAppCore
 
 @MainActor
 final class MetricsEngine: ObservableObject {
-    /// The live engine, for App Intents to read.
-    ///
-    /// Shortcuts runs an intent inside this process but hands it no reference to
-    /// the object graph the app built, and the engine is deliberately not a
-    /// singleton: `AppContainer` owns it so the scene never observes it. This is
-    /// the one seam between the two. Weak, so it claims nothing about lifetime,
-    /// and only ever read on the main actor.
-    private(set) static weak var current: MetricsEngine?
-
     /// The floating readout, when one has been created. Held here so the
     /// popover and the panel's own close button can reach it; it holds no
     /// SwiftUI tree while hidden, so this costs nothing when unused.
@@ -402,8 +393,8 @@ final class MetricsEngine: ObservableObject {
 
     /// Everything `SystemVerdict` needs, in one place.
     ///
-    /// Both the popover banner and the Shortcuts action read this, so the two
-    /// can never disagree about what the machine is doing.
+    /// Both the popover banner and the JSON snapshot read this, so the two can
+    /// never disagree about what the machine is doing.
     var verdictInput: SystemVerdict.Input {
         SystemVerdict.Input(
             cpuPercent: cpuUsagePercent,
@@ -429,21 +420,6 @@ final class MetricsEngine: ObservableObject {
         case .critical: return 3
         @unknown default: return 0
         }
-    }
-
-    /// Takes one process sample outside the usual visibility gating, for a
-    /// Shortcuts action that needs a list no open window has produced.
-    ///
-    /// Deliberately a single sample rather than opening the gate: nothing is
-    /// left running once the action has answered.
-    func sampleProcessesOnce() async {
-        processSampler.resetThrottle()
-        guard let snapshot = await processSampler.sample(
-            topCount: settings.topProcessCount,
-            owners: GlossaryStore.shared.owners
-        ) else { return }
-        topCPUProcesses = snapshot.topCPU
-        topMemoryProcesses = snapshot.topMemory
     }
 
     /// Loads sleep and wake events. Called when the History window opens; the
@@ -552,7 +528,6 @@ final class MetricsEngine: ObservableObject {
 
     init() {
         thermalState = ProcessInfo.processInfo.thermalState
-        MetricsEngine.current = self
         thermalObserver = NotificationCenter.default.addObserver(
             forName: ProcessInfo.thermalStateDidChangeNotification,
             object: nil, queue: .main

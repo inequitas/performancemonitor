@@ -480,7 +480,6 @@
 "the power button was pressed" = "the power button was pressed";
 "network activity" = "network activity";
 "a scheduled task" = "a scheduled task";
-"Nothing worth a look. All quiet." = "Nothing worth a look. All quiet.";
 "Running hot, so macOS is slowing things down to cool off." = "Running hot, so macOS is slowing things down to cool off.";
 "Warm enough that macOS has started slowing things down." = "Warm enough that macOS has started slowing things down.";
 "Memory is short, so the Mac is shuffling %.1f GB between memory and disk." = "Memory is short, so the Mac is shuffling %.1f GB between memory and disk.";

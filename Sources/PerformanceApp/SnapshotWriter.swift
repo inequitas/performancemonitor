@@ -115,8 +115,7 @@ extension SnapshotWriter.Snapshot {
     ///
     /// Only reads what is sampled on every tick, so the file never contains a
     /// figure that is stale because a window happens to be closed. Per-domain
-    /// watts and the extended sensors are absent for that reason, the same
-    /// boundary the Shortcuts actions draw.
+    /// watts and the extended sensors are absent for that reason.
     @MainActor
     init(engine: MetricsEngine) {
         let findings = SystemVerdict.evaluate(engine.verdictInput)

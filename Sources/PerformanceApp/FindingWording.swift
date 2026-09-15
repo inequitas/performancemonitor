@@ -7,9 +7,9 @@ import PerformanceAppCore
 /// The split keeps the rules testable without a running app and keeps the
 /// wording next to the rest of the translated interface.
 ///
-/// It lives here rather than on the banner because the banner is no longer the
-/// only thing that says it: the Shortcuts action that answers "how is my Mac
-/// doing" needs the same sentences, and two copies would drift apart.
+/// It lives here rather than on the banner because the banner is not the only
+/// thing that says it: the JSON snapshot carries the same sentences, and two
+/// copies would drift apart.
 @MainActor
 enum FindingWording {
 

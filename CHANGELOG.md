@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+**Removed**
+- **Shortcuts actions.** 1.3.0 listed three of them and none ever ran. macOS found them, so they appeared in Spotlight and in the Shortcuts app, but refused to connect when one was run, reporting that Shortcuts "couldn't communicate with the app". In the system log the connection fails right after macOS reports it cannot find a Team ID for the app, which it does not have: it is ad-hoc signed rather than signed with an Apple Developer ID. That is the most likely cause, though without a Developer ID to test against it is not proven. They were announced on the strength of having been found, without anyone having run one. They can come back if the app is ever signed with a Developer ID.
+
+The JSON file of current readings is unaffected and remains the way to get these numbers into another tool.
+
 ## v1.3.0: Names, not numbers *(2026-08-07)*
 
 **Knowing what you are looking at**
@@ -10,7 +17,7 @@
 
 **New windows on the machine**
 
-- **Shortcuts actions.** Read one metric, ask how the Mac is doing in words, or name the busiest app. Enough to build the automations people ask for without this app growing a scheduler.
+- **Shortcuts actions.** Read one metric, ask how the Mac is doing in words, or name the busiest app. Enough to build the automations people ask for without this app growing a scheduler. *These did not work and were removed in 1.3.1; see there.*
 - **A JSON file of the current readings**, for SwiftBar, xbar and SketchyBar. Off by default, written at most every five seconds, deleted when you turn it off.
 - **Listening ports and open connections** in the Network window. Read-only; blocking is a firewall's job.
 - **Sleep, wake and throttling marked on the history graphs**, so an hour of high CPU has an explanation next to it. Wake reasons are named only where the system log says something you can check.
