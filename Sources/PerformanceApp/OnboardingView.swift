@@ -355,7 +355,10 @@ private struct MenuBarPreview: View {
             sparkText: engine.sparklineText(for: metric),
             history: engine.sparklineHistory(for: metric),
             severity: severity,
-            isDiskSpace: isDiskSpace
+            isDiskSpace: isDiskSpace,
+            // The mock menu bar here is always dark, so the preview draws
+            // literal white instead of relying on template retinting.
+            tint: .white
         )
         image.isTemplate = false
         return image
