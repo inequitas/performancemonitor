@@ -150,7 +150,8 @@ final class ExtraMenuBarController: NSObject {
         // "Text only" stays "↓0 ↑0"). Hashing exactly the inputs the drawing
         // and the accessibility label depend on lets those ticks skip the whole
         // NSImage/CoreGraphics pass.
-        let key = renderKey(for: enabledMetrics, engine: engine)
+        let barAppearance = combinedStatusItem?.button?.effectiveAppearance
+        let key = renderKey(for: enabledMetrics, engine: engine, appearance: barAppearance)
         guard key != lastRenderKey else { return }
         lastRenderKey = key
 
@@ -170,7 +171,6 @@ final class ExtraMenuBarController: NSObject {
         let anyAlert = settings.menuBarThresholdColor
             && enabledMetrics.contains { engine.thresholdStatus(for: $0).severity != .normal }
         let tint: MenuBarRenderer.Tint = anyAlert ? .dynamic : .template
-        let barAppearance = combinedStatusItem?.button?.effectiveAppearance
         let images = enabledMetrics.reversed().map {
             makeImage(for: $0, style: settings.styleFor($0), engine: engine, tint: tint, appearance: barAppearance)
         }
@@ -195,7 +195,8 @@ final class ExtraMenuBarController: NSObject {
             lastSeparateOrder = enabledMetrics
         }
 
-        let key = renderKey(for: enabledMetrics, engine: engine)
+        let key = renderKey(for: enabledMetrics, engine: engine,
+                            appearance: anchorButton()?.effectiveAppearance)
         guard key != lastRenderKey else { return }
         lastRenderKey = key
 
@@ -209,8 +210,16 @@ final class ExtraMenuBarController: NSObject {
 
     /// Hash of every value `makeImage` and `accessibilityLabel` read. Must be
     /// kept in step with those two methods — anything they consult belongs here.
-    private func renderKey(for metrics: [MenuBarMetric], engine: MetricsEngine) -> Int {
+    /// - Parameter appearance: The menu bar's own look, hashed so a theme flip
+    ///   re-renders on its own. Only the non-template path needs it (a template
+    ///   image is retinted by macOS without a redraw), but an alerting metric's
+    ///   values change every tick anyway, so including it costs nothing and
+    ///   closes the case where they do not.
+    private func renderKey(for metrics: [MenuBarMetric],
+                           engine: MetricsEngine,
+                           appearance: NSAppearance?) -> Int {
         var hasher = Hasher()
+        hasher.combine(appearance?.name.rawValue)
         // Included so a toggle of combine/separate mode is never mistaken for
         // a no-op tick — the freshly (re)created status item(s) always get an
         // explicit image/label set at least once after a mode switch.

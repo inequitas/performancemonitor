@@ -49,11 +49,27 @@ enum MenuBarRenderer {
 
     /// Pre-built text attributes per tint for the (common) uncoloured path, so
     /// a fast-path render allocates nothing extra.
-    private static let normalAttrs: [Tint: [NSAttributedString.Key: Any]] = [
-        .template: [.font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium), .foregroundColor: NSColor.black],
-        .white:    [.font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium), .foregroundColor: NSColor.white],
-        .dynamic:  [.font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium), .foregroundColor: NSColor.labelColor]
+    ///
+    /// Selected through a switch rather than a dictionary lookup: a fourth
+    /// `Tint` would then fail to compile here instead of crashing on a missing
+    /// key at draw time.
+    private static let templateAttrs: [NSAttributedString.Key: Any] = [
+        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium), .foregroundColor: NSColor.black
     ]
+    private static let whiteAttrs: [NSAttributedString.Key: Any] = [
+        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium), .foregroundColor: NSColor.white
+    ]
+    private static let dynamicAttrs: [NSAttributedString.Key: Any] = [
+        .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium), .foregroundColor: NSColor.labelColor
+    ]
+
+    private static func normalAttrs(for tint: Tint) -> [NSAttributedString.Key: Any] {
+        switch tint {
+        case .template: templateAttrs
+        case .white:    whiteAttrs
+        case .dynamic:  dynamicAttrs
+        }
+    }
 
     // Widest string each metric/style combo will ever produce, used to fix slot widths.
     private static let maxTextLabel: [MenuBarMetric: String] = [
@@ -99,7 +115,7 @@ enum MenuBarRenderer {
     /// the fast path allocates nothing extra. Callers pass `.normal` when
     /// threshold colouring is disabled, so gating on severity alone suffices.
     private static func textAttrs(for severity: ThresholdSeverity, tint: Tint) -> [NSAttributedString.Key: Any] {
-        guard severity != .normal else { return normalAttrs[tint]! }
+        guard severity != .normal else { return normalAttrs(for: tint) }
         return [
             .font: NSFont.monospacedSystemFont(ofSize: 11, weight: .medium),
             .foregroundColor: thresholdColor(for: severity)
@@ -123,18 +139,25 @@ enum MenuBarRenderer {
                       isDiskSpace: Bool,
                       tint: Tint = .template,
                       appearance: NSAppearance? = nil) -> NSImage {
-        let previous = NSAppearance.current
-        if let appearance { NSAppearance.current = appearance }
-        defer { NSAppearance.current = previous }
-
-        let img = drawMetric(metric: metric,
-                             effectiveStyle: effectiveStyle,
-                             text: text,
-                             sparkText: sparkText,
-                             history: history,
-                             severity: severity,
-                             isDiskSpace: isDiskSpace,
-                             tint: tint)
+        // `NSAppearance.current` has been deprecated since macOS 12 and the
+        // project builds with -warnings-as-errors, so the appearance is made
+        // current through the supported call instead.
+        let draw = {
+            drawMetric(metric: metric,
+                       effectiveStyle: effectiveStyle,
+                       text: text,
+                       sparkText: sparkText,
+                       history: history,
+                       severity: severity,
+                       isDiskSpace: isDiskSpace,
+                       tint: tint)
+        }
+        var img: NSImage!
+        if let appearance {
+            appearance.performAsCurrentDrawingAppearance { img = draw() }
+        } else {
+            img = draw()
+        }
         // Template only for uncoloured drawings: an alert-coloured slot must
         // keep its orange/red, so it ships as a regular (non-retinted) image.
         img.isTemplate = (tint == .template && severity == .normal)
@@ -217,11 +240,7 @@ enum MenuBarRenderer {
         let gap: CGFloat = 6
         let h:   CGFloat = 16
         let totalW = images.reduce(0) { $0 + $1.size.width } + gap * CGFloat(images.count - 1)
-        let previous = NSAppearance.current
-        if let appearance { NSAppearance.current = appearance }
-        defer { NSAppearance.current = previous }
-
-        let img = NSImage(size: NSSize(width: totalW, height: h), flipped: false) { _ in
+        let build = { NSImage(size: NSSize(width: totalW, height: h), flipped: false) { _ in
             guard let ctx = NSGraphicsContext.current?.cgContext else { return false }
             var x: CGFloat = 0
             for (i, img) in images.enumerated() {
@@ -240,6 +259,14 @@ enum MenuBarRenderer {
                 x += img.size.width + gap
             }
             return true
+        } }
+        // See `image(metric:...)`: the deprecated `NSAppearance.current` setter
+        // would fail the build.
+        var img: NSImage!
+        if let appearance {
+            appearance.performAsCurrentDrawingAppearance { img = build() }
+        } else {
+            img = build()
         }
         img.isTemplate = !images.isEmpty && images.allSatisfy(\.isTemplate)
         return img
