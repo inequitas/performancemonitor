@@ -150,7 +150,8 @@ final class ExtraMenuBarController: NSObject {
         // "Text only" stays "↓0 ↑0"). Hashing exactly the inputs the drawing
         // and the accessibility label depend on lets those ticks skip the whole
         // NSImage/CoreGraphics pass.
-        let key = renderKey(for: enabledMetrics, engine: engine)
+        let barAppearance = combinedStatusItem?.button?.effectiveAppearance
+        let key = renderKey(for: enabledMetrics, engine: engine, appearance: barAppearance)
         guard key != lastRenderKey else { return }
         lastRenderKey = key
 
@@ -159,8 +160,21 @@ final class ExtraMenuBarController: NSObject {
         // metric in `menuBarOrder` ends up rightmost. `combinedImage` draws
         // left-to-right, so the leftmost drawn metric must be the LAST in the
         // list — keeping both modes in the same on-screen order.
-        let images = enabledMetrics.reversed().map { makeImage(for: $0, style: settings.styleFor($0), engine: engine) }
-        combinedStatusItem?.button?.image = images.isEmpty ? nil : MenuBarRenderer.combinedImage(from: images)
+        //
+        // An alert-coloured sibling forces the combined strip to stay
+        // non-template, so its uncoloured slots can't rely on template
+        // retinting and must draw with a colour resolved against the real
+        // menu-bar appearance (black on a light bar, white on a dark one).
+        // With no alert the strip is fully template and macOS handles both
+        // appearances by itself. Severity feeds `renderKey`, so the switch
+        // between the two modes always re-renders.
+        let anyAlert = settings.menuBarThresholdColor
+            && enabledMetrics.contains { engine.thresholdStatus(for: $0).severity != .normal }
+        let tint: MenuBarRenderer.Tint = anyAlert ? .dynamic : .template
+        let images = enabledMetrics.reversed().map {
+            makeImage(for: $0, style: settings.styleFor($0), engine: engine, tint: tint, appearance: barAppearance)
+        }
+        combinedStatusItem?.button?.image = images.isEmpty ? nil : MenuBarRenderer.combinedImage(from: images, appearance: barAppearance)
         combinedStatusItem?.button?.setAccessibilityLabel(accessibilityLabel(for: enabledMetrics, engine: engine))
     }
 
@@ -181,21 +195,31 @@ final class ExtraMenuBarController: NSObject {
             lastSeparateOrder = enabledMetrics
         }
 
-        let key = renderKey(for: enabledMetrics, engine: engine)
+        let key = renderKey(for: enabledMetrics, engine: engine,
+                            appearance: anchorButton()?.effectiveAppearance)
         guard key != lastRenderKey else { return }
         lastRenderKey = key
 
         for metric in enabledMetrics {
             guard let item = perMetricStatusItems[metric] else { continue }
-            item.button?.image = makeImage(for: metric, style: settings.styleFor(metric), engine: engine)
+            item.button?.image = makeImage(for: metric, style: settings.styleFor(metric), engine: engine,
+                                           appearance: item.button?.effectiveAppearance)
             item.button?.setAccessibilityLabel(accessibilityLabel(for: [metric], engine: engine))
         }
     }
 
     /// Hash of every value `makeImage` and `accessibilityLabel` read. Must be
     /// kept in step with those two methods — anything they consult belongs here.
-    private func renderKey(for metrics: [MenuBarMetric], engine: MetricsEngine) -> Int {
+    /// - Parameter appearance: The menu bar's own look, hashed so a theme flip
+    ///   re-renders on its own. Only the non-template path needs it (a template
+    ///   image is retinted by macOS without a redraw), but an alerting metric's
+    ///   values change every tick anyway, so including it costs nothing and
+    ///   closes the case where they do not.
+    private func renderKey(for metrics: [MenuBarMetric],
+                           engine: MetricsEngine,
+                           appearance: NSAppearance?) -> Int {
         var hasher = Hasher()
+        hasher.combine(appearance?.name.rawValue)
         // Included so a toggle of combine/separate mode is never mistaken for
         // a no-op tick — the freshly (re)created status item(s) always get an
         // explicit image/label set at least once after a mode switch.
@@ -242,10 +266,15 @@ final class ExtraMenuBarController: NSObject {
 
     /// Resolves the current engine/settings values for `metric` and hands them
     /// to the shared `MenuBarRenderer` — the same code path the onboarding
-    /// tour's live preview uses, so both stay pixel-identical.
+    /// tour's live preview uses, so both stay pixel-identical. `tint` defaults
+    /// to template drawing (macOS retints per menu-bar appearance); `appearance`
+    /// matters only when the drawing must stay non-template and resolve dynamic
+    /// colours against the bar's real look.
     private func makeImage(for metric: MenuBarMetric,
                            style: MenuBarStyle,
-                           engine: MetricsEngine) -> NSImage {
+                           engine: MetricsEngine,
+                           tint: MenuBarRenderer.Tint = .template,
+                           appearance: NSAppearance? = nil) -> NSImage {
         let severity = settings.menuBarThresholdColor ? engine.thresholdStatus(for: metric).severity : .normal
         // Disk in Space mode is always rendered as text — no sparkline applies.
         let isDiskSpace = (metric == .disk && settings.diskDisplayMode == .space)
@@ -257,7 +286,9 @@ final class ExtraMenuBarController: NSObject {
             sparkText: engine.sparklineText(for: metric),
             history: engine.sparklineHistory(for: metric),
             severity: severity,
-            isDiskSpace: isDiskSpace
+            isDiskSpace: isDiskSpace,
+            tint: tint,
+            appearance: appearance
         )
     }
 
