@@ -17,6 +17,17 @@ See [README.md](README.md#building-from-source): `bash build_app.sh` is all you 
 
 Run the tests with `bash scripts/test.sh` (it takes the same arguments as `swift test`, e.g. `bash scripts/test.sh --filter DiskIORates`). Use it rather than a bare `swift test`: with only the Command Line Tools installed, swift-testing isn't on the default search path and `swift test` fails with `no such module 'Testing'`. The script adds the three search paths needed and is a plain `swift test` everywhere else.
 
+### CI builds stricter than you do
+
+One thing worth knowing before you open a pull request: CI compiles with `-warnings-as-errors`, and neither `build_app.sh` nor `scripts/test.sh` does. So a build that is clean on your machine can still fail the checks, most often on an API Apple has deprecated. To see what CI will see:
+
+```
+swift build -c release --arch arm64 -Xswiftc -warnings-as-errors
+swift test -Xswiftc -warnings-as-errors
+```
+
+If your pull request comes from a fork and it is your first one, the checks wait for a maintainer to approve the workflow run, so you may see no result at all for a while. That is normal, and not something you did wrong.
+
 ## Translations
 
 The app is localized in English, Dutch, German, French, Spanish, Simplified Chinese, and Japanese. The non-English translations are AI-generated. **Improvements by native speakers are very welcome!** Each language lives in two files:

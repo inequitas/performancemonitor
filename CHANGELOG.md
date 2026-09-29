@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+**Fixed**
+- **The menu bar readout was unreadable on a light menu bar.** It was drawn as a white, non-template image, so it stayed white whatever the bar looked like, and it never followed a theme change. It is now drawn the way system status items are, which lets macOS retint it per menu-bar appearance. Reported and fixed by [@aleksanderprokofiev-cmd](https://github.com/aleksanderprokofiev-cmd) in [#13](https://github.com/inequitas/performancemonitor/pull/13).
+
 **Removed**
 - **Shortcuts actions.** 1.3.0 listed three of them and none ever ran. macOS found them, so they appeared in Spotlight and in the Shortcuts app, but refused to connect when one was run, reporting that Shortcuts "couldn't communicate with the app". In the system log the connection fails right after macOS reports it cannot find a Team ID for the app, which it does not have: it is ad-hoc signed rather than signed with an Apple Developer ID. That is the most likely cause, though without a Developer ID to test against it is not proven. They were announced on the strength of having been found, without anyone having run one. They can come back if the app is ever signed with a Developer ID.
 
