@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v1.3.1: A readable menu bar, and one feature withdrawn *(2026-10-02)*
 
 **Fixed**
 - **The menu bar readout was unreadable on a light menu bar.** It was drawn as a white, non-template image, so it stayed white whatever the bar looked like, and it never followed a theme change. It is now drawn the way system status items are, which lets macOS retint it per menu-bar appearance. Reported and fixed by [@aleksanderprokofiev-cmd](https://github.com/aleksanderprokofiev-cmd) in [#13](https://github.com/inequitas/performancemonitor/pull/13).
