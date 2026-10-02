@@ -25,7 +25,11 @@ A lightweight macOS menu bar app that gives you real-time system metrics at a gl
 
 ---
 
-## What's new in v1.3.0
+## What's new
+
+**v1.3.1** — the menu bar readout was drawn in white whatever the menu bar looked like, so it was unreadable on a light one and never followed a theme change. It is now drawn the way system status items are, and macOS retints it per appearance. Found and fixed by [@aleksanderprokofiev-cmd](https://github.com/aleksanderprokofiev-cmd). The Shortcuts actions that v1.3.0 announced never ran and have been withdrawn; the [changelog](CHANGELOG.md) explains why.
+
+**v1.3.0**
 
 - **A process glossary**: 231 entries in seven languages explaining what a process actually is. `oahd` reads as Rosetta, `ecosystemd` as Continuity, `wdavdaemon_unprivileged` as Microsoft Defender
 - **An app and its helpers are one row**: Firefox with 17 processes reads as one row, not seventeen. Open a row to see the individual processes
