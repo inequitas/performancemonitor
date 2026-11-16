@@ -228,7 +228,6 @@
 "App %.1fGB" = "App %.1fGB";
 "Wired %.1fGB" = "已连线 %.1fGB";
 "Cmp %.1fGB" = "压缩 %.1fGB";
-"App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM." = "App：活跃页 + 非活跃页 —— 应用当前正在使用或最近使用过的内存。\n\n已连线：由内核和驱动程序锁定在 RAM 中，无法调出到磁盘。\n\n已压缩：macOS 内存压力系统压缩的页面，用于释放物理 RAM。较高的压缩内存量属于正常现象；当压缩已不足以缓解压力时，会转为交换空间。\n\n交换空间：因 RAM 已满而写入磁盘的数据。持续偏高的交换空间使用量说明你需要更多 RAM。";
 "Swap used: %@ GB" = "已用交换空间：%@ GB";
 "Top Memory" = "内存占用最高";
 
@@ -498,3 +497,11 @@
 "Hide details" = "隐藏详情";
 "Open %@" = "打开%@";
 "Memory is %.0f%% full." = "内存已使用 %.0f%%。";
+
+/* Overview warnings and physical memory accounting */
+"Overview warnings" = "概览警告";
+"Show overview warnings" = "显示概览警告";
+"Controls warnings in the overview. Notification alerts are configured separately below." = "控制概览中的警告。通知提醒可在下方单独设置。";
+"Used: App + Wired + Compressed. Reclaimable file cache is excluded.\n\nApp: Anonymous memory minus purgeable pages.\n\nWired: Memory locked in RAM by the kernel and drivers.\n\nCompressed: Physical RAM used to store compressed pages.\n\nSwap: Memory stored on disk. Swap in use alone does not mean RAM is currently under pressure." = "已用：应用＋联动＋压缩。不包括可回收的文件缓存。\n\n应用：匿名内存减去可清除的页面。\n\n联动：内核和驱动程序锁定在RAM中的内存。\n\n压缩：存储压缩页面所占用的物理RAM。\n\n交换：存储在磁盘上的内存。仅有交换空间占用并不意味着当前存在内存压力。";
+"Enable all alerts" = "启用所有提醒";
+"Turn off to silence overview warnings, threshold colours, and notification alerts. Individual choices are preserved." = "关闭后将停用概览警告、阈值颜色和通知提醒，并保留各项设置。";

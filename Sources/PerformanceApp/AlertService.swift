@@ -6,6 +6,16 @@ import PerformanceAppCore
 final class AlertService: ObservableObject {
     private let ud = UserDefaults.standard
 
+    @Published var allAlertsEnabled: Bool = true {
+        didSet { ud.set(allAlertsEnabled, forKey: "allAlertsEnabled") }
+    }
+    @Published var overviewWarningsEnabled: Bool = true {
+        didSet { ud.set(overviewWarningsEnabled, forKey: "overviewWarningsEnabled") }
+    }
+    @Published var disabledOverviewTopics: Set<SystemFinding.Topic> = [] {
+        didSet { ud.set(disabledOverviewTopics.map(\.rawValue), forKey: "disabledOverviewTopics") }
+    }
+
     @Published var alertsEnabled: Bool = false {
         didSet { ud.set(alertsEnabled, forKey: "alertsEnabled"); if alertsEnabled { requestAuth() } }
     }
@@ -52,6 +62,11 @@ final class AlertService: ObservableObject {
     func loadPreferences() {
         func bool(_ k: String) -> Bool?   { ud.object(forKey: k) != nil ? ud.bool(forKey: k) : nil }
         func dbl(_ k: String)  -> Double? { ud.object(forKey: k) != nil ? ud.double(forKey: k) : nil }
+        if let v = bool("allAlertsEnabled") { allAlertsEnabled = v }
+        if let v = bool("overviewWarningsEnabled") { overviewWarningsEnabled = v }
+        if let topics = ud.stringArray(forKey: "disabledOverviewTopics") {
+            disabledOverviewTopics = Set(topics.compactMap(SystemFinding.Topic.init(rawValue:)))
+        }
         if let v = bool("alertsEnabled")            { alertsEnabled          = v }
         if let v = bool("cpuAlertEnabled")           { cpuEnabled             = v }
         if let v = bool("memoryAlertEnabled")        { memoryEnabled          = v }
@@ -67,7 +82,7 @@ final class AlertService: ObservableObject {
 
     func check(cpu: Double, memUsed: Double, memTotal: Double,
                diskFree: Double, gpu: Double, thermal: ProcessInfo.ThermalState) {
-        guard alertsEnabled else { return }
+        guard allAlertsEnabled, alertsEnabled else { return }
         let now = Date()
         if cpuEnabled, dwellTracker.shouldFire(key: "cpu", isOver: cpu >= cpuThreshold, now: now, dwell: alertSustainSeconds) {
             fire("cpu", String(localized: "High CPU usage"),

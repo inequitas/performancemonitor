@@ -229,7 +229,6 @@
 "App %.1fGB" = "App %.1fGB";
 "Wired %.1fGB" = "Fija %.1fGB";
 "Cmp %.1fGB" = "Cmp %.1fGB";
-"App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM." = "App: Páginas activas + inactivas — memoria actualmente en uso o usada recientemente por las apps.\n\nFija (wired): Bloqueada en la RAM por el kernel y los controladores. No se puede transferir al disco.\n\nComprimida: Páginas que macOS comprime mediante su sistema de gestión de presión de memoria para liberar RAM física. Un valor alto de memoria comprimida es normal; se convierte en swap cuando la compresión ya no es suficiente.\n\nSwap: Datos escritos en disco porque la RAM estaba llena. Un uso de swap persistentemente alto indica que necesitas más RAM.";
 "Swap used: %@ GB" = "Swap usada: %@ GB";
 "Top Memory" = "Memoria principal";
 
@@ -499,3 +498,11 @@
 "Hide details" = "Ocultar detalles";
 "Open %@" = "Abrir %@";
 "Memory is %.0f%% full." = "La memoria está al %.0f%%.";
+
+/* Overview warnings and physical memory accounting */
+"Overview warnings" = "Avisos en la vista general";
+"Show overview warnings" = "Mostrar avisos en la vista general";
+"Controls warnings in the overview. Notification alerts are configured separately below." = "Controla los avisos de la vista general. Las notificaciones se configuran por separado a continuación.";
+"Used: App + Wired + Compressed. Reclaimable file cache is excluded.\n\nApp: Anonymous memory minus purgeable pages.\n\nWired: Memory locked in RAM by the kernel and drivers.\n\nCompressed: Physical RAM used to store compressed pages.\n\nSwap: Memory stored on disk. Swap in use alone does not mean RAM is currently under pressure." = "Usada: Apps + cableada + comprimida. Se excluye la caché de archivos recuperable.\n\nApps: Memoria anónima menos páginas purgables.\n\nCableada: Memoria bloqueada en RAM por el kernel y los controladores.\n\nComprimida: RAM física que almacena páginas comprimidas.\n\nIntercambio: Memoria almacenada en disco. Su uso por sí solo no indica presión de memoria actual.";
+"Enable all alerts" = "Activar todas las alertas";
+"Turn off to silence overview warnings, threshold colours, and notification alerts. Individual choices are preserved." = "Desactiva para silenciar los avisos de la vista general, los colores de umbral y las notificaciones. Se conservan las opciones individuales.";

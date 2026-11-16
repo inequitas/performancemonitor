@@ -229,7 +229,6 @@
 "App %.1fGB" = "App %.1fGB";
 "Wired %.1fGB" = "Wired %.1fGB";
 "Cmp %.1fGB" = "Cmp %.1fGB";
-"App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM." = "App: Aktive + inaktive Seiten — Speicher, der aktuell oder kürzlich von Apps verwendet wird.\n\nWired: Vom Kernel und den Treibern fest im RAM verankert. Kann nicht auf die Festplatte ausgelagert werden.\n\nKomprimiert: Seiten, die das macOS-Speicherdrucksystem komprimiert, um physisches RAM freizugeben. Hoher komprimierter Speicher ist normal; er wird zu Swap, sobald Komprimierung nicht mehr ausreicht.\n\nSwap: Daten, die wegen vollem RAM auf die Festplatte geschrieben wurden. Dauerhaft hohe Swap-Nutzung bedeutet, dass du mehr RAM benötigst.";
 "Swap used: %@ GB" = "Swap belegt: %@ GB";
 "Top Memory" = "Top-Speicher";
 
@@ -499,3 +498,11 @@
 "Hide details" = "Details ausblenden";
 "Open %@" = "%@ öffnen";
 "Memory is %.0f%% full." = "Arbeitsspeicher ist zu %.0f%% belegt.";
+
+/* Overview warnings and physical memory accounting */
+"Overview warnings" = "Warnungen in der Übersicht";
+"Show overview warnings" = "Warnungen in der Übersicht anzeigen";
+"Controls warnings in the overview. Notification alerts are configured separately below." = "Steuert Warnungen in der Übersicht. Benachrichtigungen werden unten separat konfiguriert.";
+"Used: App + Wired + Compressed. Reclaimable file cache is excluded.\n\nApp: Anonymous memory minus purgeable pages.\n\nWired: Memory locked in RAM by the kernel and drivers.\n\nCompressed: Physical RAM used to store compressed pages.\n\nSwap: Memory stored on disk. Swap in use alone does not mean RAM is currently under pressure." = "Verwendet: App + reserviert + komprimiert. Freigebbarer Dateicache ist ausgeschlossen.\n\nApp: Anonymer Speicher abzüglich freigebbarer Seiten.\n\nReserviert: Vom Kernel und den Treibern im RAM gesperrter Speicher.\n\nKomprimiert: Physischer RAM zum Speichern komprimierter Seiten.\n\nSwap: Auf der Festplatte gespeicherter Speicher. Belegter Swap allein bedeutet keinen aktuellen Speicherdruck.";
+"Enable all alerts" = "Alle Warnungen aktivieren";
+"Turn off to silence overview warnings, threshold colours, and notification alerts. Individual choices are preserved." = "Ausschalten, um Warnungen in der Übersicht, Schwellenwertfarben und Benachrichtigungen zu deaktivieren. Individuelle Einstellungen bleiben erhalten.";

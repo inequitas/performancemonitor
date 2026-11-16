@@ -31,6 +31,17 @@ struct SystemVerdictTests {
         #expect(SystemVerdict.evaluate(calm()).isEmpty)
     }
 
+    @Test func disabledTopicHidesOnlyItsWarnings() {
+        let input = calm(cpu: 95, usedGB: 30, totalGB: 32, swapGB: 6, pressure: 4,
+                         diskFreeGB: 3, thermal: 3)
+        for topic in [SystemFinding.Topic.cpu, .memory, .disk, .thermal] {
+            let found = SystemVerdict.evaluate(input, excluding: [topic])
+            #expect(!found.contains { $0.topic == topic })
+            #expect(found == SystemVerdict.evaluate(input).filter { $0.topic != topic })
+        }
+        #expect(SystemVerdict.evaluate(input, excluding: [.cpu, .memory, .disk, .thermal]).isEmpty)
+    }
+
     @Test func seriousThermalPressureThrottles() {
         #expect(kinds(calm(thermal: 2)) == [.throttling(serious: false)])
         #expect(kinds(calm(thermal: 3)) == [.throttling(serious: true)])

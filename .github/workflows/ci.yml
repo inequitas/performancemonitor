@@ -4,6 +4,7 @@ on:
   push:
     branches: [main, beta]
   pull_request:
+  workflow_dispatch:
 
 # Least-privilege GITHUB_TOKEN: this workflow only builds and tests, it never
 # writes to the repo. Explicit read-only scope silences the CodeQL
@@ -34,3 +35,13 @@ jobs:
 
       - name: Test
         run: swift test -Xswiftc -warnings-as-errors
+
+      - name: Package app
+        run: bash build_app.sh
+
+      - name: Upload app
+        uses: actions/upload-artifact@v4
+        with:
+          name: PerformanceApp-arm64
+          path: dist/PerformanceApp.zip
+          if-no-files-found: error
