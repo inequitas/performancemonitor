@@ -18,7 +18,8 @@ concurrency:
 
 jobs:
   build-and-test:
-    runs-on: macos-15
+    # Cross-compile the arm64 app without depending on arm64 runner capacity.
+    runs-on: macos-15-intel
     steps:
       - name: Checkout
         uses: actions/checkout@v7
