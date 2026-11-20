@@ -393,8 +393,8 @@ final class MetricsEngine: ObservableObject {
 
     /// Everything `SystemVerdict` needs, in one place.
     ///
-    /// Both the popover banner and the JSON snapshot read this, so the two can
-    /// never disagree about what the machine is doing.
+    /// Both the popover banner and the JSON snapshot read these measurements;
+    /// the banner can hide topics the user has disabled.
     var verdictInput: SystemVerdict.Input {
         SystemVerdict.Input(
             cpuPercent: cpuUsagePercent,
@@ -491,6 +491,7 @@ final class MetricsEngine: ObservableObject {
     /// while the menu bar is showing free space rather than I/O throughput.
     /// Network has no configured alert threshold, so it is always `.normal`.
     func thresholdStatus(for metric: MenuBarMetric) -> (severity: ThresholdSeverity, label: String?) {
+        guard alerts.allAlertsEnabled else { return (.normal, nil) }
         func status(_ severity: ThresholdSeverity, _ direction: ThresholdSeverityMapper.Direction) -> (ThresholdSeverity, String?) {
             switch severity {
             case .normal:   return (.normal, nil)

@@ -121,8 +121,12 @@ extension SnapshotWriter.Snapshot {
         let findings = SystemVerdict.evaluate(engine.verdictInput)
         self.init(
             // Bumped only if a field changes meaning or disappears, so a script
-            // can tell a format it understands from one it does not.
-            schema: 1,
+            // can tell a format it understands from one it does not. Went to 2
+            // when memory accounting was corrected: memoryUsedGB and
+            // memoryPercent stopped counting reclaimable file-backed pages and
+            // started counting compressed ones, so the same field reports a
+            // different quantity than it did under schema 1.
+            schema: 2,
             timestamp: Date(),
             cpuPercent: engine.cpuUsagePercent,
             memoryUsedGB: engine.memoryUsedGB,

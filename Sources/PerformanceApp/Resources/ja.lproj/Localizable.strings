@@ -229,7 +229,6 @@
 "App %.1fGB" = "App %.1fGB";
 "Wired %.1fGB" = "Wired %.1fGB";
 "Cmp %.1fGB" = "Cmp %.1fGB";
-"App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM." = "App: アクティブ + 非アクティブページ — 現在または最近アプリが使用しているメモリ。\n\nWired: カーネルとドライバによってRAMに固定されています。ディスクにページアウトできません。\n\n圧縮: 物理RAMを解放するためmacOSのメモリ管理システムが圧縮したページ。圧縮メモリが多いのは正常な状態で、圧縮だけでは足りなくなるとswapになります。\n\nSwap: RAMが満杯になったためディスクに書き込まれたデータ。swapの使用量が高い状態が続く場合は、RAMの増設が必要であることを示します。";
 "Swap used: %@ GB" = "Swap使用量: %@ GB";
 "Top Memory" = "メモリ使用量トップ";
 
@@ -499,3 +498,11 @@
 "Hide details" = "詳細を非表示";
 "Open %@" = "%@ を開く";
 "Memory is %.0f%% full." = "メモリの使用率は %.0f%% です。";
+
+/* Overview warnings and physical memory accounting */
+"Overview warnings" = "概要の警告";
+"Show overview warnings" = "概要の警告を表示";
+"Controls warnings in the overview. Notification alerts are configured separately below." = "概要に表示する警告を設定します。通知は下で個別に設定できます。";
+"Used: App + Wired + Compressed. Reclaimable file cache is excluded.\n\nApp: Anonymous memory minus purgeable pages.\n\nWired: Memory locked in RAM by the kernel and drivers.\n\nCompressed: Physical RAM used to store compressed pages.\n\nSwap: Memory stored on disk. Swap in use alone does not mean RAM is currently under pressure." = "使用済み：アプリ＋固定＋圧縮。解放可能なファイルキャッシュは含みません。\n\nアプリ：匿名メモリから解放可能なページを除いた量。\n\n固定：カーネルやドライバがRAM内に固定したメモリ。\n\n圧縮：圧縮ページの保存に使う物理RAM。\n\nスワップ：ディスクに保存されたメモリ。スワップの使用だけでは、現在メモリが不足しているとは限りません。";
+"Enable all alerts" = "すべての警告を有効にする";
+"Turn off to silence overview warnings, threshold colours, and notification alerts. Individual choices are preserved." = "オフにすると概要の警告、しきい値の色、通知を停止します。個別の設定は保持されます。";

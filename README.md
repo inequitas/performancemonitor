@@ -58,8 +58,14 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history.
 
 ### Memory
 - Real-time breakdown: Used, Wired, Compressed, Free
+- Used memory excludes reclaimable file cache and purgeable pages and includes compressed memory
 - Memory pressure indicator
 - Historical usage chart
+
+### Alerts
+- Turn off “Enable all alerts” to silence overview warnings, threshold colours, and notification alerts without losing individual choices
+- Settings → Alerts lets you disable all overview warnings or individual CPU, memory, disk, and thermal warnings
+- Notification alerts have separate master and per-metric switches in the same tab
 
 ### Network
 - Live upload and download throughput

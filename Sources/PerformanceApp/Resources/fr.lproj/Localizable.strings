@@ -229,7 +229,6 @@
 "App %.1fGB" = "App %.1fGo";
 "Wired %.1fGB" = "Câblé %.1fGo";
 "Cmp %.1fGB" = "Cmp %.1fGo";
-"App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM." = "App : pages actives + inactives — mémoire actuellement ou récemment utilisée par les apps.\n\nCâblé (wired) : verrouillé en RAM par le noyau et les pilotes. Ne peut pas être transféré sur le disque.\n\nComprimé : pages compressées par le système de gestion de la pression mémoire de macOS pour libérer de la RAM physique. Une mémoire comprimée élevée est normale ; elle devient du swap lorsque la compression ne suffit plus.\n\nSwap : données écrites sur le disque car la RAM était pleine. Une utilisation élevée et persistante du swap indique que vous avez besoin de plus de RAM.";
 "Swap used: %@ GB" = "Swap utilisé : %@ Go";
 "Top Memory" = "Top mémoire";
 
@@ -499,3 +498,11 @@
 "Hide details" = "Masquer les détails";
 "Open %@" = "Ouvrir %@";
 "Memory is %.0f%% full." = "La mémoire est remplie à %.0f%%.";
+
+/* Overview warnings and physical memory accounting */
+"Overview warnings" = "Avertissements dans la vue d’ensemble";
+"Show overview warnings" = "Afficher les avertissements dans la vue d’ensemble";
+"Controls warnings in the overview. Notification alerts are configured separately below." = "Contrôle les avertissements de la vue d’ensemble. Les notifications se configurent séparément ci-dessous.";
+"Used: App + Wired + Compressed. Reclaimable file cache is excluded.\n\nApp: Anonymous memory minus purgeable pages.\n\nWired: Memory locked in RAM by the kernel and drivers.\n\nCompressed: Physical RAM used to store compressed pages.\n\nSwap: Memory stored on disk. Swap in use alone does not mean RAM is currently under pressure." = "Utilisée : apps + résidente + compressée. Le cache de fichiers récupérable est exclu.\n\nApps : mémoire anonyme moins les pages purgeables.\n\nRésidente : mémoire verrouillée en RAM par le noyau et les pilotes.\n\nCompressée : RAM physique stockant les pages compressées.\n\nSwap : mémoire stockée sur disque. Son utilisation seule ne signifie pas que la mémoire est actuellement sous pression.";
+"Enable all alerts" = "Activer toutes les alertes";
+"Turn off to silence overview warnings, threshold colours, and notification alerts. Individual choices are preserved." = "Désactivez pour masquer les avertissements, les couleurs de seuil et les notifications. Les choix individuels sont conservés.";

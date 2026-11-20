@@ -28,7 +28,7 @@ public struct SystemFinding: Equatable, Sendable, Identifiable {
 
     /// Which part of the app explains this further, so a row can open the right
     /// window. Deliberately not the app's own Panel type, which Core cannot see.
-    public enum Topic: String, Equatable, Sendable {
+    public enum Topic: String, Hashable, Sendable {
         case cpu, memory, disk, thermal
     }
 
@@ -138,7 +138,7 @@ public enum SystemVerdict {
     /// Thermal "fair" is deliberately absent: macOS reports it routinely under
     /// ordinary load, and a line that fires constantly teaches people to ignore
     /// it.
-    public static func evaluate(_ input: Input) -> [SystemFinding] {
+    public static func evaluate(_ input: Input, excluding disabledTopics: Set<SystemFinding.Topic> = []) -> [SystemFinding] {
         var found: [SystemFinding] = []
 
         if input.thermalLevel >= 2 {
@@ -203,6 +203,6 @@ public enum SystemVerdict {
                                        topic: .disk))
         }
 
-        return found.sorted { $0.severity > $1.severity }
+        return found.filter { !disabledTopics.contains($0.topic) }.sorted { $0.severity > $1.severity }
     }
 }

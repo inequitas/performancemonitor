@@ -13,19 +13,24 @@ import PerformanceAppCore
 /// wording in the seven-language strings file with the rest of the interface.
 struct VerdictBanner: View {
     @ObservedObject var engine: MetricsEngine
+    @ObservedObject var alerts: AlertService
     let openPanel: (MetricsEngine.Panel) -> Void
 
     @State private var expanded = false
 
     private var findings: [SystemFinding] {
-        // The same input the JSON snapshot reads, so the popover and a script
-        // can never tell different stories about the same machine.
-        SystemVerdict.evaluate(engine.verdictInput)
+        SystemVerdict.evaluate(engine.verdictInput, excluding: alerts.disabledOverviewTopics)
     }
 
     var body: some View {
+        if alerts.allAlertsEnabled && alerts.overviewWarningsEnabled {
+            banner
+        }
+    }
+
+    private var banner: some View {
         let found = findings
-        VStack(alignment: .leading, spacing: 0) {
+        return VStack(alignment: .leading, spacing: 0) {
             // A single finding is shown in full straight away. Hiding one line
             // behind "1 thing worth a look" costs a click and tells the reader
             // nothing they did not already see. Summarising only earns its keep

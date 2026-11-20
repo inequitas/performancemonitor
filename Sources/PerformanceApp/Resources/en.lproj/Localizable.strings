@@ -229,7 +229,6 @@
 "App %.1fGB" = "App %.1fGB";
 "Wired %.1fGB" = "Wired %.1fGB";
 "Cmp %.1fGB" = "Cmp %.1fGB";
-"App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM." = "App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM.";
 "Swap used: %@ GB" = "Swap used: %@ GB";
 "Top Memory" = "Top Memory";
 
@@ -499,3 +498,11 @@
 "Hide details" = "Hide details";
 "Open %@" = "Open %@";
 "Memory is %.0f%% full." = "Memory is %.0f%% full.";
+
+/* Overview warnings and physical memory accounting */
+"Overview warnings" = "Overview warnings";
+"Show overview warnings" = "Show overview warnings";
+"Controls warnings in the overview. Notification alerts are configured separately below." = "Controls warnings in the overview. Notification alerts are configured separately below.";
+"Used: App + Wired + Compressed. Reclaimable file cache is excluded.\n\nApp: Anonymous memory minus purgeable pages.\n\nWired: Memory locked in RAM by the kernel and drivers.\n\nCompressed: Physical RAM used to store compressed pages.\n\nSwap: Memory stored on disk. Swap in use alone does not mean RAM is currently under pressure." = "Used: App + Wired + Compressed. Reclaimable file cache is excluded.\n\nApp: Anonymous memory minus purgeable pages.\n\nWired: Memory locked in RAM by the kernel and drivers.\n\nCompressed: Physical RAM used to store compressed pages.\n\nSwap: Memory stored on disk. Swap in use alone does not mean RAM is currently under pressure.";
+"Enable all alerts" = "Enable all alerts";
+"Turn off to silence overview warnings, threshold colours, and notification alerts. Individual choices are preserved." = "Turn off to silence overview warnings, threshold colours, and notification alerts. Individual choices are preserved.";

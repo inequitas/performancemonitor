@@ -229,7 +229,6 @@
 "App %.1fGB" = "App %.1fGB";
 "Wired %.1fGB" = "Vast %.1fGB";
 "Cmp %.1fGB" = "Cmp %.1fGB";
-"App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM." = "App: Actieve + inactieve pagina's — geheugen dat op dit moment of recent door apps wordt gebruikt.\n\nVast (wired): Vastgezet in RAM door de kernel en drivers. Kan niet naar schijf worden uitgeplaatst.\n\nGecomprimeerd: Pagina's die macOS comprimeert om fysiek RAM vrij te maken bij geheugendruk. Hoog gecomprimeerd geheugen is normaal; het wordt swap zodra comprimeren niet meer volstaat.\n\nSwap: Data die naar schijf is geschreven omdat het RAM vol was. Aanhoudend hoog swapgebruik betekent dat je meer RAM nodig hebt.";
 "Swap used: %@ GB" = "Swap gebruikt: %@ GB";
 "Top Memory" = "Topgeheugen";
 
@@ -499,3 +498,11 @@
 "Hide details" = "Verberg details";
 "Open %@" = "Open %@";
 "Memory is %.0f%% full." = "Geheugen is %.0f%% vol.";
+
+/* Overview warnings and physical memory accounting */
+"Overview warnings" = "Waarschuwingen in het overzicht";
+"Show overview warnings" = "Waarschuwingen in het overzicht tonen";
+"Controls warnings in the overview. Notification alerts are configured separately below." = "Regelt waarschuwingen in het overzicht. Meldingen worden hieronder apart ingesteld.";
+"Used: App + Wired + Compressed. Reclaimable file cache is excluded.\n\nApp: Anonymous memory minus purgeable pages.\n\nWired: Memory locked in RAM by the kernel and drivers.\n\nCompressed: Physical RAM used to store compressed pages.\n\nSwap: Memory stored on disk. Swap in use alone does not mean RAM is currently under pressure." = "Gebruikt: App + vastgezet + gecomprimeerd. Vrij te maken bestandscache telt niet mee.\n\nApp: Anoniem geheugen min wisbare pagina’s.\n\nVastgezet: Geheugen dat door de kernel en stuurprogramma’s in RAM is vergrendeld.\n\nGecomprimeerd: Fysiek RAM voor de opslag van gecomprimeerde pagina’s.\n\nSwap: Geheugen op schijf. Swapgebruik alleen betekent niet dat er momenteel geheugendruk is.";
+"Enable all alerts" = "Alle waarschuwingen inschakelen";
+"Turn off to silence overview warnings, threshold colours, and notification alerts. Individual choices are preserved." = "Schakel uit om overzichtswaarschuwingen, drempelkleuren en meldingen uit te schakelen. Individuele keuzes blijven behouden.";

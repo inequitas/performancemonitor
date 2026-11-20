@@ -848,75 +848,113 @@ private struct MetricsTab: View {
 private struct AlertsTab: View {
     @ObservedObject var alerts: AlertService
 
-    var body: some View {
-        VStack(spacing: 16) {
-            SettingsSection(icon: "bell.badge.fill", title: String(localized: "Alerts"), color: .orange) {
-                SettingsRow(label: String(localized: "Enable notifications")) {
-                    Toggle("", isOn: $alerts.alertsEnabled).labelsHidden()
+    private func overviewWarning(_ topic: SystemFinding.Topic, label: String) -> some View {
+        SettingsRow(label: label) {
+            Toggle(label, isOn: Binding(
+                get: { !alerts.disabledOverviewTopics.contains(topic) },
+                set: { enabled in
+                    if enabled { alerts.disabledOverviewTopics.remove(topic) }
+                    else { alerts.disabledOverviewTopics.insert(topic) }
                 }
-                if alerts.alertsEnabled {
-                    Divider().padding(.vertical, 4)
-                    AlertMetricRow(
-                        icon: "cpu", label: String(localized: "CPU above"),
-                        color: MetricTheme.cpu,
-                        enabled: $alerts.cpuEnabled,
-                        value: $alerts.cpuThreshold,
-                        range: 50...100, step: 5, format: "%.0f%%"
-                    )
-                    Divider().padding(.vertical, 4)
-                    AlertMetricRow(
-                        icon: "memorychip", label: String(localized: "Memory above"),
-                        color: MetricTheme.memory,
-                        enabled: $alerts.memoryEnabled,
-                        value: $alerts.memoryThresholdPercent,
-                        range: 50...100, step: 5, format: "%.0f%%"
-                    )
-                    Divider().padding(.vertical, 4)
-                    AlertMetricRow(
-                        icon: "internaldrive", label: String(localized: "Disk free below"),
-                        color: MetricTheme.disk,
-                        enabled: $alerts.diskEnabled,
-                        value: $alerts.diskFreeThresholdGB,
-                        range: 1...50, step: 1, format: "%.0f GB"
-                    )
-                    Divider().padding(.vertical, 4)
-                    AlertMetricRow(
-                        icon: "cube.transparent", label: String(localized: "GPU above"),
-                        color: .cyan,
-                        enabled: $alerts.gpuEnabled,
-                        value: $alerts.gpuThreshold,
-                        range: 50...100, step: 5, format: "%.0f%%"
-                    )
-                    Divider().padding(.vertical, 4)
-                    SettingsRow(label: String(localized: "Thermal pressure")) {
-                        Toggle("", isOn: $alerts.thermalEnabled).labelsHidden()
+            )).labelsHidden()
+        }
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                SettingsSection(icon: "exclamationmark.triangle.fill", title: String(localized: "Overview warnings"), color: .orange) {
+                    SettingsRow(label: String(localized: "Enable all alerts")) {
+                        Toggle(String(localized: "Enable all alerts"), isOn: $alerts.allAlertsEnabled).labelsHidden()
                     }
+                    Text(String(localized: "Turn off to silence overview warnings, threshold colours, and notification alerts. Individual choices are preserved."))
+                        .font(.caption2).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                     Divider().padding(.vertical, 4)
-                    SettingsRow(label: String(localized: "Alert after exceeded for")) {
-                        Picker("", selection: $alerts.alertSustainSeconds) {
-                            Text(String(localized: "Off")).tag(0.0)
-                            Text("10s").tag(10.0)
-                            Text("30s").tag(30.0)
-                            Text(String(localized: "1 min")).tag(60.0)
-                            Text(String(localized: "2 min")).tag(120.0)
+                    SettingsRow(label: String(localized: "Show overview warnings")) {
+                        Toggle(String(localized: "Show overview warnings"), isOn: $alerts.overviewWarningsEnabled).labelsHidden()
+                    }
+                    if alerts.overviewWarningsEnabled {
+                        Divider().padding(.vertical, 4)
+                        overviewWarning(.cpu, label: String(localized: "CPU"))
+                        overviewWarning(.memory, label: String(localized: "Memory"))
+                        overviewWarning(.disk, label: String(localized: "Disk"))
+                        overviewWarning(.thermal, label: String(localized: "Thermal pressure"))
+                    }
+                    Text(String(localized: "Controls warnings in the overview. Notification alerts are configured separately below."))
+                        .font(.caption2).foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                SettingsSection(icon: "bell.badge.fill", title: String(localized: "Alerts"), color: .orange) {
+                    SettingsRow(label: String(localized: "Enable notifications")) {
+                        Toggle("", isOn: $alerts.alertsEnabled).labelsHidden()
+                    }
+                    if alerts.alertsEnabled {
+                        Divider().padding(.vertical, 4)
+                        AlertMetricRow(
+                            icon: "cpu", label: String(localized: "CPU above"),
+                            color: MetricTheme.cpu,
+                            enabled: $alerts.cpuEnabled,
+                            value: $alerts.cpuThreshold,
+                            range: 50...100, step: 5, format: "%.0f%%"
+                        )
+                        Divider().padding(.vertical, 4)
+                        AlertMetricRow(
+                            icon: "memorychip", label: String(localized: "Memory above"),
+                            color: MetricTheme.memory,
+                            enabled: $alerts.memoryEnabled,
+                            value: $alerts.memoryThresholdPercent,
+                            range: 50...100, step: 5, format: "%.0f%%"
+                        )
+                        Divider().padding(.vertical, 4)
+                        AlertMetricRow(
+                            icon: "internaldrive", label: String(localized: "Disk free below"),
+                            color: MetricTheme.disk,
+                            enabled: $alerts.diskEnabled,
+                            value: $alerts.diskFreeThresholdGB,
+                            range: 1...50, step: 1, format: "%.0f GB"
+                        )
+                        Divider().padding(.vertical, 4)
+                        AlertMetricRow(
+                            icon: "cube.transparent", label: String(localized: "GPU above"),
+                            color: .cyan,
+                            enabled: $alerts.gpuEnabled,
+                            value: $alerts.gpuThreshold,
+                            range: 50...100, step: 5, format: "%.0f%%"
+                        )
+                        Divider().padding(.vertical, 4)
+                        SettingsRow(label: String(localized: "Thermal pressure")) {
+                            Toggle("", isOn: $alerts.thermalEnabled).labelsHidden()
                         }
-                        .labelsHidden()
-                        .pickerStyle(.menu)
-                        .frame(maxWidth: 100)
+                        Divider().padding(.vertical, 4)
+                        SettingsRow(label: String(localized: "Alert after exceeded for")) {
+                            Picker("", selection: $alerts.alertSustainSeconds) {
+                                Text(String(localized: "Off")).tag(0.0)
+                                Text("10s").tag(10.0)
+                                Text("30s").tag(30.0)
+                                Text(String(localized: "1 min")).tag(60.0)
+                                Text(String(localized: "2 min")).tag(120.0)
+                            }
+                            .labelsHidden()
+                            .pickerStyle(.menu)
+                            .frame(maxWidth: 100)
+                        }
+                        Text(String(localized: "Applies to CPU, GPU and memory. Disk space and thermal alerts always fire immediately."))
+                            .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Text(String(localized: "Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min."))
+                            .font(.caption2).foregroundStyle(.secondary).padding(.top, 4)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    Text(String(localized: "Applies to CPU, GPU and memory. Disk space and thermal alerts always fire immediately."))
-                        .font(.caption2).foregroundStyle(.secondary).padding(.top, 2)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Text(String(localized: "Thermal alerts fire on Serious or Critical. All alerts are rate-limited to once per 5 min."))
-                        .font(.caption2).foregroundStyle(.secondary).padding(.top, 4)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
+            .padding(16)
         }
-        .padding(16)
+        .frame(height: 600)
         .transaction { $0.animation = nil }
     }
 }
+
 
 // MARK: - Panels tab
 

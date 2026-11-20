@@ -4,6 +4,7 @@ on:
   push:
     branches: [main, beta]
   pull_request:
+  workflow_dispatch:
 
 # Least-privilege GITHUB_TOKEN: this workflow only builds and tests, it never
 # writes to the repo. Explicit read-only scope silences the CodeQL
@@ -17,7 +18,8 @@ concurrency:
 
 jobs:
   build-and-test:
-    runs-on: macos-15
+    # Cross-compile the arm64 app without depending on arm64 runner capacity.
+    runs-on: macos-15-intel
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -34,3 +36,19 @@ jobs:
 
       - name: Test
         run: swift test -Xswiftc -warnings-as-errors
+
+      # Only on a manual run. Packaging repeats the release build this job has
+      # already done and stores a 2 MB artifact, and neither is worth paying for
+      # on every push and pull request. `workflow_dispatch` above is what makes
+      # a build available on demand.
+      - name: Package app
+        if: github.event_name == 'workflow_dispatch'
+        run: bash build_app.sh
+
+      - name: Upload app
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: PerformanceApp-arm64
+          path: dist/PerformanceApp.zip
+          if-no-files-found: error

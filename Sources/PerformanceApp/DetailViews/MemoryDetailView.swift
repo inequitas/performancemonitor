@@ -34,7 +34,7 @@ struct MemoryDetailView: View {
                         }
                         .font(.caption).foregroundStyle(.secondary)
                         Spacer()
-                        InfoButton(text: String(localized: "App: Active + inactive pages — memory currently in use or recently used by apps.\n\nWired: Locked in RAM by the kernel and drivers. Cannot be paged out to disk.\n\nCompressed: Pages compressed by macOS memory pressure system to free up physical RAM. High compressed memory is normal; it becomes swap when compression is no longer enough.\n\nSwap: Data written to disk because RAM was full. Persistent high swap usage indicates you need more RAM."))
+                        InfoButton(text: String(localized: "Used: App + Wired + Compressed. Reclaimable file cache is excluded.\n\nApp: Anonymous memory minus purgeable pages.\n\nWired: Memory locked in RAM by the kernel and drivers.\n\nCompressed: Physical RAM used to store compressed pages.\n\nSwap: Memory stored on disk. Swap in use alone does not mean RAM is currently under pressure."))
                     }
                     Text(String(format: String(localized: "Swap used: %@ GB"), String(format: "%.2f", engine.swapUsedGB)))
                         .font(.caption).foregroundStyle(.secondary)

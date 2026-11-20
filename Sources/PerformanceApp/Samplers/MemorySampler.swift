@@ -1,5 +1,6 @@
 import Foundation
 import Darwin
+import PerformanceAppCore
 
 /// Immutable result of one memory sample. All figures are in GB.
 struct MemorySnapshot {
@@ -31,9 +32,7 @@ protocol MemorySampling: AnyObject {
     func sample() async -> MemorySnapshot?
 }
 
-/// Stateless memory reader; the mach/sysctl calls run detached from the main
-/// thread. Extracted verbatim from `MetricsEngine.updateMemory` in the Part-B
-/// decomposition.
+/// Memory reader; the mach/sysctl calls run detached from the main thread.
 @MainActor
 final class MemorySampler: MemorySampling {
     private var inFlight = false
@@ -59,7 +58,11 @@ final class MemorySampler: MemorySampling {
             guard result == KERN_SUCCESS else { return nil }
 
             let pageSize = Double(vm_kernel_page_size)
-            let used = Double(stats.active_count + stats.inactive_count + stats.wire_count) * pageSize
+            let usage = MemoryUsage(internalPages: stats.internal_page_count,
+                                    purgeablePages: stats.purgeable_count,
+                                    wiredPages: stats.wire_count,
+                                    compressedPages: stats.compressor_page_count,
+                                    pageSize: pageSize)
             let total = Double(ProcessInfo.processInfo.physicalMemory)
 
             var swapUsedGB: Double? = nil
@@ -80,11 +83,11 @@ final class MemorySampler: MemorySampling {
 
             let pages = Double(stats.swapins) + Double(stats.swapouts)
             let snapshot = MemorySnapshot(
-                usedGB: used / 1_073_741_824,
+                usedGB: usage.usedGB,
                 totalGB: total / 1_073_741_824,
-                appGB: Double(stats.active_count + stats.inactive_count) * pageSize / 1_073_741_824,
-                wiredGB: Double(stats.wire_count) * pageSize / 1_073_741_824,
-                compressedGB: Double(stats.compressor_page_count) * pageSize / 1_073_741_824,
+                appGB: usage.appGB,
+                wiredGB: usage.wiredGB,
+                compressedGB: usage.compressedGB,
                 swapUsedGB: swapUsedGB,
                 pressureLevel: Int(level),
                 // Filled in by the caller, which owns the previous reading.
