@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+**Fixed**
+- **Memory used was wrong, in both directions.** The sampler counted file-backed pages the system can reclaim at any moment as used, and left compressed memory out of the total entirely. It now reports app memory plus wired plus compressed, which is what Activity Monitor shows. Which way your figure moves depends on your Mac: one with a lot of file cache will read lower than before, one with a lot of compressed memory will read higher. Fixed by [@szkocot](https://github.com/szkocot) in [#14](https://github.com/inequitas/performancemonitor/pull/14).
+  - Your memory history will show a step where the old figure stops and the corrected one begins, and the weekly summary will average across that boundary for a week. Nothing is wrong; the readings on either side were measured differently.
+  - `snapshot.json` is now schema 2, because `memoryUsedGB` and `memoryPercent` report a different quantity under the same name.
+
+**Added**
+- **Switches for the warnings.** One master switch turns off every performance alert at once: the overview warnings, the notification alerts and the menu bar threshold colours. The overview warnings can also be turned off on their own, or per topic, so a machine that is always warm does not have to say so forever. Notification settings, the weekly summary and update notices keep their own controls, and the JSON file still reports everything.
+
 ## v1.3.1: A readable menu bar, and one feature withdrawn *(2026-10-02)*
 
 **Fixed**
